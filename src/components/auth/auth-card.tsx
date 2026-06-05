@@ -144,10 +144,9 @@ export function AuthCard({ children, headline, subtitle }: AuthCardProps) {
 
             <div className="relative z-10 grid gap-4 text-sm font-bold leading-6 text-espresso/70">
               <p>
-                Dra. Mariana Rodríguez Méndez · Nutricionista funcional e
-                integrativa
+                Dra. Mariana Rodríguez Méndez
                 <br />
-                Camila Rodríguez Méndez · Entrenadora Personal
+                Camila Rodríguez Méndez
               </p>
               <Link
                 href="/"

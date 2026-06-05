@@ -230,8 +230,8 @@ function Hero() {
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <PrimaryLink>
-                Agendar consulta
-                <ArrowRight className="size-4" />
+                <span className="text-cream">Agendar consulta</span>
+                <ArrowRight className="size-4 text-cream" />
               </PrimaryLink>
               <motion.a
                 href="#servicios"
@@ -241,6 +241,12 @@ function Hero() {
               >
                 Conocer más
               </motion.a>
+              <Link
+                href="/blog"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-charcoal/10 bg-white/70 px-6 py-3.5 text-sm font-extrabold text-charcoal shadow-soft backdrop-blur-xl"
+              >
+                Leer blog
+              </Link>
             </div>
           </div>
         </motion.div>
@@ -389,9 +395,8 @@ function ProfessionalChapter({
 
           <Reveal delay={0.18} className="mt-10">
             <PrimaryLink>
-              {cta}
-              <ArrowRight className="size-4" />
-              <span>WhatsApp 8833-2426</span>
+              <span className="text-cream">{cta}</span>
+              <ArrowRight className="size-4 text-cream" />
             </PrimaryLink>
           </Reveal>
         </div>
@@ -465,8 +470,8 @@ function ClosingCta() {
 
               <div className="flex flex-col items-start gap-5 lg:items-end">
                 <PrimaryLink>
-                  <MessageCircle className="size-5" />
-                  WhatsApp · 8833-2426
+                  <MessageCircle className="size-5 text-cream" />
+                  <span className="text-cream">WhatsApp</span>
                 </PrimaryLink>
                 <Link
                   href="/login"

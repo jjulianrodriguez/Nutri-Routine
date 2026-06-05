@@ -10,10 +10,13 @@ import {
   type LoginValues,
   type RegisterValues,
 } from "@/lib/validations/auth";
+import type { Enums } from "@/types/database";
 
 const DASHBOARD_PATH = "/app/dashboard";
+const DEFAULT_PROFILE_ROLE = "client" satisfies ProfileRole;
 
 type AuthFieldErrors = Partial<Record<keyof RegisterValues, string>>;
+type ProfileRole = Enums<"profile_role">;
 
 export type AuthActionResult =
   | {
@@ -120,11 +123,13 @@ async function ensureProfile(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   fullName?: string | null,
+  role: ProfileRole = DEFAULT_PROFILE_ROLE,
 ) {
   const { error } = await supabase.from("profiles").upsert(
     {
       full_name: fullName?.trim() || null,
       id: userId,
+      role,
     },
     {
       ignoreDuplicates: true,
@@ -133,6 +138,12 @@ async function ensureProfile(
   );
 
   return error;
+}
+
+function getMetadataRole(metadata: Record<string, unknown>): ProfileRole {
+  return metadata.role === "professional" || metadata.role === "client"
+    ? metadata.role
+    : DEFAULT_PROFILE_ROLE;
 }
 
 export async function loginProfessional(
@@ -175,6 +186,7 @@ export async function loginProfessional(
       typeof data.user.user_metadata.full_name === "string"
         ? data.user.user_metadata.full_name
         : null,
+      getMetadataRole(data.user.user_metadata),
     );
 
     if (profileError) {
@@ -245,6 +257,7 @@ export async function registerProfessional(
       options: {
         data: {
           full_name: parsed.data.fullName,
+          role: parsed.data.role,
         },
         emailRedirectTo: await getEmailRedirectTo(),
       },
@@ -271,6 +284,7 @@ export async function registerProfessional(
         supabase,
         data.user.id,
         parsed.data.fullName,
+        parsed.data.role,
       );
 
       if (profileError) {

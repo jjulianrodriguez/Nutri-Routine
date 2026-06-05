@@ -9,6 +9,8 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Ingresa tu contrasena."),
 });
 
+export const profileRoleSchema = z.enum(["professional", "client"]);
+
 const passwordSchema = z
   .string()
   .min(8, "La contrasena debe tener al menos 8 caracteres.")
@@ -32,6 +34,7 @@ export const registerSchema = z
       .string()
       .trim()
       .min(1, "Ingresa el codigo de acceso."),
+    role: profileRoleSchema,
     password: passwordSchema,
     confirmPassword: z.string().min(1, "Confirma la contrasena."),
   })

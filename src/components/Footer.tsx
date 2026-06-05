@@ -27,8 +27,8 @@ export function Footer() {
             <p className="text-sm font-bold uppercase text-cream/46">
               Nutrición Con Enfoque
             </p>
-            <h2 className="mt-5 max-w-4xl font-serif text-6xl font-semibold leading-[0.88] text-cream sm:text-8xl lg:text-9xl">
-              bienestar
+            <h2 className="mt-5 max-w-4xl font-serif text-6xl font-semibold leading-[0.88] sm:text-8xl lg:text-9xl">
+              <span className="text-cream">bienestar</span>
               <br />
               <em className="font-serif italic text-sage">con enfoque</em>
             </h2>
@@ -46,10 +46,9 @@ export function Footer() {
                 Equipo
               </p>
               <p className="mt-4 text-sm leading-7 text-cream/72">
-                Dra. Mariana Rodríguez Méndez · Nutricionista funcional e
-                integrativa
+                Dra. Mariana Rodríguez Méndez
                 <br />
-                Camila Rodríguez Méndez · Entrenadora Personal
+                Camila Rodríguez Méndez
               </p>
             </div>
 
@@ -74,7 +73,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="group inline-flex items-center gap-2 text-cream/72 transition-none"
                 >
-                  WhatsApp · 8833-2426
+                  WhatsApp
                   <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </a>
               </div>

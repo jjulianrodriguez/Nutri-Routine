@@ -1,30 +1,38 @@
-import { PostRow } from "@/components/blog/PostRow";
-import { blogPosts } from "@/lib/blog/posts";
+import { BlogIndex } from "@/components/blog/BlogIndex";
+import { getPublishedBlogPosts } from "@/lib/blog/posts";
 
-export const metadata = {
-  title: "Blog · Nutrición Con Enfoque",
-  description: "Artículos sobre nutrición funcional, entrenamiento, salud hormonal y bienestar.",
-};
+export const dynamic = "force-dynamic";
 
-export default function BlogHome() {
+export default async function BlogHome() {
+  const blogPosts = await getPublishedBlogPosts();
+
   return (
-    <div className="pb-24">
-      {/* Minimalist Header */}
-      <section className="flex flex-col items-center justify-center px-5 py-24 sm:py-32 lg:px-8">
-        <h1 className="text-center font-serif text-[clamp(3.5rem,8vw,6rem)] font-bold leading-[0.85] tracking-tight text-espresso">
-          Lecturas para<br />
-          <span className="italic text-terracotta">tu bienestar</span>
-        </h1>
-        <p className="mt-8 max-w-lg text-center text-lg text-stone sm:text-xl">
-          Ciencia, reflexión y herramientas prácticas para tu salud integral y entrenamiento.
-        </p>
+    <div className="px-5 pb-20 pt-16 sm:px-8 sm:pt-20 lg:px-10">
+      <section className="mx-auto max-w-6xl">
+        <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
+          <div>
+            <p className="text-sm font-bold uppercase text-warm-brown">
+              Blog
+            </p>
+            <h1 className="mt-5 max-w-4xl font-serif text-[clamp(4rem,12vw,9rem)] font-semibold leading-[0.82] text-charcoal">
+              Lecturas para{" "}
+              <em className="font-serif italic text-warm-brown">
+                tu bienestar
+              </em>
+            </h1>
+          </div>
+
+          <div className="rounded-[24px] border border-charcoal/10 bg-white p-6 shadow-soft">
+            <p className="text-lg leading-8 text-warm-brown">
+              Ciencia, reflexión y herramientas prácticas para tu salud integral
+              y entrenamiento.
+            </p>
+          </div>
+        </div>
       </section>
 
-      {/* Post List */}
-      <section className="flex flex-col border-b border-stone-soft">
-        {blogPosts.map((post, index) => (
-          <PostRow key={post.id} post={post} index={index} />
-        ))}
+      <section className="mx-auto mt-12 max-w-6xl sm:mt-16">
+        <BlogIndex posts={blogPosts} />
       </section>
     </div>
   );

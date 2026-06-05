@@ -1,5 +1,7 @@
 import { AuthCard } from "@/components/auth/auth-card";
 import { LoginForm } from "@/components/auth/login-form";
+import { getCurrentUser } from "@/lib/auth/session";
+import { redirect } from "next/navigation";
 
 type LoginPageProps = {
   searchParams?: Promise<{
@@ -8,6 +10,12 @@ type LoginPageProps = {
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const user = await getCurrentUser();
+
+  if (user) {
+    redirect("/app/dashboard");
+  }
+
   const params = await searchParams;
   const initialError =
     params?.authError === "confirmation"

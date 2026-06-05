@@ -47,6 +47,7 @@ export function RegisterForm() {
       email: "",
       fullName: "",
       password: "",
+      role: "professional",
     },
     resolver: zodResolver(registerSchema),
   });
@@ -124,7 +125,7 @@ export function RegisterForm() {
         <FieldError id="register-email-error" message={errors.email?.message} />
       </div>
 
-      <div className="rounded-[20px] border border-stone-soft bg-sand-soft/80 p-4">
+      <div className="rounded-[20px] border border-stone-soft bg-blush p-4">
         <Label htmlFor="accessCode" className="text-sm font-bold text-espresso">
           Código de acceso
         </Label>
