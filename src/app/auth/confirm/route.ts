@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
 
-const DEFAULT_REDIRECT = "/app/dashboard";
+const DEFAULT_REDIRECT = "/app";
 
 function getSafeRedirect(value: string | null) {
   if (value?.startsWith("/app")) {

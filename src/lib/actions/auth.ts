@@ -12,7 +12,7 @@ import {
 } from "@/lib/validations/auth";
 import type { Enums } from "@/types/database";
 
-const DASHBOARD_PATH = "/app/dashboard";
+const APP_PATH = "/app";
 const DEFAULT_PROFILE_ROLE = "client" satisfies ProfileRole;
 
 type AuthFieldErrors = Partial<Record<keyof RegisterValues, string>>;
@@ -140,12 +140,6 @@ async function ensureProfile(
   return error;
 }
 
-function getMetadataRole(metadata: Record<string, unknown>): ProfileRole {
-  return metadata.role === "professional" || metadata.role === "client"
-    ? metadata.role
-    : DEFAULT_PROFILE_ROLE;
-}
-
 export async function loginProfessional(
   values: LoginValues,
 ): Promise<AuthActionResult> {
@@ -186,7 +180,6 @@ export async function loginProfessional(
       typeof data.user.user_metadata.full_name === "string"
         ? data.user.user_metadata.full_name
         : null,
-      getMetadataRole(data.user.user_metadata),
     );
 
     if (profileError) {
@@ -201,7 +194,7 @@ export async function loginProfessional(
 
     return {
       message: "Sesion iniciada.",
-      redirectTo: DASHBOARD_PATH,
+      redirectTo: APP_PATH,
       status: "success",
     };
   } catch (error) {
@@ -257,7 +250,6 @@ export async function registerProfessional(
       options: {
         data: {
           full_name: parsed.data.fullName,
-          role: parsed.data.role,
         },
         emailRedirectTo: await getEmailRedirectTo(),
       },
@@ -284,7 +276,6 @@ export async function registerProfessional(
         supabase,
         data.user.id,
         parsed.data.fullName,
-        parsed.data.role,
       );
 
       if (profileError) {
@@ -299,7 +290,7 @@ export async function registerProfessional(
 
       return {
         message: "Cuenta creada.",
-        redirectTo: DASHBOARD_PATH,
+        redirectTo: APP_PATH,
         status: "success",
       };
     }

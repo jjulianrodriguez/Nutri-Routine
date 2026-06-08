@@ -9,7 +9,7 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Ingresa tu contrasena."),
 });
 
-export const profileRoleSchema = z.enum(["professional", "client"]);
+export const profileRoleSchema = z.enum(["client"]);
 
 const passwordSchema = z
   .string()
@@ -23,7 +23,7 @@ export const registerSchema = z
     fullName: z
       .string()
       .trim()
-      .min(2, "Ingresa el nombre del profesional.")
+      .min(2, "Ingresa tu nombre completo.")
       .max(120, "El nombre no puede superar 120 caracteres."),
     email: z
       .string()
@@ -34,7 +34,6 @@ export const registerSchema = z
       .string()
       .trim()
       .min(1, "Ingresa el codigo de acceso."),
-    role: profileRoleSchema,
     password: passwordSchema,
     confirmPassword: z.string().min(1, "Confirma la contrasena."),
   })

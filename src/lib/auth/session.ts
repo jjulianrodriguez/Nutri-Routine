@@ -43,21 +43,47 @@ export const getCurrentProfile = cache(async () => {
   return data;
 });
 
+export const getCurrentProfessionalProfile = cache(async () => {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("professional_profiles")
+    .select("profile_id, specialty")
+    .eq("profile_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    return null;
+  }
+
+  return data;
+});
+
 export const getCurrentUserContext = cache(async () => {
   const user = await getCurrentUser();
 
   if (!user) {
     return {
       profile: null,
+      professionalProfile: null,
       role: null,
       user: null,
     };
   }
 
-  const profile = await getCurrentProfile();
+  const [profile, professionalProfile] = await Promise.all([
+    getCurrentProfile(),
+    getCurrentProfessionalProfile(),
+  ]);
 
   return {
     profile,
+    professionalProfile,
     role: profile?.role ?? null,
     user,
   };
@@ -82,6 +108,7 @@ export async function requireUserContext() {
 
   return {
     profile: context.profile,
+    professionalProfile: context.professionalProfile,
     role: context.role,
     user: context.user,
   };

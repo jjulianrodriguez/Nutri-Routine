@@ -47,7 +47,6 @@ export function RegisterForm() {
       email: "",
       fullName: "",
       password: "",
-      role: "professional",
     },
     resolver: zodResolver(registerSchema),
   });

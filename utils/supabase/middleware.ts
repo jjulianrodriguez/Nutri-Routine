@@ -7,7 +7,7 @@ import {
 } from "@/lib/supabase/config";
 import type { Database } from "../../types/database";
 
-const DASHBOARD_PATH = "/app/dashboard";
+const APP_PATH = "/app";
 const AUTH_PATHS = new Set(["/login", "/register"]);
 
 function isAuthPath(pathname: string) {
@@ -86,7 +86,7 @@ export async function updateSession(request: NextRequest) {
   if (isAuthenticated && authPath) {
     return copySessionResponse(
       supabaseResponse,
-      NextResponse.redirect(new URL(DASHBOARD_PATH, request.url)),
+      NextResponse.redirect(new URL(APP_PATH, request.url)),
     );
   }
 

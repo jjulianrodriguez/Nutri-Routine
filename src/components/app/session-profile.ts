@@ -1,9 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 
-import type { AppRole } from "@/components/app/SidebarNav";
+import type { AppRole } from "@/lib/auth/access-rules";
 import type { Tables } from "@/types/database";
-
-const DEV_ROLE_OVERRIDE: AppRole | null = null;
 
 type ProfileRow = Pick<Tables<"profiles">, "full_name" | "role"> | null;
 
@@ -22,11 +20,11 @@ function readString(value: unknown) {
 function normalizeRole(value: unknown): AppRole {
   const role = readString(value).toLowerCase();
 
-  if (role === "client") {
-    return "client";
+  if (role === "admin" || role === "professional" || role === "client") {
+    return role;
   }
 
-  return "professional";
+  return "client";
 }
 
 function getInitials(name: string, email: string) {
@@ -43,22 +41,13 @@ function getInitials(name: string, email: string) {
   return parts.map((part) => part[0]?.toUpperCase()).join("");
 }
 
-function getRoleLabel(role: AppRole, displayName: string) {
+function getRoleLabel(role: AppRole) {
   if (role === "client") {
     return "Cliente";
   }
 
-  const normalizedName = displayName
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-
-  if (normalizedName.includes("camila")) {
-    return "Entrenadora Personal";
-  }
-
-  if (normalizedName.includes("mariana")) {
-    return "Nutricionista funcional";
+  if (role === "admin") {
+    return "Admin";
   }
 
   return "Profesional";
@@ -76,14 +65,13 @@ export function getAppUserProfile(
     readString(user.email) ||
     "Profesional";
   const email = readString(user.email);
-  const role =
-    DEV_ROLE_OVERRIDE ?? normalizeRole(profile?.role ?? metadata.role ?? metadata.app_role);
+  const role = normalizeRole(profile?.role);
 
   return {
     displayName,
     email,
     initials: getInitials(displayName, email),
     role,
-    roleLabel: readString(metadata.role_label) || getRoleLabel(role, displayName),
+    roleLabel: getRoleLabel(role),
   };
 }

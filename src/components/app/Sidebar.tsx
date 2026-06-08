@@ -14,19 +14,17 @@ import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 
-import { SidebarNav, type AppRole } from "@/components/app/SidebarNav";
+import { CurrentUserAccessProvider } from "@/components/app/current-user-access-provider";
+import { SidebarNav } from "@/components/app/SidebarNav";
+import type { CurrentUserAccess } from "@/lib/auth/access-rules";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "nce-app-sidebar-collapsed";
 
 type SidebarProps = {
+  access: CurrentUserAccess;
   children: ReactNode;
-  displayName: string;
-  email?: string;
-  initials: string;
-  role: AppRole;
-  roleLabel: string;
 };
 
 function BrandMark({ collapsed }: { collapsed: boolean }) {
@@ -93,18 +91,15 @@ function ProfileBlock({
 }
 
 export function Sidebar({
+  access,
   children,
-  displayName,
-  email,
-  initials,
-  role,
-  roleLabel,
 }: SidebarProps) {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { displayName, email, initials, roleLabel } = access;
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -171,7 +166,13 @@ export function Sidebar({
         >
           {isCollapsed ? (
             <span className="text-xs font-extrabold text-charcoal">
-              {role === "client" ? "CL" : "PR"}
+              {access.isClient
+                ? "CL"
+                : access.specialty === "nutrition"
+                  ? "NU"
+                  : access.specialty === "training"
+                    ? "EN"
+                    : "AD"}
             </span>
           ) : (
             <>
@@ -188,8 +189,8 @@ export function Sidebar({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 no-scrollbar">
         <SidebarNav
+          access={access}
           collapsed={isCollapsed}
-          role={role}
           onNavigate={() => setMobileOpen(false)}
         />
       </div>
@@ -228,7 +229,8 @@ export function Sidebar({
   }
 
   return (
-    <div className="min-h-dvh bg-background text-charcoal">
+    <CurrentUserAccessProvider access={access}>
+      <div className="min-h-dvh bg-background text-charcoal">
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-background/90 px-4 backdrop-blur-xl lg:hidden">
         <button
           type="button"
@@ -312,6 +314,7 @@ export function Sidebar({
           <ChevronLeft className="size-4" />
         )}
       </button>
-    </div>
+      </div>
+    </CurrentUserAccessProvider>
   );
 }

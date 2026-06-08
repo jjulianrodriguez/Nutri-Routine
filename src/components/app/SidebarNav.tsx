@@ -2,17 +2,12 @@
 
 import {
   Activity,
-  Apple,
-  BarChart3,
   BookOpen,
   CalendarDays,
   Dumbbell,
-  FileDown,
-  HeartPulse,
   Home,
   Leaf,
   MessageCircle,
-  NotebookTabs,
   Settings,
   Sparkles,
   Users,
@@ -21,93 +16,39 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import {
+  buildNavigationForUser,
+  type AppNavIcon,
+  type CurrentUserAccess,
+} from "@/lib/auth/access-rules";
 import { cn } from "@/lib/utils";
 
-export type AppRole = "professional" | "client";
-
-type SidebarNavItem = {
-  href: string;
-  icon: LucideIcon;
-  label: string;
+const iconMap: Record<AppNavIcon, LucideIcon> = {
+  calendar: CalendarDays,
+  clients: Users,
+  dashboard: Home,
+  messages: MessageCircle,
+  nutrition: Leaf,
+  pending: Sparkles,
+  profile: Sparkles,
+  progress: Activity,
+  resources: BookOpen,
+  settings: Settings,
+  training: Dumbbell,
 };
-
-type SidebarNavSection = {
-  items: SidebarNavItem[];
-  label: string;
-};
-
-const professionalSections: SidebarNavSection[] = [
-  {
-    label: "Gestión",
-    items: [
-      { href: "/app/dashboard", icon: Home, label: "Dashboard" },
-      { href: "/app/dashboard#agenda", icon: CalendarDays, label: "Agenda" },
-      { href: "/app/dashboard#clientes", icon: Users, label: "Clientes" },
-      { href: "/app/dashboard#mensajes", icon: MessageCircle, label: "Mensajes" },
-    ],
-  },
-  {
-    label: "Planes",
-    items: [
-      { href: "/app/dashboard#nutricion", icon: Leaf, label: "Nutrición" },
-      { href: "/app/dashboard#entrenamiento", icon: Dumbbell, label: "Entrenamiento" },
-      { href: "/app/dashboard#seguimiento", icon: BarChart3, label: "Seguimiento" },
-      { href: "/app/dashboard#recursos", icon: NotebookTabs, label: "Recursos" },
-    ],
-  },
-  {
-    label: "Sistema",
-    items: [
-      { href: "/app/exportar", icon: FileDown, label: "Exportar" },
-      { href: "/app/configuracion", icon: Settings, label: "Configuración" },
-    ],
-  },
-];
-
-const clientSections: SidebarNavSection[] = [
-  {
-    label: "Mi bienestar",
-    items: [
-      { href: "/app/dashboard", icon: Home, label: "Dashboard" },
-      { href: "/app/dashboard#plan", icon: Apple, label: "Plan nutricional" },
-      { href: "/app/dashboard#rutina", icon: Dumbbell, label: "Rutina" },
-      { href: "/app/dashboard#progreso", icon: Activity, label: "Progreso" },
-    ],
-  },
-  {
-    label: "Acompañamiento",
-    items: [
-      { href: "/app/dashboard#citas", icon: CalendarDays, label: "Citas" },
-      { href: "/app/dashboard#mensajes", icon: MessageCircle, label: "Mensajes" },
-      { href: "/app/dashboard#recursos", icon: BookOpen, label: "Recursos" },
-      { href: "/app/dashboard#habitos", icon: HeartPulse, label: "Hábitos" },
-    ],
-  },
-  {
-    label: "Cuenta",
-    items: [
-      { href: "/app/dashboard#objetivos", icon: Sparkles, label: "Objetivos" },
-      { href: "/app/configuracion", icon: Settings, label: "Configuración" },
-    ],
-  },
-];
-
-export function getSidebarSections(role: AppRole) {
-  return role === "client" ? clientSections : professionalSections;
-}
 
 type SidebarNavProps = {
+  access: CurrentUserAccess;
   collapsed: boolean;
   onNavigate?: () => void;
-  role: AppRole;
 };
 
-export function SidebarNav({ collapsed, onNavigate, role }: SidebarNavProps) {
+export function SidebarNav({ access, collapsed, onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
-  const sections = getSidebarSections(role);
+  const sections = buildNavigationForUser(access);
 
   return (
-    <nav className="space-y-7" aria-label="Navegación principal">
+    <nav className="space-y-7" aria-label="Navegacion principal">
       {sections.map((section) => (
         <div key={section.label} className="space-y-2">
           <p
@@ -121,14 +62,11 @@ export function SidebarNav({ collapsed, onNavigate, role }: SidebarNavProps) {
 
           <div className="space-y-1">
             {section.items.map((item) => {
-              const Icon = item.icon;
-              const cleanHref = item.href.split("#")[0];
+              const Icon = iconMap[item.icon];
               const isActive =
-                pathname === item.href ||
-                (item.href === "/app/dashboard" && pathname === "/app/dashboard") ||
-                (item.href !== "/app/dashboard" &&
-                  !item.href.includes("#") &&
-                  pathname.startsWith(cleanHref));
+                item.href === "/app/dashboard"
+                  ? pathname === "/app" || pathname === "/app/dashboard"
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
               return (
                 <Link

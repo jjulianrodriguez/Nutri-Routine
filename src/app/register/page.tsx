@@ -7,7 +7,7 @@ export default async function RegisterPage() {
   const user = await getCurrentUser();
 
   if (user) {
-    redirect("/app/dashboard");
+    redirect("/app");
   }
 
   return (
