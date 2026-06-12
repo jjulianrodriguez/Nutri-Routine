@@ -232,6 +232,8 @@ export const getCurrentUserAccess = cache(async () => {
     (isGeneralAdmin ||
       professionalSpecialty === "training" ||
       professionalSpecialty === "both");
+  const canManageClientPlans = canManageNutrition || canManageTraining;
+  const canManageProfessionalAccounts = isGeneralAdmin;
   const canViewNutrition = isClient
     ? hasNutritionService
     : canManageNutrition;
@@ -251,7 +253,9 @@ export const getCurrentUserAccess = cache(async () => {
     assignedTrainerId,
     canAccessApp,
     canAccessOnlyBasicSettings,
+    canManageClientPlans,
     canManageNutrition,
+    canManageProfessionalAccounts,
     canManageTraining,
     canViewNutrition,
     canViewTraining,

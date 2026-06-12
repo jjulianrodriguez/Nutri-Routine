@@ -2,7 +2,6 @@ import {
   CalendarDays,
   Dumbbell,
   Leaf,
-  MessageCircle,
   NotebookTabs,
   Settings,
   Users,
@@ -229,22 +228,16 @@ function ClientDashboard({
 
         <FadeIn delay={0.3}>
           <AppPanel
-            title="Citas y mensajes"
-            description="Accede a recordatorios, calendario y conversaciones desde sus secciones."
+            title="Citas y recordatorios"
+            description="Accede a tus proximas citas y recordatorios desde el calendario."
             tone="primary"
           >
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3">
               <QuickLink
                 description="Ver proximas citas y recordatorios."
                 href="/app/calendario"
                 icon={CalendarDays}
                 label="Calendario"
-              />
-              <QuickLink
-                description="Abrir conversaciones recientes."
-                href="/app/mensajes"
-                icon={MessageCircle}
-                label="Mensajes"
               />
             </div>
           </AppPanel>
@@ -278,12 +271,14 @@ function AdminDashboard({
           label: "Modulo de entrenamiento",
         }
       : null,
-    {
-      description: "Clientes asignados por area de servicio.",
-      href: "/app/clientes",
-      icon: Users,
-      label: "Clientes",
-    },
+    access.canManageClientPlans
+      ? {
+          description: "Usuarios registrados y activacion de planes.",
+          href: "/app/clientes",
+          icon: Users,
+          label: "Usuarios y planes",
+        }
+      : null,
     {
       description: "Biblioteca compartida y materiales enviados.",
       href: "/app/recursos",
@@ -367,7 +362,7 @@ function AdminDashboard({
         </FadeIn>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-3">
+      <div className="grid gap-6 xl:grid-cols-2">
         <FadeIn delay={0.18}>
           <AppPanel
             title="Calendario"
@@ -383,20 +378,6 @@ function AdminDashboard({
         </FadeIn>
 
         <FadeIn delay={0.22}>
-          <AppPanel
-            title="Mensajes"
-            description="Conversaciones con clientes y seguimiento."
-          >
-            <QuickLink
-              description="Abrir bandeja de mensajes."
-              href="/app/mensajes"
-              icon={MessageCircle}
-              label="Ver mensajes"
-            />
-          </AppPanel>
-        </FadeIn>
-
-        <FadeIn delay={0.26}>
           <AppPanel
             title="Configuracion"
             description="Perfil, cuenta y preferencias internas."

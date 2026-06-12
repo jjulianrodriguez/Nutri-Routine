@@ -1,0 +1,2 @@
+-- The same migration was applied concurrently under version 20260612004037.
+-- Keep this version as a no-op so local migration history matches Supabase.

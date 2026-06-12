@@ -53,27 +53,32 @@ export default async function SettingsPage() {
           </AppPanel>
         ) : null}
 
-        {access.isAdmin ? (
+        {access.canManageClientPlans ||
+        access.canManageProfessionalAccounts ? (
           <AppPanel
             title="Administracion"
-            description="Herramientas internas visibles solo para roles administrativos."
+            description="Herramientas internas disponibles segun los permisos de la cuenta."
             tone="primary"
           >
             <div className="grid gap-3">
-              <Button asChild size="lg">
-                <Link href="/app/clientes">
-                  <Users className="size-4" aria-hidden="true" />
-                  Clientes y activacion
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="/app/configuracion/profesionales">
-                  <ShieldCheck className="size-4" aria-hidden="true" />
-                  Cuentas profesionales
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </Link>
-              </Button>
+              {access.canManageClientPlans ? (
+                <Button asChild size="lg">
+                  <Link href="/app/clientes">
+                    <Users className="size-4" aria-hidden="true" />
+                    Usuarios y planes
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+              ) : null}
+              {access.canManageProfessionalAccounts ? (
+                <Button asChild size="lg" variant="outline">
+                  <Link href="/app/configuracion/profesionales">
+                    <ShieldCheck className="size-4" aria-hidden="true" />
+                    Cuentas profesionales
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+              ) : null}
             </div>
           </AppPanel>
         ) : null}

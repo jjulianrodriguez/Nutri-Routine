@@ -10,13 +10,10 @@ import {
   type CreateProfessionalAccountValues,
   type ProfessionalSpecialty,
 } from "@/lib/validations/professional-accounts";
-import type { Enums } from "@/types/database";
 
 const CONFIGURATION_PATH = "/app/configuracion";
 const PROFESSIONAL_ACCOUNTS_PATH = "/app/configuracion/profesionales";
-const PRIVILEGED_ROLES = new Set<ProfileRole>(["admin", "professional"]);
 
-type ProfileRole = Enums<"profile_role">;
 type ProfessionalAccountFieldErrors = Partial<
   Record<keyof CreateProfessionalAccountValues, string>
 >;
@@ -99,7 +96,7 @@ function isProfessionalSpecialty(
   );
 }
 
-async function getCurrentPrivilegedProfile() {
+async function getCurrentUniversalAdminProfile() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -114,13 +111,23 @@ async function getCurrentPrivilegedProfile() {
     };
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("id, role")
-    .eq("id", user.id)
-    .maybeSingle();
+  const [
+    { data: profile, error: profileError },
+    { data: professionalProfile, error: professionalProfileError },
+  ] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, role")
+      .eq("id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("professional_profiles")
+      .select("profile_id")
+      .eq("profile_id", user.id)
+      .maybeSingle(),
+  ]);
 
-  if (profileError) {
+  if (profileError || professionalProfileError) {
     return {
       error: "No se pudo validar tu perfil actual.",
       profile: null,
@@ -136,9 +143,10 @@ async function getCurrentPrivilegedProfile() {
     };
   }
 
-  if (!PRIVILEGED_ROLES.has(profile.role)) {
+  if (profile.role !== "admin" || professionalProfile) {
     return {
-      error: "No tienes permisos para crear cuentas profesionales.",
+      error:
+        "Solo la cuenta administradora universal puede gestionar cuentas profesionales.",
       profile: null,
       user,
     };
@@ -172,7 +180,7 @@ export async function createProfessionalAccount(
     };
   }
 
-  const privilegedContext = await getCurrentPrivilegedProfile();
+  const privilegedContext = await getCurrentUniversalAdminProfile();
 
   if (privilegedContext.error) {
     return {
@@ -181,12 +189,13 @@ export async function createProfessionalAccount(
     };
   }
 
-  const expectedAdminCode = process.env.ADMIN_CREATION_ACCESS_CODE?.trim();
+  const expectedAdminCode =
+    process.env.PROFESSIONAL_REGISTER_ACCESS_CODE?.trim();
 
   if (!expectedAdminCode) {
     return {
       message:
-        "Configura ADMIN_CREATION_ACCESS_CODE antes de crear cuentas profesionales.",
+        "Configura PROFESSIONAL_REGISTER_ACCESS_CODE antes de crear cuentas profesionales.",
       status: "error",
     };
   }
@@ -290,7 +299,7 @@ export async function createProfessionalAccount(
 }
 
 export async function listProfessionalAccounts(): Promise<ProfessionalAccountListResult> {
-  const privilegedContext = await getCurrentPrivilegedProfile();
+  const privilegedContext = await getCurrentUniversalAdminProfile();
 
   if (privilegedContext.error) {
     return {

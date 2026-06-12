@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const clientActivationServiceSchema = z.enum([
+  "none",
   "nutrition",
   "training",
   "both",

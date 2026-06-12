@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createAdminClient, hasSupabaseAdminConfig } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
   clientActivationSchema,
@@ -18,7 +17,7 @@ const PRIVILEGED_ROLES = new Set<ProfileRole>(["admin", "professional"]);
 
 type ProfileRole = Enums<"profile_role">;
 type ProfessionalSpecialty = Enums<"professional_specialty">;
-type AdminSupabase = ReturnType<typeof createAdminClient>;
+type ActivationSupabase = Awaited<ReturnType<typeof createClient>>;
 type ClientActivationFieldErrors = Partial<
   Record<keyof ClientActivationValues, string>
 >;
@@ -31,6 +30,11 @@ export type ClientAccountsFilter =
   | "nutrition"
   | "pending"
   | "training";
+
+export type ClientActivationCounts = Record<ClientAccountsFilter, number> & {
+  nutritionActive: number;
+  trainingActive: number;
+};
 
 export type AssignableProfessional = {
   email: string;
@@ -59,7 +63,7 @@ export type ClientActivationData = {
   canManageNutrition: boolean;
   canManageTraining: boolean;
   clients: ClientAccountListItem[];
-  counts: Record<ClientAccountsFilter, number>;
+  counts: ClientActivationCounts;
   currentUserId: string;
   error?: string;
   nutritionists: AssignableProfessional[];
@@ -86,18 +90,6 @@ function getFieldErrors(error: {
       messages?.[0],
     ]),
   ) as ClientActivationFieldErrors;
-}
-
-function canSpecialtyManage(
-  role: ProfileRole,
-  specialty: ProfessionalSpecialty | null,
-  service: "nutrition" | "training",
-) {
-  if (role === "admin" && specialty === null) {
-    return true;
-  }
-
-  return specialty === service || specialty === "both";
 }
 
 function serviceNeeds(
@@ -149,7 +141,7 @@ function normalizeFilter(filter?: string | null): ClientAccountsFilter {
     return filter;
   }
 
-  return "pending";
+  return "all";
 }
 
 function matchesFilter(
@@ -172,19 +164,6 @@ function matchesFilter(
 }
 
 async function getCurrentActivationActor() {
-  if (!hasSupabaseAdminConfig()) {
-    return {
-      adminSupabase: null,
-      canManageNutrition: false,
-      canManageTraining: false,
-      currentUserId: "",
-      error:
-        "Configura SUPABASE_SERVICE_ROLE_KEY o SUPABASE_SECRET_KEY para administrar clientes.",
-      role: null,
-      specialty: null,
-    };
-  }
-
   const supabase = await createClient();
   const {
     data: { user },
@@ -193,18 +172,16 @@ async function getCurrentActivationActor() {
 
   if (userError || !user) {
     return {
-      adminSupabase: null,
+      activationSupabase: null,
       canManageNutrition: false,
       canManageTraining: false,
       currentUserId: "",
       error: "Debes iniciar sesion para administrar clientes.",
       role: null,
-      specialty: null,
     };
   }
 
-  const adminSupabase = createAdminClient();
-  const { data: profile, error: profileError } = await adminSupabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("id, role")
     .eq("id", user.id)
@@ -212,72 +189,77 @@ async function getCurrentActivationActor() {
 
   if (profileError || !profile) {
     return {
-      adminSupabase,
+      activationSupabase: supabase,
       canManageNutrition: false,
       canManageTraining: false,
       currentUserId: user.id,
       error: "No se pudo validar tu perfil administrativo.",
       role: null,
-      specialty: null,
     };
   }
 
-  if (!PRIVILEGED_ROLES.has(profile.role)) {
+  const { data: professionalProfile, error: professionalProfileError } =
+    await supabase
+      .from("professional_profiles")
+      .select("profile_id, specialty")
+      .eq("profile_id", user.id)
+      .maybeSingle();
+
+  if (!PRIVILEGED_ROLES.has(profile.role) || professionalProfileError) {
     return {
-      adminSupabase,
+      activationSupabase: supabase,
       canManageNutrition: false,
       canManageTraining: false,
       currentUserId: user.id,
-      error: "No tienes permisos para administrar clientes.",
+      error: "Tu cuenta no tiene permisos para gestionar planes.",
       role: profile.role,
-      specialty: null,
     };
   }
 
-  const { data: professionalProfile } = await adminSupabase
-    .from("professional_profiles")
-    .select("specialty")
-    .eq("profile_id", user.id)
-    .maybeSingle();
+  const isGeneralAdmin = profile.role === "admin" && !professionalProfile;
   const specialty = professionalProfile?.specialty ?? null;
-  const canManageNutrition = canSpecialtyManage(
-    profile.role,
-    specialty,
-    "nutrition",
-  );
-  const canManageTraining = canSpecialtyManage(
-    profile.role,
-    specialty,
-    "training",
-  );
+  const canManageNutrition =
+    isGeneralAdmin || isProfessionalAllowedForService(specialty, "nutrition");
+  const canManageTraining =
+    isGeneralAdmin || isProfessionalAllowedForService(specialty, "training");
+
+  if (!canManageNutrition && !canManageTraining) {
+    return {
+      activationSupabase: supabase,
+      canManageNutrition: false,
+      canManageTraining: false,
+      currentUserId: user.id,
+      error: "Tu cuenta no tiene una especialidad habilitada para gestionar planes.",
+      role: profile.role,
+    };
+  }
 
   return {
-    adminSupabase,
+    activationSupabase: supabase,
     canManageNutrition,
     canManageTraining,
     currentUserId: user.id,
     error: null,
     role: profile.role,
-    specialty,
   };
 }
 
 async function validateAssignableProfessional({
-  adminSupabase,
+  activationSupabase,
   professionalId,
   service,
 }: {
-  adminSupabase: AdminSupabase;
+  activationSupabase: ActivationSupabase;
   professionalId: string;
   service: "nutrition" | "training";
 }) {
   const [{ data: profile }, { data: professionalProfile }] = await Promise.all([
-    adminSupabase
+    activationSupabase
       .from("profiles")
       .select("id, role")
       .eq("id", professionalId)
       .maybeSingle(),
-    adminSupabase
+    activationSupabase
       .from("professional_profiles")
       .select("profile_id, specialty")
       .eq("profile_id", professionalId)
@@ -288,7 +270,8 @@ async function validateAssignableProfessional({
     profile &&
       PRIVILEGED_ROLES.has(profile.role) &&
       isProfessionalAllowedForService(
-        professionalProfile?.specialty ?? null,
+        professionalProfile?.specialty ??
+          (profile.role === "admin" ? "both" : null),
         service,
       ),
   );
@@ -309,35 +292,22 @@ export async function activateClientAccount(
 
   const actor = await getCurrentActivationActor();
 
-  if (actor.error || !actor.adminSupabase || !actor.role) {
+  if (actor.error || !actor.activationSupabase || !actor.role) {
     return {
       message: actor.error ?? "No se pudo validar tu sesion.",
       status: "error",
     };
   }
 
-  const needsNutrition = serviceNeeds(parsed.data.serviceType, "nutrition");
-  const needsTraining = serviceNeeds(parsed.data.serviceType, "training");
+  const wantsNutrition = serviceNeeds(parsed.data.serviceType, "nutrition");
+  const wantsTraining = serviceNeeds(parsed.data.serviceType, "training");
 
-  if (needsNutrition && !actor.canManageNutrition) {
-    return {
-      message: "No tienes permisos para activar nutricion.",
-      status: "error",
-    };
-  }
-
-  if (needsTraining && !actor.canManageTraining) {
-    return {
-      message: "No tienes permisos para activar entrenamiento.",
-      status: "error",
-    };
-  }
-
-  const { data: clientProfile, error: clientError } = await actor.adminSupabase
-    .from("profiles")
-    .select("id, role")
-    .eq("id", parsed.data.clientId)
-    .maybeSingle();
+  const { data: clientProfile, error: clientError } =
+    await actor.activationSupabase
+      .from("profiles")
+      .select("id, role")
+      .eq("id", parsed.data.clientId)
+      .maybeSingle();
 
   if (clientError || !clientProfile || clientProfile.role !== "client") {
     return {
@@ -346,90 +316,117 @@ export async function activateClientAccount(
     };
   }
 
-  const { data: existingAssignment } = await actor.adminSupabase
-    .from("client_profiles")
-    .select("assigned_nutritionist_id, assigned_trainer_id")
-    .eq("profile_id", parsed.data.clientId)
-    .maybeSingle();
+  const { data: existingAssignment, error: assignmentError } =
+    await actor.activationSupabase
+      .from("client_profiles")
+      .select("assigned_nutritionist_id, assigned_trainer_id")
+      .eq("profile_id", parsed.data.clientId)
+      .maybeSingle();
 
-  const nutritionistId = parsed.data.assignedNutritionistId || "";
-  const trainerId = parsed.data.assignedTrainerId || "";
-
-  if (needsNutrition && !nutritionistId) {
+  if (assignmentError) {
     return {
-      fieldErrors: {
-        assignedNutritionistId: "Selecciona una nutricionista.",
-      },
-      message: "Selecciona una nutricionista para activar nutricion.",
+      message: "No se pudo consultar la activacion actual del cliente.",
       status: "error",
     };
   }
 
-  if (needsTraining && !trainerId) {
+  const nutritionistId = parsed.data.assignedNutritionistId || "";
+  const trainerId = parsed.data.assignedTrainerId || "";
+
+  if (actor.canManageNutrition && wantsNutrition && !nutritionistId) {
     return {
       fieldErrors: {
-        assignedTrainerId: "Selecciona una entrenadora.",
+        assignedNutritionistId: "Selecciona un profesional en nutricion.",
       },
-      message: "Selecciona una entrenadora para activar entrenamiento.",
+      message: "Selecciona un profesional en nutricion para activar el plan.",
+      status: "error",
+    };
+  }
+
+  if (actor.canManageTraining && wantsTraining && !trainerId) {
+    return {
+      fieldErrors: {
+        assignedTrainerId: "Selecciona un profesional en entrenamiento.",
+      },
+      message:
+        "Selecciona un profesional en entrenamiento para activar el plan.",
       status: "error",
     };
   }
 
   if (
-    needsNutrition &&
+    actor.canManageNutrition &&
+    wantsNutrition &&
     !(await validateAssignableProfessional({
-      adminSupabase: actor.adminSupabase,
+      activationSupabase: actor.activationSupabase,
       professionalId: nutritionistId,
       service: "nutrition",
     }))
   ) {
     return {
       fieldErrors: {
-        assignedNutritionistId: "La profesional no tiene especialidad de nutricion.",
+        assignedNutritionistId:
+          "El profesional no tiene especialidad de nutricion.",
       },
-      message: "La nutricionista seleccionada no es valida.",
+      message: "El profesional en nutricion seleccionado no es valido.",
       status: "error",
     };
   }
 
   if (
-    needsTraining &&
+    actor.canManageTraining &&
+    wantsTraining &&
     !(await validateAssignableProfessional({
-      adminSupabase: actor.adminSupabase,
+      activationSupabase: actor.activationSupabase,
       professionalId: trainerId,
       service: "training",
     }))
   ) {
     return {
       fieldErrors: {
-        assignedTrainerId: "La profesional no tiene especialidad de entrenamiento.",
+        assignedTrainerId:
+          "El profesional no tiene especialidad de entrenamiento.",
       },
-      message: "La entrenadora seleccionada no es valida.",
+      message: "El profesional en entrenamiento seleccionado no es valido.",
       status: "error",
     };
   }
 
-  const assignedNutritionistId = needsNutrition
-    ? nutritionistId
-    : actor.canManageNutrition
-      ? null
-      : existingAssignment?.assigned_nutritionist_id ?? null;
-  const assignedTrainerId = needsTraining
-    ? trainerId
-    : actor.canManageTraining
-      ? null
-      : existingAssignment?.assigned_trainer_id ?? null;
+  const assignedNutritionistId = actor.canManageNutrition
+    ? wantsNutrition
+      ? nutritionistId
+      : null
+    : existingAssignment?.assigned_nutritionist_id ?? null;
+  const assignedTrainerId = actor.canManageTraining
+    ? wantsTraining
+      ? trainerId
+      : null
+    : existingAssignment?.assigned_trainer_id ?? null;
 
-  const { error } = await actor.adminSupabase.from("client_profiles").upsert(
-    {
+  let mutation;
+
+  if (!assignedNutritionistId && !assignedTrainerId) {
+    mutation = actor.activationSupabase
+      .from("client_profiles")
+      .delete()
+      .eq("profile_id", parsed.data.clientId);
+  } else if (existingAssignment) {
+    mutation = actor.activationSupabase
+      .from("client_profiles")
+      .update({
+        assigned_nutritionist_id: assignedNutritionistId,
+        assigned_trainer_id: assignedTrainerId,
+      })
+      .eq("profile_id", parsed.data.clientId);
+  } else {
+    mutation = actor.activationSupabase.from("client_profiles").insert({
       assigned_nutritionist_id: assignedNutritionistId,
       assigned_trainer_id: assignedTrainerId,
       profile_id: parsed.data.clientId,
-    },
-    {
-      onConflict: "profile_id",
-    },
-  );
+    });
+  }
+
+  const { error } = await mutation;
 
   if (error) {
     return {
@@ -444,28 +441,9 @@ export async function activateClientAccount(
   revalidatePath("/app", "layout");
 
   return {
-    message: "Cliente actualizado correctamente.",
+    message: "Planes del usuario actualizados correctamente.",
     status: "success",
   };
-}
-
-function canSeeClient(
-  client: ClientAccountListItem,
-  canManageNutrition: boolean,
-  canManageTraining: boolean,
-) {
-  if (canManageNutrition && canManageTraining) {
-    return true;
-  }
-
-  if (!client.isClientActivated) {
-    return true;
-  }
-
-  return (
-    (canManageNutrition && client.hasNutritionService) ||
-    (canManageTraining && client.hasTrainingService)
-  );
 }
 
 function emptyClientActivationData(error: string): ClientActivationData {
@@ -479,8 +457,10 @@ function emptyClientActivationData(error: string): ClientActivationData {
       both: 0,
       none: 0,
       nutrition: 0,
+      nutritionActive: 0,
       pending: 0,
       training: 0,
+      trainingActive: 0,
     },
     currentUserId: "",
     error,
@@ -497,10 +477,14 @@ function buildCounts(clients: ClientAccountListItem[]) {
     none: clients.filter((client) => !client.isClientActivated).length,
     nutrition: clients.filter((client) => client.serviceType === "nutrition")
       .length,
+    nutritionActive: clients.filter((client) => client.hasNutritionService)
+      .length,
     pending: clients.filter((client) => !client.isClientActivated).length,
     training: clients.filter((client) => client.serviceType === "training")
       .length,
-  } satisfies Record<ClientAccountsFilter, number>;
+    trainingActive: clients.filter((client) => client.hasTrainingService)
+      .length,
+  } satisfies ClientActivationCounts;
 }
 
 export async function listClientActivationData(
@@ -509,7 +493,7 @@ export async function listClientActivationData(
   const filter = normalizeFilter(rawFilter);
   const actor = await getCurrentActivationActor();
 
-  if (actor.error || !actor.adminSupabase) {
+  if (actor.error || !actor.activationSupabase) {
     return emptyClientActivationData(actor.error ?? "No se pudo validar tu sesion.");
   }
 
@@ -521,49 +505,66 @@ export async function listClientActivationData(
 
   const [
     { data: clientProfiles, error: clientsError },
-    { data: clientAssignments },
-    { data: professionalRows },
-    { data: authUsers },
+    { data: clientAssignments, error: assignmentsError },
+    { data: professionalRows, error: professionalsError },
   ] = await Promise.all([
-    actor.adminSupabase
+    actor.activationSupabase
       .from("profiles")
       .select("id, full_name, created_at, role")
       .eq("role", "client")
       .order("created_at", { ascending: false }),
-    actor.adminSupabase
+    actor.activationSupabase
       .from("client_profiles")
       .select("profile_id, assigned_nutritionist_id, assigned_trainer_id"),
-    actor.adminSupabase
+    actor.activationSupabase
       .from("professional_profiles")
       .select("profile_id, specialty"),
-    actor.adminSupabase.auth.admin.listUsers({
-      page: 1,
-      perPage: 1000,
-    }),
   ]);
 
-  if (clientsError) {
+  if (clientsError || assignmentsError || professionalsError) {
     return emptyClientActivationData("No se pudo cargar la lista de clientes.");
   }
 
-  const professionals = (professionalRows ?? []).filter(
-    (item): item is Pick<
-      Tables<"professional_profiles">,
-      "profile_id" | "specialty"
-    > & { specialty: ProfessionalSpecialty } => Boolean(item.specialty),
-  );
-  const professionalIds = professionals.map((item) => item.profile_id);
-  const { data: professionalProfiles } = professionalIds.length
-    ? await actor.adminSupabase
-        .from("profiles")
-        .select("id, full_name, role")
-        .in("id", professionalIds)
-    : { data: [] };
+  const professionalById = new Map<
+    string,
+    Pick<Tables<"professional_profiles">, "profile_id" | "specialty"> & {
+      specialty: ProfessionalSpecialty;
+    }
+  >();
+
+  for (const item of professionalRows ?? []) {
+    if (item.specialty) {
+      professionalById.set(item.profile_id, {
+        profile_id: item.profile_id,
+        specialty: item.specialty,
+      });
+    }
+  }
+
+  const { data: professionalProfiles, error: professionalProfilesError } =
+    await actor.activationSupabase
+      .from("profiles")
+      .select("id, full_name, role")
+      .in("role", ["admin", "professional"]);
+
+  if (professionalProfilesError) {
+    return emptyClientActivationData(
+      "No se pudo cargar la lista de profesionales.",
+    );
+  }
+
+  for (const profile of professionalProfiles ?? []) {
+    if (profile.role === "admin" && !professionalById.has(profile.id)) {
+      professionalById.set(profile.id, {
+        profile_id: profile.id,
+        specialty: "both",
+      });
+    }
+  }
+
+  const professionals = Array.from(professionalById.values());
   const profileById = new Map(
     (professionalProfiles ?? []).map((profile) => [profile.id, profile]),
-  );
-  const emailById = new Map(
-    (authUsers?.users ?? []).map((user) => [user.id, user.email ?? ""]),
   );
   const professionalNameById = new Map(
     professionals.map((item) => {
@@ -586,7 +587,7 @@ export async function listClientActivationData(
       }
 
       return {
-        email: emailById.get(item.profile_id) ?? "",
+        email: "",
         fullName: profile.full_name ?? "Profesional sin nombre",
         id: item.profile_id,
         specialty: item.specialty,
@@ -613,7 +614,7 @@ export async function listClientActivationData(
         : null,
       clientProfileExists: Boolean(assignment),
       createdAt: profile.created_at,
-      email: emailById.get(profile.id) ?? "",
+      email: "",
       fullName: profile.full_name ?? "Cliente sin nombre",
       hasNutritionService,
       hasTrainingService,
@@ -625,15 +626,12 @@ export async function listClientActivationData(
       }),
     } satisfies ClientAccountListItem;
   });
-  const visibleClients = allClients.filter((client) =>
-    canSeeClient(client, actor.canManageNutrition, actor.canManageTraining),
-  );
-  const counts = buildCounts(visibleClients);
+  const counts = buildCounts(allClients);
 
   return {
     canManageNutrition: actor.canManageNutrition,
     canManageTraining: actor.canManageTraining,
-    clients: visibleClients.filter((client) => matchesFilter(client, filter)),
+    clients: allClients.filter((client) => matchesFilter(client, filter)),
     counts,
     currentUserId: actor.currentUserId,
     nutritionists: assignableProfessionals.filter((professional) =>

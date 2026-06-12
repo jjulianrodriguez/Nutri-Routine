@@ -33,10 +33,6 @@ type AppointmentRow = Pick<
   Tables<"appointments">,
   "area" | "id" | "starts_at" | "status" | "title"
 >;
-type ConversationRow = Pick<
-  Tables<"conversations">,
-  "area" | "created_at" | "id" | "subject" | "updated_at"
->;
 type DietPlanRow = Pick<
   Tables<"diet_plans">,
   "created_at" | "description" | "end_date" | "id" | "start_date" | "status" | "title"
@@ -173,15 +169,6 @@ function summarizeProgress(record: ProgressEntryRow): SectionRecord {
     id: record.id,
     meta: formatDate(record.recorded_at),
     title: record.metric_type,
-  };
-}
-
-function summarizeConversation(record: ConversationRow): SectionRecord {
-  return {
-    detail: firstText(AREA_LABELS[record.area], formatDate(record.created_at)),
-    id: record.id,
-    meta: formatDate(record.updated_at),
-    title: record.subject ?? "Conversacion sin asunto",
   };
 }
 
@@ -417,36 +404,3 @@ export async function getProgressData(
     records: rows.map(summarizeProgress),
   };
 }
-
-export async function getMessagesData(
-  access: CurrentUserAccess,
-): Promise<SectionData> {
-  const supabase = await createClient();
-  let rowsQuery = supabase
-    .from("conversations")
-    .select("id, subject, area, created_at, updated_at")
-    .order("updated_at", { ascending: false })
-    .limit(5);
-  let countQuery = supabase
-    .from("conversations")
-    .select("id", { count: "exact", head: true });
-
-  if (access.isClient) {
-    rowsQuery = rowsQuery.eq("client_id", access.userId);
-    countQuery = countQuery.eq("client_id", access.userId);
-  } else if (!isGeneralAdmin(access)) {
-    rowsQuery = rowsQuery.eq("professional_id", access.userId);
-    countQuery = countQuery.eq("professional_id", access.userId);
-  }
-
-  const [rows, count] = await Promise.all([
-    resolveRows<ConversationRow>(rowsQuery),
-    resolveCount(countQuery),
-  ]);
-
-  return {
-    count,
-    records: rows.map(summarizeConversation),
-  };
-}
-

@@ -51,12 +51,12 @@ export default async function ProgressPage() {
         <StatTile
           label="Nutricion"
           value={access.hasNutritionService ? "Activa" : "No asignada"}
-          detail="Disponible si hay nutricionista asignada"
+          detail="Disponible si hay un profesional en nutricion asignado"
         />
         <StatTile
           label="Entrenamiento"
           value={access.hasTrainingService ? "Activo" : "No asignado"}
-          detail="Disponible si hay entrenadora asignada"
+          detail="Disponible si hay un profesional en entrenamiento asignado"
         />
         <StatTile
           label="Registros"

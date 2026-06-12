@@ -1,4 +1,4 @@
-import { CalendarDays, MessageCircle } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 
 import { AppHeader, AppPanel, AppScreen, EmptyState } from "@/components/app/AppScreen";
 import { getCalendarData } from "@/lib/app/dashboard-data";
@@ -60,24 +60,15 @@ export default async function CalendarPage() {
         </AppPanel>
 
         <AppPanel title="Recordatorios" tone="primary">
-          <div className="grid gap-3">
-            <div className="rounded-[20px] border border-primary/30 bg-surface p-4">
-              <CalendarDays className="size-5 text-warm-brown" />
-              <h2 className="mt-4 font-extrabold text-charcoal">
-                {access.isClient ? "Seguimiento personal" : "Seguimiento de clientes"}
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-muted">
-                La vista se adapta al rol sin exponer secciones administrativas a
-                clientes.
-              </p>
-            </div>
-            <div className="rounded-[20px] border border-primary/30 bg-surface p-4">
-              <MessageCircle className="size-5 text-warm-brown" />
-              <h2 className="mt-4 font-extrabold text-charcoal">Mensajes</h2>
-              <p className="mt-2 text-sm leading-6 text-muted">
-                Los mensajes tienen su propia ruta protegida en /app/mensajes.
-              </p>
-            </div>
+          <div className="rounded-[20px] border border-primary/30 bg-surface p-4">
+            <CalendarDays className="size-5 text-warm-brown" />
+            <h2 className="mt-4 font-extrabold text-charcoal">
+              {access.isClient ? "Seguimiento personal" : "Seguimiento de clientes"}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-muted">
+              La vista se adapta al rol sin exponer secciones administrativas a
+              clientes.
+            </p>
           </div>
         </AppPanel>
       </div>

@@ -20,15 +20,15 @@ import { cn } from "@/lib/utils";
 
 const specialtyOptions = [
   {
-    label: "Nutricionista",
+    label: "Profesional en nutricion",
     value: "nutrition",
   },
   {
-    label: "Entrenadora personal",
+    label: "Profesional en entrenamiento",
     value: "training",
   },
   {
-    label: "Ambas areas",
+    label: "Profesional en ambas areas",
     value: "both",
   },
 ] as const;
@@ -112,7 +112,7 @@ export function ProfessionalAccountForm() {
             type="text"
             autoComplete="name"
             className={inputClasses}
-            placeholder="Nombre de la profesional"
+            placeholder="Nombre del profesional"
             aria-describedby={
               errors.fullName ? "professional-full-name-error" : undefined
             }

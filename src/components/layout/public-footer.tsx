@@ -10,10 +10,10 @@ export function PublicFooter() {
               Nutrición Con Enfoque
             </p>
             <p className="mt-3 max-w-sm text-sm leading-6 text-sand-soft/80">
-              Dra. Mariana Rodríguez Méndez · Nutricionista funcional e
+              Dra. Mariana Rodríguez Méndez · Profesional en nutrición funcional e
               integrativa
               <br />
-              Camila Rodríguez Méndez · Entrenadora Personal
+              Camila Rodríguez Méndez · Profesional en entrenamiento
             </p>
           </div>
 

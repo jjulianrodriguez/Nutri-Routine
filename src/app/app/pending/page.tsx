@@ -18,7 +18,7 @@ export default async function PendingAccountPage() {
       <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
         <AppPanel
           title="Estado de activacion"
-          description="Tu rol sigue siendo cliente, pero todavia no hay nutricionista ni entrenadora asignada."
+          description="Tu rol sigue siendo cliente, pero todavia no hay profesionales de nutricion o entrenamiento asignados."
           tone="primary"
         >
           <div className="grid gap-3 sm:grid-cols-2">

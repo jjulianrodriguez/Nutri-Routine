@@ -77,11 +77,14 @@ export type Database = {
           created_at: string;
           excerpt: string;
           id: string;
+          is_pinned: boolean;
           published: boolean;
           published_at: string | null;
           read_time_minutes: number;
           slug: string;
+          tags: string[];
           title: string;
+          updated_at: string;
         };
         Insert: {
           author_id: string;
@@ -90,11 +93,14 @@ export type Database = {
           created_at?: string;
           excerpt: string;
           id?: string;
+          is_pinned?: boolean;
           published?: boolean;
           published_at?: string | null;
           read_time_minutes?: number;
           slug: string;
+          tags?: string[];
           title: string;
+          updated_at?: string;
         };
         Update: {
           author_id?: string;
@@ -103,11 +109,14 @@ export type Database = {
           created_at?: string;
           excerpt?: string;
           id?: string;
+          is_pinned?: boolean;
           published?: boolean;
           published_at?: string | null;
           read_time_minutes?: number;
           slug?: string;
+          tags?: string[];
           title?: string;
+          updated_at?: string;
         };
         Relationships: [
           {
@@ -177,51 +186,6 @@ export type Database = {
           },
         ];
       };
-      conversations: {
-        Row: {
-          area: Database["public"]["Enums"]["service_area"];
-          client_id: string;
-          created_at: string;
-          id: string;
-          professional_id: string;
-          subject: string | null;
-          updated_at: string;
-        };
-        Insert: {
-          area?: Database["public"]["Enums"]["service_area"];
-          client_id: string;
-          created_at?: string;
-          id?: string;
-          professional_id: string;
-          subject?: string | null;
-          updated_at?: string;
-        };
-        Update: {
-          area?: Database["public"]["Enums"]["service_area"];
-          client_id?: string;
-          created_at?: string;
-          id?: string;
-          professional_id?: string;
-          subject?: string | null;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "conversations_client_id_fkey";
-            columns: ["client_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "conversations_professional_id_fkey";
-            columns: ["professional_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       diet_plans: {
         Row: {
           client_id: string;
@@ -276,39 +240,53 @@ export type Database = {
           },
         ];
       };
-      messages: {
+      exercises: {
         Row: {
-          body: string;
-          conversation_id: string;
+          category: string;
           created_at: string;
+          created_by: string;
+          description: string | null;
+          difficulty: string | null;
+          exercise_type: string;
           id: string;
-          sender_id: string;
+          is_active: boolean;
+          multimedia_url: string | null;
+          muscle_group: string;
+          name: string;
+          updated_at: string;
         };
         Insert: {
-          body: string;
-          conversation_id: string;
+          category: string;
           created_at?: string;
+          created_by: string;
+          description?: string | null;
+          difficulty?: string | null;
+          exercise_type?: string;
           id?: string;
-          sender_id: string;
+          is_active?: boolean;
+          multimedia_url?: string | null;
+          muscle_group?: string;
+          name: string;
+          updated_at?: string;
         };
         Update: {
-          body?: string;
-          conversation_id?: string;
+          category?: string;
           created_at?: string;
+          created_by?: string;
+          description?: string | null;
+          difficulty?: string | null;
+          exercise_type?: string;
           id?: string;
-          sender_id?: string;
+          is_active?: boolean;
+          multimedia_url?: string | null;
+          muscle_group?: string;
+          name?: string;
+          updated_at?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "messages_conversation_id_fkey";
-            columns: ["conversation_id"];
-            isOneToOne: false;
-            referencedRelation: "conversations";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "messages_sender_id_fkey";
-            columns: ["sender_id"];
+            foreignKeyName: "exercises_created_by_fkey";
+            columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -482,13 +460,119 @@ export type Database = {
           },
         ];
       };
+      routine_exercises: {
+        Row: {
+          created_at: string;
+          duration_minutes: number | null;
+          exercise_id: string;
+          id: string;
+          notes: string | null;
+          position: number;
+          repetitions: string | null;
+          rest_seconds: number | null;
+          routine_id: string;
+          series: number | null;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          duration_minutes?: number | null;
+          exercise_id: string;
+          id?: string;
+          notes?: string | null;
+          position: number;
+          repetitions?: string | null;
+          rest_seconds?: number | null;
+          routine_id: string;
+          series?: number | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          duration_minutes?: number | null;
+          exercise_id?: string;
+          id?: string;
+          notes?: string | null;
+          position?: number;
+          repetitions?: string | null;
+          rest_seconds?: number | null;
+          routine_id?: string;
+          series?: number | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "routine_exercises_exercise_id_fkey";
+            columns: ["exercise_id"];
+            isOneToOne: false;
+            referencedRelation: "exercises";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "routine_exercises_routine_id_fkey";
+            columns: ["routine_id"];
+            isOneToOne: false;
+            referencedRelation: "routines";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      routines: {
+        Row: {
+          category: string;
+          created_at: string;
+          creator_id: string;
+          description: string;
+          difficulty: string;
+          id: string;
+          is_active: boolean;
+          name: string;
+          target_audience: string;
+          updated_at: string;
+        };
+        Insert: {
+          category: string;
+          created_at?: string;
+          creator_id: string;
+          description: string;
+          difficulty: string;
+          id?: string;
+          is_active?: boolean;
+          name: string;
+          target_audience: string;
+          updated_at?: string;
+        };
+        Update: {
+          category?: string;
+          created_at?: string;
+          creator_id?: string;
+          description?: string;
+          difficulty?: string;
+          id?: string;
+          is_active?: boolean;
+          name?: string;
+          target_audience?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "routines_creator_id_fkey";
+            columns: ["creator_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       workout_plans: {
         Row: {
           client_id: string;
           created_at: string;
           description: string | null;
+          duration_weeks: number | null;
           end_date: string | null;
           id: string;
+          routine_id: string | null;
           start_date: string | null;
           status: Database["public"]["Enums"]["plan_status"];
           title: string;
@@ -499,8 +583,10 @@ export type Database = {
           client_id: string;
           created_at?: string;
           description?: string | null;
+          duration_weeks?: number | null;
           end_date?: string | null;
           id?: string;
+          routine_id?: string | null;
           start_date?: string | null;
           status?: Database["public"]["Enums"]["plan_status"];
           title: string;
@@ -511,8 +597,10 @@ export type Database = {
           client_id?: string;
           created_at?: string;
           description?: string | null;
+          duration_weeks?: number | null;
           end_date?: string | null;
           id?: string;
+          routine_id?: string | null;
           start_date?: string | null;
           status?: Database["public"]["Enums"]["plan_status"];
           title?: string;
@@ -534,6 +622,13 @@ export type Database = {
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "workout_plans_routine_id_fkey";
+            columns: ["routine_id"];
+            isOneToOne: false;
+            referencedRelation: "routines";
+            referencedColumns: ["id"];
+          },
         ];
       };
     };
@@ -541,6 +636,15 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      assign_routine_to_client: {
+        Args: {
+          p_client_id: string;
+          p_duration_weeks: number;
+          p_routine_id: string;
+          p_start_date?: string;
+        };
+        Returns: string;
+      };
       has_specialty: {
         Args: {
           required_specialty: Database["public"]["Enums"]["professional_specialty"];
@@ -557,6 +661,19 @@ export type Database = {
           client_profile_id: string;
         };
         Returns: boolean;
+      };
+      save_routine: {
+        Args: {
+          p_category: string;
+          p_description: string;
+          p_difficulty: string;
+          p_exercises: Json;
+          p_is_active: boolean;
+          p_name: string;
+          p_routine_id: string | null;
+          p_target_audience: string;
+        };
+        Returns: string;
       };
     };
     Enums: {

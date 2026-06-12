@@ -13,7 +13,6 @@ export type AppRouteKind =
   | "training"
   | "resources"
   | "calendar"
-  | "messages"
   | "settings";
 
 export type AppNavIcon =
@@ -25,7 +24,6 @@ export type AppNavIcon =
   | "training"
   | "resources"
   | "calendar"
-  | "messages"
   | "pending"
   | "settings";
 
@@ -46,7 +44,9 @@ export type CurrentUserAccess = {
   assignedTrainerId: string | null;
   canAccessApp: boolean;
   canAccessOnlyBasicSettings: boolean;
+  canManageClientPlans: boolean;
   canManageNutrition: boolean;
+  canManageProfessionalAccounts: boolean;
   canManageTraining: boolean;
   canViewNutrition: boolean;
   canViewTraining: boolean;
@@ -70,7 +70,6 @@ const ROUTE_PATHS: Record<AppRouteKind, string> = {
   calendar: "/app/calendario",
   clients: "/app/clientes",
   dashboard: "/app/dashboard",
-  messages: "/app/mensajes",
   nutrition: "/app/nutricion",
   pending: "/app/pending",
   profile: "/app/perfil",
@@ -84,7 +83,6 @@ const ROUTE_PATHS: Record<AppRouteKind, string> = {
 const ROUTE_ALIASES: Partial<Record<AppRouteKind, string[]>> = {
   calendar: ["/app/calendar"],
   clients: ["/app/clients"],
-  messages: ["/app/messages"],
   nutrition: ["/app/nutrition", "/app/dietas"],
   pending: ["/app/account-pending"],
   profile: ["/app/profile"],
@@ -110,10 +108,7 @@ export function buildNavigationForUser(
     if (access.canAccessOnlyBasicSettings) {
       return [
         {
-          items: [
-            item("pending", "pending", "Cuenta"),
-            item("settings", "settings", "Configuracion"),
-          ],
+          items: [item("settings", "settings", "Configuracion")],
           label: "Cuenta",
         },
       ];
@@ -142,7 +137,6 @@ export function buildNavigationForUser(
         items: [
           item("resources", "resources", "Recursos"),
           item("calendar", "calendar", "Calendario"),
-          item("messages", "messages", "Mensajes"),
         ],
         label: "Acompa\u00f1amiento",
       },
@@ -155,8 +149,11 @@ export function buildNavigationForUser(
 
   const managementItems: AppNavigationItem[] = [
     item("dashboard", "dashboard", "Dashboard"),
-    item("clients", "clients", "Clientes"),
   ];
+
+  if (access.canManageClientPlans) {
+    managementItems.push(item("clients", "clients", "Clientes"));
+  }
 
   if (access.canManageNutrition) {
     managementItems.push(item("nutrition", "nutrition", "Nutrici\u00f3n"));
@@ -175,7 +172,6 @@ export function buildNavigationForUser(
       items: [
         item("resources", "resources", "Recursos"),
         item("calendar", "calendar", "Calendario"),
-        item("messages", "messages", "Mensajes"),
       ],
       label: "Operaci\u00f3n",
     },
@@ -238,7 +234,7 @@ export function canAccessRoute(
   }
 
   if (access.canAccessOnlyBasicSettings) {
-    return route === "pending" || route === "settings";
+    return route === "settings";
   }
 
   if (access.isClient && !access.isClientActivated) {
@@ -249,7 +245,6 @@ export function canAccessRoute(
     case "dashboard":
     case "resources":
     case "calendar":
-    case "messages":
     case "settings":
       return true;
     case "pending":
@@ -259,8 +254,9 @@ export function canAccessRoute(
     case "progress":
       return access.isClient;
     case "clients":
+      return access.canManageClientPlans;
     case "professionalAccounts":
-      return access.isAdmin;
+      return access.canManageProfessionalAccounts;
     case "nutrition":
       return access.canViewNutrition;
     case "training":
@@ -270,7 +266,7 @@ export function canAccessRoute(
 
 export function getDefaultAppRoute(access: CurrentUserAccess) {
   if (access.canAccessOnlyBasicSettings) {
-    return ROUTE_PATHS.pending;
+    return ROUTE_PATHS.settings;
   }
 
   return ROUTE_PATHS.dashboard;

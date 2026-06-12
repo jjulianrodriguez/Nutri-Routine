@@ -1,8 +1,8 @@
 "use client";
 
-import { Loader2, Save } from "lucide-react";
+import { Check, Dumbbell, Leaf, Loader2, Save, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -26,36 +26,25 @@ type ClientActivationFormProps = {
 };
 
 const selectClasses =
-  "mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20";
+  "mt-2 h-12 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20";
 
-function getDefaultServiceType({
-  canManageNutrition,
-  canManageTraining,
-  client,
-}: {
-  canManageNutrition: boolean;
-  canManageTraining: boolean;
-  client: ClientAccountListItem;
-}): ClientActivationService {
-  if (client.serviceType !== "none") {
-    if (client.serviceType === "both" && canManageNutrition && canManageTraining) {
-      return "both";
-    }
-
-    if (client.serviceType === "nutrition" && canManageNutrition) {
-      return "nutrition";
-    }
-
-    if (client.serviceType === "training" && canManageTraining) {
-      return "training";
-    }
+function getServiceType(
+  nutritionEnabled: boolean,
+  trainingEnabled: boolean,
+): ClientActivationService {
+  if (nutritionEnabled && trainingEnabled) {
+    return "both";
   }
 
-  if (canManageNutrition) {
+  if (nutritionEnabled) {
     return "nutrition";
   }
 
-  return "training";
+  if (trainingEnabled) {
+    return "training";
+  }
+
+  return "none";
 }
 
 function getPreferredProfessionalId({
@@ -78,16 +67,49 @@ function getPreferredProfessionalId({
   return professionals[0]?.id ?? "";
 }
 
-function serviceLabel(serviceType: ClientActivationService) {
-  if (serviceType === "nutrition") {
-    return "Nutricion";
-  }
-
-  if (serviceType === "training") {
-    return "Entrenamiento";
-  }
-
-  return "Ambos servicios";
+function PlanToggle({
+  active,
+  disabled,
+  icon: Icon,
+  label,
+  onToggle,
+}: {
+  active: boolean;
+  disabled: boolean;
+  icon: typeof Leaf;
+  label: string;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      disabled={disabled}
+      onClick={onToggle}
+      className={cn(
+        "flex min-h-14 w-full items-center justify-between gap-3 rounded-[18px] border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-55",
+        active
+          ? "border-primary/40 bg-primary-soft text-charcoal"
+          : "border-border bg-surface text-warm-brown hover:border-primary/30 hover:bg-primary-soft/60",
+      )}
+    >
+      <span className="flex items-center gap-3">
+        <Icon className="size-5" aria-hidden="true" />
+        <span className="font-extrabold">{label}</span>
+      </span>
+      <span
+        className={cn(
+          "grid size-7 shrink-0 place-items-center rounded-full",
+          active
+            ? "bg-primary text-charcoal"
+            : "border border-border bg-background text-muted",
+        )}
+        aria-hidden="true"
+      >
+        {active ? <Check className="size-4" /> : <X className="size-3.5" />}
+      </span>
+    </button>
+  );
 }
 
 export function ClientActivationForm({
@@ -101,29 +123,11 @@ export function ClientActivationForm({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [serverMessage, setServerMessage] = useState("");
-  const serviceOptions = useMemo(() => {
-    const options: Array<{ label: string; value: ClientActivationService }> = [];
-
-    if (canManageNutrition) {
-      options.push({ label: "Nutricion", value: "nutrition" });
-    }
-
-    if (canManageTraining) {
-      options.push({ label: "Entrenamiento", value: "training" });
-    }
-
-    if (canManageNutrition && canManageTraining) {
-      options.push({ label: "Ambos servicios", value: "both" });
-    }
-
-    return options;
-  }, [canManageNutrition, canManageTraining]);
-  const [serviceType, setServiceType] = useState<ClientActivationService>(() =>
-    getDefaultServiceType({
-      canManageNutrition,
-      canManageTraining,
-      client,
-    }),
+  const [nutritionEnabled, setNutritionEnabled] = useState(
+    client.hasNutritionService,
+  );
+  const [trainingEnabled, setTrainingEnabled] = useState(
+    client.hasTrainingService,
   );
   const [assignedNutritionistId, setAssignedNutritionistId] = useState(() =>
     getPreferredProfessionalId({
@@ -139,20 +143,33 @@ export function ClientActivationForm({
       professionals: trainers,
     }),
   );
-  const needsNutrition =
-    serviceType === "nutrition" || serviceType === "both";
-  const needsTraining = serviceType === "training" || serviceType === "both";
+  const serviceType = getServiceType(nutritionEnabled, trainingEnabled);
   const hasRequiredProfessionals =
-    (!needsNutrition || nutritionists.length > 0) &&
-    (!needsTraining || trainers.length > 0);
+    (!canManageNutrition ||
+      !nutritionEnabled ||
+      Boolean(assignedNutritionistId)) &&
+    (!canManageTraining || !trainingEnabled || Boolean(assignedTrainerId));
+  const removesNutrition =
+    client.hasNutritionService && !nutritionEnabled;
+  const removesTraining = client.hasTrainingService && !trainingEnabled;
+  const hasPlanSelection = serviceType !== "none" || client.isClientActivated;
 
   function submit() {
     setServerMessage("");
 
+    if (
+      (removesNutrition || removesTraining) &&
+      !window.confirm(
+        "Esta accion retirara acceso a las secciones desactivadas. Deseas continuar?",
+      )
+    ) {
+      return;
+    }
+
     startTransition(async () => {
       const result = await activateClientAccount({
-        assignedNutritionistId: needsNutrition ? assignedNutritionistId : "",
-        assignedTrainerId: needsTraining ? assignedTrainerId : "",
+        assignedNutritionistId: nutritionEnabled ? assignedNutritionistId : "",
+        assignedTrainerId: trainingEnabled ? assignedTrainerId : "",
         clientId: client.id,
         serviceType,
       });
@@ -168,11 +185,11 @@ export function ClientActivationForm({
     });
   }
 
-  if (serviceOptions.length === 0) {
+  if (!canManageNutrition && !canManageTraining) {
     return (
       <Alert className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3">
         <AlertDescription className="font-semibold text-danger">
-          Tu perfil no tiene permisos para activar servicios.
+          Tu cuenta no tiene permisos para modificar planes.
         </AlertDescription>
       </Alert>
     );
@@ -180,76 +197,104 @@ export function ClientActivationForm({
 
   return (
     <div className="space-y-4 rounded-[22px] border border-border bg-background p-4">
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div>
-          <Label
-            htmlFor={`service-${client.id}`}
-            className="font-extrabold text-charcoal"
-          >
-            Tipo de servicio
-          </Label>
-          <select
-            id={`service-${client.id}`}
-            className={selectClasses}
-            value={serviceType}
-            onChange={(event) =>
-              setServiceType(event.target.value as ClientActivationService)
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-2">
+          <PlanToggle
+            active={nutritionEnabled}
+            disabled={
+              !canManageNutrition ||
+              (!nutritionEnabled && nutritionists.length === 0)
             }
-          >
-            {serviceOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            icon={Leaf}
+            label="Plan de nutricion"
+            onToggle={() => setNutritionEnabled((current) => !current)}
+          />
+          {nutritionists.length === 0 ? (
+            <p className="px-1 text-xs font-semibold leading-5 text-muted">
+              No hay profesionales de nutricion disponibles para nuevas
+              activaciones.
+            </p>
+          ) : null}
         </div>
-
-        {needsNutrition ? (
-          <div>
-            <Label
-              htmlFor={`nutritionist-${client.id}`}
-              className="font-extrabold text-charcoal"
-            >
-              Nutricionista asignada
-            </Label>
-            <select
-              id={`nutritionist-${client.id}`}
-              className={selectClasses}
-              value={assignedNutritionistId}
-              onChange={(event) => setAssignedNutritionistId(event.target.value)}
-            >
-              {nutritionists.map((professional) => (
-                <option key={professional.id} value={professional.id}>
-                  {professional.fullName}
-                </option>
-              ))}
-            </select>
-          </div>
-        ) : null}
-
-        {needsTraining ? (
-          <div>
-            <Label
-              htmlFor={`trainer-${client.id}`}
-              className="font-extrabold text-charcoal"
-            >
-              Entrenadora asignada
-            </Label>
-            <select
-              id={`trainer-${client.id}`}
-              className={selectClasses}
-              value={assignedTrainerId}
-              onChange={(event) => setAssignedTrainerId(event.target.value)}
-            >
-              {trainers.map((professional) => (
-                <option key={professional.id} value={professional.id}>
-                  {professional.fullName}
-                </option>
-              ))}
-            </select>
-          </div>
-        ) : null}
+        <div className="space-y-2">
+          <PlanToggle
+            active={trainingEnabled}
+            disabled={
+              !canManageTraining ||
+              (!trainingEnabled && trainers.length === 0)
+            }
+            icon={Dumbbell}
+            label="Plan de entrenamiento"
+            onToggle={() => setTrainingEnabled((current) => !current)}
+          />
+          {trainers.length === 0 ? (
+            <p className="px-1 text-xs font-semibold leading-5 text-muted">
+              No hay profesionales de entrenamiento disponibles para nuevas
+              activaciones.
+            </p>
+          ) : null}
+        </div>
       </div>
+
+      {nutritionEnabled || trainingEnabled ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          {nutritionEnabled ? (
+            <div>
+              <Label
+                htmlFor={`nutritionist-${client.id}`}
+                className="font-extrabold text-charcoal"
+              >
+                Profesional en nutricion
+              </Label>
+              <select
+                id={`nutritionist-${client.id}`}
+                className={selectClasses}
+                disabled={!canManageNutrition}
+                value={assignedNutritionistId}
+                onChange={(event) =>
+                  setAssignedNutritionistId(event.target.value)
+                }
+              >
+                {nutritionists.map((professional) => (
+                  <option key={professional.id} value={professional.id}>
+                    {professional.fullName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+
+          {trainingEnabled ? (
+            <div>
+              <Label
+                htmlFor={`trainer-${client.id}`}
+                className="font-extrabold text-charcoal"
+              >
+                Profesional en entrenamiento
+              </Label>
+              <select
+                id={`trainer-${client.id}`}
+                className={selectClasses}
+                disabled={!canManageTraining}
+                value={assignedTrainerId}
+                onChange={(event) => setAssignedTrainerId(event.target.value)}
+              >
+                {trainers.map((professional) => (
+                  <option key={professional.id} value={professional.id}>
+                    {professional.fullName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <Alert className="rounded-[18px] border-primary/25 bg-primary-soft px-4 py-3">
+          <AlertDescription className="font-semibold text-charcoal">
+            Sin planes activos, el usuario solo podra entrar a configuracion.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {serverMessage ? (
         <Alert
@@ -265,9 +310,17 @@ export function ClientActivationForm({
       <Button
         type="button"
         onClick={submit}
-        disabled={isPending || !hasRequiredProfessionals}
-        className={cn("w-full sm:w-auto", !hasRequiredProfessionals && "opacity-60")}
+        disabled={isPending || !hasRequiredProfessionals || !hasPlanSelection}
+        className={cn(
+          "w-full sm:w-auto",
+          (!hasRequiredProfessionals || !hasPlanSelection) && "opacity-60",
+        )}
         size="lg"
+        variant={
+          serviceType === "none" && client.isClientActivated
+            ? "destructive"
+            : "default"
+        }
       >
         {isPending ? (
           <>
@@ -277,9 +330,13 @@ export function ClientActivationForm({
         ) : (
           <>
             <Save className="size-4" />
-            {client.isClientActivated
-              ? `Guardar ${serviceLabel(serviceType).toLowerCase()}`
-              : "Activar cliente"}
+            {serviceType === "none"
+              ? client.isClientActivated
+                ? "Desactivar todos los planes"
+                : "Sin planes activos"
+              : client.isClientActivated
+                ? "Guardar cambios"
+                : "Activar planes"}
           </>
         )}
       </Button>

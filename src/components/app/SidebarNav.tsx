@@ -7,7 +7,7 @@ import {
   Dumbbell,
   Home,
   Leaf,
-  MessageCircle,
+  NotebookPen,
   Settings,
   Sparkles,
   Users,
@@ -27,7 +27,6 @@ const iconMap: Record<AppNavIcon, LucideIcon> = {
   calendar: CalendarDays,
   clients: Users,
   dashboard: Home,
-  messages: MessageCircle,
   nutrition: Leaf,
   pending: Sparkles,
   profile: Sparkles,
@@ -102,6 +101,50 @@ export function SidebarNav({ access, collapsed, onNavigate }: SidebarNavProps) {
           </div>
         </div>
       ))}
+
+      {access.role === "admin" ? (
+        <div className="space-y-2">
+          <p
+            className={cn(
+              "px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-muted transition-opacity duration-200",
+              collapsed && "pointer-events-none opacity-0",
+            )}
+          >
+            Contenido
+          </p>
+          <Link
+            href="/app/blog"
+            onClick={onNavigate}
+            className={cn(
+              "group/nav relative flex h-11 items-center gap-3 rounded-control border px-3 text-sm font-bold transition-all duration-200",
+              collapsed && "justify-center px-0",
+              pathname === "/app/blog" || pathname.startsWith("/app/blog/")
+                ? "border-primary/30 bg-primary text-charcoal shadow-soft"
+                : "border-transparent text-warm-brown hover:border-charcoal/10 hover:bg-primary-soft hover:text-charcoal",
+            )}
+            aria-current={
+              pathname === "/app/blog" || pathname.startsWith("/app/blog/")
+                ? "page"
+                : undefined
+            }
+          >
+            <NotebookPen className="size-4 shrink-0" aria-hidden="true" />
+            <span
+              className={cn(
+                "min-w-0 truncate transition-[opacity,transform,width] duration-200",
+                collapsed && "w-0 -translate-x-1 opacity-0",
+              )}
+            >
+              Blogs
+            </span>
+            {collapsed ? (
+              <span className="pointer-events-none absolute left-[calc(100%+0.75rem)] top-1/2 z-50 -translate-y-1/2 whitespace-nowrap rounded-control border border-border bg-surface px-3 py-1.5 text-xs font-bold text-charcoal opacity-0 shadow-soft transition-opacity duration-150 group-hover/nav:opacity-100">
+                Blogs
+              </span>
+            ) : null}
+          </Link>
+        </div>
+      ) : null}
     </nav>
   );
 }

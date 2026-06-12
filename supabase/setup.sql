@@ -18,6 +18,9 @@ begin
 end;
 $$;
 
+alter type public.profile_role
+  add value if not exists 'admin';
+
 grant usage on type public.profile_role to anon;
 grant usage on type public.profile_role to authenticated;
 
@@ -129,27 +132,17 @@ language plpgsql
 security definer
 set search_path = ''
 as $$
-declare
-  requested_role public.profile_role;
 begin
-  requested_role :=
-    case
-      when new.raw_user_meta_data ->> 'role' in ('professional', 'client')
-        then (new.raw_user_meta_data ->> 'role')::public.profile_role
-      else 'client'::public.profile_role
-    end;
-
   insert into public.profiles (id, full_name, role, avatar_url)
   values (
     new.id,
     nullif(trim(coalesce(new.raw_user_meta_data ->> 'full_name', '')), ''),
-    requested_role,
+    'client'::public.profile_role,
     nullif(trim(coalesce(new.raw_user_meta_data ->> 'avatar_url', '')), '')
   )
   on conflict (id) do update
   set
     full_name = coalesce(public.profiles.full_name, excluded.full_name),
-    role = coalesce(public.profiles.role, excluded.role),
     avatar_url = coalesce(public.profiles.avatar_url, excluded.avatar_url);
 
   return new;
@@ -185,11 +178,11 @@ grant usage on schema public to anon;
 grant usage on schema public to authenticated;
 
 grant select on public.profiles to authenticated;
-grant insert (id, full_name, role, avatar_url) on public.profiles to authenticated;
+grant insert (id, full_name, avatar_url) on public.profiles to authenticated;
 grant update (full_name, avatar_url) on public.profiles to authenticated;
 
 grant select on public.blog_posts to anon;
-grant select, insert, update, delete on public.blog_posts to authenticated;
+grant select, insert, update on public.blog_posts to authenticated;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own"
@@ -199,21 +192,16 @@ to authenticated
 using ((select auth.uid()) = id);
 
 drop policy if exists "profiles_select_clients_for_professionals" on public.profiles;
-create policy "profiles_select_clients_for_professionals"
-on public.profiles
-for select
-to authenticated
-using (
-  role = 'client'::public.profile_role
-  and private.current_profile_role() = 'professional'::public.profile_role
-);
 
 drop policy if exists "profiles_insert_own" on public.profiles;
 create policy "profiles_insert_own"
 on public.profiles
 for insert
 to authenticated
-with check ((select auth.uid()) = id);
+with check (
+  (select auth.uid()) = id
+  and role = 'client'::public.profile_role
+);
 
 drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own"
@@ -231,33 +219,31 @@ to anon, authenticated
 using (published is true);
 
 drop policy if exists "blog_posts_select_all_professionals" on public.blog_posts;
-create policy "blog_posts_select_all_professionals"
+drop policy if exists "blog_posts_select_all_admins" on public.blog_posts;
+create policy "blog_posts_select_all_admins"
 on public.blog_posts
 for select
 to authenticated
-using (private.current_profile_role() = 'professional'::public.profile_role);
+using ((select private.current_profile_role()::text = 'admin'));
 
 drop policy if exists "blog_posts_insert_professionals" on public.blog_posts;
-create policy "blog_posts_insert_professionals"
+drop policy if exists "blog_posts_insert_admins" on public.blog_posts;
+create policy "blog_posts_insert_admins"
 on public.blog_posts
 for insert
 to authenticated
 with check (
-  private.current_profile_role() = 'professional'::public.profile_role
+  (select private.current_profile_role()::text = 'admin')
   and (select auth.uid()) = author_id
 );
 
 drop policy if exists "blog_posts_update_professionals" on public.blog_posts;
-create policy "blog_posts_update_professionals"
+drop policy if exists "blog_posts_update_admins" on public.blog_posts;
+create policy "blog_posts_update_admins"
 on public.blog_posts
 for update
 to authenticated
-using (private.current_profile_role() = 'professional'::public.profile_role)
-with check (private.current_profile_role() = 'professional'::public.profile_role);
+using ((select private.current_profile_role()::text = 'admin'))
+with check ((select private.current_profile_role()::text = 'admin'));
 
 drop policy if exists "blog_posts_delete_professionals" on public.blog_posts;
-create policy "blog_posts_delete_professionals"
-on public.blog_posts
-for delete
-to authenticated
-using (private.current_profile_role() = 'professional'::public.profile_role);

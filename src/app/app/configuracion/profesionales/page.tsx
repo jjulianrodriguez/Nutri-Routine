@@ -10,9 +10,9 @@ import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import type { ProfessionalSpecialty } from "@/lib/validations/professional-accounts";
 
 const specialtyLabels: Record<ProfessionalSpecialty, string> = {
-  both: "Ambas areas",
-  nutrition: "Nutricionista",
-  training: "Entrenadora personal",
+  both: "Profesional en ambas areas",
+  nutrition: "Profesional en nutricion",
+  training: "Profesional en entrenamiento",
 };
 
 function formatCreatedAt(value: string) {
@@ -26,7 +26,7 @@ function formatCreatedAt(value: string) {
 export default async function ProfessionalAccountsPage() {
   const access = await requireRouteAccess("/app/configuracion/profesionales");
 
-  if (!access.isAdmin) {
+  if (!access.canManageProfessionalAccounts) {
     redirect("/app/dashboard");
   }
 
@@ -38,7 +38,7 @@ export default async function ProfessionalAccountsPage() {
         <AppHeader
           eyebrow="Equipo"
           title="Crear cuenta profesional"
-          description="Alta segura para administradoras de nutricion, entrenamiento o ambas areas."
+          description="Alta segura para profesionales de nutricion, entrenamiento o ambas areas."
         />
       </FadeIn>
 
@@ -112,7 +112,7 @@ export default async function ProfessionalAccountsPage() {
           ) : (
             <div className="rounded-[22px] border border-dashed border-border bg-background px-4 py-8 text-center">
               <p className="font-extrabold text-charcoal">
-                Aun no hay profesionales creadas.
+                Aun no hay cuentas profesionales.
               </p>
               <p className="mt-2 text-sm text-muted">
                 Cuando completes el formulario, apareceran aqui.

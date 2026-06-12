@@ -1,4 +1,11 @@
-import { CheckCircle2, Clock, Dumbbell, Leaf, Users } from "lucide-react";
+import {
+  CheckCircle2,
+  CircleOff,
+  Clock,
+  Dumbbell,
+  Leaf,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 
 import { ClientActivationForm } from "@/components/app/client-activation-form";
@@ -28,13 +35,12 @@ const filterOptions: Array<{
   label: string;
   value: ClientAccountsFilter;
 }> = [
-  { label: "Pendientes", value: "pending" },
-  { label: "Activos", value: "active" },
   { label: "Todos", value: "all" },
+  { label: "Activos", value: "active" },
+  { label: "Sin planes", value: "none" },
   { label: "Solo nutricion", value: "nutrition" },
   { label: "Solo entrenamiento", value: "training" },
-  { label: "Ambos servicios", value: "both" },
-  { label: "Sin servicio", value: "none" },
+  { label: "Ambos planes", value: "both" },
 ];
 
 function normalizeFilter(value?: string): ClientAccountsFilter {
@@ -50,7 +56,7 @@ function normalizeFilter(value?: string): ClientAccountsFilter {
     return value;
   }
 
-  return "pending";
+  return "all";
 }
 
 function formatCreatedAt(value: string) {
@@ -74,7 +80,7 @@ function serviceLabel(client: ClientAccountListItem) {
     return "Solo entrenamiento";
   }
 
-  return "Pendiente de activacion";
+  return "Sin planes activos";
 }
 
 function serviceTone(client: ClientAccountListItem) {
@@ -98,9 +104,9 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
   return (
     <AppScreen>
       <AppHeader
-        eyebrow="Administracion de clientes"
-        title="Clientes y cuentas pendientes"
-        description="Activa cuentas registradas como clientes de nutricion, entrenamiento o ambos sin cambiar profiles.role."
+        eyebrow="Administracion de usuarios"
+        title="Usuarios y planes activos"
+        description="Consulta las cuentas registradas y controla de forma independiente el acceso a nutricion y entrenamiento."
       />
 
       {data.error ? (
@@ -116,30 +122,30 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
-          label="Cuentas pendientes"
-          value={String(data.counts.pending)}
-          detail="Sin servicio asignado"
+          label="Usuarios registrados"
+          value={String(data.counts.all)}
+          detail="Cuentas registradas con rol cliente"
         />
         <StatTile
-          label="Clientes activos"
+          label="Usuarios activos"
           value={String(data.counts.active)}
-          detail="Con nutricion, entrenamiento o ambos"
+          detail="Con al menos un plan activo"
         />
         <StatTile
-          label="Solo nutricion"
-          value={String(data.counts.nutrition)}
-          detail="assigned_nutritionist_id"
+          label="Nutricion activa"
+          value={String(data.counts.nutritionActive)}
+          detail="Incluye usuarios con ambos planes"
         />
         <StatTile
-          label="Solo entrenamiento"
-          value={String(data.counts.training)}
-          detail="assigned_trainer_id"
+          label="Entrenamiento activo"
+          value={String(data.counts.trainingActive)}
+          detail="Incluye usuarios con ambos planes"
         />
       </section>
 
       <AppPanel
         title="Filtros"
-        description="Las acciones disponibles tambien se validan en servidor."
+        description="Filtra por estado actual; cada cambio tambien se valida en el servidor."
         tone="primary"
       >
         <div className="flex flex-wrap gap-2">
@@ -168,8 +174,8 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
       </AppPanel>
 
       <AppPanel
-        title="Cuentas"
-        description="Cada cuenta conserva role client; la activacion se guarda en client_profiles."
+        title="Usuarios registrados"
+        description="Los planes determinan que secciones puede abrir cada cliente dentro de la app."
       >
         {data.clients.length > 0 ? (
           <div className="space-y-4">
@@ -228,19 +234,42 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                           <Users className="size-4 text-warm-brown" />
                         )}
                         <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
-                          client_profiles
+                          Estado de cuenta
                         </p>
                         <p className="mt-1 font-bold text-charcoal">
                           {client.clientProfileExists
-                            ? "Registro existente"
-                            : "Sin registro"}
+                            ? "Planes configurables"
+                            : "Sin planes configurados"}
                         </p>
                       </div>
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-[18px] border border-border bg-background p-4">
-                        <Leaf className="size-4 text-warm-brown" />
+                      <div
+                        className={cn(
+                          "rounded-[18px] border p-4",
+                          client.hasNutritionService
+                            ? "border-primary/35 bg-primary-soft/60"
+                            : "border-border bg-background",
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <Leaf className="size-4 text-warm-brown" />
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-2.5 py-1 text-xs font-extrabold text-charcoal">
+                            {client.hasNutritionService ? (
+                              <CheckCircle2
+                                className="size-3.5"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <CircleOff
+                                className="size-3.5"
+                                aria-hidden="true"
+                              />
+                            )}
+                            {client.hasNutritionService ? "Activo" : "Inactivo"}
+                          </span>
+                        </div>
                         <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
                           Nutricion
                         </p>
@@ -248,8 +277,31 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                           {client.assignedNutritionistName ?? "No asignada"}
                         </p>
                       </div>
-                      <div className="rounded-[18px] border border-border bg-background p-4">
-                        <Dumbbell className="size-4 text-warm-brown" />
+                      <div
+                        className={cn(
+                          "rounded-[18px] border p-4",
+                          client.hasTrainingService
+                            ? "border-primary/35 bg-primary-soft/60"
+                            : "border-border bg-background",
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <Dumbbell className="size-4 text-warm-brown" />
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-2.5 py-1 text-xs font-extrabold text-charcoal">
+                            {client.hasTrainingService ? (
+                              <CheckCircle2
+                                className="size-3.5"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <CircleOff
+                                className="size-3.5"
+                                aria-hidden="true"
+                              />
+                            )}
+                            {client.hasTrainingService ? "Activo" : "Inactivo"}
+                          </span>
+                        </div>
                         <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
                           Entrenamiento
                         </p>
@@ -263,8 +315,8 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                   <div>
                     <h3 className="mb-3 text-sm font-extrabold uppercase tracking-[0.16em] text-muted">
                       {client.isClientActivated
-                        ? "Editar asignacion"
-                        : "Activar cliente"}
+                        ? "Gestionar planes"
+                        : "Activar planes"}
                     </h3>
                     <ClientActivationForm
                       canManageNutrition={data.canManageNutrition}
@@ -281,22 +333,21 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
           </div>
         ) : (
           <EmptyState>
-            No hay cuentas que coincidan con este filtro o con tus permisos de
-            especialidad.
+            No hay usuarios que coincidan con este filtro.
           </EmptyState>
         )}
       </AppPanel>
 
       <AppPanel
         title="Profesionales disponibles"
-        description="Los selects solo incluyen specialty nutrition/both o training/both segun corresponda."
+        description="Cada plan activo requiere una profesional compatible asignada."
         tone="accent"
       >
         <div className="grid gap-4 md:grid-cols-2">
           <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">
             <Leaf className="size-5 text-warm-brown" />
             <h2 className="mt-4 font-extrabold text-charcoal">
-              Nutricionistas
+              Profesionales en nutricion
             </h2>
             <p className="mt-2 text-sm text-muted">
               {data.nutritionists.length} disponibles
@@ -305,7 +356,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
           <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">
             <Dumbbell className="size-5 text-warm-brown" />
             <h2 className="mt-4 font-extrabold text-charcoal">
-              Entrenadoras
+              Profesionales en entrenamiento
             </h2>
             <p className="mt-2 text-sm text-muted">
               {data.trainers.length} disponibles

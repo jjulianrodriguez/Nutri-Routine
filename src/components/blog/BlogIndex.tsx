@@ -28,6 +28,19 @@ export function BlogIndex({ posts }: BlogIndexProps) {
 
   const [featuredPost, ...restPosts] = filteredPosts;
 
+  if (posts.length === 0) {
+    return (
+      <div className="rounded-[24px] border border-dashed border-charcoal/15 bg-white px-6 py-14 text-center shadow-soft">
+        <h2 className="font-serif text-3xl font-semibold text-charcoal">
+          Pronto habra nuevas lecturas
+        </h2>
+        <p className="mx-auto mt-3 max-w-xl leading-7 text-warm-brown">
+          Los articulos visibles publicados por el equipo apareceran aqui.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="flex gap-2 overflow-x-auto pb-2">
@@ -38,12 +51,13 @@ export function BlogIndex({ posts }: BlogIndexProps) {
             <button
               key={category}
               type="button"
+              aria-pressed={isActive}
               onClick={() => setActiveCategory(category)}
               className={[
-                "shrink-0 rounded-full border px-4 py-2 text-sm font-bold shadow-soft",
+                "min-h-11 shrink-0 rounded-full border px-4 py-2 text-sm font-bold shadow-soft transition-colors",
                 isActive
                   ? "border-sage bg-sage text-charcoal"
-                  : "border-charcoal/10 bg-white text-warm-brown",
+                  : "border-charcoal/10 bg-white text-warm-brown hover:border-sage hover:bg-cream",
               ].join(" ")}
             >
               {category}

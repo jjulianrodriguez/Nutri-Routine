@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Pin } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 
@@ -41,9 +41,17 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
 
       <div className="relative z-0 flex h-full flex-col">
         <div className="flex items-center justify-between gap-4">
-          <span className="rounded-full bg-cream px-3 py-1.5 text-xs font-bold text-warm-brown">
-            {post.category}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-cream px-3 py-1.5 text-xs font-bold text-warm-brown">
+              {post.category}
+            </span>
+            {post.isPinned ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-sage px-3 py-1.5 text-xs font-bold text-charcoal">
+                <Pin className="size-3" aria-hidden="true" />
+                Principal
+              </span>
+            ) : null}
+          </div>
           <span className="text-xs font-semibold text-warm-brown/70">
             {post.readTime}
           </span>
