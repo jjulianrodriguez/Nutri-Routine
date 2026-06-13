@@ -3,13 +3,12 @@ import {
   ArrowRight,
   CalendarDays,
   CheckCircle2,
+  ClipboardCheck,
   Clock3,
-  Dumbbell,
   History,
   ListChecks,
   NotebookTabs,
-  Repeat2,
-  TimerReset,
+  Dumbbell,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -20,13 +19,13 @@ import {
   EmptyState,
   StatTile,
 } from "@/components/app/AppScreen";
+import { RoutineExerciseList } from "@/components/app/routine-exercise-list";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
   getClientTrainingOverview,
   getRoutineManagementOverview,
 } from "@/lib/routines/data";
-import { formatRestTime } from "@/lib/routines/format";
 import { cn } from "@/lib/utils";
 import type {
   RoutineAssignmentState,
@@ -178,64 +177,10 @@ async function ClientTrainingPage({
               </div>
             </article>
 
-            {overview.currentRoutine?.exercises.length ? (
-              <div className="space-y-4">
-                {overview.currentRoutine.exercises.map((item, index) => (
-                  <article
-                    key={item.id}
-                    className="rounded-[22px] border border-border bg-background p-5"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary text-sm font-extrabold text-charcoal">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-charcoal">
-                          {item.exercise.name}
-                        </h3>
-                        <p className="mt-1 text-sm font-bold text-warm-brown">
-                          {item.exercise.muscleGroup} -{" "}
-                          {item.exercise.exerciseType}
-                        </p>
-                        {item.exercise.description ? (
-                          <p className="mt-3 text-sm leading-6 text-muted">
-                            {item.exercise.description}
-                          </p>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                      <RoutineValue
-                        icon={Dumbbell}
-                        label="Series"
-                        value={item.series?.toString() ?? "Opcional"}
-                      />
-                      <RoutineValue
-                        icon={Repeat2}
-                        label="Repeticiones"
-                        value={item.repetitions ?? "Opcional"}
-                      />
-                      <RoutineValue
-                        icon={TimerReset}
-                        label="Descanso"
-                        value={formatRestTime(item.restSeconds)}
-                      />
-                    </div>
-
-                    {item.notes ? (
-                      <p className="mt-4 rounded-[16px] bg-surface p-4 text-sm leading-6 text-charcoal">
-                        <strong>Notas:</strong> {item.notes}
-                      </p>
-                    ) : null}
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <EmptyState>
-                Esta asignacion no tiene un detalle de ejercicios disponible.
-              </EmptyState>
-            )}
+            <RoutineExerciseList
+              emptyMessage="Esta asignacion no tiene un detalle de ejercicios disponible."
+              exercises={overview.currentRoutine?.exercises ?? []}
+            />
           </div>
         ) : (
           <EmptyState>
@@ -252,26 +197,59 @@ async function ClientTrainingPage({
       >
         {overview.history.length > 0 ? (
           <div className="grid gap-4 lg:grid-cols-2">
-            {overview.history.map((assignment) => (
-              <article
-                key={assignment.id}
-                className="rounded-[20px] border border-charcoal/10 bg-surface p-4"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <History className="size-5 text-warm-brown" aria-hidden="true" />
-                  <span className="rounded-full bg-background px-3 py-1 text-xs font-extrabold text-charcoal">
-                    {assignmentStateLabels[assignment.state]}
-                  </span>
-                </div>
-                <h3 className="mt-4 text-lg font-extrabold text-charcoal">
-                  {assignment.title}
-                </h3>
-                <p className="mt-2 text-sm text-muted">
-                  {formatDate(assignment.startDate)} -{" "}
-                  {formatDate(assignment.endDate)}
-                </p>
-              </article>
-            ))}
+            {overview.history.map((assignment) => {
+              const content = (
+                <>
+                  <div className="flex items-start justify-between gap-3">
+                    <History
+                      className="size-5 text-warm-brown"
+                      aria-hidden="true"
+                    />
+                    <span className="rounded-full bg-background px-3 py-1 text-xs font-extrabold text-charcoal">
+                      {assignmentStateLabels[assignment.state]}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-lg font-extrabold text-charcoal">
+                    {assignment.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-muted">
+                    {formatDate(assignment.startDate)} -{" "}
+                    {formatDate(assignment.endDate)}
+                  </p>
+                  {assignment.routineId ? (
+                    <span className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-warm-brown transition group-hover:text-charcoal">
+                      Ver detalle
+                      <ArrowRight
+                        className="size-4 transition group-hover:translate-x-1"
+                        aria-hidden="true"
+                      />
+                    </span>
+                  ) : (
+                    <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
+                      Rutina eliminada o no disponible
+                    </p>
+                  )}
+                </>
+              );
+
+              return assignment.routineId ? (
+                <Link
+                  key={assignment.id}
+                  href={`/app/entrenamiento/historial/${assignment.id}`}
+                  className="group rounded-[20px] border border-charcoal/10 bg-surface p-4 outline-none transition hover:border-primary/50 hover:shadow-soft focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/35"
+                  aria-label={`Ver detalle de ${assignment.title}`}
+                >
+                  {content}
+                </Link>
+              ) : (
+                <article
+                  key={assignment.id}
+                  className="rounded-[20px] border border-charcoal/10 bg-background/70 p-4"
+                >
+                  {content}
+                </article>
+              );
+            })}
           </div>
         ) : (
           <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">
@@ -283,26 +261,6 @@ async function ClientTrainingPage({
         )}
       </AppPanel>
     </AppScreen>
-  );
-}
-
-function RoutineValue({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Dumbbell;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-[16px] border border-border bg-surface p-3">
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
-      <p className="mt-2 text-xs font-extrabold uppercase tracking-wide text-muted">
-        {label}
-      </p>
-      <p className="mt-1 font-extrabold text-charcoal">{value}</p>
-    </div>
   );
 }
 
@@ -343,7 +301,7 @@ export default async function TrainingPage() {
         />
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-3">
         <Link
           href="/app/entrenamiento/ejercicios"
           className="group rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
@@ -378,6 +336,26 @@ export default async function TrainingPage() {
           </p>
           <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
             Gestionar rutinas
+            <ArrowRight className="size-4 transition group-hover:translate-x-1" />
+          </span>
+        </Link>
+
+        <Link
+          href="/app/entrenamiento/asignaciones"
+          className="group rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
+        >
+          <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-charcoal">
+            <ClipboardCheck className="size-5" aria-hidden="true" />
+          </div>
+          <h2 className="mt-5 text-3xl font-semibold text-charcoal">
+            Asignaciones
+          </h2>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
+            Consulta los clientes disponibles, asigna rutinas activas y
+            archiva asignaciones sin perder el historial.
+          </p>
+          <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
+            Gestionar asignaciones
             <ArrowRight className="size-4 transition group-hover:translate-x-1" />
           </span>
         </Link>

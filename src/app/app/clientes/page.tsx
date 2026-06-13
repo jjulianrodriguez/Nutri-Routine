@@ -4,11 +4,14 @@ import {
   Clock,
   Dumbbell,
   Leaf,
+  ArrowRight,
   Users,
 } from "lucide-react";
 import Link from "next/link";
 
 import { ClientActivationForm } from "@/components/app/client-activation-form";
+import { ClientAvatar } from "@/components/app/client-avatar";
+import { ClientCardActions } from "@/components/app/client-card-actions";
 import {
   AppHeader,
   AppPanel,
@@ -145,7 +148,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
 
       <AppPanel
         title="Filtros"
-        description="Filtra por estado actual; cada cambio tambien se valida en el servidor."
+        description="Filtra por el estado actual de cada cuenta."
         tone="primary"
       >
         <div className="flex flex-wrap gap-2">
@@ -189,32 +192,47 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <div className="flex items-center gap-3">
-                          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-sm font-extrabold text-charcoal">
-                            {client.fullName
-                              .split(/\s+/)
-                              .filter(Boolean)
-                              .slice(0, 2)
-                              .map((part) => part[0]?.toUpperCase())
-                              .join("") || "CL"}
-                          </div>
+                          <Link
+                            href={`/app/clientes/${client.id}`}
+                            aria-label={`Ver perfil de ${client.fullName}`}
+                          >
+                            <ClientAvatar
+                              name={client.fullName}
+                              src={client.avatarUrl}
+                            />
+                          </Link>
                           <div className="min-w-0">
-                            <h2 className="truncate text-lg font-extrabold text-charcoal">
-                              {client.fullName}
-                            </h2>
-                            <p className="mt-1 truncate text-sm text-muted">
-                              {client.email || "Email no disponible"}
-                            </p>
+                            <Link
+                              href={`/app/clientes/${client.id}`}
+                              className="group block rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/35"
+                            >
+                              <h2 className="truncate text-lg font-extrabold text-charcoal transition group-hover:text-warm-brown">
+                                {client.fullName}
+                              </h2>
+                              <p className="mt-1 truncate text-sm text-muted">
+                                {client.email || "Correo no disponible"}
+                              </p>
+                            </Link>
                           </div>
                         </div>
                       </div>
-                      <span
-                        className={cn(
-                          "w-fit rounded-full px-3 py-1 text-xs font-extrabold",
-                          serviceTone(client),
-                        )}
-                      >
-                        {serviceLabel(client)}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={cn(
+                            "w-fit rounded-full px-3 py-1 text-xs font-extrabold",
+                            serviceTone(client),
+                          )}
+                        >
+                          {serviceLabel(client)}
+                        </span>
+                        <ClientCardActions
+                          canManagePlans={
+                            data.canManageNutrition || data.canManageTraining
+                          }
+                          clientId={client.id}
+                          clientName={client.fullName}
+                        />
+                      </div>
                     </div>
 
                     <div className="grid gap-3 sm:grid-cols-2">
@@ -310,9 +328,17 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                         </p>
                       </div>
                     </div>
+
+                    <Link
+                      href={`/app/clientes/${client.id}`}
+                      className="inline-flex items-center gap-2 text-sm font-extrabold text-warm-brown transition hover:text-charcoal"
+                    >
+                      Ver perfil completo
+                      <ArrowRight className="size-4" aria-hidden="true" />
+                    </Link>
                   </div>
 
-                  <div>
+                  <div id={`planes-${client.id}`} className="scroll-mt-6">
                     <h3 className="mb-3 text-sm font-extrabold uppercase tracking-[0.16em] text-muted">
                       {client.isClientActivated
                         ? "Gestionar planes"

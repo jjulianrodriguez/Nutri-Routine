@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateBasicAccount } from "@/lib/actions/account";
@@ -36,6 +37,8 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 
 export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
   const router = useRouter();
+  const [pendingUpdate, setPendingUpdate] =
+    useState<UpdateBasicAccountValues | null>(null);
   const [serverMessage, setServerMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const {
@@ -51,12 +54,19 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
     resolver: zodResolver(updateBasicAccountSchema),
   });
 
-  async function onSubmit(values: UpdateBasicAccountValues) {
+  function onSubmit(values: UpdateBasicAccountValues) {
     clearErrors("root");
     setServerMessage("");
     setSuccessMessage("");
+    setPendingUpdate(values);
+  }
 
-    const result = await updateBasicAccount(values);
+  async function confirmUpdate() {
+    if (!pendingUpdate) {
+      return;
+    }
+
+    const result = await updateBasicAccount(pendingUpdate);
 
     if (result.status === "error") {
       if (result.fieldErrors) {
@@ -142,6 +152,20 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
           </>
         )}
       </Button>
+
+      <ConfirmationDialog
+        open={Boolean(pendingUpdate)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingUpdate(null);
+          }
+        }}
+        title="Guardar cambios de cuenta"
+        description="Se actualizará el nombre asociado a tu cuenta. El correo y los permisos actuales no cambiarán."
+        confirmLabel="Guardar cambios"
+        pendingLabel="Guardando…"
+        onConfirm={confirmUpdate}
+      />
     </form>
   );
 }

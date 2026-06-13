@@ -1,0 +1,27 @@
+"use client";
+
+import { RecoveryState } from "@/components/errors/recovery-state";
+
+type RootErrorProps = {
+  error: Error & { digest?: string };
+  reset: () => void;
+  unstable_retry?: () => void;
+};
+
+export default function RootError({
+  reset,
+  unstable_retry,
+}: RootErrorProps) {
+  return (
+    <main className="grid min-h-dvh place-items-center bg-[radial-gradient(circle_at_top_right,var(--primary-soft),transparent_30rem)] px-4 py-10 sm:px-6">
+      <RecoveryState
+        description="No pudimos cargar esta pagina correctamente. Puedes intentarlo otra vez o regresar a un lugar seguro."
+        eyebrow="Error de la pagina"
+        fallbackHref="/"
+        fallbackLabel="Ir al inicio"
+        retry={unstable_retry ?? reset}
+        title="Ocurrio un error inesperado"
+      />
+    </main>
+  );
+}

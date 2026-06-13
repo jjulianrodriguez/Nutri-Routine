@@ -17,7 +17,7 @@ export default async function NutritionPage() {
   return (
     <AppScreen>
       <AppHeader
-        eyebrow={access.isClient ? "Mi nutricion" : "Modulo administrativo"}
+        eyebrow={access.isClient ? "Mi nutricion" : "Area profesional"}
         title={access.isClient ? "Nutricion" : "Gestion de nutricion"}
         description={
           access.isClient
@@ -43,7 +43,7 @@ export default async function NutritionPage() {
         <StatTile
           label="Planes alimenticios"
           value={String(data.dietPlansCount)}
-          detail="Disponibles por permisos"
+          detail="Disponibles para tu cuenta"
         />
         <StatTile
           label="Recursos"
@@ -57,8 +57,8 @@ export default async function NutritionPage() {
           title={access.isClient ? "Plan alimenticio actual" : "Planes alimenticios"}
           description={
             access.isClient
-              ? "Tu plan vigente aparece si la tabla diet_plans lo expone para tu cuenta."
-              : "Vista de planes para crear, revisar o editar dietas desde las acciones reales del modulo."
+              ? "Aqui encontraras tu plan vigente cuando este disponible para tu cuenta."
+              : "Crea, revisa y actualiza los planes alimenticios de tus clientes."
           }
         >
           {data.currentDietPlan ? (
@@ -96,7 +96,7 @@ export default async function NutritionPage() {
               <p className="mt-2 text-sm leading-6 text-muted">
                 {access.isClient
                   ? "Solo tus planes alimenticios quedan disponibles en esta vista."
-                  : "Visible solo para perfiles con specialty nutrition o both."}
+                  : "Disponible para profesionales autorizados en nutricion."}
               </p>
             </div>
             {!access.isClient ? (
@@ -106,7 +106,7 @@ export default async function NutritionPage() {
                   Clientes de nutricion
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-muted">
-                  Filtrados por assigned_nutritionist_id.
+                  Solo se muestran los clientes asignados a tu area de nutricion.
                 </p>
               </div>
             ) : null}

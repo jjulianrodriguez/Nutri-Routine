@@ -1,11 +1,12 @@
 "use client";
 
-import { Loader2, Power, PowerOff } from "lucide-react";
+import { Power, PowerOff } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { setRoutineActive } from "@/lib/actions/routines";
 
 export function RoutineStatusButton({
@@ -18,10 +19,10 @@ export function RoutineStatusButton({
   routineName: string;
 }) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isConfirming, setIsConfirming] = useState(false);
 
-  function toggleStatus() {
-    startTransition(async () => {
+  async function toggleStatus() {
+    try {
       const result = await setRoutineActive(routineId, !isActive);
 
       if (result.status === "error") {
@@ -31,29 +32,47 @@ export function RoutineStatusButton({
 
       toast.success(result.message);
       router.refresh();
-    });
+    } catch {
+      toast.error(
+        "Ocurrió un error inesperado al cambiar el estado. Inténtalo de nuevo.",
+      );
+    }
   }
 
   return (
-    <Button
-      type="button"
-      size="icon"
-      variant={isActive ? "destructive" : "outline"}
-      disabled={isPending}
-      onClick={toggleStatus}
-      aria-label={
-        isActive
-          ? `Desactivar ${routineName}`
-          : `Activar ${routineName}`
-      }
-    >
-      {isPending ? (
-        <Loader2 className="animate-spin" aria-hidden="true" />
-      ) : isActive ? (
-        <PowerOff aria-hidden="true" />
-      ) : (
-        <Power aria-hidden="true" />
-      )}
-    </Button>
+    <>
+      <Button
+        type="button"
+        size="icon"
+        variant={isActive ? "destructive" : "outline"}
+        onClick={() => setIsConfirming(true)}
+        aria-label={
+          isActive
+            ? `Desactivar ${routineName}`
+            : `Activar ${routineName}`
+        }
+      >
+        {isActive ? (
+          <PowerOff aria-hidden="true" />
+        ) : (
+          <Power aria-hidden="true" />
+        )}
+      </Button>
+
+      <ConfirmationDialog
+        open={isConfirming}
+        onOpenChange={setIsConfirming}
+        title={isActive ? "Desactivar rutina" : "Activar rutina"}
+        description={
+          isActive
+            ? `"${routineName}" dejará de estar disponible para nuevas asignaciones.`
+            : `"${routineName}" volverá a estar disponible para asignaciones.`
+        }
+        confirmLabel={isActive ? "Desactivar" : "Activar"}
+        pendingLabel={isActive ? "Desactivando…" : "Activando…"}
+        tone={isActive ? "destructive" : "default"}
+        onConfirm={toggleStatus}
+      />
+    </>
   );
 }

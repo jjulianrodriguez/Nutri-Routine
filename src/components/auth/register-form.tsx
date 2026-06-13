@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { registerProfessional } from "@/lib/actions/auth";
 import { registerSchema, type RegisterValues } from "@/lib/validations/auth";
 
@@ -150,9 +151,8 @@ export function RegisterForm() {
         <Label htmlFor="password" className="text-sm font-bold text-espresso">
           Contraseña
         </Label>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           autoComplete="new-password"
           aria-describedby={
             errors.password ? "register-password-error" : undefined
@@ -175,9 +175,9 @@ export function RegisterForm() {
         >
           Confirmar contraseña
         </Label>
-        <Input
+        <PasswordInput
           id="confirmPassword"
-          type="password"
+          visibilityLabel="confirmación de contraseña"
           autoComplete="new-password"
           aria-describedby={
             errors.confirmPassword

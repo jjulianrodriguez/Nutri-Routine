@@ -13,12 +13,14 @@ import {
   Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
+import { CardActionsMenu } from "@/components/app/card-actions-menu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -53,6 +55,16 @@ const defaultValues: ExerciseFormValues = {
   name: "",
 };
 
+type ExerciseConfirmation =
+  | {
+      exercise: ExerciseListItem;
+      type: "delete" | "status";
+    }
+  | {
+      type: "update";
+      values: ExerciseFormValues;
+    };
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("es-CR", {
     day: "2-digit",
@@ -81,11 +93,8 @@ export function ExerciseManager({
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
-  const [pendingAction, setPendingAction] = useState<{
-    exerciseId: string;
-    type: "delete" | "status";
-  } | null>(null);
-  const [isStatusPending, startStatusTransition] = useTransition();
+  const [confirmation, setConfirmation] =
+    useState<ExerciseConfirmation | null>(null);
   const {
     clearErrors,
     control,
@@ -139,7 +148,7 @@ export function ExerciseManager({
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  async function onSubmit(values: ExerciseFormValues) {
+  async function saveExerciseValues(values: ExerciseFormValues) {
     setStatusMessage("");
     clearErrors();
 
@@ -164,9 +173,17 @@ export function ExerciseManager({
     router.refresh();
   }
 
-  function toggleExercise(exercise: ExerciseListItem) {
-    setPendingAction({ exerciseId: exercise.id, type: "status" });
-    startStatusTransition(async () => {
+  async function onSubmit(values: ExerciseFormValues) {
+    if (values.id) {
+      setConfirmation({ type: "update", values });
+      return;
+    }
+
+    await saveExerciseValues(values);
+  }
+
+  async function toggleExercise(exercise: ExerciseListItem) {
+    try {
       const result = await setExerciseActive(
         exercise.id,
         !exercise.isActive,
@@ -179,21 +196,19 @@ export function ExerciseManager({
         router.refresh();
       }
 
-      setPendingAction(null);
-    });
+    } catch {
+      toast.error(
+        "Ocurrió un error inesperado al cambiar el estado. Inténtalo de nuevo.",
+      );
+    }
   }
 
   function removeExercise(exercise: ExerciseListItem) {
-    const confirmed = window.confirm(
-      `Eliminaras "${exercise.name}" definitivamente. Si esta en una rutina, la eliminacion sera bloqueada. ¿Deseas continuar?`,
-    );
+    setConfirmation({ exercise, type: "delete" });
+  }
 
-    if (!confirmed) {
-      return;
-    }
-
-    setPendingAction({ exerciseId: exercise.id, type: "delete" });
-    startStatusTransition(async () => {
+  async function deleteExerciseValue(exercise: ExerciseListItem) {
+    try {
       const result = await deleteExercise(exercise.id);
 
       if (result.status === "error") {
@@ -207,9 +222,57 @@ export function ExerciseManager({
         router.refresh();
       }
 
-      setPendingAction(null);
-    });
+    } catch {
+      toast.error(
+        "Ocurrió un error inesperado al eliminar el ejercicio. Inténtalo de nuevo.",
+      );
+    }
   }
+
+  async function confirmAction() {
+    if (!confirmation) {
+      return;
+    }
+
+    if (confirmation.type === "update") {
+      await saveExerciseValues(confirmation.values);
+      return;
+    }
+
+    if (confirmation.type === "status") {
+      await toggleExercise(confirmation.exercise);
+      return;
+    }
+
+    await deleteExerciseValue(confirmation.exercise);
+  }
+
+  const confirmationTitle =
+    confirmation?.type === "update"
+      ? "Guardar cambios del ejercicio"
+      : confirmation?.type === "delete"
+        ? "Eliminar ejercicio"
+        : confirmation?.exercise.isActive
+          ? "Desactivar ejercicio"
+          : "Activar ejercicio";
+  const confirmationDescription =
+    confirmation?.type === "update"
+      ? `Se actualizará "${confirmation.values.name}" con la información del formulario.`
+      : confirmation?.type === "delete"
+        ? `Se eliminará "${confirmation.exercise.name}" definitivamente. Si forma parte de una rutina, la eliminación no se realizará.`
+        : confirmation?.exercise.isActive
+          ? `"${confirmation.exercise.name}" dejará de estar disponible para nuevas rutinas.`
+          : confirmation
+            ? `"${confirmation.exercise.name}" volverá a estar disponible para nuevas rutinas.`
+            : "";
+  const confirmationLabel =
+    confirmation?.type === "update"
+      ? "Guardar cambios"
+      : confirmation?.type === "delete"
+        ? "Eliminar ejercicio"
+        : confirmation?.exercise.isActive
+          ? "Desactivar"
+          : "Activar";
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
@@ -480,62 +543,30 @@ export function ExerciseManager({
                       {exercise.description}
                     </p>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="outline"
-                      onClick={() => editExercise(exercise)}
-                      aria-label={`Editar ${exercise.name}`}
-                    >
-                      <Pencil aria-hidden="true" />
-                    </Button>
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant={exercise.isActive ? "destructive" : "outline"}
-                      disabled={
-                        isStatusPending &&
-                        pendingAction?.exerciseId === exercise.id
-                      }
-                      onClick={() => toggleExercise(exercise)}
-                      aria-label={
-                        exercise.isActive
-                          ? `Desactivar ${exercise.name}`
-                          : `Activar ${exercise.name}`
-                      }
-                    >
-                      {isStatusPending &&
-                      pendingAction?.exerciseId === exercise.id &&
-                      pendingAction.type === "status" ? (
-                        <Loader2 className="animate-spin" aria-hidden="true" />
-                      ) : exercise.isActive ? (
-                        <PowerOff aria-hidden="true" />
-                      ) : (
-                        <Power aria-hidden="true" />
-                      )}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="destructive"
-                      disabled={
-                        isStatusPending &&
-                        pendingAction?.exerciseId === exercise.id
-                      }
-                      onClick={() => removeExercise(exercise)}
-                      aria-label={`Eliminar definitivamente ${exercise.name}`}
-                      title="Eliminar definitivamente"
-                    >
-                      {isStatusPending &&
-                      pendingAction?.exerciseId === exercise.id &&
-                      pendingAction.type === "delete" ? (
-                        <Loader2 className="animate-spin" aria-hidden="true" />
-                      ) : (
-                        <Trash2 aria-hidden="true" />
-                      )}
-                    </Button>
-                  </div>
+                  <CardActionsMenu
+                    label={exercise.name}
+                    items={[
+                      {
+                        icon: Pencil,
+                        label: "Editar",
+                        onSelect: () => editExercise(exercise),
+                      },
+                      {
+                        destructive: exercise.isActive,
+                        icon: exercise.isActive ? PowerOff : Power,
+                        label: exercise.isActive ? "Desactivar" : "Activar",
+                        onSelect: () =>
+                          setConfirmation({ exercise, type: "status" }),
+                        separatorBefore: true,
+                      },
+                      {
+                        destructive: true,
+                        icon: Trash2,
+                        label: "Eliminar",
+                        onSelect: () => removeExercise(exercise),
+                      },
+                    ]}
+                  />
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-warm-brown">
@@ -585,6 +616,33 @@ export function ExerciseManager({
           )}
         </div>
       </section>
+
+      <ConfirmationDialog
+        open={Boolean(confirmation)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setConfirmation(null);
+          }
+        }}
+        title={confirmationTitle}
+        description={confirmationDescription}
+        confirmLabel={confirmationLabel}
+        pendingLabel={
+          confirmation?.type === "delete"
+            ? "Eliminando…"
+            : confirmation?.type === "status"
+              ? "Actualizando…"
+              : "Guardando…"
+        }
+        tone={
+          confirmation?.type === "delete" ||
+          (confirmation?.type === "status" &&
+            confirmation.exercise.isActive)
+            ? "destructive"
+            : "default"
+        }
+        onConfirm={confirmAction}
+      />
     </div>
   );
 }

@@ -1,9 +1,8 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import {
   getAppRouteKind,
   getAppRoutePath,
-  getDefaultAppRoute,
 } from "@/lib/auth/access-rules";
 import {
   requireCurrentUserAccess,
@@ -24,9 +23,9 @@ export default async function GuardedAliasPage({
   const route = getAppRouteKind(pathname);
 
   if (!route) {
-    const access = await requireCurrentUserAccess();
+    await requireCurrentUserAccess();
 
-    redirect(getDefaultAppRoute(access));
+    notFound();
   }
 
   await requireRouteAccess(pathname);

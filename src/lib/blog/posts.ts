@@ -70,7 +70,7 @@ export const getPublishedBlogPosts = cache(async () => {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return [];
+    throw new Error("No se pudieron cargar los articulos publicados.");
   }
 
   return (data ?? []).map(mapBlogPost);
@@ -91,7 +91,11 @@ export const getPostBySlug = cache(async (slug: string) => {
     .eq("published", true)
     .maybeSingle();
 
-  if (error || !data) {
+  if (error) {
+    throw new Error("No se pudo cargar el articulo solicitado.");
+  }
+
+  if (!data) {
     return null;
   }
 

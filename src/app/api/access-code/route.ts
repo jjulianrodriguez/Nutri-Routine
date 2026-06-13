@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Configura REGISTER_ACCESS_CODE antes de permitir nuevos registros.",
+          "El registro de nuevas cuentas no esta disponible en este momento.",
       },
       { status: 500 },
     );

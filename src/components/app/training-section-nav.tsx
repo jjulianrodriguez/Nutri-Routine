@@ -1,4 +1,4 @@
-import { Dumbbell, LayoutGrid, ListChecks } from "lucide-react";
+import { ClipboardCheck, Dumbbell, LayoutGrid, ListChecks } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -21,6 +21,12 @@ const items = [
     icon: ListChecks,
     key: "routines",
     label: "Rutinas",
+  },
+  {
+    href: "/app/entrenamiento/asignaciones",
+    icon: ClipboardCheck,
+    key: "assignments",
+    label: "Asignaciones",
   },
 ] as const;
 

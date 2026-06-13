@@ -325,6 +325,53 @@ export type Database = {
           },
         ];
       };
+      profile_personal_details: {
+        Row: {
+          birth_date: string | null;
+          created_at: string;
+          gender: string | null;
+          gender_description: string | null;
+          height_cm: number | null;
+          medical_conditions: string | null;
+          phone: string | null;
+          profile_id: string;
+          updated_at: string;
+          weight_kg: number | null;
+        };
+        Insert: {
+          birth_date?: string | null;
+          created_at?: string;
+          gender?: string | null;
+          gender_description?: string | null;
+          height_cm?: number | null;
+          medical_conditions?: string | null;
+          phone?: string | null;
+          profile_id: string;
+          updated_at?: string;
+          weight_kg?: number | null;
+        };
+        Update: {
+          birth_date?: string | null;
+          created_at?: string;
+          gender?: string | null;
+          gender_description?: string | null;
+          height_cm?: number | null;
+          medical_conditions?: string | null;
+          phone?: string | null;
+          profile_id?: string;
+          updated_at?: string;
+          weight_kg?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "profile_personal_details_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;

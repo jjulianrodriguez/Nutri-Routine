@@ -54,7 +54,9 @@ export default async function CalendarPage() {
       <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
         <AppPanel
           title={access.isClient ? "Proximas citas" : "Agenda administrativa"}
-          description={`${data.count} registros visibles en appointments.`}
+          description={`${data.count} ${
+            data.count === 1 ? "registro visible" : "registros visibles"
+          }.`}
         >
           <AppointmentRecords records={data.records} />
         </AppPanel>

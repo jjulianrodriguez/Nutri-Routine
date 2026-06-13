@@ -11,21 +11,21 @@ export default async function ProfilePage() {
       <AppHeader
         eyebrow="Mi perfil"
         title="Mi perfil"
-        description="Resumen personal para clientes. Los perfiles administrativos usan Configuracion."
+        description="Resumen de tus servicios y datos de cuenta."
       />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatTile
           label="Nutricion"
           value={access.hasNutritionService ? "Activa" : "No asignada"}
-          detail="assigned_nutritionist_id"
+          detail="Estado de tu servicio"
         />
         <StatTile
           label="Entrenamiento"
           value={access.hasTrainingService ? "Activo" : "No asignado"}
-          detail="assigned_trainer_id"
+          detail="Estado de tu servicio"
         />
-        <StatTile label="Rol" value="Cliente" detail="profiles.role" />
+        <StatTile label="Rol" value="Cliente" detail="Tipo de cuenta actual" />
       </section>
 
       <AppPanel title="Datos de cuenta" description={access.roleLabel}>

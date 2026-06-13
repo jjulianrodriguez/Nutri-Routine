@@ -15,12 +15,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
+import { CardActionsMenu } from "@/components/app/card-actions-menu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -40,6 +42,17 @@ import {
 type BlogManagerProps = {
   initialPosts: AdminBlogPost[];
 };
+
+type BlogConfirmation =
+  | {
+      post: AdminBlogPost;
+      type: "delete" | "pinned" | "visibility";
+    }
+  | {
+      post: AdminBlogPost;
+      type: "update";
+      values: BlogPostValues;
+    };
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("es-CR", {
@@ -64,9 +77,9 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
   const router = useRouter();
   const formRef = useRef<HTMLDivElement>(null);
   const [editingPost, setEditingPost] = useState<AdminBlogPost | null>(null);
+  const [confirmation, setConfirmation] =
+    useState<BlogConfirmation | null>(null);
   const [serverMessage, setServerMessage] = useState("");
-  const [pendingPostId, setPendingPostId] = useState<string | null>(null);
-  const [isChangingStatus, startStatusTransition] = useTransition();
   const {
     clearErrors,
     control,
@@ -115,12 +128,15 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
     });
   }
 
-  async function onSubmit(values: BlogPostValues) {
+  async function savePost(
+    values: BlogPostValues,
+    post: AdminBlogPost | null,
+  ) {
     setServerMessage("");
     clearErrors("root");
 
-    const result = editingPost
-      ? await updateBlogPost({ ...values, id: editingPost.id })
+    const result = post
+      ? await updateBlogPost({ ...values, id: post.id })
       : await createBlogPost(values);
 
     if (result.status === "error") {
@@ -142,39 +158,115 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
     router.refresh();
   }
 
-  function changeStatus(
-    postId: string,
+  async function onSubmit(values: BlogPostValues) {
+    if (editingPost) {
+      setConfirmation({ post: editingPost, type: "update", values });
+      return;
+    }
+
+    await savePost(values, null);
+  }
+
+  async function changeStatus(
+    post: AdminBlogPost,
     action: () => Promise<BlogActionResult>,
   ) {
-    setPendingPostId(postId);
-    startStatusTransition(async () => {
+    try {
       const result = await action();
 
       if (result.status === "error") {
         toast.error(result.message);
       } else {
         toast.success(result.message);
-        if (editingPost?.id === postId) {
+        if (editingPost?.id === post.id) {
           clearForm();
         }
         router.refresh();
       }
-
-      setPendingPostId(null);
-    });
+    } catch {
+      toast.error(
+        "Ocurrió un error inesperado al actualizar el blog. Inténtalo de nuevo.",
+      );
+    }
   }
 
   function confirmDelete(post: AdminBlogPost) {
-    const confirmed = window.confirm(
-      `¿Eliminar definitivamente "${post.title}"?\n\nEsta accion no se puede deshacer.`,
-    );
+    setConfirmation({ post, type: "delete" });
+  }
 
-    if (!confirmed) {
+  async function confirmAction() {
+    if (!confirmation) {
       return;
     }
 
-    changeStatus(post.id, () => deleteBlogPost(post.id));
+    if (confirmation.type === "update") {
+      await savePost(confirmation.values, confirmation.post);
+      return;
+    }
+
+    if (confirmation.type === "delete") {
+      await changeStatus(confirmation.post, () =>
+        deleteBlogPost(confirmation.post.id),
+      );
+      return;
+    }
+
+    if (confirmation.type === "visibility") {
+      await changeStatus(confirmation.post, () =>
+        updateBlogVisibility(
+          confirmation.post.id,
+          !confirmation.post.published,
+        ),
+      );
+      return;
+    }
+
+    await changeStatus(confirmation.post, () =>
+      updateBlogPinned(
+        confirmation.post.id,
+        !confirmation.post.is_pinned,
+      ),
+    );
   }
+
+  const confirmationTitle =
+    confirmation?.type === "update"
+      ? "Guardar cambios del blog"
+      : confirmation?.type === "delete"
+        ? "Eliminar blog"
+        : confirmation?.type === "visibility"
+          ? confirmation.post.published
+            ? "Ocultar blog"
+            : "Mostrar blog"
+          : confirmation?.post.is_pinned
+            ? "Desanclar blog"
+            : "Anclar blog";
+  const confirmationDescription =
+    confirmation?.type === "update"
+      ? `Se actualizará "${confirmation.values.title}" con la información del formulario.`
+      : confirmation?.type === "delete"
+        ? `Se eliminará definitivamente "${confirmation.post.title}". Esta acción no se puede deshacer.`
+        : confirmation?.type === "visibility"
+          ? confirmation.post.published
+            ? `"${confirmation.post.title}" dejará de estar visible en el blog público.`
+            : `"${confirmation.post.title}" volverá a estar visible en el blog público.`
+          : confirmation?.post.is_pinned
+            ? `"${confirmation.post.title}" dejará de ser la publicación principal.`
+            : confirmation
+              ? `"${confirmation.post.title}" se mostrará como publicación principal.`
+              : "";
+  const confirmationLabel =
+    confirmation?.type === "update"
+      ? "Guardar cambios"
+      : confirmation?.type === "delete"
+        ? "Eliminar blog"
+        : confirmation?.type === "visibility"
+          ? confirmation.post.published
+            ? "Ocultar"
+            : "Mostrar"
+          : confirmation?.post.is_pinned
+            ? "Desanclar"
+            : "Anclar";
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] xl:items-start">
@@ -386,37 +478,64 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
 
         {initialPosts.length > 0 ? (
           <div className="mt-6 space-y-4">
-            {initialPosts.map((post) => {
-              const isPending =
-                isChangingStatus && pendingPostId === post.id;
-
-              return (
+            {initialPosts.map((post) => (
                 <article
                   key={post.id}
                   className="rounded-[22px] border border-border bg-background p-4 sm:p-5"
                 >
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={[
-                        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold",
-                        post.published
-                          ? "bg-success/10 text-success"
-                          : "bg-stone-soft text-warm-brown",
-                      ].join(" ")}
-                    >
-                      {post.published ? (
-                        <Eye className="size-3" aria-hidden="true" />
-                      ) : (
-                        <EyeOff className="size-3" aria-hidden="true" />
-                      )}
-                      {post.published ? "Visible" : "Oculto"}
-                    </span>
-                    {post.is_pinned ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-extrabold text-charcoal">
-                        <Pin className="size-3" aria-hidden="true" />
-                        Principal
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={[
+                          "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold",
+                          post.published
+                            ? "bg-success/10 text-success"
+                            : "bg-stone-soft text-warm-brown",
+                        ].join(" ")}
+                      >
+                        {post.published ? (
+                          <Eye className="size-3" aria-hidden="true" />
+                        ) : (
+                          <EyeOff className="size-3" aria-hidden="true" />
+                        )}
+                        {post.published ? "Visible" : "Oculto"}
                       </span>
-                    ) : null}
+                      {post.is_pinned ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-extrabold text-charcoal">
+                          <Pin className="size-3" aria-hidden="true" />
+                          Principal
+                        </span>
+                      ) : null}
+                    </div>
+                    <CardActionsMenu
+                      label={post.title}
+                      items={[
+                        {
+                          icon: Pencil,
+                          label: "Editar",
+                          onSelect: () => startEditing(post),
+                        },
+                        {
+                          icon: post.published ? EyeOff : Eye,
+                          label: post.published ? "Ocultar" : "Mostrar",
+                          onSelect: () =>
+                            setConfirmation({ post, type: "visibility" }),
+                        },
+                        {
+                          icon: post.is_pinned ? PinOff : Pin,
+                          label: post.is_pinned ? "Desanclar" : "Anclar",
+                          onSelect: () =>
+                            setConfirmation({ post, type: "pinned" }),
+                        },
+                        {
+                          destructive: true,
+                          icon: Trash2,
+                          label: "Eliminar",
+                          onSelect: () => confirmDelete(post),
+                          separatorBefore: true,
+                        },
+                      ]}
+                    />
                   </div>
 
                   <h3 className="mt-4 text-2xl font-semibold leading-tight text-charcoal">
@@ -441,79 +560,8 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
                     </div>
                   </dl>
 
-                  <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => startEditing(post)}
-                      disabled={isPending}
-                    >
-                      <Pencil className="size-4" aria-hidden="true" />
-                      Editar
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      disabled={isPending}
-                      onClick={() =>
-                        changeStatus(post.id, () =>
-                          updateBlogVisibility(post.id, !post.published),
-                        )
-                      }
-                    >
-                      {isPending ? (
-                        <Loader2
-                          className="size-4 animate-spin"
-                          aria-hidden="true"
-                        />
-                      ) : post.published ? (
-                        <EyeOff className="size-4" aria-hidden="true" />
-                      ) : (
-                        <Eye className="size-4" aria-hidden="true" />
-                      )}
-                      {post.published ? "Ocultar" : "Mostrar"}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant={post.is_pinned ? "ghost" : "outline"}
-                      disabled={isPending}
-                      onClick={() =>
-                        changeStatus(post.id, () =>
-                          updateBlogPinned(post.id, !post.is_pinned),
-                        )
-                      }
-                    >
-                      {post.is_pinned ? (
-                        <PinOff className="size-4" aria-hidden="true" />
-                      ) : (
-                        <Pin className="size-4" aria-hidden="true" />
-                      )}
-                      {post.is_pinned ? "Desanclar" : "Anclar"}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="destructive"
-                      disabled={isPending}
-                      onClick={() => confirmDelete(post)}
-                    >
-                      {isPending ? (
-                        <Loader2
-                          className="size-4 animate-spin"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <Trash2 className="size-4" aria-hidden="true" />
-                      )}
-                      Eliminar
-                    </Button>
-                  </div>
                 </article>
-              );
-            })}
+            ))}
           </div>
         ) : (
           <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
@@ -526,6 +574,27 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
           </div>
         )}
       </section>
+
+      <ConfirmationDialog
+        open={Boolean(confirmation)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setConfirmation(null);
+          }
+        }}
+        title={confirmationTitle}
+        description={confirmationDescription}
+        confirmLabel={confirmationLabel}
+        pendingLabel={
+          confirmation?.type === "delete"
+            ? "Eliminando…"
+            : confirmation?.type === "update"
+              ? "Guardando…"
+              : "Actualizando…"
+        }
+        tone={confirmation?.type === "delete" ? "destructive" : "default"}
+        onConfirm={confirmAction}
+      />
     </div>
   );
 }

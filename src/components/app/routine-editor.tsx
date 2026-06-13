@@ -19,6 +19,7 @@ import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { saveRoutine } from "@/lib/actions/routines";
@@ -121,6 +122,8 @@ export function RoutineEditor({
   routine?: RoutineDetail;
 }) {
   const router = useRouter();
+  const [pendingUpdate, setPendingUpdate] =
+    useState<RoutineFormValues | null>(null);
   const [selectedExerciseId, setSelectedExerciseId] = useState("");
   const [serverMessage, setServerMessage] = useState("");
   const {
@@ -160,16 +163,8 @@ export function RoutineEditor({
     setSelectedExerciseId("");
   }
 
-  async function onSubmit(values: RoutineFormValues) {
+  async function saveRoutineValues(values: RoutineFormValues) {
     setServerMessage("");
-
-    if (inactiveSelected) {
-      const message =
-        "Retira los ejercicios inactivos antes de guardar la rutina.";
-      setServerMessage(message);
-      toast.error(message);
-      return;
-    }
 
     const result = await saveRoutine(routine?.id ?? null, values);
 
@@ -182,6 +177,29 @@ export function RoutineEditor({
     toast.success(result.message);
     router.push("/app/entrenamiento/rutinas");
     router.refresh();
+  }
+
+  async function onSubmit(values: RoutineFormValues) {
+    if (inactiveSelected) {
+      const message =
+        "Retira los ejercicios inactivos antes de guardar la rutina.";
+      setServerMessage(message);
+      toast.error(message);
+      return;
+    }
+
+    if (routine) {
+      setPendingUpdate(values);
+      return;
+    }
+
+    await saveRoutineValues(values);
+  }
+
+  async function confirmUpdate() {
+    if (pendingUpdate) {
+      await saveRoutineValues(pendingUpdate);
+    }
   }
 
   return (
@@ -592,6 +610,20 @@ export function RoutineEditor({
           )}
         </Button>
       </div>
+
+      <ConfirmationDialog
+        open={Boolean(pendingUpdate)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingUpdate(null);
+          }
+        }}
+        title="Guardar cambios de la rutina"
+        description={`Se actualizará "${pendingUpdate?.name ?? routine?.name ?? "esta rutina"}" y la configuración de sus ejercicios.`}
+        confirmLabel="Guardar cambios"
+        pendingLabel="Guardando…"
+        onConfirm={confirmUpdate}
+      />
     </form>
   );
 }

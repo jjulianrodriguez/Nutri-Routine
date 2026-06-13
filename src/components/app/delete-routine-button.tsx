@@ -1,28 +1,19 @@
 "use client";
 
-import { Loader2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { deleteRoutine } from "@/lib/actions/routines";
 
 export function DeleteRoutineButton({ routineId }: { routineId: string }) {
   const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   async function handleDelete() {
-    const confirmed = window.confirm(
-      "Esta accion eliminara la rutina y su configuracion de ejercicios.",
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    setIsDeleting(true);
-
     try {
       const result = await deleteRoutine(routineId);
 
@@ -34,25 +25,35 @@ export function DeleteRoutineButton({ routineId }: { routineId: string }) {
       toast.success(result.message);
       router.push("/app/entrenamiento");
       router.refresh();
-    } finally {
-      setIsDeleting(false);
+    } catch {
+      toast.error(
+        "Ocurrio un error inesperado al eliminar la rutina. Intentalo de nuevo.",
+      );
     }
   }
 
   return (
-    <Button
-      type="button"
-      variant="destructive"
-      size="lg"
-      onClick={handleDelete}
-      disabled={isDeleting}
-    >
-      {isDeleting ? (
-        <Loader2 className="size-4 animate-spin" />
-      ) : (
+    <>
+      <Button
+        type="button"
+        variant="destructive"
+        size="lg"
+        onClick={() => setIsConfirming(true)}
+      >
         <Trash2 className="size-4" />
-      )}
-      {isDeleting ? "Eliminando..." : "Eliminar rutina"}
-    </Button>
+        Eliminar rutina
+      </Button>
+
+      <ConfirmationDialog
+        open={isConfirming}
+        onOpenChange={setIsConfirming}
+        title="Eliminar rutina"
+        description="Esta acción eliminará la rutina y su configuración de ejercicios. Las asignaciones de clientes se archivarán y dejarán de mostrarla como activa."
+        confirmLabel="Eliminar rutina"
+        pendingLabel="Eliminando…"
+        tone="destructive"
+        onConfirm={handleDelete}
+      />
+    </>
   );
 }

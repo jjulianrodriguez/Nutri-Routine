@@ -15,6 +15,7 @@ import type { Json } from "@/types/database";
 
 const TRAINING_PATH = "/app/entrenamiento";
 const ROUTINES_PATH = `${TRAINING_PATH}/rutinas`;
+const ASSIGNMENTS_PATH = `${TRAINING_PATH}/asignaciones`;
 
 export type RoutineActionResult =
   | {
@@ -194,27 +195,31 @@ export async function deleteRoutine(
     .select("id")
     .maybeSingle();
 
-  if (error?.code === "23503") {
+  if (error?.code === "42501") {
     return {
-      message:
-        "No puedes eliminar esta rutina porque tiene asignaciones de clientes. Desactivala para conservar el historial.",
+      message: "No tienes permisos para eliminar esta rutina.",
       status: "error",
     };
   }
 
   if (error || !data) {
     return {
-      message: "No se pudo eliminar la rutina.",
+      message:
+        error?.code === "23503"
+          ? "No se pudo eliminar la rutina por una relacion de datos inesperada."
+          : "No se pudo eliminar la rutina. Intentalo de nuevo.",
       status: "error",
     };
   }
 
   revalidatePath(TRAINING_PATH);
   revalidatePath(ROUTINES_PATH);
+  revalidatePath(ASSIGNMENTS_PATH);
 
   return {
     id: data.id,
-    message: "Rutina eliminada correctamente.",
+    message:
+      "Rutina eliminada correctamente. Sus asignaciones quedaron archivadas.",
     status: "success",
   };
 }
@@ -313,11 +318,59 @@ export async function assignRoutineToClient(
 
   revalidatePath(TRAINING_PATH);
   revalidatePath(ROUTINES_PATH);
+  revalidatePath(ASSIGNMENTS_PATH);
   revalidatePath(`${ROUTINES_PATH}/${parsed.data.routineId}`);
 
   return {
     id: data,
     message: "Rutina asignada correctamente.",
+    status: "success",
+  };
+}
+
+export async function unassignRoutineFromClient(
+  assignmentId: string,
+): Promise<RoutineActionResult> {
+  if (!/^[0-9a-f-]{36}$/i.test(assignmentId)) {
+    return {
+      message: "La asignacion indicada no es valida.",
+      status: "error",
+    };
+  }
+
+  const context = await getTrainingManagerContext();
+
+  if (context.error || !context.user) {
+    return {
+      message: context.error ?? "No tienes permisos para desasignar rutinas.",
+      status: "error",
+    };
+  }
+
+  const { data, error } = await context.supabase
+    .from("workout_plans")
+    .update({ status: "archived" })
+    .eq("id", assignmentId)
+    .eq("status", "active")
+    .select("id")
+    .maybeSingle();
+
+  if (error || !data) {
+    return {
+      message:
+        error?.code === "42501"
+          ? "Solo puedes desasignar rutinas de clientes vinculados contigo."
+          : "No se pudo desasignar la rutina.",
+      status: "error",
+    };
+  }
+
+  revalidatePath(TRAINING_PATH);
+  revalidatePath(ASSIGNMENTS_PATH);
+
+  return {
+    id: data.id,
+    message: "Rutina desasignada. La asignacion se conservo en el historial.",
     status: "success",
   };
 }

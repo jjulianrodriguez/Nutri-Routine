@@ -48,6 +48,7 @@ export type ClientAccountListItem = {
   assignedNutritionistName: string | null;
   assignedTrainerId: string | null;
   assignedTrainerName: string | null;
+  avatarUrl: string | null;
   clientProfileExists: boolean;
   createdAt: string;
   email: string;
@@ -193,7 +194,7 @@ async function getCurrentActivationActor() {
       canManageNutrition: false,
       canManageTraining: false,
       currentUserId: user.id,
-      error: "No se pudo validar tu perfil administrativo.",
+      error: "No se pudo validar tu cuenta.",
       role: null,
     };
   }
@@ -499,7 +500,7 @@ export async function listClientActivationData(
 
   if (!actor.canManageNutrition && !actor.canManageTraining) {
     return emptyClientActivationData(
-      "Tu perfil administrativo no tiene permisos de nutricion ni entrenamiento.",
+      "Tu cuenta no puede gestionar planes de nutricion ni entrenamiento.",
     );
   }
 
@@ -510,7 +511,7 @@ export async function listClientActivationData(
   ] = await Promise.all([
     actor.activationSupabase
       .from("profiles")
-      .select("id, full_name, created_at, role")
+      .select("id, full_name, avatar_url, created_at, role")
       .eq("role", "client")
       .order("created_at", { ascending: false }),
     actor.activationSupabase
@@ -612,6 +613,7 @@ export async function listClientActivationData(
       assignedTrainerName: assignedTrainerId
         ? professionalNameById.get(assignedTrainerId) ?? null
         : null,
+      avatarUrl: profile.avatar_url,
       clientProfileExists: Boolean(assignment),
       createdAt: profile.created_at,
       email: "",

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { loginProfessional } from "@/lib/actions/auth";
 import { loginSchema, type LoginValues } from "@/lib/validations/auth";
 
@@ -105,9 +106,8 @@ export function LoginForm({ initialError }: LoginFormProps) {
         <Label htmlFor="password" className="text-sm font-bold text-espresso">
           Contraseña
         </Label>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           autoComplete="current-password"
           aria-describedby={
             errors.password ? "login-password-error" : undefined

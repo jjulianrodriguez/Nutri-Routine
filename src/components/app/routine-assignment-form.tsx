@@ -3,11 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarPlus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { assignRoutineToClient } from "@/lib/actions/routines";
@@ -15,21 +17,32 @@ import {
   routineAssignmentSchema,
   type RoutineAssignmentFormValues,
 } from "@/lib/validations/routine-assignments";
-import type { AssignableTrainingClient } from "@/types/routine";
+import type {
+  AssignableRoutine,
+  AssignableTrainingClient,
+} from "@/types/routine";
 
 const inputClasses =
   "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft focus-visible:ring-primary/20";
 
 export function RoutineAssignmentForm({
   clients,
+  defaultClientId = "",
+  defaultRoutineId = "",
   defaultStartDate,
-  routineId,
+  routines,
 }: {
   clients: AssignableTrainingClient[];
+  defaultClientId?: string;
+  defaultRoutineId?: string;
   defaultStartDate: string;
-  routineId: string;
+  routines: AssignableRoutine[];
 }) {
   const router = useRouter();
+  const [pendingReplacement, setPendingReplacement] = useState<{
+    client: AssignableTrainingClient;
+    values: RoutineAssignmentFormValues;
+  } | null>(null);
   const {
     formState: { errors, isSubmitting },
     handleSubmit,
@@ -38,15 +51,15 @@ export function RoutineAssignmentForm({
     setError,
   } = useForm<RoutineAssignmentFormValues>({
     defaultValues: {
-      clientId: "",
+      clientId: defaultClientId,
       durationWeeks: "6",
-      routineId,
+      routineId: defaultRoutineId,
       startDate: defaultStartDate,
     },
     resolver: zodResolver(routineAssignmentSchema),
   });
 
-  async function onSubmit(values: RoutineAssignmentFormValues) {
+  async function assignRoutine(values: RoutineAssignmentFormValues) {
     const result = await assignRoutineToClient(values);
 
     if (result.status === "error") {
@@ -59,10 +72,27 @@ export function RoutineAssignmentForm({
     reset({
       clientId: "",
       durationWeeks: values.durationWeeks,
-      routineId,
+      routineId: values.routineId,
       startDate: values.startDate,
     });
     router.refresh();
+  }
+
+  async function onSubmit(values: RoutineAssignmentFormValues) {
+    const client = clients.find((item) => item.id === values.clientId);
+
+    if (client?.currentAssignment) {
+      setPendingReplacement({ client, values });
+      return;
+    }
+
+    await assignRoutine(values);
+  }
+
+  async function confirmReplacement() {
+    if (pendingReplacement) {
+      await assignRoutine(pendingReplacement.values);
+    }
   }
 
   if (clients.length === 0) {
@@ -75,14 +105,22 @@ export function RoutineAssignmentForm({
     );
   }
 
+  if (routines.length === 0) {
+    return (
+      <Alert className="rounded-[18px] border-border bg-background px-4 py-3">
+        <AlertDescription className="font-semibold text-muted">
+          No hay rutinas activas disponibles para asignar.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <form
-      className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(8rem,0.6fr)_minmax(10rem,0.7fr)_auto] lg:items-end"
+      className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(8rem,0.55fr)_minmax(10rem,0.65fr)_auto] xl:items-end"
       onSubmit={handleSubmit(onSubmit)}
       noValidate
     >
-      <input type="hidden" {...register("routineId")} />
-
       <div>
         <Label htmlFor="assignment-client" className="font-extrabold text-charcoal">
           Cliente
@@ -97,8 +135,8 @@ export function RoutineAssignmentForm({
           {clients.map((client) => (
             <option key={client.id} value={client.id}>
               {client.name}
-              {client.currentRoutineName
-                ? ` - actual: ${client.currentRoutineName}`
+              {client.currentAssignment
+                ? ` - actual: ${client.currentAssignment.title}`
                 : ""}
             </option>
           ))}
@@ -106,6 +144,30 @@ export function RoutineAssignmentForm({
         {errors.clientId ? (
           <p className="mt-2 text-sm font-semibold text-danger" role="alert">
             {errors.clientId.message}
+          </p>
+        ) : null}
+      </div>
+
+      <div>
+        <Label htmlFor="assignment-routine" className="font-extrabold text-charcoal">
+          Rutina
+        </Label>
+        <select
+          id="assignment-routine"
+          className={`${inputClasses} h-11 w-full appearance-none text-sm font-semibold`}
+          aria-invalid={Boolean(errors.routineId)}
+          {...register("routineId")}
+        >
+          <option value="">Selecciona una rutina</option>
+          {routines.map((routine) => (
+            <option key={routine.id} value={routine.id}>
+              {routine.name} - {routine.category}
+            </option>
+          ))}
+        </select>
+        {errors.routineId ? (
+          <p className="mt-2 text-sm font-semibold text-danger" role="alert">
+            {errors.routineId.message}
           </p>
         ) : null}
       </div>
@@ -172,13 +234,32 @@ export function RoutineAssignmentForm({
       {errors.root?.message ? (
         <Alert
           variant="destructive"
-          className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3 lg:col-span-4"
+          className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3 md:col-span-2 xl:col-span-5"
         >
           <AlertDescription className="font-semibold text-danger">
             {errors.root.message}
           </AlertDescription>
         </Alert>
       ) : null}
+
+      <ConfirmationDialog
+        open={Boolean(pendingReplacement)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingReplacement(null);
+          }
+        }}
+        title="Reemplazar rutina activa"
+        description={
+          pendingReplacement
+            ? `${pendingReplacement.client.name} ya tiene "${pendingReplacement.client.currentAssignment?.title}" activa. La asignación actual se archivará antes de guardar la nueva rutina.`
+            : ""
+        }
+        confirmLabel="Reemplazar rutina"
+        pendingLabel="Asignando…"
+        tone="destructive"
+        onConfirm={confirmReplacement}
+      />
     </form>
   );
 }

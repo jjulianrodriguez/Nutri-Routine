@@ -50,12 +50,6 @@ export type RoutineManagementOverview = {
   routines: RoutineListItem[];
 };
 
-export type AssignableTrainingClient = {
-  currentRoutineName: string | null;
-  id: string;
-  name: string;
-};
-
 export type RoutineAssignmentState =
   | "active"
   | "archived"
@@ -73,6 +67,23 @@ export type RoutineAssignmentSummary = {
   startDate: string | null;
   state: RoutineAssignmentState;
   title: string;
+};
+
+export type RoutineAssignmentDetail = {
+  assignment: RoutineAssignmentSummary;
+  routine: RoutineDetail;
+};
+
+export type AssignableRoutine = {
+  category: string;
+  id: string;
+  name: string;
+};
+
+export type AssignableTrainingClient = {
+  currentAssignment: RoutineAssignmentSummary | null;
+  id: string;
+  name: string;
 };
 
 export type ClientTrainingOverview = {

@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   CalendarDays,
+  ClipboardCheck,
   Clock3,
   Dumbbell,
   Pencil,
@@ -18,14 +19,10 @@ import {
   EmptyState,
 } from "@/components/app/AppScreen";
 import { DeleteRoutineButton } from "@/components/app/delete-routine-button";
-import { RoutineAssignmentForm } from "@/components/app/routine-assignment-form";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
 import { Button } from "@/components/ui/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
-import {
-  getRoutineDetail,
-  listAssignableTrainingClients,
-} from "@/lib/routines/data";
+import { getRoutineDetail } from "@/lib/routines/data";
 import { formatRestTime } from "@/lib/routines/format";
 import type { RoutineDifficulty } from "@/types/routine";
 
@@ -55,10 +52,7 @@ export default async function RoutineDetailPage({
   }
 
   const { id } = await params;
-  const [routine, clients] = await Promise.all([
-    getRoutineDetail(id),
-    listAssignableTrainingClients(access),
-  ]);
+  const routine = await getRoutineDetail(id);
 
   if (!routine) {
     notFound();
@@ -81,6 +75,14 @@ export default async function RoutineDetailPage({
           </Link>
         </Button>
         <div className="flex flex-col gap-3 sm:flex-row">
+          <Button asChild variant="outline" size="lg">
+            <Link
+              href={`/app/entrenamiento/asignaciones?routine=${routine.id}`}
+            >
+              <ClipboardCheck className="size-4" />
+              Asignar rutina
+            </Link>
+          </Button>
           <DeleteRoutineButton routineId={routine.id} />
           <Button asChild size="lg">
             <Link href={`/app/entrenamiento/rutinas/${routine.id}/editar`}>
@@ -117,18 +119,6 @@ export default async function RoutineDetailPage({
           </p>
         </div>
       </section>
-
-      <AppPanel
-        title="Asignar a un cliente"
-        description="La nueva asignacion archiva la rutina activa anterior de ese cliente y conserva su historial."
-        tone="primary"
-      >
-        <RoutineAssignmentForm
-          clients={clients}
-          defaultStartDate={new Date().toISOString().slice(0, 10)}
-          routineId={routine.id}
-        />
-      </AppPanel>
 
       <AppPanel
         title="Ejercicios"

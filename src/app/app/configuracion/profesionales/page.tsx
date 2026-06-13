@@ -49,7 +49,7 @@ export default async function ProfessionalAccountsPage() {
               <ShieldCheck className="size-4" aria-hidden="true" />
             </div>
             <p className="text-sm font-extrabold leading-6 text-charcoal">
-              El codigo administrativo se valida solo en servidor.
+              El codigo administrativo se verifica de forma segura.
             </p>
           </div>
         </div>
@@ -58,7 +58,7 @@ export default async function ProfessionalAccountsPage() {
       <FadeIn delay={0.06}>
         <AppPanel
           title="Crear cuenta"
-          description="Estas cuentas se crean con rol admin y especialidad profesional."
+          description="Estas cuentas reciben permisos administrativos para el area profesional seleccionada."
         >
           <ProfessionalAccountForm />
         </AppPanel>

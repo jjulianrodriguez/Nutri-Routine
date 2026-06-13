@@ -67,7 +67,7 @@ export default async function ProgressPage() {
 
       <AppPanel
         title="Registro de avances"
-        description="Metricas reales guardadas en progress_entries."
+        description="Consulta tus metricas y revisa como evolucionan tus avances."
         tone="accent"
       >
         <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">

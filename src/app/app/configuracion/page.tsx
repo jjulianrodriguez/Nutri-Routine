@@ -1,20 +1,29 @@
-import { ArrowRight, Settings, ShieldCheck, Users } from "lucide-react";
+import {
+  ArrowRight,
+  LockKeyhole,
+  Settings,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 
 import { BasicAccountForm } from "@/components/app/basic-account-form";
 import { AppHeader, AppPanel, AppScreen } from "@/components/app/AppScreen";
+import { PersonalDetailsForm } from "@/components/app/personal-details-form";
 import { Button } from "@/components/ui/button";
+import { getPersonalDetails } from "@/lib/account/personal-details";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 
 export default async function SettingsPage() {
   const access = await requireRouteAccess("/app/configuracion");
+  const personalDetails = await getPersonalDetails(access.userId);
 
   return (
     <AppScreen>
       <AppHeader
         eyebrow="Cuenta"
         title="Configuracion"
-        description="Perfil, preferencias y datos de cuenta para el usuario autenticado."
+        description="Perfil, preferencias y datos asociados a tu cuenta."
       />
 
       <div className="grid gap-6 xl:grid-cols-2">
@@ -31,6 +40,32 @@ export default async function SettingsPage() {
           <BasicAccountForm
             email={access.email}
             fullName={access.displayName}
+          />
+        </AppPanel>
+
+        <AppPanel
+          title="Informacion personal opcional"
+          description="Completa solo los datos que quieras conservar en tu perfil."
+        >
+          <div className="mb-5 flex items-start gap-3 rounded-[20px] border border-primary/25 bg-primary-soft/60 p-4">
+            <LockKeyhole
+              className="mt-0.5 size-5 shrink-0 text-warm-brown"
+              aria-hidden="true"
+            />
+            <div>
+              <h3 className="font-extrabold text-charcoal">
+                Privacidad por defecto
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-muted">
+                Estos datos no son publicos. Solo vos y, para perfiles de
+                clientes, profesionales autorizados pueden consultarlos.
+              </p>
+            </div>
+          </div>
+          <PersonalDetailsForm
+            hasSavedDetails={personalDetails.hasSavedDetails}
+            initialValues={personalDetails.values}
+            maxBirthDate={new Date().toISOString().slice(0, 10)}
           />
         </AppPanel>
 
@@ -57,7 +92,7 @@ export default async function SettingsPage() {
         access.canManageProfessionalAccounts ? (
           <AppPanel
             title="Administracion"
-            description="Herramientas internas disponibles segun los permisos de la cuenta."
+            description="Herramientas de gestion disponibles para tu cuenta."
             tone="primary"
           >
             <div className="grid gap-3">

@@ -195,7 +195,7 @@ export async function createProfessionalAccount(
   if (!expectedAdminCode) {
     return {
       message:
-        "Configura PROFESSIONAL_REGISTER_ACCESS_CODE antes de crear cuentas profesionales.",
+        "La creacion de cuentas profesionales no esta disponible en este momento.",
       status: "error",
     };
   }
@@ -213,7 +213,7 @@ export async function createProfessionalAccount(
   if (!hasSupabaseAdminConfig()) {
     return {
       message:
-        "Configura SUPABASE_SERVICE_ROLE_KEY o SUPABASE_SECRET_KEY para crear usuarios.",
+        "La creacion de cuentas profesionales no esta disponible en este momento.",
       status: "error",
     };
   }
@@ -240,7 +240,7 @@ export async function createProfessionalAccount(
 
   if (!createdUser) {
     return {
-      message: "Supabase no devolvio el usuario creado.",
+      message: "No se pudo completar la creacion de la cuenta profesional.",
       status: "error",
     };
   }
@@ -260,8 +260,7 @@ export async function createProfessionalAccount(
     await deleteCreatedUser(createdUser.id);
 
     return {
-      message:
-        "La cuenta se creo en Auth, pero no se pudo asignar el perfil admin.",
+      message: "No se pudo completar la configuracion de la cuenta profesional.",
       status: "error",
     };
   }
@@ -282,8 +281,7 @@ export async function createProfessionalAccount(
     await deleteCreatedUser(createdUser.id);
 
     return {
-      message:
-        "La cuenta se creo en Auth, pero no se pudo asignar la especialidad.",
+      message: "No se pudo guardar el area profesional seleccionada.",
       status: "error",
     };
   }
@@ -310,8 +308,7 @@ export async function listProfessionalAccounts(): Promise<ProfessionalAccountLis
 
   if (!hasSupabaseAdminConfig()) {
     return {
-      error:
-        "Configura SUPABASE_SERVICE_ROLE_KEY o SUPABASE_SECRET_KEY para ver emails.",
+      error: "La lista de profesionales no esta disponible en este momento.",
       items: [],
     };
   }

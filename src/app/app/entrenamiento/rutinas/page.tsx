@@ -15,7 +15,7 @@ import {
   EmptyState,
   StatTile,
 } from "@/components/app/AppScreen";
-import { RoutineStatusButton } from "@/components/app/routine-status-button";
+import { RoutineCardActions } from "@/components/app/routine-card-actions";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
 import { Button } from "@/components/ui/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
@@ -128,7 +128,7 @@ export default async function RoutinesPage() {
                       <ArrowRight className="size-4 transition group-hover:translate-x-1" />
                     </span>
                   </Link>
-                  <RoutineStatusButton
+                  <RoutineCardActions
                     isActive={routine.isActive}
                     routineId={routine.id}
                     routineName={routine.name}

@@ -63,7 +63,7 @@ function getLoginErrorMessage(message: string, code?: string) {
   }
 
   if (normalized.includes("missing supabase")) {
-    return "Faltan variables de entorno de Supabase.";
+    return "El servicio de acceso no esta disponible en este momento.";
   }
 
   return "No se pudo iniciar sesion. Intentalo de nuevo.";
@@ -88,11 +88,11 @@ function getRegisterErrorMessage(message: string, code?: string) {
   }
 
   if (normalized.includes("signup") && normalized.includes("disabled")) {
-    return "El registro esta deshabilitado en Supabase.";
+    return "El registro no esta disponible en este momento.";
   }
 
   if (normalized.includes("missing supabase")) {
-    return "Faltan variables de entorno de Supabase.";
+    return "El servicio de acceso no esta disponible en este momento.";
   }
 
   return "No se pudo crear la cuenta. Intentalo de nuevo.";
@@ -227,8 +227,7 @@ export async function registerProfessional(
 
   if (!expectedCode) {
     return {
-      message:
-        "Configura REGISTER_ACCESS_CODE antes de permitir nuevos registros.",
+      message: "El registro de nuevas cuentas no esta disponible en este momento.",
       status: "error",
     };
   }

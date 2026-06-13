@@ -1,109 +1,99 @@
-import { BookOpen, Dumbbell, Leaf } from "lucide-react";
-
 import {
   AppHeader,
-  AppPanel,
   AppScreen,
-  EmptyState,
   StatTile,
 } from "@/components/app/AppScreen";
+import { ResourceManager } from "@/components/app/resource-manager";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
-import { getDashboardData } from "@/lib/app/dashboard-data";
+import { getVisibleResources } from "@/lib/resources/data";
+import type { Enums } from "@/types/database";
 
-export default async function ResourcesPage() {
+export const dynamic = "force-dynamic";
+
+type ResourceArea = Enums<"service_area">;
+type ResourceFilter = ResourceArea | "all";
+
+function normalizeFilter(value?: string): ResourceFilter {
+  if (
+    value === "training" ||
+    value === "nutrition" ||
+    value === "general"
+  ) {
+    return value;
+  }
+
+  return "all";
+}
+
+export default async function ResourcesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ area?: string }>;
+}) {
   const access = await requireRouteAccess("/app/recursos");
-  const data = await getDashboardData(access);
+  const canManage = access.role === "admin";
+  const resources = await getVisibleResources({
+    includeCreator: canManage,
+  });
+  const { area } = await searchParams;
+  const activeFilter = normalizeFilter(area);
+  const filteredResources =
+    activeFilter === "all"
+      ? resources
+      : resources.filter((resource) => resource.area === activeFilter);
+  const trainingCount = resources.filter(
+    (resource) => resource.area === "training",
+  ).length;
+  const nutritionCount = resources.filter(
+    (resource) => resource.area === "nutrition",
+  ).length;
+  const bothCount = resources.filter(
+    (resource) => resource.area === "general",
+  ).length;
 
   return (
     <AppScreen>
       <AppHeader
-        eyebrow="Biblioteca"
-        title="Recursos"
+        eyebrow={canManage ? "Administracion" : "Biblioteca"}
+        title="Recursos multimedia"
         description={
-          access.isClient
-            ? "Material visible para tus servicios activos."
-            : "Biblioteca y materiales compartidos con clientes segun especialidad."
+          canManage
+            ? "Crea y administra enlaces externos para entrenamiento, nutricion o ambas areas."
+            : "Explora materiales externos habilitados para tus servicios activos."
         }
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <section
+        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        aria-label="Resumen de recursos"
+      >
         <StatTile
-          label="Recursos visibles"
-          value={String(data.resourcesCount)}
-          detail="Filtrados por Supabase/RLS"
+          label="Total visible"
+          value={String(resources.length)}
+          detail="Disponibles segun tus servicios activos"
         />
-        {access.canViewNutrition ? (
-          <StatTile
-            label="Nutricion"
-            value="Activa"
-            detail={access.isClient ? "Servicio asignado" : "Gestion permitida"}
-          />
-        ) : null}
-        {access.canViewTraining ? (
-          <StatTile
-            label="Entrenamiento"
-            value="Activa"
-            detail={access.isClient ? "Servicio asignado" : "Gestion permitida"}
-          />
-        ) : null}
+        <StatTile
+          label="Entrenamiento"
+          value={String(trainingCount)}
+          detail="Acceso exclusivo de entrenamiento"
+        />
+        <StatTile
+          label="Nutricion"
+          value={String(nutritionCount)}
+          detail="Acceso exclusivo de nutricion"
+        />
+        <StatTile
+          label="Ambos"
+          value={String(bothCount)}
+          detail="Material compartido entre areas"
+        />
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-        <AppPanel
-          title="Recursos recientes"
-          description="Se muestran registros reales de la tabla resources cuando estan disponibles."
-        >
-          {data.recentResources.length > 0 ? (
-            <div className="space-y-3">
-              {data.recentResources.map((resource) => (
-                <article
-                  key={resource.id}
-                  className="rounded-[20px] border border-border bg-background p-4"
-                >
-                  <BookOpen className="size-5 text-warm-brown" />
-                  <h2 className="mt-4 font-extrabold text-charcoal">
-                    {resource.title}
-                  </h2>
-                  {resource.detail ? (
-                    <p className="mt-2 text-sm text-muted">{resource.detail}</p>
-                  ) : null}
-                </article>
-              ))}
-            </div>
-          ) : (
-            <EmptyState>No hay recursos visibles para esta cuenta.</EmptyState>
-          )}
-        </AppPanel>
-
-        <AppPanel
-          title={access.isClient ? "Mis areas" : "Envio de recursos"}
-          description={
-            access.isClient
-              ? "Solo aparecen las categorias asociadas a tus servicios."
-              : "Solo se ofrecen areas compatibles con tu specialty."
-          }
-          tone="accent"
-        >
-          <div className="grid gap-3">
-            {access.canViewNutrition ? (
-              <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">
-                <Leaf className="size-5 text-warm-brown" />
-                <h3 className="mt-4 font-extrabold text-charcoal">
-                  Recursos de nutricion
-                </h3>
-              </div>
-            ) : null}
-            {access.canViewTraining ? (
-              <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">
-                <Dumbbell className="size-5 text-warm-brown" />
-                <h3 className="mt-4 font-extrabold text-charcoal">
-                  Recursos de entrenamiento
-                </h3>
-              </div>
-            ) : null}
-          </div>
-        </AppPanel>
-      </div>
+      <ResourceManager
+        activeFilter={activeFilter}
+        canManage={canManage}
+        resources={filteredResources}
+      />
     </AppScreen>
   );
 }

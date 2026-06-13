@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { createProfessionalAccount } from "@/lib/actions/professional-accounts";
 import {
   createProfessionalAccountSchema,
@@ -152,11 +153,11 @@ export function ProfessionalAccountForm() {
             htmlFor="temporaryPassword"
             className="font-extrabold text-charcoal"
           >
-            Contrasena temporal
+            Contraseña temporal
           </Label>
-          <Input
+          <PasswordInput
             id="temporaryPassword"
-            type="password"
+            visibilityLabel="contraseña temporal"
             autoComplete="new-password"
             className={inputClasses}
             placeholder="Minimo 8 caracteres"
@@ -179,11 +180,11 @@ export function ProfessionalAccountForm() {
             htmlFor="confirmTemporaryPassword"
             className="font-extrabold text-charcoal"
           >
-            Confirmar contrasena temporal
+            Confirmar contraseña temporal
           </Label>
-          <Input
+          <PasswordInput
             id="confirmTemporaryPassword"
-            type="password"
+            visibilityLabel="confirmación de contraseña temporal"
             autoComplete="new-password"
             className={inputClasses}
             placeholder="Repite la contrasena"
@@ -235,9 +236,9 @@ export function ProfessionalAccountForm() {
           >
             Codigo de acceso administrativo
           </Label>
-          <Input
+          <PasswordInput
             id="adminAccessCode"
-            type="password"
+            visibilityLabel="código administrativo"
             autoComplete="off"
             className="mt-2 h-12 rounded-control border-primary/20 bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20"
             placeholder="Codigo privado de administracion"

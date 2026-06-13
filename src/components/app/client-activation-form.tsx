@@ -2,11 +2,12 @@
 
 import { Check, Dumbbell, Leaf, Loader2, Save, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Label } from "@/components/ui/label";
 import { activateClientAccount } from "@/lib/actions/client-activation";
 import type {
@@ -121,7 +122,8 @@ export function ClientActivationForm({
   trainers,
 }: ClientActivationFormProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isPending, setIsPending] = useState(false);
   const [serverMessage, setServerMessage] = useState("");
   const [nutritionEnabled, setNutritionEnabled] = useState(
     client.hasNutritionService,
@@ -154,19 +156,11 @@ export function ClientActivationForm({
   const removesTraining = client.hasTrainingService && !trainingEnabled;
   const hasPlanSelection = serviceType !== "none" || client.isClientActivated;
 
-  function submit() {
+  async function savePlans() {
     setServerMessage("");
+    setIsPending(true);
 
-    if (
-      (removesNutrition || removesTraining) &&
-      !window.confirm(
-        "Esta accion retirara acceso a las secciones desactivadas. Deseas continuar?",
-      )
-    ) {
-      return;
-    }
-
-    startTransition(async () => {
+    try {
       const result = await activateClientAccount({
         assignedNutritionistId: nutritionEnabled ? assignedNutritionistId : "",
         assignedTrainerId: trainingEnabled ? assignedTrainerId : "",
@@ -182,7 +176,22 @@ export function ClientActivationForm({
 
       toast.success(result.message);
       router.refresh();
-    });
+    } catch {
+      toast.error(
+        "Ocurrió un error inesperado al guardar los planes. Inténtalo de nuevo.",
+      );
+    } finally {
+      setIsPending(false);
+    }
+  }
+
+  function submit() {
+    if (client.isClientActivated) {
+      setIsConfirming(true);
+      return;
+    }
+
+    void savePlans();
   }
 
   if (!canManageNutrition && !canManageTraining) {
@@ -340,6 +349,29 @@ export function ClientActivationForm({
           </>
         )}
       </Button>
+
+      <ConfirmationDialog
+        open={isConfirming}
+        onOpenChange={setIsConfirming}
+        title={
+          removesNutrition || removesTraining
+            ? "Confirmar cambio de planes"
+            : "Guardar cambios de planes"
+        }
+        description={
+          removesNutrition || removesTraining
+            ? "Este cambio retirará el acceso del cliente a las secciones desactivadas."
+            : "Se actualizarán los planes y profesionales asignados a este cliente."
+        }
+        confirmLabel={
+          serviceType === "none" ? "Desactivar planes" : "Guardar cambios"
+        }
+        pendingLabel="Guardando…"
+        tone={
+          removesNutrition || removesTraining ? "destructive" : "default"
+        }
+        onConfirm={savePlans}
+      />
     </div>
   );
 }

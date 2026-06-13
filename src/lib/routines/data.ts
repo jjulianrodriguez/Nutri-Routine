@@ -6,6 +6,7 @@ import type { ExerciseOption } from "@/types/exercise";
 import type {
   AssignableTrainingClient,
   ClientTrainingOverview,
+  RoutineAssignmentDetail,
   RoutineAssignmentState,
   RoutineAssignmentSummary,
   RoutineDetail,
@@ -237,6 +238,92 @@ function isGeneralAdmin(access: CurrentUserAccess) {
   return access.role === "admin" && access.specialty === null;
 }
 
+function getAssignmentState(
+  status: "active" | "archived" | "draft",
+  startDate: string | null,
+  endDate: string | null,
+  today: string,
+): RoutineAssignmentState {
+  if (status === "archived") {
+    return "archived";
+  }
+
+  if (endDate && endDate < today) {
+    return "expired";
+  }
+
+  if (startDate && startDate > today) {
+    return "upcoming";
+  }
+
+  return status === "active" ? "active" : "archived";
+}
+
+function getDaysRemaining(
+  endDate: string | null,
+  state: RoutineAssignmentState,
+) {
+  if (!endDate || state !== "active") {
+    return null;
+  }
+
+  const today = new Date();
+  const todayUtc = Date.UTC(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+  const [year, month, day] = endDate.split("-").map(Number);
+  const endUtc = Date.UTC(year, month - 1, day);
+
+  return Math.max(0, Math.round((endUtc - todayUtc) / 86_400_000));
+}
+
+function getTodayDateKey() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
+type AssignmentSummaryRow = {
+  created_at: string;
+  description: string | null;
+  duration_weeks: number | null;
+  end_date: string | null;
+  id: string;
+  routine_id: string | null;
+  start_date: string | null;
+  status: "active" | "archived" | "draft";
+  title: string;
+};
+
+function mapAssignmentSummary(
+  plan: AssignmentSummaryRow,
+  today: string,
+): RoutineAssignmentSummary {
+  const state = getAssignmentState(
+    plan.status,
+    plan.start_date,
+    plan.end_date,
+    today,
+  );
+
+  return {
+    createdAt: plan.created_at,
+    daysRemaining: getDaysRemaining(plan.end_date, state),
+    description: plan.description,
+    durationWeeks: plan.duration_weeks,
+    endDate: plan.end_date,
+    id: plan.id,
+    routineId: plan.routine_id,
+    startDate: plan.start_date,
+    state,
+    title: plan.title,
+  };
+}
+
 export async function listAssignableTrainingClients(
   access: CurrentUserAccess,
 ): Promise<AssignableTrainingClient[]> {
@@ -275,7 +362,9 @@ export async function listAssignableTrainingClients(
       .in("id", clientIds),
     supabase
       .from("workout_plans")
-      .select("client_id, title, created_at")
+      .select(
+        "id, client_id, routine_id, title, description, status, start_date, end_date, duration_weeks, created_at",
+      )
       .in("client_id", clientIds)
       .eq("status", "active")
       .order("created_at", { ascending: false }),
@@ -285,67 +374,30 @@ export async function listAssignableTrainingClients(
     throw new Error("No se pudo completar la lista de clientes.");
   }
 
-  const currentRoutineByClient = new Map<string, string>();
+  const currentAssignmentByClient = new Map<
+    string,
+    RoutineAssignmentSummary
+  >();
+  const today = getTodayDateKey();
 
   (plansResult.data ?? []).forEach((plan) => {
-    if (!currentRoutineByClient.has(plan.client_id)) {
-      currentRoutineByClient.set(plan.client_id, plan.title);
+    if (currentAssignmentByClient.has(plan.client_id)) {
+      return;
     }
+
+    currentAssignmentByClient.set(
+      plan.client_id,
+      mapAssignmentSummary(plan, today),
+    );
   });
 
   return (profilesResult.data ?? [])
     .map((profile) => ({
-      currentRoutineName: currentRoutineByClient.get(profile.id) ?? null,
+      currentAssignment: currentAssignmentByClient.get(profile.id) ?? null,
       id: profile.id,
       name: profile.full_name ?? "Cliente",
     }))
     .sort((left, right) => left.name.localeCompare(right.name, "es"));
-}
-
-function getAssignmentState(
-  status: "active" | "archived" | "draft",
-  startDate: string | null,
-  endDate: string | null,
-  today: string,
-): RoutineAssignmentState {
-  if (status === "archived") {
-    return "archived";
-  }
-
-  if (endDate && endDate < today) {
-    return "expired";
-  }
-
-  if (startDate && startDate > today) {
-    return "upcoming";
-  }
-
-  return status === "active" ? "active" : "archived";
-}
-
-function getDaysRemaining(endDate: string | null, state: RoutineAssignmentState) {
-  if (!endDate || state !== "active") {
-    return null;
-  }
-
-  const today = new Date();
-  const todayUtc = Date.UTC(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
-  );
-  const [year, month, day] = endDate.split("-").map(Number);
-  const endUtc = Date.UTC(year, month - 1, day);
-
-  return Math.max(0, Math.round((endUtc - todayUtc) / 86_400_000));
-}
-
-function getTodayDateKey() {
-  const today = new Date();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-
-  return `${today.getFullYear()}-${month}-${day}`;
 }
 
 export async function getClientTrainingOverview(
@@ -364,26 +416,41 @@ export async function getClientTrainingOverview(
     throw new Error("No se pudieron cargar tus rutinas asignadas.");
   }
 
+  const routineIds = [
+    ...new Set(
+      (data ?? []).flatMap((plan) =>
+        plan.routine_id ? [plan.routine_id] : [],
+      ),
+    ),
+  ];
+  const availableRoutineIds = new Set<string>();
+
+  if (routineIds.length > 0) {
+    const { data: availableRoutines, error: routinesError } = await supabase
+      .from("routines")
+      .select("id")
+      .in("id", routineIds);
+
+    if (routinesError) {
+      throw new Error("No se pudo verificar el historial de rutinas.");
+    }
+
+    (availableRoutines ?? []).forEach((routine) => {
+      availableRoutineIds.add(routine.id);
+    });
+  }
+
   const today = getTodayDateKey();
   const assignments: RoutineAssignmentSummary[] = (data ?? []).map((plan) => {
-    const state = getAssignmentState(
-      plan.status,
-      plan.start_date,
-      plan.end_date,
-      today,
-    );
+    const assignment = mapAssignmentSummary(plan, today);
 
     return {
-      createdAt: plan.created_at,
-      daysRemaining: getDaysRemaining(plan.end_date, state),
-      description: plan.description,
-      durationWeeks: plan.duration_weeks,
-      endDate: plan.end_date,
-      id: plan.id,
-      routineId: plan.routine_id,
-      startDate: plan.start_date,
-      state,
-      title: plan.title,
+      ...assignment,
+      routineId:
+        assignment.routineId &&
+        availableRoutineIds.has(assignment.routineId)
+          ? assignment.routineId
+          : null,
     };
   });
   const currentIndex = assignments.findIndex(
@@ -402,5 +469,54 @@ export async function getClientTrainingOverview(
     currentAssignment,
     currentRoutine,
     history: assignments.filter((_, index) => index !== currentIndex),
+  };
+}
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function getRoutineAssignmentDetail(
+  assignmentId: string,
+  access: CurrentUserAccess,
+): Promise<RoutineAssignmentDetail | null> {
+  if (!UUID_PATTERN.test(assignmentId)) {
+    return null;
+  }
+
+  const supabase = await createClient();
+  const { data: plan, error } = await supabase
+    .from("workout_plans")
+    .select(
+      "id, client_id, trainer_id, routine_id, title, description, status, start_date, end_date, duration_weeks, created_at",
+    )
+    .eq("id", assignmentId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error("No se pudo cargar la asignacion de rutina.");
+  }
+
+  if (!plan?.routine_id) {
+    return null;
+  }
+
+  const canReadAssignment = access.isClient
+    ? plan.client_id === access.userId
+    : access.canManageTraining &&
+      (isGeneralAdmin(access) || plan.trainer_id === access.userId);
+
+  if (!canReadAssignment) {
+    return null;
+  }
+
+  const routine = await getRoutineDetail(plan.routine_id);
+
+  if (!routine) {
+    return null;
+  }
+
+  return {
+    assignment: mapAssignmentSummary(plan, getTodayDateKey()),
+    routine,
   };
 }

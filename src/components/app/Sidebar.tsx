@@ -6,8 +6,6 @@ import {
   ChevronRight,
   LogOut,
   Menu,
-  PanelLeftClose,
-  PanelLeftOpen,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -16,6 +14,12 @@ import { useEffect, useState } from "react";
 
 import { CurrentUserAccessProvider } from "@/components/app/current-user-access-provider";
 import { SidebarNav } from "@/components/app/SidebarNav";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { CurrentUserAccess } from "@/lib/auth/access-rules";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -26,29 +30,6 @@ type SidebarProps = {
   access: CurrentUserAccess;
   children: ReactNode;
 };
-
-function BrandMark({ collapsed }: { collapsed: boolean }) {
-  return (
-    <div className="flex min-w-0 items-center gap-3">
-      <div className="grid size-11 shrink-0 place-items-center rounded-[18px] border border-charcoal/10 bg-primary text-lg font-extrabold text-charcoal shadow-soft">
-        NC
-      </div>
-      <div
-        className={cn(
-          "min-w-0 transition-[opacity,transform,width] duration-200",
-          collapsed && "w-0 -translate-x-1 opacity-0",
-        )}
-      >
-        <p className="truncate font-serif text-xl font-semibold leading-none text-charcoal">
-          Nutrición Con Enfoque
-        </p>
-        <p className="mt-1 truncate text-xs font-bold uppercase tracking-[0.14em] text-muted">
-          Área privada
-        </p>
-      </div>
-    </div>
-  );
-}
 
 function ProfileBlock({
   collapsed,
@@ -63,30 +44,52 @@ function ProfileBlock({
   initials: string;
   roleLabel: string;
 }) {
-  return (
+  const profile = (
     <div
       className={cn(
-        "rounded-[22px] border border-border bg-surface p-3 shadow-soft",
-        collapsed && "flex justify-center p-2",
+        "flex min-w-0 items-center gap-3 rounded-[22px] border border-primary/25 bg-primary-soft p-3 shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
+        !collapsed && "pr-14 lg:pr-3",
+        collapsed && "mx-auto size-12 justify-center rounded-full p-0",
       )}
+      tabIndex={collapsed ? 0 : undefined}
+      aria-label={
+        collapsed ? `Perfil activo: ${displayName}, ${roleLabel}` : undefined
+      }
     >
-      <div className="flex items-center gap-3">
-        <div className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-sm font-extrabold text-charcoal">
-          {initials}
-        </div>
-        <div
-          className={cn(
-            "min-w-0 transition-[opacity,transform,width] duration-200",
-            collapsed && "w-0 -translate-x-1 opacity-0",
-          )}
-        >
-          <p className="truncate text-sm font-extrabold text-charcoal">
+      <div className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-sm font-extrabold text-charcoal">
+        {initials}
+      </div>
+      {!collapsed ? (
+        <div className="min-w-0">
+          <p className="text-[0.68rem] font-extrabold uppercase tracking-[0.16em] text-muted">
+            Perfil activo
+          </p>
+          <p className="mt-1 truncate text-sm font-extrabold text-charcoal">
             {displayName}
           </p>
           <p className="truncate text-xs text-muted">{email || roleLabel}</p>
+          {email ? (
+            <p className="truncate text-xs font-bold text-warm-brown">
+              {roleLabel}
+            </p>
+          ) : null}
         </div>
-      </div>
+      ) : null}
     </div>
+  );
+
+  if (!collapsed) {
+    return profile;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{profile}</TooltipTrigger>
+      <TooltipContent side="right">
+        <p>{displayName}</p>
+        <p className="font-semibold text-muted">{roleLabel}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -132,113 +135,91 @@ export function Sidebar({
 
   function renderSidebarContent(isCollapsed: boolean) {
     return (
-      <div className="flex h-full flex-col">
-      <div className="space-y-4 border-b border-border px-4 pb-5 pt-4">
-        <div className="flex items-center justify-between gap-3">
-          <BrandMark collapsed={isCollapsed} />
-          <button
-            type="button"
-            className="hidden size-10 shrink-0 place-items-center rounded-full border border-border bg-surface text-warm-brown shadow-soft hover:bg-primary-soft hover:text-charcoal lg:grid"
-            onClick={() => setCollapsed((current) => !current)}
-            aria-label={isCollapsed ? "Expandir navegación" : "Contraer navegación"}
-          >
-            {isCollapsed ? (
-              <PanelLeftOpen className="size-4" />
-            ) : (
-              <PanelLeftClose className="size-4" />
-            )}
-          </button>
-          <button
-            type="button"
-            className="grid size-10 shrink-0 place-items-center rounded-full border border-border bg-surface text-warm-brown shadow-soft hover:bg-primary-soft hover:text-charcoal lg:hidden"
-            onClick={() => setMobileOpen(false)}
-            aria-label="Cerrar navegación"
-          >
-            <X className="size-4" />
-          </button>
-        </div>
-
-        <div
-          className={cn(
-            "rounded-[20px] border border-primary/25 bg-primary-soft px-3 py-3 transition-[opacity,transform,width] duration-200",
-            isCollapsed && "grid size-11 place-items-center rounded-full p-0",
-          )}
-        >
-          {isCollapsed ? (
-            <span className="text-xs font-extrabold text-charcoal">
-              {access.isClient
-                ? "CL"
-                : access.specialty === "nutrition"
-                  ? "NU"
-                  : access.specialty === "training"
-                    ? "EN"
-                    : "AD"}
-            </span>
-          ) : (
-            <>
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
-                Perfil activo
-              </p>
-              <p className="mt-1 text-sm font-extrabold text-charcoal">
-                {roleLabel}
-              </p>
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 no-scrollbar">
-        <SidebarNav
-          access={access}
-          collapsed={isCollapsed}
-          onNavigate={() => setMobileOpen(false)}
-        />
-      </div>
-
-      <div className="space-y-3 border-t border-border px-4 py-4">
-        <ProfileBlock
-          collapsed={isCollapsed}
-          displayName={displayName}
-          email={email}
-          initials={initials}
-          roleLabel={roleLabel}
-        />
-        <button
-          type="button"
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          className={cn(
-            "group/logout flex h-11 w-full items-center justify-center gap-3 rounded-control border border-border bg-surface text-sm font-extrabold text-warm-brown shadow-soft hover:border-primary/30 hover:bg-primary hover:text-charcoal disabled:opacity-60",
-            isCollapsed && "px-0",
-          )}
-          aria-label="Cerrar sesión"
-        >
-          <LogOut className="size-4" aria-hidden="true" />
-          <span
+      <TooltipProvider>
+        <div className="flex h-full min-w-0 flex-col overflow-x-hidden">
+          <div
             className={cn(
-              "truncate transition-[opacity,transform,width] duration-200",
-              isCollapsed && "w-0 -translate-x-1 opacity-0",
+              "relative border-b border-border py-4",
+              isCollapsed ? "px-3" : "px-4",
             )}
           >
-            {isLoggingOut ? "Cerrando..." : "Cerrar sesión"}
-          </span>
-        </button>
-      </div>
-      </div>
+            <ProfileBlock
+              collapsed={isCollapsed}
+              displayName={displayName}
+              email={email}
+              initials={initials}
+              roleLabel={roleLabel}
+            />
+            <button
+              type="button"
+              className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-border bg-surface text-warm-brown shadow-soft transition-colors hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 lg:hidden"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Cerrar navegación"
+            >
+              <X className="size-4" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div
+            className={cn(
+              "min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto py-5 no-scrollbar",
+              isCollapsed ? "px-3" : "px-4",
+            )}
+          >
+            <SidebarNav
+              access={access}
+              collapsed={isCollapsed}
+              onNavigate={() => setMobileOpen(false)}
+            />
+          </div>
+
+          <div
+            className={cn(
+              "border-t border-border py-4",
+              isCollapsed ? "flex justify-center px-3" : "px-4",
+            )}
+          >
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className={cn(
+                    "flex h-11 min-w-0 items-center justify-center gap-3 rounded-control border border-border bg-surface text-sm font-extrabold text-warm-brown shadow-soft transition-[background-color,border-color,color] hover:border-primary/30 hover:bg-primary hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:opacity-60",
+                    isCollapsed ? "size-11 w-11 px-0" : "w-full px-3",
+                  )}
+                  aria-label="Cerrar sesión"
+                >
+                  <LogOut className="size-4 shrink-0" aria-hidden="true" />
+                  {!isCollapsed ? (
+                    <span className="truncate">
+                      {isLoggingOut ? "Cerrando..." : "Cerrar sesión"}
+                    </span>
+                  ) : null}
+                </button>
+              </TooltipTrigger>
+              {isCollapsed ? (
+                <TooltipContent side="right">Cerrar sesión</TooltipContent>
+              ) : null}
+            </Tooltip>
+          </div>
+        </div>
+      </TooltipProvider>
     );
   }
 
   return (
     <CurrentUserAccessProvider access={access}>
-      <div className="min-h-dvh bg-background text-charcoal">
+      <div className="min-h-dvh overflow-x-clip bg-background text-charcoal">
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-background/90 px-4 backdrop-blur-xl lg:hidden">
         <button
           type="button"
-          className="grid size-10 place-items-center rounded-full border border-border bg-surface text-warm-brown shadow-soft hover:bg-primary-soft hover:text-charcoal"
+          className="grid size-10 place-items-center rounded-full border border-border bg-surface text-warm-brown shadow-soft transition-colors hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
           onClick={() => setMobileOpen(true)}
           aria-label="Abrir navegación"
         >
-          <Menu className="size-4" />
+          <Menu className="size-4" aria-hidden="true" />
         </button>
         <div className="text-center">
           <p className="font-serif text-xl font-semibold leading-none">
@@ -255,7 +236,7 @@ export function Sidebar({
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 hidden border-r border-border bg-surface/88 shadow-soft backdrop-blur-xl transition-[width] duration-300 ease-[var(--ease-premium)] lg:block",
+          "fixed inset-y-0 left-0 z-40 hidden overflow-x-visible border-r border-border bg-surface/88 shadow-soft backdrop-blur-xl transition-[width] duration-300 ease-[var(--ease-premium)] lg:block",
           collapsed ? "w-20" : "w-72",
         )}
       >
@@ -275,7 +256,7 @@ export function Sidebar({
               type="button"
             />
             <motion.aside
-              className="fixed inset-y-0 left-0 z-50 w-[min(21rem,calc(100vw-2rem))] border-r border-border bg-surface shadow-premium lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-[min(21rem,calc(100vw-2rem))] overflow-x-hidden border-r border-border bg-surface shadow-premium lg:hidden"
               initial={reduceMotion ? false : { x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -289,7 +270,7 @@ export function Sidebar({
 
       <main
         className={cn(
-          "min-h-dvh transition-[padding] duration-300 ease-[var(--ease-premium)] lg:pl-72",
+          "min-h-dvh min-w-0 transition-[padding] duration-300 ease-[var(--ease-premium)] lg:pl-72",
           collapsed && "lg:pl-20",
         )}
       >
@@ -304,14 +285,14 @@ export function Sidebar({
 
       <button
         type="button"
-        className="fixed bottom-5 right-5 z-30 hidden size-11 place-items-center rounded-full border border-border bg-surface text-warm-brown shadow-pop hover:bg-primary hover:text-charcoal lg:grid"
+        className="fixed bottom-5 right-5 z-30 hidden size-11 place-items-center rounded-full border border-border bg-surface text-warm-brown shadow-pop transition-colors hover:bg-primary hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 lg:grid"
         onClick={() => setCollapsed((current) => !current)}
         aria-label={collapsed ? "Expandir navegación" : "Contraer navegación"}
       >
         {collapsed ? (
-          <ChevronRight className="size-4" />
+          <ChevronRight className="size-4" aria-hidden="true" />
         ) : (
-          <ChevronLeft className="size-4" />
+          <ChevronLeft className="size-4" aria-hidden="true" />
         )}
       </button>
       </div>

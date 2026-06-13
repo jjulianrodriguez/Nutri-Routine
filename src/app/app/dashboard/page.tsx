@@ -84,7 +84,7 @@ function ServicesSummary({ access }: { access: CurrentUserAccess }) {
   return (
     <AppPanel
       title="Resumen personal"
-      description="Tus secciones se activan segun los profesionales asignados en Supabase."
+      description="Tus secciones se activan segun los servicios y profesionales asignados a tu cuenta."
       tone="primary"
     >
       {services.length > 0 ? (
@@ -125,7 +125,7 @@ function ClientDashboard({
       <FadeIn>
         <AppHeader
           eyebrow={access.roleLabel}
-          title={`Hola, ${access.displayName}. Tu dashboard esta listo.`}
+          title={`Hola, ${access.displayName}. Tu panel esta listo.`}
           description="Esta vista muestra solo las areas que tenes asignadas: nutricion, entrenamiento o ambas."
         />
       </FadeIn>
@@ -138,7 +138,7 @@ function ClientDashboard({
           <StatTile
             label="Servicios activos"
             value={String(activeServices)}
-            detail="Definidos por client_profiles"
+            detail="Segun los servicios de tu cuenta"
           />
           {access.canViewNutrition ? (
             <StatTile
@@ -170,7 +170,7 @@ function ClientDashboard({
         <FadeIn delay={0.14}>
           <AppPanel
             title="Progreso"
-            description="Tu progreso vive separado de los modulos clinicos para que puedas seguir tus avances sin ver herramientas administrativas."
+            description="Consulta tus avances en un espacio separado de las areas de nutricion y entrenamiento."
           >
             <Link
               href="/app/progreso"
@@ -260,7 +260,7 @@ function AdminDashboard({
           description: "Clientes, dietas, planes alimenticios y recursos.",
           href: "/app/nutricion",
           icon: Leaf,
-          label: "Modulo de nutricion",
+          label: "Nutricion",
         }
       : null,
     access.canManageTraining
@@ -268,7 +268,7 @@ function AdminDashboard({
           description: "Clientes, rutinas, planes de entrenamiento y recursos.",
           href: "/app/entrenamiento",
           icon: Dumbbell,
-          label: "Modulo de entrenamiento",
+          label: "Entrenamiento",
         }
       : null,
     access.canManageClientPlans
@@ -298,7 +298,7 @@ function AdminDashboard({
         <AppHeader
           eyebrow={access.roleLabel}
           title={`Hola, ${access.displayName}. Tu gestion esta organizada por area.`}
-          description="Esta vista muestra clientes, planes y accesos administrativos segun la especialidad cargada en professional_profiles."
+          description="Esta vista reune clientes, planes y accesos segun tu area profesional."
         />
       </FadeIn>
 
@@ -310,26 +310,26 @@ function AdminDashboard({
           <StatTile
             label="Clientes asignados"
             value={String(data.assignedClientsCount)}
-            detail="Segun client_profiles"
+            detail="Segun tus clientes asignados"
           />
           {access.canManageNutrition ? (
             <StatTile
               label="Planes alimenticios"
               value={String(data.dietPlansCount)}
-              detail="Visibles para tu rol"
+              detail="Disponibles segun tu area profesional"
             />
           ) : null}
           {access.canManageTraining ? (
             <StatTile
               label="Planes de entrenamiento"
               value={String(data.workoutPlansCount)}
-              detail="Visibles para tu rol"
+              detail="Disponibles segun tu area profesional"
             />
           ) : null}
           <StatTile
             label="Recursos enviados"
             value={String(data.resourcesCount)}
-            detail="Disponibles por RLS"
+            detail="Disponibles segun tus permisos"
           />
         </section>
       </FadeIn>
@@ -338,7 +338,7 @@ function AdminDashboard({
         <FadeIn delay={0.1}>
           <AppPanel
             title="Accesos rapidos"
-            description="Solo aparecen los modulos permitidos por tu especialidad."
+            description="Solo aparecen las secciones disponibles para tu area profesional."
           >
             <div className="grid gap-3 sm:grid-cols-2">
               {quickLinks.map((link) => (
@@ -351,7 +351,7 @@ function AdminDashboard({
         <FadeIn delay={0.14}>
           <AppPanel
             title="Actividad reciente"
-            description="Ultimos recursos compartidos y movimientos visibles para tu rol."
+            description="Ultimos recursos compartidos y actividad disponible para tu cuenta."
             tone="accent"
           >
             <RecordList
@@ -380,7 +380,7 @@ function AdminDashboard({
         <FadeIn delay={0.22}>
           <AppPanel
             title="Configuracion"
-            description="Perfil, cuenta y preferencias internas."
+            description="Perfil, cuenta y preferencias personales."
           >
             <QuickLink
               description="Administrar tu configuracion."
