@@ -199,14 +199,18 @@ async function getCurrentActivationActor() {
     };
   }
 
-  const { data: professionalProfile, error: professionalProfileError } =
-    await supabase
-      .from("professional_profiles")
-      .select("profile_id, specialty")
-      .eq("profile_id", user.id)
-      .maybeSingle();
+  if (profile.role === "admin") {
+    return {
+      activationSupabase: supabase,
+      canManageNutrition: true,
+      canManageTraining: true,
+      currentUserId: user.id,
+      error: null,
+      role: profile.role,
+    };
+  }
 
-  if (!PRIVILEGED_ROLES.has(profile.role) || professionalProfileError) {
+  if (profile.role !== "professional") {
     return {
       activationSupabase: supabase,
       canManageNutrition: false,
@@ -217,12 +221,31 @@ async function getCurrentActivationActor() {
     };
   }
 
-  const isGeneralAdmin = profile.role === "admin" && !professionalProfile;
+  const { data: professionalProfile, error: professionalProfileError } =
+    await supabase
+      .from("professional_profiles")
+      .select("profile_id, specialty, is_active")
+      .eq("profile_id", user.id)
+      .maybeSingle();
+  const isActiveProfessional =
+    !professionalProfileError && professionalProfile?.is_active === true;
+
+  if (!isActiveProfessional) {
+    return {
+      activationSupabase: supabase,
+      canManageNutrition: false,
+      canManageTraining: false,
+      currentUserId: user.id,
+      error: "Tu cuenta profesional esta inactiva.",
+      role: profile.role,
+    };
+  }
+
   const specialty = professionalProfile?.specialty ?? null;
   const canManageNutrition =
-    isGeneralAdmin || isProfessionalAllowedForService(specialty, "nutrition");
+    isProfessionalAllowedForService(specialty, "nutrition");
   const canManageTraining =
-    isGeneralAdmin || isProfessionalAllowedForService(specialty, "training");
+    isProfessionalAllowedForService(specialty, "training");
 
   if (!canManageNutrition && !canManageTraining) {
     return {
@@ -254,27 +277,30 @@ async function validateAssignableProfessional({
   professionalId: string;
   service: "nutrition" | "training";
 }) {
-  const [{ data: profile }, { data: professionalProfile }] = await Promise.all([
-    activationSupabase
-      .from("profiles")
-      .select("id, role")
-      .eq("id", professionalId)
-      .maybeSingle(),
-    activationSupabase
-      .from("professional_profiles")
-      .select("profile_id, specialty")
-      .eq("profile_id", professionalId)
-      .maybeSingle(),
-  ]);
+  const { data: profile } = await activationSupabase
+    .from("profiles")
+    .select("id, role")
+    .eq("id", professionalId)
+    .maybeSingle();
+
+  if (!profile) {
+    return false;
+  }
+
+  if (profile.role === "admin") {
+    return true;
+  }
+
+  const { data: professionalProfile } = await activationSupabase
+    .from("professional_profiles")
+    .select("profile_id, specialty, is_active")
+    .eq("profile_id", professionalId)
+    .maybeSingle();
 
   return Boolean(
-    profile &&
-      PRIVILEGED_ROLES.has(profile.role) &&
-      isProfessionalAllowedForService(
-        professionalProfile?.specialty ??
-          (profile.role === "admin" ? "both" : null),
-        service,
-      ),
+    profile.role === "professional" &&
+      professionalProfile?.is_active === true &&
+      isProfessionalAllowedForService(professionalProfile.specialty, service),
   );
 }
 
@@ -519,7 +545,7 @@ export async function listClientActivationData(
       .select("profile_id, assigned_nutritionist_id, assigned_trainer_id"),
     actor.activationSupabase
       .from("professional_profiles")
-      .select("profile_id, specialty"),
+      .select("profile_id, specialty, is_active"),
   ]);
 
   if (clientsError || assignmentsError || professionalsError) {
@@ -528,7 +554,10 @@ export async function listClientActivationData(
 
   const professionalById = new Map<
     string,
-    Pick<Tables<"professional_profiles">, "profile_id" | "specialty"> & {
+    Pick<
+      Tables<"professional_profiles">,
+      "is_active" | "profile_id" | "specialty"
+    > & {
       specialty: ProfessionalSpecialty;
     }
   >();
@@ -536,6 +565,7 @@ export async function listClientActivationData(
   for (const item of professionalRows ?? []) {
     if (item.specialty) {
       professionalById.set(item.profile_id, {
+        is_active: item.is_active,
         profile_id: item.profile_id,
         specialty: item.specialty,
       });
@@ -555,8 +585,9 @@ export async function listClientActivationData(
   }
 
   for (const profile of professionalProfiles ?? []) {
-    if (profile.role === "admin" && !professionalById.has(profile.id)) {
+    if (profile.role === "admin") {
       professionalById.set(profile.id, {
+        is_active: true,
         profile_id: profile.id,
         specialty: "both",
       });
@@ -583,7 +614,11 @@ export async function listClientActivationData(
     .map((item) => {
       const profile = profileById.get(item.profile_id);
 
-      if (!profile || !PRIVILEGED_ROLES.has(profile.role)) {
+      if (
+        !profile ||
+        !PRIVILEGED_ROLES.has(profile.role) ||
+        !item.is_active
+      ) {
         return null;
       }
 

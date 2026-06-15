@@ -93,7 +93,21 @@ export default async function RoutineDetailPage({
         </div>
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section
+        className={`grid gap-4 sm:grid-cols-2 ${
+          routine.identifier ? "xl:grid-cols-5" : "xl:grid-cols-4"
+        }`}
+      >
+        {routine.identifier ? (
+          <div className="rounded-[24px] border border-border bg-accent-soft p-5 shadow-soft">
+            <p className="text-sm font-bold text-muted">
+              Identificador interno
+            </p>
+            <p className="mt-3 break-words text-xl font-extrabold text-charcoal">
+              {routine.identifier}
+            </p>
+          </div>
+        ) : null}
         <div className="rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Dificultad</p>
           <p className="mt-3 text-xl font-extrabold text-charcoal">
@@ -142,7 +156,7 @@ export default async function RoutineDetailPage({
                       {item.exercise.name}
                     </h2>
                     <p className="mt-1 text-sm font-bold text-warm-brown">
-                      {item.exercise.category} · {item.exercise.muscleGroup} ·{" "}
+                      {item.exercise.category} / {item.exercise.muscleGroup} /{" "}
                       {item.exercise.exerciseType}
                     </p>
                     {item.exercise.description ? (

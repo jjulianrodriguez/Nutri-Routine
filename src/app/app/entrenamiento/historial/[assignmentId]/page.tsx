@@ -13,6 +13,7 @@ import {
   AppHeader,
   AppPanel,
   AppScreen,
+  EmptyState,
 } from "@/components/app/AppScreen";
 import { RoutineExerciseList } from "@/components/app/routine-exercise-list";
 import { Button } from "@/components/ui/button";
@@ -67,7 +68,14 @@ export default async function HistoricalRoutineDetailPage({
     notFound();
   }
 
-  const { assignment, routine } = detail;
+  const { assignment, routine, routineSource, template } = detail;
+  const historicalMessage = template
+    ? "Esta vista usa la copia guardada cuando se asigno la plantilla. Los cambios posteriores no alteran este historial."
+    : routineSource === "snapshot"
+      ? "Esta vista usa la copia guardada cuando se asigno la rutina. Los cambios posteriores no alteran este historial."
+      : routineSource === "live"
+        ? "Esta asignacion antigua no tenia una copia guardada. Se muestra la version actual disponible."
+        : "No fue posible reconstruir el contenido original de esta asignacion.";
 
   return (
     <AppScreen>
@@ -76,7 +84,8 @@ export default async function HistoricalRoutineDetailPage({
         title={assignment.title}
         description={
           assignment.description ||
-          routine.description ||
+          routine?.description ||
+          template?.template.description ||
           "Detalle de la rutina asignada."
         }
       />
@@ -87,6 +96,19 @@ export default async function HistoricalRoutineDetailPage({
           Volver a entrenamiento
         </Link>
       </Button>
+
+      <div className="flex items-start gap-3 rounded-[22px] border border-primary/30 bg-primary-soft/55 p-4">
+        <History
+          className="mt-0.5 size-5 shrink-0 text-warm-brown"
+          aria-hidden="true"
+        />
+        <div>
+          <p className="font-extrabold text-charcoal">Copia historica</p>
+          <p className="mt-1 text-sm leading-6 text-muted">
+            {historicalMessage}
+          </p>
+        </div>
+      </div>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <DetailValue
@@ -106,27 +128,68 @@ export default async function HistoricalRoutineDetailPage({
             assignment.endDate,
           )}`}
         />
-        <DetailValue
-          icon={ListChecks}
-          label="Dificultad"
-          value={difficultyLabels[routine.difficulty]}
-        />
-        <DetailValue
-          icon={Tags}
-          label="Categoria"
-          value={routine.category}
-        />
+        {routine ? (
+          <>
+            <DetailValue
+              icon={ListChecks}
+              label="Dificultad"
+              value={difficultyLabels[routine.difficulty]}
+            />
+            <DetailValue
+              icon={Tags}
+              label="Categoria"
+              value={routine.category}
+            />
+          </>
+        ) : template ? (
+          <>
+            <DetailValue
+              icon={ListChecks}
+              label="Dias del ciclo"
+              value={String(template.template.cycleDays)}
+            />
+            <DetailValue
+              icon={Tags}
+              label="Tipo"
+              value="Plantilla de entrenamiento"
+            />
+          </>
+        ) : null}
       </section>
 
-      <AppPanel
-        title="Ejercicios de la rutina"
-        description={`${routine.exercises.length} ejercicios en el orden definido para esta rutina.`}
-      >
-        <RoutineExerciseList
-          emptyMessage="Esta rutina historica no tiene ejercicios disponibles."
-          exercises={routine.exercises}
-        />
-      </AppPanel>
+      {routine ? (
+        <AppPanel
+          title="Ejercicios de la rutina"
+          description={`${routine.exercises.length} ejercicios en el orden definido para esta rutina.`}
+        >
+          <RoutineExerciseList
+            emptyMessage="Esta rutina historica no tiene ejercicios disponibles."
+            exercises={routine.exercises}
+          />
+        </AppPanel>
+      ) : template ? (
+        <div className="space-y-6">
+          {template.days.map((day) => (
+            <AppPanel
+              key={`${day.dayNumber}-${day.routine.id}`}
+              title={`Dia ${day.dayNumber}: ${day.routine.name}`}
+              description={day.routine.description}
+            >
+              <RoutineExerciseList
+                emptyMessage="Este dia no tiene ejercicios disponibles."
+                exercises={day.routine.exercises}
+              />
+            </AppPanel>
+          ))}
+        </div>
+      ) : (
+        <AppPanel
+          title="Detalle historico"
+          description="La asignacion se conserva, pero su contenido original no pudo recuperarse."
+        >
+          <EmptyState>Informacion historica no disponible.</EmptyState>
+        </AppPanel>
+      )}
     </AppScreen>
   );
 }

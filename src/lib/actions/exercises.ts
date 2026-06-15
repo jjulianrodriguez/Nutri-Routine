@@ -75,12 +75,14 @@ export async function saveExercise(
   }
 
   const supabase = await createClient();
+  const multimediaUrls = parsed.data.multimediaUrls.filter(Boolean);
   const payload = {
     category: parsed.data.category,
     description: parsed.data.description,
     difficulty: parsed.data.difficulty,
     exercise_type: parsed.data.exerciseType,
-    multimedia_url: parsed.data.multimediaUrl || null,
+    multimedia_url: multimediaUrls[0] ?? null,
+    multimedia_urls: multimediaUrls,
     muscle_group: parsed.data.muscleGroup,
     name: parsed.data.name,
   };

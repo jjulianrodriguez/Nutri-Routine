@@ -2,6 +2,7 @@ import type {
   ExerciseDifficulty,
   ExerciseOption,
 } from "@/types/exercise";
+import type { WorkoutTemplateSnapshot } from "@/types/workout-template";
 
 export type RoutineDifficulty = ExerciseDifficulty;
 
@@ -9,9 +10,11 @@ export type RoutineListItem = {
   category: string;
   createdAt: string;
   creatorName: string;
+  description: string;
   difficulty: RoutineDifficulty;
   exerciseCount: number;
   id: string;
+  identifier: string | null;
   isActive: boolean;
   name: string;
   targetAudience: string;
@@ -38,6 +41,7 @@ export type RoutineDetail = {
   difficulty: RoutineDifficulty;
   exercises: RoutineExerciseDetail[];
   id: string;
+  identifier: string | null;
   isActive: boolean;
   name: string;
   targetAudience: string;
@@ -57,30 +61,40 @@ export type RoutineAssignmentState =
   | "upcoming";
 
 export type RoutineAssignmentSummary = {
+  assignmentType: "legacy-training" | "template";
   createdAt: string;
   daysRemaining: number | null;
   description: string | null;
+  detailAvailable: boolean;
   durationWeeks: number | null;
   endDate: string | null;
   id: string;
   routineId: string | null;
   startDate: string | null;
   state: RoutineAssignmentState;
+  templateId: string | null;
   title: string;
 };
 
 export type RoutineAssignmentDetail = {
   assignment: RoutineAssignmentSummary;
-  routine: RoutineDetail;
+  routine: RoutineDetail | null;
+  routineSource: "live" | "snapshot" | null;
+  template: WorkoutTemplateSnapshot | null;
 };
 
 export type AssignableRoutine = {
   category: string;
+  description: string;
+  difficulty: RoutineDifficulty;
   id: string;
+  identifier: string | null;
   name: string;
 };
 
 export type AssignableTrainingClient = {
+  avatarUrl: string | null;
+  contact: string | null;
   currentAssignment: RoutineAssignmentSummary | null;
   id: string;
   name: string;
@@ -89,5 +103,6 @@ export type AssignableTrainingClient = {
 export type ClientTrainingOverview = {
   currentAssignment: RoutineAssignmentSummary | null;
   currentRoutine: RoutineDetail | null;
+  currentTemplate: WorkoutTemplateSnapshot | null;
   history: RoutineAssignmentSummary[];
 };

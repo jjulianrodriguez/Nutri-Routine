@@ -42,26 +42,44 @@ export default async function ProgressPage() {
   return (
     <AppScreen>
       <AppHeader
-        eyebrow="Mi progreso"
-        title="Mi progreso"
-        description="Seguimiento personal para clientes, separado de las herramientas administrativas."
+        eyebrow={access.role === "admin" ? "Administracion" : "Mi progreso"}
+        title={access.role === "admin" ? "Progreso de clientes" : "Mi progreso"}
+        description={
+          access.role === "admin"
+            ? "Vista global de registros de progreso para supervision administrativa."
+            : "Seguimiento personal para clientes, separado de las herramientas administrativas."
+        }
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <StatTile
-          label="Nutricion"
-          value={access.hasNutritionService ? "Activa" : "No asignada"}
-          detail="Disponible si hay un profesional en nutricion asignado"
-        />
-        <StatTile
-          label="Entrenamiento"
-          value={access.hasTrainingService ? "Activo" : "No asignado"}
-          detail="Disponible si hay un profesional en entrenamiento asignado"
-        />
+      <section
+        className={
+          access.role === "admin"
+            ? "grid gap-4"
+            : "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+        }
+      >
+        {access.role !== "admin" ? (
+          <>
+            <StatTile
+              label="Nutricion"
+              value={access.hasNutritionService ? "Activa" : "No asignada"}
+              detail="Disponible si hay un profesional en nutricion asignado"
+            />
+            <StatTile
+              label="Entrenamiento"
+              value={access.hasTrainingService ? "Activo" : "No asignado"}
+              detail="Disponible si hay un profesional en entrenamiento asignado"
+            />
+          </>
+        ) : null}
         <StatTile
           label="Registros"
           value={String(data.count)}
-          detail="Filtrados por tu cuenta"
+          detail={
+            access.role === "admin"
+              ? "Visibles en toda la aplicacion"
+              : "Filtrados por tu cuenta"
+          }
         />
       </section>
 

@@ -1,66 +1,173 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarPlus, Loader2 } from "lucide-react";
+import {
+  CalendarPlus,
+  CheckCircle2,
+  Layers3,
+  Loader2,
+  UserRound,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useMemo, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
+import {
+  AssignmentEntitySelector,
+  ClientSearchCard,
+  WorkoutTemplateSearchCard,
+} from "@/components/app/assignment-entity-selector";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { assignRoutineToClient } from "@/lib/actions/routines";
+import { useProgressiveResults } from "@/hooks/use-progressive-results";
+import { assignWorkoutTemplateToClient } from "@/lib/actions/workout-templates";
 import {
-  routineAssignmentSchema,
-  type RoutineAssignmentFormValues,
-} from "@/lib/validations/routine-assignments";
+  workoutTemplateAssignmentSchema,
+  type WorkoutTemplateAssignmentFormValues,
+} from "@/lib/validations/workout-templates";
+import { cn } from "@/lib/utils";
 import type {
-  AssignableRoutine,
   AssignableTrainingClient,
 } from "@/types/routine";
+import type { AssignableWorkoutTemplate } from "@/types/workout-template";
 
 const inputClasses =
   "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft focus-visible:ring-primary/20";
 
-export function RoutineAssignmentForm({
+function normalizeSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("es");
+}
+
+export function WorkoutTemplateAssignmentForm({
   clients,
   defaultClientId = "",
-  defaultRoutineId = "",
+  defaultTemplateId = "",
   defaultStartDate,
-  routines,
+  templates,
 }: {
   clients: AssignableTrainingClient[];
   defaultClientId?: string;
-  defaultRoutineId?: string;
+  defaultTemplateId?: string;
   defaultStartDate: string;
-  routines: AssignableRoutine[];
+  templates: AssignableWorkoutTemplate[];
 }) {
   const router = useRouter();
+  const [clientQuery, setClientQuery] = useState("");
+  const [templateQuery, setTemplateQuery] = useState("");
   const [pendingReplacement, setPendingReplacement] = useState<{
     client: AssignableTrainingClient;
-    values: RoutineAssignmentFormValues;
+    values: WorkoutTemplateAssignmentFormValues;
   } | null>(null);
   const {
+    control,
     formState: { errors, isSubmitting },
     handleSubmit,
     register,
     reset,
     setError,
-  } = useForm<RoutineAssignmentFormValues>({
+    setValue,
+  } = useForm<WorkoutTemplateAssignmentFormValues>({
     defaultValues: {
       clientId: defaultClientId,
       durationWeeks: "6",
-      routineId: defaultRoutineId,
       startDate: defaultStartDate,
+      templateId: defaultTemplateId,
     },
-    resolver: zodResolver(routineAssignmentSchema),
+    resolver: zodResolver(workoutTemplateAssignmentSchema),
   });
+  const selectedClientId = useWatch({ control, name: "clientId" });
+  const selectedTemplateId = useWatch({ control, name: "templateId" });
+  const selectedClient = clients.find(
+    (client) => client.id === selectedClientId,
+  );
+  const selectedTemplate = templates.find(
+    (template) => template.id === selectedTemplateId,
+  );
+  const filteredClients = useMemo(() => {
+    const query = normalizeSearch(clientQuery.trim());
 
-  async function assignRoutine(values: RoutineAssignmentFormValues) {
-    const result = await assignRoutineToClient(values);
+    if (!query) {
+      return clients;
+    }
+
+    return clients.filter((client) =>
+      normalizeSearch(
+        [
+          client.name,
+          client.contact,
+          client.currentAssignment?.title,
+          client.id,
+        ]
+          .filter(Boolean)
+          .join(" "),
+      ).includes(query),
+    );
+  }, [clientQuery, clients]);
+  const filteredTemplates = useMemo(() => {
+    const query = normalizeSearch(templateQuery.trim());
+
+    if (!query) {
+      return templates;
+    }
+
+    return templates.filter((template) =>
+      normalizeSearch(
+        [
+          template.name,
+          template.description,
+          template.cycleDays,
+        ]
+          .filter(Boolean)
+          .join(" "),
+      ).includes(query),
+    );
+  }, [templateQuery, templates]);
+  const clientResults = useProgressiveResults(filteredClients, 5);
+  const templateResults = useProgressiveResults(filteredTemplates, 5);
+
+  function updateClientQuery(value: string) {
+    setClientQuery(value);
+    clientResults.reset();
+  }
+
+  function updateTemplateQuery(value: string) {
+    setTemplateQuery(value);
+    templateResults.reset();
+  }
+
+  function toggleClient(clientId: string) {
+    setValue(
+      "clientId",
+      clientId === selectedClientId ? "" : clientId,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+  }
+
+  function toggleTemplate(templateId: string) {
+    setValue(
+      "templateId",
+      templateId === selectedTemplateId ? "" : templateId,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+  }
+
+  async function assignTemplate(
+    values: WorkoutTemplateAssignmentFormValues,
+  ) {
+    const result = await assignWorkoutTemplateToClient(values);
 
     if (result.status === "error") {
       setError("root", { message: result.message });
@@ -72,13 +179,13 @@ export function RoutineAssignmentForm({
     reset({
       clientId: "",
       durationWeeks: values.durationWeeks,
-      routineId: values.routineId,
       startDate: values.startDate,
+      templateId: values.templateId,
     });
     router.refresh();
   }
 
-  async function onSubmit(values: RoutineAssignmentFormValues) {
+  async function onSubmit(values: WorkoutTemplateAssignmentFormValues) {
     const client = clients.find((item) => item.id === values.clientId);
 
     if (client?.currentAssignment) {
@@ -86,12 +193,12 @@ export function RoutineAssignmentForm({
       return;
     }
 
-    await assignRoutine(values);
+    await assignTemplate(values);
   }
 
   async function confirmReplacement() {
     if (pendingReplacement) {
-      await assignRoutine(pendingReplacement.values);
+      await assignTemplate(pendingReplacement.values);
     }
   }
 
@@ -105,11 +212,11 @@ export function RoutineAssignmentForm({
     );
   }
 
-  if (routines.length === 0) {
+  if (templates.length === 0) {
     return (
       <Alert className="rounded-[18px] border-border bg-background px-4 py-3">
         <AlertDescription className="font-semibold text-muted">
-          No hay rutinas activas disponibles para asignar.
+          No hay plantillas activas disponibles para asignar.
         </AlertDescription>
       </Alert>
     );
@@ -117,124 +224,169 @@ export function RoutineAssignmentForm({
 
   return (
     <form
-      className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(8rem,0.55fr)_minmax(10rem,0.65fr)_auto] xl:items-end"
+      className="space-y-6"
       onSubmit={handleSubmit(onSubmit)}
       noValidate
     >
-      <div>
-        <Label htmlFor="assignment-client" className="font-extrabold text-charcoal">
-          Cliente
-        </Label>
-        <select
-          id="assignment-client"
-          className={`${inputClasses} h-11 w-full appearance-none text-sm font-semibold`}
-          aria-invalid={Boolean(errors.clientId)}
-          {...register("clientId")}
+      <input type="hidden" {...register("clientId")} />
+      <input type="hidden" {...register("templateId")} />
+
+      <div className="grid min-w-0 gap-5 xl:grid-cols-2">
+        <AssignmentEntitySelector
+          id="assignment-client-search"
+          label="1. Selecciona un cliente"
+          query={clientQuery}
+          onQueryChange={updateClientQuery}
+          resultCount={filteredClients.length}
+          totalCount={clients.length}
+          visibleCount={clientResults.visibleItems.length}
+          searchPlaceholder="Buscar por nombre, contacto o plan..."
+          emptyMessage="No encontramos clientes que coincidan con la busqueda."
+          error={errors.clientId?.message}
+          isLoading={clientResults.isLoading}
+          loadMoreLabel="Cargar mas clientes"
+          onLoadMore={clientResults.loadMore}
         >
-          <option value="">Selecciona un cliente</option>
-          {clients.map((client) => (
-            <option key={client.id} value={client.id}>
-              {client.name}
-              {client.currentAssignment
-                ? ` - actual: ${client.currentAssignment.title}`
-                : ""}
-            </option>
+          {clientResults.visibleItems.map((client) => (
+            <ClientSearchCard
+              key={client.id}
+              client={client}
+              selected={client.id === selectedClientId}
+              onSelect={toggleClient}
+            />
           ))}
-        </select>
-        {errors.clientId ? (
-          <p className="mt-2 text-sm font-semibold text-danger" role="alert">
-            {errors.clientId.message}
-          </p>
-        ) : null}
+        </AssignmentEntitySelector>
+
+        <AssignmentEntitySelector
+          id="assignment-template-search"
+          label="2. Selecciona una plantilla"
+          query={templateQuery}
+          onQueryChange={updateTemplateQuery}
+          resultCount={filteredTemplates.length}
+          totalCount={templates.length}
+          visibleCount={templateResults.visibleItems.length}
+          searchPlaceholder="Buscar por nombre o cantidad de días..."
+          emptyMessage="No encontramos plantillas activas que coincidan con la búsqueda."
+          error={errors.templateId?.message}
+          isLoading={templateResults.isLoading}
+          loadMoreLabel="Cargar más plantillas"
+          onLoadMore={templateResults.loadMore}
+        >
+          {templateResults.visibleItems.map((template) => (
+            <WorkoutTemplateSearchCard
+              key={template.id}
+              template={template}
+              selected={template.id === selectedTemplateId}
+              onSelect={toggleTemplate}
+            />
+          ))}
+        </AssignmentEntitySelector>
       </div>
 
-      <div>
-        <Label htmlFor="assignment-routine" className="font-extrabold text-charcoal">
-          Rutina
-        </Label>
-        <select
-          id="assignment-routine"
-          className={`${inputClasses} h-11 w-full appearance-none text-sm font-semibold`}
-          aria-invalid={Boolean(errors.routineId)}
-          {...register("routineId")}
-        >
-          <option value="">Selecciona una rutina</option>
-          {routines.map((routine) => (
-            <option key={routine.id} value={routine.id}>
-              {routine.name} - {routine.category}
-            </option>
-          ))}
-        </select>
-        {errors.routineId ? (
-          <p className="mt-2 text-sm font-semibold text-danger" role="alert">
-            {errors.routineId.message}
-          </p>
-        ) : null}
-      </div>
-
-      <div>
-        <Label
-          htmlFor="assignment-duration"
-          className="font-extrabold text-charcoal"
-        >
-          Duracion
-        </Label>
-        <div className="relative">
-          <Input
-            id="assignment-duration"
-            type="number"
-            min="1"
-            max="104"
-            inputMode="numeric"
-            className={`${inputClasses} pr-20`}
-            aria-invalid={Boolean(errors.durationWeeks)}
-            {...register("durationWeeks")}
-          />
-          <span className="pointer-events-none absolute right-4 top-1/2 translate-y-0.5 text-xs font-bold text-muted">
-            semanas
-          </span>
+      <section className="rounded-[24px] border border-charcoal/10 bg-surface p-5">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="size-5 text-warm-brown" aria-hidden="true" />
+          <h2 className="font-extrabold text-charcoal">
+            Seleccion para asignar
+          </h2>
         </div>
-        {errors.durationWeeks ? (
-          <p className="mt-2 text-sm font-semibold text-danger" role="alert">
-            {errors.durationWeeks.message}
-          </p>
-        ) : null}
-      </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          <SelectedEntity
+            icon={UserRound}
+            label="Cliente"
+            selected={Boolean(selectedClient)}
+            value={selectedClient?.name ?? "Selecciona un cliente"}
+            detail={
+              selectedClient?.currentAssignment
+                ? `Plantilla actual: ${selectedClient.currentAssignment.title}`
+                : selectedClient
+                  ? "Sin plantilla activa"
+                  : "Usa el buscador de clientes"
+            }
+          />
+          <SelectedEntity
+            icon={Layers3}
+            label="Plantilla"
+            selected={Boolean(selectedTemplate)}
+            value={selectedTemplate?.name ?? "Selecciona una plantilla"}
+            detail={
+              selectedTemplate
+                ? `Ciclo de ${selectedTemplate.cycleDays} días`
+                : "Usa el buscador de plantillas"
+            }
+          />
+        </div>
+      </section>
 
-      <div>
-        <Label
-          htmlFor="assignment-start-date"
-          className="font-extrabold text-charcoal"
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(8rem,0.55fr)_minmax(10rem,0.65fr)_auto] xl:items-end">
+        <div>
+          <Label
+            htmlFor="assignment-duration"
+            className="font-extrabold text-charcoal"
+          >
+            Duracion
+          </Label>
+          <div className="relative">
+            <Input
+              id="assignment-duration"
+              type="number"
+              min="1"
+              max="104"
+              inputMode="numeric"
+              className={`${inputClasses} pr-20`}
+              aria-invalid={Boolean(errors.durationWeeks)}
+              {...register("durationWeeks")}
+            />
+            <span className="pointer-events-none absolute right-4 top-1/2 translate-y-0.5 text-xs font-bold text-muted">
+              semanas
+            </span>
+          </div>
+          {errors.durationWeeks ? (
+            <p className="mt-2 text-sm font-semibold text-danger" role="alert">
+              {errors.durationWeeks.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div>
+          <Label
+            htmlFor="assignment-start-date"
+            className="font-extrabold text-charcoal"
+          >
+            Fecha de inicio
+          </Label>
+          <Input
+            id="assignment-start-date"
+            type="date"
+            className={inputClasses}
+            aria-invalid={Boolean(errors.startDate)}
+            {...register("startDate")}
+          />
+          {errors.startDate ? (
+            <p className="mt-2 text-sm font-semibold text-danger" role="alert">
+              {errors.startDate.message}
+            </p>
+          ) : null}
+        </div>
+
+        <Button
+          type="submit"
+          size="lg"
+          disabled={isSubmitting || !selectedClient || !selectedTemplate}
         >
-          Fecha de inicio
-        </Label>
-        <Input
-          id="assignment-start-date"
-          type="date"
-          className={inputClasses}
-          aria-invalid={Boolean(errors.startDate)}
-          {...register("startDate")}
-        />
-        {errors.startDate ? (
-          <p className="mt-2 text-sm font-semibold text-danger" role="alert">
-            {errors.startDate.message}
-          </p>
-        ) : null}
+          {isSubmitting ? (
+            <Loader2 className="animate-spin" aria-hidden="true" />
+          ) : (
+            <CalendarPlus aria-hidden="true" />
+          )}
+          {isSubmitting ? "Asignando..." : "Confirmar asignacion"}
+        </Button>
       </div>
-
-      <Button type="submit" size="lg" disabled={isSubmitting}>
-        {isSubmitting ? (
-          <Loader2 className="animate-spin" aria-hidden="true" />
-        ) : (
-          <CalendarPlus aria-hidden="true" />
-        )}
-        {isSubmitting ? "Asignando..." : "Asignar"}
-      </Button>
 
       {errors.root?.message ? (
         <Alert
           variant="destructive"
-          className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3 md:col-span-2 xl:col-span-5"
+          className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
         >
           <AlertDescription className="font-semibold text-danger">
             {errors.root.message}
@@ -249,17 +401,62 @@ export function RoutineAssignmentForm({
             setPendingReplacement(null);
           }
         }}
-        title="Reemplazar rutina activa"
+        title="Reemplazar plantilla activa"
         description={
           pendingReplacement
-            ? `${pendingReplacement.client.name} ya tiene "${pendingReplacement.client.currentAssignment?.title}" activa. La asignación actual se archivará antes de guardar la nueva rutina.`
+            ? `${pendingReplacement.client.name} ya tiene "${pendingReplacement.client.currentAssignment?.title}" asignada actualmente. La asignación anterior se archivará antes de guardar la nueva plantilla.`
             : ""
         }
-        confirmLabel="Reemplazar rutina"
-        pendingLabel="Asignando…"
+        confirmLabel="Reemplazar plantilla"
+        pendingLabel="Asignando..."
         tone="destructive"
         onConfirm={confirmReplacement}
       />
     </form>
+  );
+}
+
+function SelectedEntity({
+  detail,
+  icon: Icon,
+  label,
+  selected,
+  value,
+}: {
+  detail: string;
+  icon: typeof UserRound;
+  label: string;
+  selected: boolean;
+  value: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex min-w-0 items-start gap-3 rounded-[18px] border p-4",
+        selected
+          ? "border-primary/70 bg-primary-soft"
+          : "border-dashed border-border bg-background",
+      )}
+    >
+      <div
+        className={cn(
+          "grid size-11 shrink-0 place-items-center rounded-full",
+          selected
+            ? "bg-primary text-charcoal"
+            : "bg-stone-soft text-stone-hover",
+        )}
+      >
+        <Icon className="size-5" aria-hidden="true" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
+          {label}
+        </p>
+        <p className="mt-1 truncate font-extrabold text-charcoal">{value}</p>
+        <p className="mt-1 truncate text-xs font-semibold text-muted">
+          {detail}
+        </p>
+      </div>
+    </div>
   );
 }

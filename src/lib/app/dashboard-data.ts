@@ -105,7 +105,7 @@ async function resolveRows<Row>(query: RowsQuery<Row>) {
 }
 
 function isGeneralAdmin(access: CurrentUserAccess) {
-  return access.role === "admin" && access.specialty === null;
+  return access.role === "admin";
 }
 
 function firstText(...values: Array<string | null | undefined>) {

@@ -11,12 +11,12 @@ import { unassignRoutineFromClient } from "@/lib/actions/routines";
 
 export function RoutineUnassignButton({
   assignmentId,
+  assignmentName,
   clientName,
-  routineName,
 }: {
   assignmentId: string;
+  assignmentName: string;
   clientName: string;
-  routineName: string;
 }) {
   const router = useRouter();
   const [isConfirming, setIsConfirming] = useState(false);
@@ -34,7 +34,7 @@ export function RoutineUnassignButton({
       router.refresh();
     } catch {
       toast.error(
-        "Ocurrió un error inesperado al desasignar la rutina. Inténtalo de nuevo.",
+        "Ocurrió un error inesperado al desasignar la plantilla. Inténtalo de nuevo.",
       );
     }
   }
@@ -54,8 +54,8 @@ export function RoutineUnassignButton({
       <ConfirmationDialog
         open={isConfirming}
         onOpenChange={setIsConfirming}
-        title="Desasignar rutina"
-        description={`Se desasignará "${routineName}" de ${clientName}. La asignación quedará archivada en su historial.`}
+        title="Desasignar plantilla"
+        description={`Se desasignará "${assignmentName}" de ${clientName}. La asignación quedará archivada en su historial.`}
         confirmLabel="Desasignar"
         pendingLabel="Desasignando…"
         tone="destructive"

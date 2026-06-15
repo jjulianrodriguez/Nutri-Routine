@@ -19,5 +19,6 @@ export type ExerciseListItem = ExerciseOption & {
   createdAt: string;
   createdBy: string;
   creatorName: string;
+  multimediaUrls: string[];
   updatedAt: string;
 };

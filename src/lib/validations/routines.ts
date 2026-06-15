@@ -71,6 +71,10 @@ export const routineFormSchema = z
       .array(routineExerciseSchema)
       .min(1, "Agrega al menos un ejercicio.")
       .max(100, "Una rutina no puede superar 100 ejercicios."),
+    identifier: z
+      .string()
+      .trim()
+      .max(160, "El identificador no puede superar 160 caracteres."),
     isActive: z.boolean(),
     name: z
       .string()

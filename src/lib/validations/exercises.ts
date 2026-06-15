@@ -6,6 +6,33 @@ const difficultySchema = z.enum([
   "advanced",
 ]);
 
+const optionalExternalUrlSchema = z
+  .string()
+  .trim()
+  .max(2048, "La URL no puede superar 2048 caracteres.")
+  .refine((value) => {
+    if (!value) {
+      return true;
+    }
+
+    try {
+      const url = new URL(value);
+      const hostname = url.hostname.toLowerCase();
+
+      return (
+        (url.protocol === "http:" || url.protocol === "https:") &&
+        !url.username &&
+        !url.password &&
+        hostname !== "localhost" &&
+        hostname !== "127.0.0.1" &&
+        hostname !== "::1" &&
+        !hostname.endsWith(".local")
+      );
+    } catch {
+      return false;
+    }
+  }, "Ingresa una URL externa valida con http o https.");
+
 export const exerciseFormSchema = z.object({
   category: z
     .string()
@@ -24,22 +51,30 @@ export const exerciseFormSchema = z.object({
     .min(2, "Ingresa el tipo de ejercicio.")
     .max(100, "El tipo no puede superar 100 caracteres."),
   id: z.union([z.literal(""), z.string().uuid()]),
-  multimediaUrl: z
-    .string()
-    .trim()
-    .max(2048, "La URL no puede superar 2048 caracteres.")
-    .refine((value) => {
-      if (!value) {
-        return true;
-      }
+  multimediaUrls: z
+    .array(optionalExternalUrlSchema)
+    .max(3, "Puedes agregar un maximo de 3 recursos multimedia.")
+    .superRefine((values, context) => {
+      const seen = new Set<string>();
 
-      try {
-        const url = new URL(value);
-        return url.protocol === "http:" || url.protocol === "https:";
-      } catch {
-        return false;
-      }
-    }, "Ingresa una URL externa valida con http o https."),
+      values.forEach((value, index) => {
+        if (!value) {
+          return;
+        }
+
+        const normalized = value.toLowerCase();
+
+        if (seen.has(normalized)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Esta URL ya fue agregada.",
+            path: [index],
+          });
+        }
+
+        seen.add(normalized);
+      });
+    }),
   muscleGroup: z
     .string()
     .trim()

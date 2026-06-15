@@ -6,6 +6,7 @@ import {
   ClipboardCheck,
   Clock3,
   History,
+  Layers3,
   ListChecks,
   NotebookTabs,
   Dumbbell,
@@ -21,11 +22,13 @@ import {
 } from "@/components/app/AppScreen";
 import { RoutineExerciseList } from "@/components/app/routine-exercise-list";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import { WorkoutTemplateSnapshotView } from "@/components/app/workout-template-snapshot-view";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
   getClientTrainingOverview,
   getRoutineManagementOverview,
 } from "@/lib/routines/data";
+import { listWorkoutTemplates } from "@/lib/workout-templates/data";
 import { cn } from "@/lib/utils";
 import type {
   RoutineAssignmentState,
@@ -53,7 +56,7 @@ function formatDate(value: string | null) {
 
 function remainingLabel(assignment: RoutineAssignmentSummary) {
   if (assignment.state === "expired") {
-    return "El periodo termino. Debes solicitar una actualizacion.";
+    return "El periodo termino. Sigue asignada hasta que tu entrenador la renueve o archive.";
   }
 
   if (assignment.state === "upcoming") {
@@ -73,6 +76,30 @@ function remainingLabel(assignment: RoutineAssignmentSummary) {
   return "Vigencia sin fecha de cierre.";
 }
 
+function getCurrentCycleDay(
+  startDate: string | null,
+  cycleDays: number,
+) {
+  if (!startDate || cycleDays < 1) {
+    return 1;
+  }
+
+  const [year, month, day] = startDate.split("-").map(Number);
+  const startUtc = Date.UTC(year, month - 1, day);
+  const today = new Date();
+  const todayUtc = Date.UTC(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+  const elapsedDays = Math.max(
+    0,
+    Math.floor((todayUtc - startUtc) / 86_400_000),
+  );
+
+  return (elapsedDays % cycleDays) + 1;
+}
+
 async function ClientTrainingPage({
   access,
 }: {
@@ -80,23 +107,29 @@ async function ClientTrainingPage({
 }) {
   const overview = await getClientTrainingOverview(access.userId);
   const current = overview.currentAssignment;
+  const currentCycleDay = overview.currentTemplate
+    ? getCurrentCycleDay(
+        current?.startDate ?? null,
+        overview.currentTemplate.template.cycleDays,
+      )
+    : null;
 
   return (
     <AppScreen>
       <AppHeader
         eyebrow="Mi entrenamiento"
         title="Entrenamiento"
-        description="Rutina actual, historial de rutinas y recursos de entrenamiento asignados a tu cuenta."
+        description="Plantilla actual, ciclo diario e historial de entrenamiento asignado a tu cuenta."
       />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatTile
           label="Estado actual"
-          value={current ? assignmentStateLabels[current.state] : "Sin rutina"}
+          value={current ? assignmentStateLabels[current.state] : "Sin plantilla"}
           detail={
             current
               ? remainingLabel(current)
-              : "Tu entrenador aun no ha asignado una rutina"
+              : "Tu entrenador aún no ha asignado una plantilla"
           }
         />
         <StatTile
@@ -113,15 +146,15 @@ async function ClientTrainingPage({
           }
         />
         <StatTile
-          label="Rutinas anteriores"
+          label="Plantillas anteriores"
           value={String(overview.history.length)}
           detail="Historial conservado"
         />
       </section>
 
       <AppPanel
-        title="Rutina actual"
-        description="Consulta la vigencia y sigue los ejercicios en el orden indicado por tu entrenador."
+        title="Plantilla actual"
+        description="Consulta la vigencia, el día actual del ciclo y los entrenamientos indicados."
       >
         {current ? (
           <div className="space-y-5">
@@ -177,21 +210,39 @@ async function ClientTrainingPage({
               </div>
             </article>
 
-            <RoutineExerciseList
-              emptyMessage="Esta asignacion no tiene un detalle de ejercicios disponible."
-              exercises={overview.currentRoutine?.exercises ?? []}
-            />
+            {overview.currentTemplate ? (
+              <>
+                <div className="rounded-[20px] border border-primary/25 bg-primary-soft/45 p-4">
+                  <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
+                    Ciclo actual
+                  </p>
+                  <p className="mt-2 text-xl font-extrabold text-charcoal">
+                    Día {currentCycleDay} de{" "}
+                    {overview.currentTemplate.template.cycleDays}
+                  </p>
+                </div>
+                <WorkoutTemplateSnapshotView
+                  currentDayNumber={currentCycleDay}
+                  snapshot={overview.currentTemplate}
+                />
+              </>
+            ) : (
+              <RoutineExerciseList
+                emptyMessage="Esta asignación heredada no tiene ejercicios disponibles."
+                exercises={overview.currentRoutine?.exercises ?? []}
+              />
+            )}
           </div>
         ) : (
           <EmptyState>
-            No hay una rutina asignada actualmente. Cuando tu entrenador cree
-            una asignacion aparecera aqui.
+            No hay una plantilla asignada actualmente. Cuando tu entrenador
+            cree una asignación aparecerá aquí.
           </EmptyState>
         )}
       </AppPanel>
 
       <AppPanel
-        title="Historial de rutinas"
+        title="Historial de plantillas"
         description="Las asignaciones anteriores permanecen visibles con sus fechas y estado."
         tone="accent"
       >
@@ -205,9 +256,14 @@ async function ClientTrainingPage({
                       className="size-5 text-warm-brown"
                       aria-hidden="true"
                     />
-                    <span className="rounded-full bg-background px-3 py-1 text-xs font-extrabold text-charcoal">
-                      {assignmentStateLabels[assignment.state]}
-                    </span>
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                        Copia historica
+                      </span>
+                      <span className="rounded-full bg-background px-3 py-1 text-xs font-extrabold text-charcoal">
+                        {assignmentStateLabels[assignment.state]}
+                      </span>
+                    </div>
                   </div>
                   <h3 className="mt-4 text-lg font-extrabold text-charcoal">
                     {assignment.title}
@@ -216,7 +272,7 @@ async function ClientTrainingPage({
                     {formatDate(assignment.startDate)} -{" "}
                     {formatDate(assignment.endDate)}
                   </p>
-                  {assignment.routineId ? (
+                  {assignment.detailAvailable ? (
                     <span className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-warm-brown transition group-hover:text-charcoal">
                       Ver detalle
                       <ArrowRight
@@ -226,13 +282,13 @@ async function ClientTrainingPage({
                     </span>
                   ) : (
                     <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
-                      Rutina eliminada o no disponible
+                      Informacion historica no disponible
                     </p>
                   )}
                 </>
               );
 
-              return assignment.routineId ? (
+              return assignment.detailAvailable ? (
                 <Link
                   key={assignment.id}
                   href={`/app/entrenamiento/historial/${assignment.id}`}
@@ -255,7 +311,7 @@ async function ClientTrainingPage({
           <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">
             <NotebookTabs className="size-5 text-warm-brown" />
             <p className="mt-4 text-sm font-semibold leading-6 text-muted">
-              Todavia no hay rutinas anteriores.
+              Todavía no hay plantillas anteriores.
             </p>
           </div>
         )}

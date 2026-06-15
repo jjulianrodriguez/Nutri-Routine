@@ -43,21 +43,13 @@ async function getTrainingManagerContext() {
     };
   }
 
-  const [{ data: profile, error: profileError }, professionalResult] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .maybeSingle(),
-      supabase
-        .from("professional_profiles")
-        .select("specialty")
-        .eq("profile_id", user.id)
-        .maybeSingle(),
-    ]);
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
 
-  if (profileError || professionalResult.error || !profile) {
+  if (profileError || !profile) {
     return {
       error: "No se pudo validar tu perfil profesional.",
       supabase,
@@ -65,11 +57,26 @@ async function getTrainingManagerContext() {
     };
   }
 
-  const specialty = professionalResult.data?.specialty ?? null;
-  const isGeneralAdmin = profile.role === "admin" && specialty === null;
+  if (profile.role === "admin") {
+    return {
+      error: null,
+      supabase,
+      user,
+    };
+  }
+
+  const { data: professionalProfile, error: professionalProfileError } =
+    await supabase
+      .from("professional_profiles")
+      .select("is_active, specialty")
+      .eq("profile_id", user.id)
+      .maybeSingle();
   const canManageTraining =
-    (profile.role === "admin" || profile.role === "professional") &&
-    (isGeneralAdmin || specialty === "training" || specialty === "both");
+    !professionalProfileError &&
+    profile.role === "professional" &&
+    professionalProfile?.is_active === true &&
+    (professionalProfile.specialty === "training" ||
+      professionalProfile.specialty === "both");
 
   return {
     error: canManageTraining
@@ -80,7 +87,14 @@ async function getTrainingManagerContext() {
   };
 }
 
-function getRoutineErrorMessage(code?: string) {
+function getRoutineErrorMessage(code?: string, message?: string) {
+  if (
+    code === "23505" &&
+    message?.includes("routines_identifier_unique_idx")
+  ) {
+    return "Ese identificador ya esta usado por otra rutina.";
+  }
+
   if (code === "23505") {
     return "Un ejercicio esta repetido o tiene un orden duplicado.";
   }
@@ -94,6 +108,29 @@ function getRoutineErrorMessage(code?: string) {
   }
 
   return "No se pudo guardar la rutina. Revisa los datos e intentalo de nuevo.";
+}
+
+function getRoutineAssignmentErrorMessage(code?: string, message?: string) {
+  if (code === "42501") {
+    return "Solo puedes asignar rutinas a clientes vinculados contigo.";
+  }
+
+  if (
+    code === "23505" &&
+    message?.includes("workout_plans_one_active_per_client_idx")
+  ) {
+    return "El cliente ya tiene una rutina asignada. Actualiza la pagina y confirma el reemplazo.";
+  }
+
+  if (code === "23503") {
+    return "El cliente no tiene un entrenador asignado.";
+  }
+
+  if (code === "P0002") {
+    return "La rutina no existe o esta inactiva.";
+  }
+
+  return "No se pudo asignar la rutina.";
 }
 
 export async function saveRoutine(
@@ -143,6 +180,7 @@ export async function saveRoutine(
     p_description: parsed.data.description,
     p_difficulty: parsed.data.difficulty,
     p_exercises: exercises,
+    p_identifier: parsed.data.identifier,
     p_is_active: parsed.data.isActive,
     p_name: parsed.data.name,
     p_routine_id: routineId,
@@ -151,7 +189,7 @@ export async function saveRoutine(
 
   if (error || !data) {
     return {
-      message: getRoutineErrorMessage(error?.code),
+      message: getRoutineErrorMessage(error?.code, error?.message),
       status: "error",
     };
   }
@@ -301,17 +339,11 @@ export async function assignRoutineToClient(
   );
 
   if (error || !data) {
-    const message =
-      error?.code === "42501"
-        ? "Solo puedes asignar rutinas a clientes vinculados contigo."
-        : error?.code === "23503"
-          ? "El cliente no tiene un entrenador asignado."
-          : error?.code === "P0002"
-            ? "La rutina no existe o esta inactiva."
-            : "No se pudo asignar la rutina.";
-
     return {
-      message,
+      message: getRoutineAssignmentErrorMessage(
+        error?.code,
+        error?.message,
+      ),
       status: "error",
     };
   }
@@ -342,7 +374,7 @@ export async function unassignRoutineFromClient(
 
   if (context.error || !context.user) {
     return {
-      message: context.error ?? "No tienes permisos para desasignar rutinas.",
+      message: context.error ?? "No tienes permisos para desasignar planes.",
       status: "error",
     };
   }
@@ -359,8 +391,8 @@ export async function unassignRoutineFromClient(
     return {
       message:
         error?.code === "42501"
-          ? "Solo puedes desasignar rutinas de clientes vinculados contigo."
-          : "No se pudo desasignar la rutina.",
+          ? "Solo puedes desasignar planes de clientes vinculados contigo."
+          : "No se pudo desasignar el plan.",
       status: "error",
     };
   }
@@ -370,7 +402,7 @@ export async function unassignRoutineFromClient(
 
   return {
     id: data.id,
-    message: "Rutina desasignada. La asignacion se conservo en el historial.",
+    message: "Plan desasignado. La asignación se conservó en el historial.",
     status: "success",
   };
 }

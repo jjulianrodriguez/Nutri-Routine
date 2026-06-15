@@ -23,7 +23,7 @@ type ClientProfileRow =
     >
   | null;
 type ProfessionalProfileRow =
-  | Pick<Tables<"professional_profiles">, "specialty">
+  | Pick<Tables<"professional_profiles">, "is_active" | "specialty">
   | null;
 
 function readString(value: unknown) {
@@ -85,6 +85,7 @@ function getRoleLabel({
   hasTrainingService,
   isClientActivated,
   isClient,
+  isProfessionalActive,
   role,
   specialty,
 }: {
@@ -92,6 +93,7 @@ function getRoleLabel({
   hasTrainingService: boolean;
   isClientActivated: boolean;
   isClient: boolean;
+  isProfessionalActive: boolean;
   role: AppRole;
   specialty: ProfessionalSpecialty | null;
 }) {
@@ -113,6 +115,10 @@ function getRoleLabel({
     }
 
     return "Cliente";
+  }
+
+  if (!isProfessionalActive) {
+    return "Profesional inactivo";
   }
 
   const prefix = role === "admin" ? "Admin" : "Profesional";
@@ -168,7 +174,7 @@ async function getProfessionalProfile(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("professional_profiles")
-    .select("specialty")
+    .select("is_active, specialty")
     .eq("profile_id", userId)
     .maybeSingle();
 
@@ -207,11 +213,13 @@ export const getCurrentUserAccess = cache(async () => {
 
   if (isClient) {
     clientProfile = await getClientProfile(user.id);
-  } else {
+  } else if (isProfessional) {
     professionalProfile = await getProfessionalProfile(user.id);
   }
 
   const professionalSpecialty = normalizeSpecialty(professionalProfile?.specialty);
+  const isProfessionalActive =
+    !isProfessional || professionalProfile?.is_active === true;
   const clientProfileExists = Boolean(clientProfile);
   const assignedNutritionistId = clientProfile?.assigned_nutritionist_id ?? null;
   const assignedTrainerId = clientProfile?.assigned_trainer_id ?? null;
@@ -219,16 +227,23 @@ export const getCurrentUserAccess = cache(async () => {
   const hasTrainingService = assignedTrainerId !== null;
   const isClientActivated =
     isClient && (hasNutritionService || hasTrainingService);
-  const canAccessOnlyBasicSettings = isClient && !isClientActivated;
-  const canAccessApp = !isClient || isClientActivated;
-  const isGeneralAdmin = role === "admin" && professionalSpecialty === null;
+  const canAccessOnlyBasicSettings =
+    (isClient && !isClientActivated) ||
+    (isProfessional && !isProfessionalActive);
+  const canAccessApp =
+    (isClient && isClientActivated) ||
+    (isProfessional && isProfessionalActive) ||
+    role === "admin";
+  const isGeneralAdmin = role === "admin";
   const canManageNutrition =
     isAdmin &&
+    isProfessionalActive &&
     (isGeneralAdmin ||
       professionalSpecialty === "nutrition" ||
       professionalSpecialty === "both");
   const canManageTraining =
     isAdmin &&
+    isProfessionalActive &&
     (isGeneralAdmin ||
       professionalSpecialty === "training" ||
       professionalSpecialty === "both");
@@ -269,12 +284,14 @@ export const getCurrentUserAccess = cache(async () => {
     isClient,
     isClientActivated,
     isProfessional,
+    isProfessionalActive,
     role,
     roleLabel: getRoleLabel({
       hasNutritionService,
       hasTrainingService,
       isClientActivated,
       isClient,
+      isProfessionalActive,
       role,
       specialty,
     }),

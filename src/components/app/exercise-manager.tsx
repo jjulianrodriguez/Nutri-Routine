@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ExternalLink,
+  Link2,
   Loader2,
   Pencil,
   Plus,
@@ -11,7 +11,9 @@ import {
   RotateCcw,
   Search,
   Trash2,
+  X,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -50,7 +52,7 @@ const defaultValues: ExerciseFormValues = {
   difficulty: "beginner",
   exerciseType: "",
   id: "",
-  multimediaUrl: "",
+  multimediaUrls: [""],
   muscleGroup: "",
   name: "",
 };
@@ -103,11 +105,14 @@ export function ExerciseManager({
     register,
     reset,
     setError,
+    setValue,
   } = useForm<ExerciseFormValues>({
     defaultValues,
     resolver: zodResolver(exerciseFormSchema),
   });
   const editingId = useWatch({ control, name: "id" });
+  const multimediaUrls =
+    useWatch({ control, name: "multimediaUrls" }) ?? [""];
   const filteredExercises = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
@@ -138,7 +143,10 @@ export function ExerciseManager({
       difficulty: exercise.difficulty ?? "beginner",
       exerciseType: exercise.exerciseType,
       id: exercise.id,
-      multimediaUrl: exercise.multimediaUrl ?? "",
+      multimediaUrls:
+        exercise.multimediaUrls.length > 0
+          ? exercise.multimediaUrls
+          : [""],
       muscleGroup: exercise.muscleGroup,
       name: exercise.name,
     });
@@ -146,6 +154,32 @@ export function ExerciseManager({
     document
       .getElementById("exercise-form")
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function addMultimediaUrl() {
+    if (multimediaUrls.length >= 3) {
+      return;
+    }
+
+    setValue("multimediaUrls", [...multimediaUrls, ""], {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }
+
+  function removeMultimediaUrl(index: number) {
+    const nextUrls = multimediaUrls.filter(
+      (_, urlIndex) => urlIndex !== index,
+    );
+
+    setValue(
+      "multimediaUrls",
+      nextUrls.length > 0 ? nextUrls : [""],
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
   }
 
   async function saveExerciseValues(values: ExerciseFormValues) {
@@ -428,34 +462,78 @@ export function ExerciseManager({
             </div>
           </div>
 
-          <div>
-            <Label
-              htmlFor="exercise-multimedia"
-              className="font-extrabold text-charcoal"
-            >
-              Recurso multimedia externo
-            </Label>
-            <Input
-              id="exercise-multimedia"
-              type="url"
-              className={inputClasses}
-              placeholder="https://..."
-              aria-invalid={Boolean(errors.multimediaUrl)}
-              aria-describedby={
-                errors.multimediaUrl
-                  ? "exercise-multimedia-error"
-                  : "exercise-multimedia-help"
-              }
-              {...register("multimediaUrl")}
-            />
-            <p id="exercise-multimedia-help" className="mt-2 text-xs text-muted">
-              Opcional. Solo se aceptan enlaces http o https; no se suben archivos.
+          <fieldset className="rounded-[22px] border border-border bg-background p-4">
+            <legend className="px-1 font-extrabold text-charcoal">
+              Recursos multimedia externos
+            </legend>
+            <p className="text-sm leading-6 text-muted">
+              Opcional. Agrega hasta 3 enlaces HTTP o HTTPS. No se suben
+              imagenes, videos ni archivos.
             </p>
-            <FieldError
-              id="exercise-multimedia-error"
-              message={errors.multimediaUrl?.message}
-            />
-          </div>
+
+            <div className="mt-4 space-y-4">
+              {multimediaUrls.map((_, index) => {
+                const error = errors.multimediaUrls?.[index]?.message;
+                const inputId = `exercise-multimedia-${index}`;
+                const errorId = `${inputId}-error`;
+
+                return (
+                  <div
+                    key={inputId}
+                    className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
+                  >
+                    <div>
+                      <Label
+                        htmlFor={inputId}
+                        className="font-extrabold text-charcoal"
+                      >
+                        Recurso {index + 1}
+                      </Label>
+                      <Input
+                        id={inputId}
+                        type="url"
+                        className={inputClasses}
+                        placeholder="https://..."
+                        aria-invalid={Boolean(error)}
+                        aria-describedby={error ? errorId : undefined}
+                        {...register(`multimediaUrls.${index}`)}
+                      />
+                      <FieldError id={errorId} message={error} />
+                    </div>
+
+                    {multimediaUrls.length > 1 ? (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        className="min-h-11"
+                        onClick={() => removeMultimediaUrl(index)}
+                        aria-label={`Quitar recurso multimedia ${index + 1}`}
+                      >
+                        <X aria-hidden="true" />
+                        Quitar
+                      </Button>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+
+            {multimediaUrls.length < 3 ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-4 min-h-11"
+                onClick={addMultimediaUrl}
+              >
+                <Plus aria-hidden="true" />
+                Agregar recurso multimedia
+              </Button>
+            ) : (
+              <p className="mt-4 text-xs font-bold text-muted">
+                Alcanzaste el maximo de 3 recursos multimedia.
+              </p>
+            )}
+          </fieldset>
 
           {statusMessage ? (
             <Alert
@@ -516,12 +594,22 @@ export function ExerciseManager({
               <article
                 key={exercise.id}
                 className={cn(
-                  "rounded-[22px] border bg-background p-4 transition-colors",
+                  "relative rounded-[22px] border bg-background p-4 transition-colors hover:border-primary/45 hover:shadow-soft",
                   exercise.isActive
                     ? "border-border"
                     : "border-dashed border-stone/35 opacity-75",
                 )}
               >
+                <Link
+                  href={`/app/entrenamiento/ejercicios/${exercise.id}`}
+                  className="absolute inset-0 rounded-[22px] outline-none focus-visible:ring-3 focus-visible:ring-ring/35"
+                  aria-label={`Ver información completa de ${exercise.name}`}
+                >
+                  <span className="sr-only">
+                    Ver información completa de {exercise.name}
+                  </span>
+                </Link>
+
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -543,30 +631,32 @@ export function ExerciseManager({
                       {exercise.description}
                     </p>
                   </div>
-                  <CardActionsMenu
-                    label={exercise.name}
-                    items={[
-                      {
-                        icon: Pencil,
-                        label: "Editar",
-                        onSelect: () => editExercise(exercise),
-                      },
-                      {
-                        destructive: exercise.isActive,
-                        icon: exercise.isActive ? PowerOff : Power,
-                        label: exercise.isActive ? "Desactivar" : "Activar",
-                        onSelect: () =>
-                          setConfirmation({ exercise, type: "status" }),
-                        separatorBefore: true,
-                      },
-                      {
-                        destructive: true,
-                        icon: Trash2,
-                        label: "Eliminar",
-                        onSelect: () => removeExercise(exercise),
-                      },
-                    ]}
-                  />
+                  <div className="relative z-10">
+                    <CardActionsMenu
+                      label={exercise.name}
+                      items={[
+                        {
+                          icon: Pencil,
+                          label: "Editar",
+                          onSelect: () => editExercise(exercise),
+                        },
+                        {
+                          destructive: exercise.isActive,
+                          icon: exercise.isActive ? PowerOff : Power,
+                          label: exercise.isActive ? "Desactivar" : "Activar",
+                          onSelect: () =>
+                            setConfirmation({ exercise, type: "status" }),
+                          separatorBefore: true,
+                        },
+                        {
+                          destructive: true,
+                          icon: Trash2,
+                          label: "Eliminar",
+                          onSelect: () => removeExercise(exercise),
+                        },
+                      ]}
+                    />
+                  </div>
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-warm-brown">
@@ -590,16 +680,14 @@ export function ExerciseManager({
                     <span>Creado: {formatDate(exercise.createdAt)}</span>
                     <span>Actualizado: {formatDate(exercise.updatedAt)}</span>
                   </div>
-                  {exercise.multimediaUrl ? (
-                    <a
-                      href={exercise.multimediaUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown hover:text-charcoal"
-                    >
-                      Ver recurso
-                      <ExternalLink className="size-3.5" aria-hidden="true" />
-                    </a>
+                  {exercise.multimediaUrls.length > 0 ? (
+                    <span className="inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown">
+                      <Link2 className="size-3.5" aria-hidden="true" />
+                      {exercise.multimediaUrls.length}{" "}
+                      {exercise.multimediaUrls.length === 1
+                        ? "recurso multimedia"
+                        : "recursos multimedia"}
+                    </span>
                   ) : null}
                 </div>
               </article>

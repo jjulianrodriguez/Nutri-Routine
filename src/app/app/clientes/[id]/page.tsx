@@ -6,9 +6,12 @@ import {
   Clock3,
   Dumbbell,
   History,
+  HeartPulse,
   Leaf,
   Mail,
   Phone,
+  Ruler,
+  Scale,
   ShieldCheck,
   UserRound,
 } from "lucide-react";
@@ -64,6 +67,36 @@ function formatDate(value: string | null, includeTime = false) {
   }).format(new Date(value.includes("T") ? value : `${value}T12:00:00`));
 }
 
+function formatGender(
+  value: string | null,
+  description: string | null,
+) {
+  switch (value) {
+    case "male":
+      return "Masculino";
+    case "female":
+      return "Femenino";
+    case "non_binary":
+      return "No binario";
+    case "prefer_not_to_say":
+      return "Prefiere no indicarlo";
+    case "self_described":
+      return description ?? "Autodescripcion no indicada";
+    default:
+      return "No indicado";
+  }
+}
+
+function formatMeasurement(value: number | null, unit: string) {
+  if (value === null) {
+    return "No indicado";
+  }
+
+  return `${new Intl.NumberFormat("es-CR", {
+    maximumFractionDigits: 2,
+  }).format(value)} ${unit}`;
+}
+
 function getCurrentPlan(plans: ClientPlanSummary[]) {
   const currentIndex = plans.findIndex(
     (plan) =>
@@ -79,16 +112,23 @@ function getCurrentPlan(plans: ClientPlanSummary[]) {
 }
 
 function DetailItem({
+  className,
   icon: Icon,
   label,
   value,
 }: {
+  className?: string;
   icon: typeof UserRound;
   label: string;
   value: string;
 }) {
   return (
-    <div className="rounded-[18px] border border-border bg-background p-4">
+    <div
+      className={cn(
+        "rounded-[18px] border border-border bg-background p-4",
+        className,
+      )}
+    >
       <Icon className="size-4 text-warm-brown" aria-hidden="true" />
       <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
         {label}
@@ -170,7 +210,7 @@ function PlanCard({
           ) : null}
         </div>
         {showRoutineLink ? (
-          plan.routineId ? (
+          plan.detailAvailable ? (
             <Button asChild size="sm" variant="outline">
               <Link href={`/app/entrenamiento/historial/${plan.id}`}>
                 Abrir rutina
@@ -178,7 +218,7 @@ function PlanCard({
             </Button>
           ) : (
             <span className="rounded-full bg-surface px-3 py-2 text-xs font-extrabold text-muted">
-              Rutina no disponible
+              Informacion historica no disponible
             </span>
           )
         ) : null}
@@ -327,8 +367,8 @@ export default async function ClientProfilePage({
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <AppPanel
-          title="Informacion basica"
-          description="Informacion compartida con profesionales autorizados."
+          title="Informacion personal"
+          description="Datos opcionales visibles solo para profesionales asignados y administracion."
         >
           <div className="grid gap-3 sm:grid-cols-2">
             <DetailItem
@@ -339,17 +379,40 @@ export default async function ClientProfilePage({
             <DetailItem
               icon={Phone}
               label="Telefono"
-              value={client.phone ?? "No registrado"}
+              value={client.phone ?? "No indicado"}
             />
             <DetailItem
               icon={CalendarDays}
               label="Fecha de nacimiento"
-              value={formatDate(client.birthDate)}
+              value={
+                client.birthDate
+                  ? formatDate(client.birthDate)
+                  : "No indicado"
+              }
             />
             <DetailItem
               icon={UserRound}
               label="Genero"
-              value={client.gender ?? "No registrado"}
+              value={formatGender(
+                client.gender,
+                client.genderDescription,
+              )}
+            />
+            <DetailItem
+              icon={Scale}
+              label="Peso"
+              value={formatMeasurement(client.weightKg, "kg")}
+            />
+            <DetailItem
+              icon={Ruler}
+              label="Altura"
+              value={formatMeasurement(client.heightCm, "cm")}
+            />
+            <DetailItem
+              className="sm:col-span-2"
+              icon={HeartPulse}
+              label="Enfermedades o condiciones medicas"
+              value={client.medicalConditions ?? "No indicado"}
             />
           </div>
         </AppPanel>

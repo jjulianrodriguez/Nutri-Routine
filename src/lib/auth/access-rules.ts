@@ -60,6 +60,7 @@ export type CurrentUserAccess = {
   isClient: boolean;
   isClientActivated: boolean;
   isProfessional: boolean;
+  isProfessionalActive: boolean;
   role: AppRole;
   roleLabel: string;
   specialty: ProfessionalSpecialty | null;
@@ -104,16 +105,16 @@ function item(route: AppRouteKind, icon: AppNavIcon, label: string): AppNavigati
 export function buildNavigationForUser(
   access: CurrentUserAccess,
 ): AppNavigationSection[] {
-  if (access.isClient) {
-    if (access.canAccessOnlyBasicSettings) {
-      return [
-        {
-          items: [item("settings", "settings", "Configuracion")],
-          label: "Cuenta",
-        },
-      ];
-    }
+  if (access.canAccessOnlyBasicSettings) {
+    return [
+      {
+        items: [item("settings", "settings", "Configuracion")],
+        label: "Cuenta",
+      },
+    ];
+  }
 
+  if (access.isClient) {
     const personalItems: AppNavigationItem[] = [
       item("dashboard", "dashboard", "Dashboard"),
       item("profile", "profile", "Mi perfil"),
@@ -153,6 +154,10 @@ export function buildNavigationForUser(
 
   if (access.canManageClientPlans) {
     managementItems.push(item("clients", "clients", "Clientes"));
+  }
+
+  if (access.role === "admin") {
+    managementItems.push(item("progress", "progress", "Progreso"));
   }
 
   if (access.canManageNutrition) {
@@ -252,7 +257,7 @@ export function canAccessRoute(
     case "profile":
       return access.isClient;
     case "progress":
-      return access.isClient;
+      return access.isClient || access.role === "admin";
     case "clients":
       return access.canManageClientPlans;
     case "professionalAccounts":

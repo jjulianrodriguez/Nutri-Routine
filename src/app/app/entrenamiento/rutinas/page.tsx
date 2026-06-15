@@ -107,6 +107,11 @@ export default async function RoutinesPage() {
                       <span className="rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-charcoal">
                         {difficultyLabels[routine.difficulty]}
                       </span>
+                      {routine.identifier ? (
+                        <span className="max-w-full truncate rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                          ID: {routine.identifier}
+                        </span>
+                      ) : null}
                       <span
                         className={
                           routine.isActive
@@ -121,7 +126,7 @@ export default async function RoutinesPage() {
                       {routine.name}
                     </h2>
                     <p className="mt-2 text-sm font-bold text-warm-brown">
-                      {routine.category} · {routine.targetAudience}
+                      {routine.category} / {routine.targetAudience}
                     </p>
                     <span className="mt-4 inline-flex items-center gap-2 text-sm font-extrabold text-warm-brown group-hover:text-charcoal">
                       Ver detalle

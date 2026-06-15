@@ -1,0 +1,238 @@
+import {
+  ArrowLeft,
+  CalendarDays,
+  ExternalLink,
+  FileText,
+  Tag,
+  Target,
+  UserRound,
+} from "lucide-react";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+
+import {
+  AppHeader,
+  AppPanel,
+  AppScreen,
+} from "@/components/app/AppScreen";
+import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import { Button } from "@/components/ui/button";
+import { requireRouteAccess } from "@/lib/auth/current-user-access";
+import { getExerciseDetail } from "@/lib/exercises/data";
+import type { ExerciseDifficulty } from "@/types/exercise";
+
+const difficultyLabels: Record<ExerciseDifficulty, string> = {
+  advanced: "Avanzado",
+  beginner: "Principiante",
+  intermediate: "Intermedio",
+};
+
+function readValue(value: string | null | undefined) {
+  return value?.trim() || "No indicado";
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("es-CR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+export default async function ExerciseDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const access = await requireRouteAccess("/app/entrenamiento");
+
+  if (!access.canViewTraining) {
+    redirect("/app");
+  }
+
+  const { id } = await params;
+  const exercise = await getExerciseDetail(id);
+
+  if (!exercise) {
+    notFound();
+  }
+
+  return (
+    <AppScreen>
+      <AppHeader
+        eyebrow="Detalle de ejercicio"
+        title={exercise.name}
+        description="Información completa del ejercicio y sus indicaciones."
+      />
+      {access.canManageTraining ? (
+        <TrainingSectionNav active="exercises" />
+      ) : null}
+
+      <div className="flex flex-wrap justify-between gap-3">
+        <Button asChild variant="outline" size="lg">
+          <Link
+            href={
+              access.canManageTraining
+                ? "/app/entrenamiento/ejercicios"
+                : "/app/entrenamiento"
+            }
+          >
+            <ArrowLeft aria-hidden="true" />
+            {access.canManageTraining
+              ? "Volver a ejercicios"
+              : "Volver a entrenamiento"}
+          </Link>
+        </Button>
+      </div>
+
+      <section>
+        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
+          Nombre del ejercicio
+        </p>
+        <h2 className="mt-2 text-2xl font-extrabold text-charcoal sm:text-3xl">
+          {readValue(exercise.name)}
+        </h2>
+      </section>
+
+      <AppPanel
+        title="Descripción e instrucciones"
+        description="Indicaciones disponibles para realizar el ejercicio."
+      >
+        <div className="rounded-[20px] border border-border bg-surface p-4 shadow-soft">
+          <FileText
+            className="size-4 text-warm-brown"
+            aria-hidden="true"
+          />
+          <p className="mt-3 whitespace-pre-wrap text-sm font-semibold leading-7 text-charcoal">
+            {readValue(exercise.description)}
+          </p>
+        </div>
+      </AppPanel>
+
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <DetailValue
+          icon={Target}
+          label="Grupo muscular"
+          value={readValue(exercise.muscleGroup)}
+        />
+        <DetailValue
+          icon={Tag}
+          label="Dificultad"
+          value={
+            exercise.difficulty
+              ? difficultyLabels[exercise.difficulty]
+              : "No indicado"
+          }
+        />
+        <DetailValue
+          icon={Tag}
+          label="Categoría"
+          value={readValue(exercise.category)}
+        />
+        <DetailValue
+          icon={Target}
+          label="Tipo"
+          value={readValue(exercise.exerciseType)}
+        />
+      </section>
+
+      <AppPanel
+        title="Recursos multimedia"
+        description="Enlaces externos de apoyo disponibles para este ejercicio."
+      >
+        {exercise.multimediaUrls.length > 0 ? (
+          <div className="grid gap-3 lg:grid-cols-2">
+            {exercise.multimediaUrls.map((url, index) => (
+              <article
+                key={url}
+                className="rounded-[20px] border border-border bg-surface p-4 shadow-soft"
+              >
+                <ExternalLink
+                  className="size-4 text-warm-brown"
+                  aria-hidden="true"
+                />
+                <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
+                  Recurso {index + 1}
+                </p>
+                <p className="mt-2 break-all text-sm font-semibold leading-6 text-charcoal">
+                  {url}
+                </p>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="mt-4"
+                >
+                  <a href={url} target="_blank" rel="noreferrer">
+                    <ExternalLink aria-hidden="true" />
+                    Abrir recurso
+                  </a>
+                </Button>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-[20px] border border-border bg-surface p-4 shadow-soft">
+            <ExternalLink
+              className="size-4 text-warm-brown"
+              aria-hidden="true"
+            />
+            <p className="mt-3 font-extrabold text-charcoal">
+              No indicado
+            </p>
+          </div>
+        )}
+      </AppPanel>
+
+      <AppPanel
+        title="Estado y registro"
+        description="Información administrativa del ejercicio."
+      >
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <DetailValue
+            icon={Target}
+            label="Estado"
+            value={exercise.isActive ? "Activo" : "Inactivo"}
+          />
+          <DetailValue
+            icon={UserRound}
+            label="Creador"
+            value={readValue(exercise.creatorName)}
+          />
+          <DetailValue
+            icon={CalendarDays}
+            label="Creado"
+            value={formatDate(exercise.createdAt)}
+          />
+          <DetailValue
+            icon={CalendarDays}
+            label="Actualizado"
+            value={formatDate(exercise.updatedAt)}
+          />
+        </div>
+      </AppPanel>
+    </AppScreen>
+  );
+}
+
+function DetailValue({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Target;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-[20px] border border-border bg-surface p-4 shadow-soft">
+      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
+      <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
+        {label}
+      </p>
+      <p className="mt-1 break-words font-extrabold text-charcoal">
+        {value}
+      </p>
+    </div>
+  );
+}

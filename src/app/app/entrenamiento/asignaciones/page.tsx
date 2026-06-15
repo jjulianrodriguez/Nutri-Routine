@@ -14,14 +14,14 @@ import {
   EmptyState,
   StatTile,
 } from "@/components/app/AppScreen";
-import { RoutineAssignmentForm } from "@/components/app/routine-assignment-form";
+import { WorkoutTemplateAssignmentForm } from "@/components/app/routine-assignment-form";
 import { RoutineUnassignButton } from "@/components/app/routine-unassign-button";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
-  getRoutineManagementOverview,
   listAssignableTrainingClients,
 } from "@/lib/routines/data";
+import { listAssignableWorkoutTemplates } from "@/lib/workout-templates/data";
 import { cn } from "@/lib/utils";
 import type {
   RoutineAssignmentState,
@@ -49,7 +49,7 @@ function formatDate(value: string | null) {
 
 function getStatusDetail(assignment: RoutineAssignmentSummary) {
   if (assignment.state === "expired") {
-    return `Vencio el ${formatDate(assignment.endDate)}`;
+    return `Vencio el ${formatDate(assignment.endDate)}. Sigue asignada hasta renovarla o desasignarla.`;
   }
 
   if (assignment.state === "upcoming") {
@@ -72,7 +72,7 @@ export default async function RoutineAssignmentsPage({
 }: {
   searchParams: Promise<{
     client?: string | string[];
-    routine?: string | string[];
+    template?: string | string[];
   }>;
 }) {
   const access = await requireRouteAccess(
@@ -83,26 +83,19 @@ export default async function RoutineAssignmentsPage({
     redirect("/app/entrenamiento");
   }
 
-  const [clients, overview, query] = await Promise.all([
+  const [clients, templates, query] = await Promise.all([
     listAssignableTrainingClients(access),
-    getRoutineManagementOverview(),
+    listAssignableWorkoutTemplates(),
     searchParams,
   ]);
-  const routines = overview.routines
-    .filter((routine) => routine.isActive)
-    .map((routine) => ({
-      category: routine.category,
-      id: routine.id,
-      name: routine.name,
-    }));
-  const requestedRoutineId =
-    typeof query.routine === "string" ? query.routine : "";
+  const requestedTemplateId =
+    typeof query.template === "string" ? query.template : "";
   const requestedClientId =
     typeof query.client === "string" ? query.client : "";
-  const defaultRoutineId = routines.some(
-    (routine) => routine.id === requestedRoutineId,
+  const defaultTemplateId = templates.some(
+    (template) => template.id === requestedTemplateId,
   )
-    ? requestedRoutineId
+    ? requestedTemplateId
     : "";
   const defaultClientId = clients.some(
     (client) => client.id === requestedClientId,
@@ -120,8 +113,8 @@ export default async function RoutineAssignmentsPage({
     <AppScreen>
       <AppHeader
         eyebrow="Entrenamiento"
-        title="Asignaciones de rutinas"
-        description="Asigna rutinas activas a tus clientes y administra su vigencia desde un unico lugar."
+        title="Asignaciones de plantillas"
+        description="Asigna ciclos de entrenamiento completos a tus clientes y administra su vigencia desde un único lugar."
       />
 
       <TrainingSectionNav active="assignments" />
@@ -130,15 +123,19 @@ export default async function RoutineAssignmentsPage({
         <StatTile
           label="Clientes disponibles"
           value={String(clients.length)}
-          detail="Vinculados con entrenamiento"
+          detail={
+            access.role === "admin"
+              ? "Todas las cuentas cliente"
+              : "Vinculados con entrenamiento"
+          }
         />
         <StatTile
-          label="Con rutina actual"
+          label="Con plantilla actual"
           value={String(assignedCount)}
-          detail="Asignaciones activas o programadas"
+          detail="Una asignacion abierta por cliente"
         />
         <StatTile
-          label="Rutinas vencidas"
+          label="Plantillas vencidas"
           value={String(expiredCount)}
           detail="Pendientes de renovar o desasignar"
         />
@@ -146,21 +143,25 @@ export default async function RoutineAssignmentsPage({
 
       <AppPanel
         title="Nueva asignacion"
-        description="Al asignar una nueva rutina se archiva la asignacion activa anterior y se conserva en el historial del cliente."
+        description="Al asignar una nueva plantilla se archiva la asignación activa anterior y se conserva en el historial del cliente."
         tone="primary"
       >
-        <RoutineAssignmentForm
+        <WorkoutTemplateAssignmentForm
           clients={clients}
           defaultClientId={defaultClientId}
-          defaultRoutineId={defaultRoutineId}
+          defaultTemplateId={defaultTemplateId}
           defaultStartDate={new Date().toISOString().slice(0, 10)}
-          routines={routines}
+          templates={templates}
         />
       </AppPanel>
 
       <AppPanel
-        title="Clientes y rutinas actuales"
-        description="Solo se muestran los clientes asignados a tu area profesional."
+        title="Clientes y plantillas actuales"
+        description={
+          access.role === "admin"
+            ? "El administrador universal puede gestionar cualquier cuenta cliente."
+            : "Solo se muestran los clientes asignados a tu area profesional."
+        }
       >
         {clients.length === 0 ? (
           <EmptyState>
@@ -204,7 +205,7 @@ export default async function RoutineAssignmentsPage({
                     >
                       {assignment
                         ? stateLabels[assignment.state]
-                        : "Sin rutina"}
+                        : "Sin plantilla"}
                     </span>
                   </div>
 
@@ -217,7 +218,7 @@ export default async function RoutineAssignmentsPage({
                               className="size-4"
                               aria-hidden="true"
                             />
-                            Rutina asignada
+                            Plantilla asignada
                           </div>
                           <h3 className="mt-2 text-lg font-extrabold text-charcoal">
                             {assignment.title}
@@ -228,8 +229,8 @@ export default async function RoutineAssignmentsPage({
                         </div>
                         <RoutineUnassignButton
                           assignmentId={assignment.id}
+                          assignmentName={assignment.title}
                           clientName={client.name}
-                          routineName={assignment.title}
                         />
                       </div>
 
@@ -258,7 +259,7 @@ export default async function RoutineAssignmentsPage({
                   ) : (
                     <div className="mt-5">
                       <EmptyState>
-                        Este cliente no tiene una rutina asignada actualmente.
+                        Este cliente no tiene una plantilla asignada actualmente.
                       </EmptyState>
                     </div>
                   )}

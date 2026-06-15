@@ -31,6 +31,7 @@ export type ClientPlanState =
 export type ClientPlanSummary = {
   createdAt: string;
   description: string | null;
+  detailAvailable: boolean;
   durationWeeks: number | null;
   endDate: string | null;
   id: string;
@@ -53,18 +54,22 @@ export type ClientAdministrativeProfile = {
   email: string | null;
   fullName: string;
   gender: string | null;
+  genderDescription: string | null;
   hasNutritionService: boolean;
   hasTrainingService: boolean;
+  heightCm: number | null;
   id: string;
+  medicalConditions: string | null;
   nutritionPlans: ClientPlanSummary[];
   phone: string | null;
   role: "client";
   trainingPlans: ClientPlanSummary[];
   updatedAt: string;
+  weightKg: number | null;
 };
 
 function isGeneralAdmin(access: CurrentUserAccess) {
-  return access.role === "admin" && access.specialty === null;
+  return access.role === "admin";
 }
 
 function getTodayDateKey() {
@@ -164,6 +169,7 @@ async function listDietPlans(
   return (data ?? []).map((plan) => ({
     createdAt: plan.created_at,
     description: plan.description,
+    detailAvailable: false,
     durationWeeks: null,
     endDate: plan.end_date,
     id: plan.id,
@@ -182,7 +188,7 @@ async function listTrainingPlans(
   const { data, error } = await supabase
     .from("workout_plans")
     .select(
-      "id, routine_id, title, description, status, start_date, end_date, duration_weeks, created_at",
+      "id, routine_id, routine_snapshot, template_snapshot, title, description, status, start_date, end_date, duration_weeks, created_at",
     )
     .eq("client_id", clientId)
     .order("created_at", { ascending: false });
@@ -194,6 +200,11 @@ async function listTrainingPlans(
   return (data ?? []).map((plan) => ({
     createdAt: plan.created_at,
     description: plan.description,
+    detailAvailable: Boolean(
+      plan.routine_snapshot ||
+        plan.template_snapshot ||
+        plan.routine_id,
+    ),
     durationWeeks: plan.duration_weeks,
     endDate: plan.end_date,
     id: plan.id,
@@ -228,7 +239,7 @@ export async function getClientAdministrativeProfile(
     supabase
       .from("client_profiles")
       .select(
-        "profile_id, assigned_nutritionist_id, assigned_trainer_id, birth_date, gender, phone, created_at, updated_at",
+        "profile_id, assigned_nutritionist_id, assigned_trainer_id, created_at, updated_at",
       )
       .eq("profile_id", clientId)
       .maybeSingle(),
@@ -266,8 +277,13 @@ export async function getClientAdministrativeProfile(
     assignedTrainerId,
   ].filter((id): id is string => Boolean(id));
 
-  const [professionalProfilesResult, nutritionPlans, trainingPlans, auth] =
-    await Promise.all([
+  const [
+    professionalProfilesResult,
+    personalDetailsResult,
+    nutritionPlans,
+    trainingPlans,
+    auth,
+  ] = await Promise.all([
       professionalIds.length > 0
         ? supabase
             .from("profiles")
@@ -277,6 +293,13 @@ export async function getClientAdministrativeProfile(
             data: [] as Pick<Tables<"profiles">, "full_name" | "id">[],
             error: null,
           }),
+      supabase
+        .from("profile_personal_details")
+        .select(
+          "phone, birth_date, gender, gender_description, weight_kg, height_cm, medical_conditions, updated_at",
+        )
+        .eq("profile_id", clientId)
+        .maybeSingle(),
       canViewNutritionPlans
         ? listDietPlans(supabase, clientId)
         : Promise.resolve([]),
@@ -286,10 +309,11 @@ export async function getClientAdministrativeProfile(
       getAuthAccount(clientId),
     ]);
 
-  if (professionalProfilesResult.error) {
-    throw new Error("No se pudieron cargar los profesionales asignados.");
+  if (professionalProfilesResult.error || personalDetailsResult.error) {
+    throw new Error("No se pudo completar el perfil administrativo.");
   }
 
+  const personalDetails = personalDetailsResult.data;
   const professionalNameById = new Map(
     (professionalProfilesResult.data ?? []).map((professional) => [
       professional.id,
@@ -306,20 +330,27 @@ export async function getClientAdministrativeProfile(
       ? professionalNameById.get(assignedTrainerId) ?? null
       : null,
     avatarUrl: profile.avatar_url,
-    birthDate: clientProfile?.birth_date ?? null,
+    birthDate: personalDetails?.birth_date ?? null,
     canViewNutritionPlans,
     canViewTrainingPlans,
     createdAt: profile.created_at,
     email: auth.email,
     fullName: profile.full_name ?? "Cliente sin nombre",
-    gender: clientProfile?.gender ?? null,
+    gender: personalDetails?.gender ?? null,
+    genderDescription: personalDetails?.gender_description ?? null,
     hasNutritionService: assignedNutritionistId !== null,
     hasTrainingService: assignedTrainerId !== null,
+    heightCm: personalDetails?.height_cm ?? null,
     id: profile.id,
+    medicalConditions: personalDetails?.medical_conditions ?? null,
     nutritionPlans,
-    phone: clientProfile?.phone ?? null,
+    phone: personalDetails?.phone ?? null,
     role: "client",
     trainingPlans,
-    updatedAt: clientProfile?.updated_at ?? profile.updated_at,
+    updatedAt:
+      personalDetails?.updated_at ??
+      clientProfile?.updated_at ??
+      profile.updated_at,
+    weightKg: personalDetails?.weight_kg ?? null,
   };
 }

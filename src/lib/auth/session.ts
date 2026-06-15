@@ -53,7 +53,7 @@ export const getCurrentProfessionalProfile = cache(async () => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("professional_profiles")
-    .select("profile_id, specialty")
+    .select("is_active, profile_id, specialty")
     .eq("profile_id", user.id)
     .maybeSingle();
 

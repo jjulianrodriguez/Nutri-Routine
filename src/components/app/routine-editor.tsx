@@ -7,21 +7,25 @@ import {
   ArrowUp,
   Dumbbell,
   Loader2,
-  Plus,
   Save,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
+import {
+  AssignmentEntitySelector,
+  ExerciseSearchCard,
+} from "@/components/app/assignment-entity-selector";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useProgressiveResults } from "@/hooks/use-progressive-results";
 import { saveRoutine } from "@/lib/actions/routines";
 import {
   routineFormSchema,
@@ -40,6 +44,13 @@ const difficultyLabels = {
 
 const inputClasses =
   "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+
+function normalizeSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("es");
+}
 
 function toFormExercise(
   exercise: ExerciseOption,
@@ -96,6 +107,7 @@ function getDefaultValues(routine?: RoutineDetail): RoutineFormValues {
           series: item.series,
         }),
       ) ?? [],
+    identifier: routine?.identifier ?? "",
     isActive: routine?.isActive ?? true,
     name: routine?.name ?? "",
     targetAudience: routine?.targetAudience ?? "General",
@@ -124,7 +136,7 @@ export function RoutineEditor({
   const router = useRouter();
   const [pendingUpdate, setPendingUpdate] =
     useState<RoutineFormValues | null>(null);
-  const [selectedExerciseId, setSelectedExerciseId] = useState("");
+  const [exerciseQuery, setExerciseQuery] = useState("");
   const [serverMessage, setServerMessage] = useState("");
   const {
     control,
@@ -139,28 +151,84 @@ export function RoutineEditor({
     control,
     name: "exercises",
   });
-  const selectedItems = useWatch({ control, name: "exercises" }) ?? [];
-  const selectedIds = new Set(
-    selectedItems.map((item) => item.exerciseId),
+  const watchedItems = useWatch({ control, name: "exercises" });
+  const selectedItems = useMemo(() => watchedItems ?? [], [watchedItems]);
+  const selectedIds = useMemo(
+    () => new Set(selectedItems.map((item) => item.exerciseId)),
+    [selectedItems],
   );
-  const availableExercises = exerciseOptions.filter(
-    (exercise) => exercise.isActive && !selectedIds.has(exercise.id),
-  );
-  const inactiveSelected = routine?.exercises.some(
-    (item) => !item.exercise.isActive && selectedIds.has(item.exercise.id),
-  );
-
-  function addExercise() {
-    const exercise = exerciseOptions.find(
-      (item) => item.id === selectedExerciseId,
+  const catalogExercises = useMemo(() => {
+    const exercisesById = new Map(
+      exerciseOptions.map((exercise) => [exercise.id, exercise]),
     );
 
-    if (!exercise || selectedIds.has(exercise.id)) {
+    routine?.exercises.forEach((item) => {
+      if (!exercisesById.has(item.exercise.id)) {
+        exercisesById.set(item.exercise.id, item.exercise);
+      }
+    });
+
+    return [...exercisesById.values()];
+  }, [exerciseOptions, routine]);
+  const listedExercises = useMemo(
+    () =>
+      catalogExercises.filter(
+        (exercise) => exercise.isActive || selectedIds.has(exercise.id),
+      ),
+    [catalogExercises, selectedIds],
+  );
+  const filteredExercises = useMemo(() => {
+    const query = normalizeSearch(exerciseQuery.trim());
+
+    return listedExercises.filter((exercise) => {
+      if (!query) {
+        return true;
+      }
+
+      return normalizeSearch(
+        [
+          exercise.name,
+          exercise.muscleGroup,
+          exercise.difficulty,
+          exercise.category,
+          exercise.exerciseType,
+          exercise.isActive ? "activo" : "inactivo",
+        ]
+          .filter(Boolean)
+          .join(" "),
+      ).includes(query);
+    });
+  }, [exerciseQuery, listedExercises]);
+  const exerciseResults = useProgressiveResults(filteredExercises, 10);
+  const inactiveSelected = selectedItems.some(
+    (item) =>
+      catalogExercises.find((exercise) => exercise.id === item.exerciseId)
+        ?.isActive === false,
+  );
+
+  function updateExerciseQuery(value: string) {
+    setExerciseQuery(value);
+    exerciseResults.reset();
+  }
+
+  function toggleExercise(exerciseId: string) {
+    const exercise = exerciseOptions.find(
+      (item) => item.id === exerciseId,
+    );
+    const selectedIndex = selectedItems.findIndex(
+      (item) => item.exerciseId === exerciseId,
+    );
+
+    if (selectedIndex >= 0) {
+      remove(selectedIndex);
+      return;
+    }
+
+    if (!exercise?.isActive || selectedIds.has(exercise.id)) {
       return;
     }
 
     append(toFormExercise(exercise));
-    setSelectedExerciseId("");
   }
 
   async function saveRoutineValues(values: RoutineFormValues) {
@@ -235,6 +303,25 @@ export function RoutineEditor({
               {...register("name")}
             />
             <FieldError message={errors.name?.message} />
+          </div>
+
+          <div>
+            <Label
+              htmlFor="routine-identifier"
+              className="font-extrabold text-charcoal"
+            >
+              Identificador interno
+            </Label>
+            <Input
+              id="routine-identifier"
+              className={inputClasses}
+              aria-invalid={Boolean(errors.identifier)}
+              {...register("identifier")}
+            />
+            <p className="mt-2 text-xs leading-5 text-muted">
+              Opcional, unico y visible solo para profesionales.
+            </p>
+            <FieldError message={errors.identifier?.message} />
           </div>
 
           <div>
@@ -337,38 +424,37 @@ export function RoutineEditor({
           </p>
         </div>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-          <select
-            value={selectedExerciseId}
-            onChange={(event) => setSelectedExerciseId(event.target.value)}
-            className="h-11 w-full rounded-control border border-border bg-background px-4 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
-            aria-label="Seleccionar ejercicio"
+        <div className="mt-5">
+          <AssignmentEntitySelector
+            id="routine-exercise-search"
+            label="Selecciona ejercicios de la biblioteca"
+            query={exerciseQuery}
+            onQueryChange={updateExerciseQuery}
+            resultCount={filteredExercises.length}
+            totalCount={listedExercises.length}
+            visibleCount={exerciseResults.visibleItems.length}
+            searchPlaceholder="Buscar por nombre, musculo, categoria o tipo..."
+            emptyMessage="No encontramos ejercicios que coincidan con la busqueda."
+            error={errors.exercises?.root?.message}
+            isLoading={exerciseResults.isLoading}
+            loadMoreLabel="Cargar mas ejercicios"
+            onLoadMore={exerciseResults.loadMore}
           >
-            <option value="">Selecciona un ejercicio</option>
-            {availableExercises.map((exercise) => (
-              <option key={exercise.id} value={exercise.id}>
-                {exercise.name} - {exercise.muscleGroup}
-              </option>
+            {exerciseResults.visibleItems.map((exercise) => (
+              <ExerciseSearchCard
+                key={exercise.id}
+                exercise={exercise}
+                selected={selectedIds.has(exercise.id)}
+                onSelect={toggleExercise}
+              />
             ))}
-          </select>
-          <Button
-            type="button"
-            onClick={addExercise}
-            disabled={!selectedExerciseId}
-          >
-            <Plus aria-hidden="true" />
-            Agregar
-          </Button>
+          </AssignmentEntitySelector>
         </div>
-
-        {errors.exercises?.root?.message ? (
-          <FieldError message={errors.exercises.root.message} />
-        ) : null}
 
         <div className="mt-5 space-y-4">
           {fields.length > 0 ? (
             fields.map((field, index) => {
-              const sourceExercise = exerciseOptions.find(
+              const sourceExercise = catalogExercises.find(
                 (exercise) => exercise.id === field.exerciseId,
               );
               const isInactive = sourceExercise && !sourceExercise.isActive;

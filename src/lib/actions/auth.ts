@@ -190,6 +190,33 @@ export async function loginProfessional(
       };
     }
 
+    const [{ data: profile }, { data: professionalProfile }] =
+      await Promise.all([
+        supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .maybeSingle(),
+        supabase
+          .from("professional_profiles")
+          .select("is_active")
+          .eq("profile_id", data.user.id)
+          .maybeSingle(),
+      ]);
+
+    if (
+      profile?.role === "professional" &&
+      professionalProfile?.is_active !== true
+    ) {
+      await supabase.auth.signOut();
+
+      return {
+        message:
+          "Tu cuenta profesional esta inactiva. Contacta al administrador universal.",
+        status: "error",
+      };
+    }
+
     revalidatePath("/", "layout");
 
     return {

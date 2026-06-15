@@ -328,6 +328,10 @@ select {
   font: inherit;
 }
 
+textarea {
+  resize: none !important;
+}
+
 button,
 input,
 textarea,

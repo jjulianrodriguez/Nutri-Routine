@@ -251,6 +251,7 @@ export type Database = {
           id: string;
           is_active: boolean;
           multimedia_url: string | null;
+          multimedia_urls: string[];
           muscle_group: string;
           name: string;
           updated_at: string;
@@ -265,6 +266,7 @@ export type Database = {
           id?: string;
           is_active?: boolean;
           multimedia_url?: string | null;
+          multimedia_urls?: string[];
           muscle_group?: string;
           name: string;
           updated_at?: string;
@@ -279,6 +281,7 @@ export type Database = {
           id?: string;
           is_active?: boolean;
           multimedia_url?: string | null;
+          multimedia_urls?: string[];
           muscle_group?: string;
           name?: string;
           updated_at?: string;
@@ -297,6 +300,7 @@ export type Database = {
         Row: {
           bio: string | null;
           created_at: string;
+          is_active: boolean;
           profile_id: string;
           specialty: Database["public"]["Enums"]["professional_specialty"];
           updated_at: string;
@@ -304,6 +308,7 @@ export type Database = {
         Insert: {
           bio?: string | null;
           created_at?: string;
+          is_active?: boolean;
           profile_id: string;
           specialty: Database["public"]["Enums"]["professional_specialty"];
           updated_at?: string;
@@ -311,6 +316,7 @@ export type Database = {
         Update: {
           bio?: string | null;
           created_at?: string;
+          is_active?: boolean;
           profile_id?: string;
           specialty?: Database["public"]["Enums"]["professional_specialty"];
           updated_at?: string;
@@ -572,6 +578,7 @@ export type Database = {
           description: string;
           difficulty: string;
           id: string;
+          identifier: string | null;
           is_active: boolean;
           name: string;
           target_audience: string;
@@ -584,6 +591,7 @@ export type Database = {
           description: string;
           difficulty: string;
           id?: string;
+          identifier?: string | null;
           is_active?: boolean;
           name: string;
           target_audience: string;
@@ -596,6 +604,7 @@ export type Database = {
           description?: string;
           difficulty?: string;
           id?: string;
+          identifier?: string | null;
           is_active?: boolean;
           name?: string;
           target_audience?: string;
@@ -604,6 +613,89 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "routines_creator_id_fkey";
+            columns: ["creator_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_template_days: {
+        Row: {
+          created_at: string;
+          day_number: number;
+          id: string;
+          routine_id: string;
+          template_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          day_number: number;
+          id?: string;
+          routine_id: string;
+          template_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          day_number?: number;
+          id?: string;
+          routine_id?: string;
+          template_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_template_days_routine_id_fkey";
+            columns: ["routine_id"];
+            isOneToOne: false;
+            referencedRelation: "routines";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_template_days_template_id_fkey";
+            columns: ["template_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_templates";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_templates: {
+        Row: {
+          created_at: string;
+          creator_id: string;
+          cycle_days: number;
+          description: string | null;
+          id: string;
+          is_active: boolean;
+          name: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          creator_id: string;
+          cycle_days: number;
+          description?: string | null;
+          id?: string;
+          is_active?: boolean;
+          name: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          creator_id?: string;
+          cycle_days?: number;
+          description?: string | null;
+          id?: string;
+          is_active?: boolean;
+          name?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_templates_creator_id_fkey";
             columns: ["creator_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
@@ -620,8 +712,11 @@ export type Database = {
           end_date: string | null;
           id: string;
           routine_id: string | null;
+          routine_snapshot: Json | null;
           start_date: string | null;
           status: Database["public"]["Enums"]["plan_status"];
+          template_id: string | null;
+          template_snapshot: Json | null;
           title: string;
           trainer_id: string;
           updated_at: string;
@@ -634,8 +729,11 @@ export type Database = {
           end_date?: string | null;
           id?: string;
           routine_id?: string | null;
+          routine_snapshot?: Json | null;
           start_date?: string | null;
           status?: Database["public"]["Enums"]["plan_status"];
+          template_id?: string | null;
+          template_snapshot?: Json | null;
           title: string;
           trainer_id: string;
           updated_at?: string;
@@ -648,8 +746,11 @@ export type Database = {
           end_date?: string | null;
           id?: string;
           routine_id?: string | null;
+          routine_snapshot?: Json | null;
           start_date?: string | null;
           status?: Database["public"]["Enums"]["plan_status"];
+          template_id?: string | null;
+          template_snapshot?: Json | null;
           title?: string;
           trainer_id?: string;
           updated_at?: string;
@@ -670,6 +771,13 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "workout_plans_template_id_fkey";
+            columns: ["template_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_templates";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "workout_plans_routine_id_fkey";
             columns: ["routine_id"];
             isOneToOne: false;
@@ -683,6 +791,15 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      assign_workout_template_to_client: {
+        Args: {
+          p_client_id: string;
+          p_duration_weeks: number;
+          p_start_date?: string;
+          p_template_id: string;
+        };
+        Returns: string;
+      };
       assign_routine_to_client: {
         Args: {
           p_client_id: string;
@@ -709,16 +826,35 @@ export type Database = {
         };
         Returns: boolean;
       };
+      list_manageable_routine_identifiers: {
+        Args: never;
+        Returns: {
+          id: string;
+          identifier: string | null;
+        }[];
+      };
       save_routine: {
         Args: {
           p_category: string;
           p_description: string;
           p_difficulty: string;
           p_exercises: Json;
+          p_identifier: string;
           p_is_active: boolean;
           p_name: string;
           p_routine_id: string | null;
           p_target_audience: string;
+        };
+        Returns: string;
+      };
+      save_workout_template: {
+        Args: {
+          p_cycle_days: number;
+          p_days: Json;
+          p_description: string;
+          p_is_active: boolean;
+          p_name: string;
+          p_template_id: string | null;
         };
         Returns: string;
       };

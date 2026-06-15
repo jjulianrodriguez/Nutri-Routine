@@ -13,6 +13,24 @@ export const professionalSpecialtySchema = z.enum([
   "both",
 ]);
 
+export const professionalIdSchema = z
+  .string()
+  .uuid("La cuenta profesional indicada no es valida.");
+
+export const updateProfessionalAccountSchema = z.object({
+  bio: z
+    .string()
+    .trim()
+    .max(800, "La descripcion no puede superar 800 caracteres."),
+  fullName: z
+    .string()
+    .trim()
+    .min(2, "Ingresa el nombre completo.")
+    .max(120, "El nombre no puede superar 120 caracteres."),
+  professionalId: professionalIdSchema,
+  specialty: professionalSpecialtySchema,
+});
+
 export const createProfessionalAccountSchema = z
   .object({
     adminAccessCode: z
@@ -44,3 +62,6 @@ export type CreateProfessionalAccountValues = z.infer<
   typeof createProfessionalAccountSchema
 >;
 export type ProfessionalSpecialty = z.infer<typeof professionalSpecialtySchema>;
+export type UpdateProfessionalAccountValues = z.infer<
+  typeof updateProfessionalAccountSchema
+>;
