@@ -60,12 +60,12 @@ function AuthWordmark() {
       aria-label="Nutrición Con Enfoque · Inicio"
       className="inline-grid grid-cols-[2.5rem_1fr] items-center gap-3"
     >
-      <span className="relative flex size-10 items-center justify-center overflow-hidden rounded-full border border-charcoal/12 bg-cream shadow-soft">
+      <span className="relative flex size-10 items-center justify-center overflow-hidden rounded-full border border-border bg-surface shadow-soft">
         <span className="absolute h-8 w-5 rotate-45 rounded-[100%_0_100%_0] bg-terracotta" />
         <span className="relative size-1.5 rounded-full bg-espresso" />
       </span>
       <span className="leading-none">
-        <span className="block font-serif text-lg font-semibold text-espresso">
+        <span className="block font-heading text-lg font-bold text-espresso">
           Nutrición
         </span>
         <span className="block text-[0.68rem] font-bold uppercase text-stone">
@@ -95,7 +95,7 @@ export function AuthCard({ children, headline, subtitle }: AuthCardProps) {
     <SmoothScroll>
       <main
         ref={ref}
-        className="nce-grain relative min-h-dvh overflow-hidden bg-cream text-charcoal"
+        className="nce-grain relative min-h-dvh overflow-hidden bg-background text-charcoal"
       >
         <div className="relative z-10 mx-auto grid min-h-dvh max-w-7xl grid-rows-[auto_1fr] px-5 py-6 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:grid-rows-1 lg:px-10">
           <section className="relative flex items-center justify-between lg:hidden">
@@ -109,7 +109,7 @@ export function AuthCard({ children, headline, subtitle }: AuthCardProps) {
             </Link>
           </section>
 
-          <section className="relative hidden min-h-dvh flex-col justify-between overflow-hidden border-r border-charcoal/10 bg-sand px-10 py-10 lg:flex xl:px-14">
+          <section className="relative hidden min-h-dvh flex-col justify-between overflow-hidden border-r border-border bg-primary-soft/80 px-10 py-10 backdrop-blur-xl lg:flex xl:px-14">
             <motion.div
               style={reduceMotion ? undefined : { y: artY }}
               className="pointer-events-none absolute -bottom-28 -right-40 w-[38rem]"
@@ -130,10 +130,10 @@ export function AuthCard({ children, headline, subtitle }: AuthCardProps) {
               <p className="text-sm font-extrabold text-espresso/70">
                 Nutrición Con Enfoque
               </p>
-              <h1 className="mt-5 font-serif text-[clamp(4.5rem,8vw,7.2rem)] font-semibold leading-[0.8] text-espresso">
+              <h1 className="mt-5 font-heading text-[clamp(4.5rem,8vw,7.2rem)] font-bold leading-[0.84] text-espresso">
                 Bienestar con
                 <br />
-                <em className="font-serif italic text-terracotta">criterio</em>
+                <em className="font-heading italic text-terracotta">criterio</em>
               </h1>
               <p className="mt-7 max-w-md text-base leading-7 text-espresso/80">
                 Un espacio cálido para acompañar tu nutrición, tu entrenamiento
@@ -150,7 +150,7 @@ export function AuthCard({ children, headline, subtitle }: AuthCardProps) {
               </p>
               <Link
                 href="/"
-                className="inline-flex w-fit items-center gap-2 rounded-full border border-espresso/10 bg-cream/55 px-4 py-2 text-espresso backdrop-blur-xl transition-colors hover:bg-cream"
+                className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-surface/58 px-4 py-2 text-espresso shadow-soft backdrop-blur-xl transition-colors hover:bg-surface"
               >
                 Inicio
                 <ArrowUpRight className="size-4" />
@@ -170,21 +170,21 @@ export function AuthCard({ children, headline, subtitle }: AuthCardProps) {
               }}
               className="w-full max-w-[34rem]"
             >
-              <div className="relative overflow-hidden rounded-[2.1rem] border border-charcoal/10 bg-white/78 p-5 shadow-premium backdrop-blur-2xl sm:p-7">
+              <div className="relative overflow-hidden rounded-[2.1rem] border border-border bg-surface/74 p-5 shadow-premium backdrop-blur-2xl sm:p-7">
                 <div className="absolute inset-x-0 top-0 h-2 bg-terracotta" />
-                <div className="rounded-[1.6rem] bg-cream p-6 sm:p-8">
+                <div className="rounded-[1.6rem] bg-surface/82 p-6 shadow-soft backdrop-blur-xl sm:p-8">
                   <div className="mb-8 flex items-center justify-between gap-4">
                     <p className="text-sm font-extrabold text-stone">
                       Nutrición Con Enfoque
                     </p>
-                    <span className="flex size-10 items-center justify-center rounded-full bg-sand text-espresso">
+                    <span className="flex size-10 items-center justify-center rounded-full bg-primary-soft text-espresso">
                       <Sparkles className="size-4" />
                     </span>
                   </div>
-                  <h2 className="font-serif text-[clamp(3.25rem,11vw,5rem)] font-semibold leading-[0.86] text-espresso">
+                  <h2 className="font-heading text-[clamp(3.25rem,11vw,5rem)] font-bold leading-[0.9] text-espresso">
                     {headline}
                   </h2>
-                  <p className="mt-4 font-serif text-2xl italic leading-7 text-terracotta">
+                  <p className="mt-4 font-heading text-2xl italic leading-8 text-terracotta">
                     {subtitle}
                   </p>
 

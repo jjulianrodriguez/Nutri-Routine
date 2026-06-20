@@ -26,9 +26,9 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
         duration: 0.58,
         ease: [0.22, 0.72, 0.18, 1],
       }}
-      whileHover={reduceMotion ? undefined : { y: -6 }}
+      whileHover={reduceMotion ? undefined : { y: -2 }}
       className={[
-        "group relative overflow-hidden rounded-[24px] border border-charcoal/10 bg-white shadow-soft",
+        "group relative overflow-hidden rounded-[24px] border border-border bg-surface/82 shadow-soft backdrop-blur-lg",
         isFeatured ? "min-h-full p-6 sm:p-8" : "p-5 sm:p-6",
       ].join(" ")}
     >
@@ -42,7 +42,7 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
       <div className="relative z-0 flex h-full flex-col">
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-cream px-3 py-1.5 text-xs font-bold text-warm-brown">
+            <span className="rounded-full border border-border bg-surface/78 px-3 py-1.5 text-xs font-bold text-warm-brown shadow-soft">
               {post.category}
             </span>
             {post.isPinned ? (
@@ -59,7 +59,7 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
 
         <h2
           className={[
-            "mt-8 font-serif font-semibold leading-[0.96] text-charcoal",
+            "mt-8 font-heading font-bold leading-[0.98] text-charcoal",
             isFeatured
               ? "text-[clamp(3rem,8vw,5.75rem)]"
               : "text-3xl sm:text-4xl",
@@ -82,7 +82,7 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
             <p className="font-bold text-charcoal">{post.author}</p>
             <p className="mt-1">{post.date}</p>
           </div>
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-sage text-charcoal shadow-soft">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-soft">
             <ArrowUpRight className="size-5" />
           </span>
         </div>

@@ -29,6 +29,7 @@ const STORAGE_KEY = "nce-app-sidebar-collapsed";
 type SidebarProps = {
   access: CurrentUserAccess;
   children: ReactNode;
+  unreadNotifications: number;
 };
 
 function ProfileBlock({
@@ -47,7 +48,7 @@ function ProfileBlock({
   const profile = (
     <div
       className={cn(
-        "flex min-w-0 items-center gap-3 rounded-[22px] border border-primary/25 bg-primary-soft p-3 shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
+        "flex min-w-0 items-center gap-3 rounded-[22px] border border-primary/20 bg-surface/72 p-3 shadow-soft backdrop-blur-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
         !collapsed && "pr-14 lg:pr-3",
         collapsed && "mx-auto size-12 justify-center rounded-full p-0",
       )}
@@ -96,6 +97,7 @@ function ProfileBlock({
 export function Sidebar({
   access,
   children,
+  unreadNotifications,
 }: SidebarProps) {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
@@ -152,7 +154,7 @@ export function Sidebar({
             />
             <button
               type="button"
-              className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-border bg-surface text-warm-brown shadow-soft transition-colors hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 lg:hidden"
+              className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-border bg-surface/82 text-warm-brown shadow-soft backdrop-blur-md transition-colors hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 lg:hidden"
               onClick={() => setMobileOpen(false)}
               aria-label="Cerrar navegación"
             >
@@ -170,6 +172,7 @@ export function Sidebar({
               access={access}
               collapsed={isCollapsed}
               onNavigate={() => setMobileOpen(false)}
+              unreadNotifications={unreadNotifications}
             />
           </div>
 
@@ -186,7 +189,7 @@ export function Sidebar({
                   onClick={handleLogout}
                   disabled={isLoggingOut}
                   className={cn(
-                    "flex h-11 min-w-0 items-center justify-center gap-3 rounded-control border border-border bg-surface text-sm font-extrabold text-warm-brown shadow-soft transition-[background-color,border-color,color] hover:border-primary/30 hover:bg-primary hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:opacity-60",
+                    "flex h-11 min-w-0 items-center justify-center gap-3 rounded-control border border-border bg-surface/78 text-sm font-extrabold text-warm-brown shadow-soft backdrop-blur-md transition-[background-color,border-color,color,box-shadow,transform] hover:border-primary/30 hover:bg-primary hover:text-charcoal hover:shadow-glow focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:opacity-60",
                     isCollapsed ? "size-11 w-11 px-0" : "w-full px-3",
                   )}
                   aria-label="Cerrar sesión"
@@ -212,17 +215,17 @@ export function Sidebar({
   return (
     <CurrentUserAccessProvider access={access}>
       <div className="min-h-dvh overflow-x-clip bg-background text-charcoal">
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-background/90 px-4 backdrop-blur-xl lg:hidden">
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-surface/78 px-4 shadow-soft backdrop-blur-xl lg:hidden">
         <button
           type="button"
-          className="grid size-10 place-items-center rounded-full border border-border bg-surface text-warm-brown shadow-soft transition-colors hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+          className="grid size-10 place-items-center rounded-full border border-border bg-surface/82 text-warm-brown shadow-soft backdrop-blur-md transition-colors hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
           onClick={() => setMobileOpen(true)}
           aria-label="Abrir navegación"
         >
           <Menu className="size-4" aria-hidden="true" />
         </button>
         <div className="text-center">
-          <p className="font-serif text-xl font-semibold leading-none">
+          <p className="font-heading text-xl font-bold leading-none">
             Nutrición Con Enfoque
           </p>
           <p className="mt-0.5 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-muted">
@@ -236,7 +239,7 @@ export function Sidebar({
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 hidden overflow-x-visible border-r border-border bg-surface/88 shadow-soft backdrop-blur-xl transition-[width] duration-300 ease-[var(--ease-premium)] lg:block",
+          "fixed inset-y-0 left-0 z-40 hidden overflow-x-visible border-r border-border bg-surface/76 shadow-card backdrop-blur-2xl transition-[width] duration-300 ease-[var(--ease-premium)] lg:block",
           collapsed ? "w-20" : "w-72",
         )}
       >
@@ -256,7 +259,7 @@ export function Sidebar({
               type="button"
             />
             <motion.aside
-              className="fixed inset-y-0 left-0 z-50 w-[min(21rem,calc(100vw-2rem))] overflow-x-hidden border-r border-border bg-surface shadow-premium lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-[min(21rem,calc(100vw-2rem))] overflow-x-hidden border-r border-border bg-surface/88 shadow-premium backdrop-blur-2xl lg:hidden"
               initial={reduceMotion ? false : { x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -285,7 +288,7 @@ export function Sidebar({
 
       <button
         type="button"
-        className="fixed bottom-5 right-5 z-30 hidden size-11 place-items-center rounded-full border border-border bg-surface text-warm-brown shadow-pop transition-colors hover:bg-primary hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 lg:grid"
+        className="fixed bottom-5 right-5 z-30 hidden size-11 place-items-center rounded-full border border-border bg-surface/82 text-warm-brown shadow-pop backdrop-blur-lg transition-[background-color,color,box-shadow,transform] hover:bg-primary hover:text-charcoal hover:shadow-glow focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 lg:grid"
         onClick={() => setCollapsed((current) => !current)}
         aria-label={collapsed ? "Expandir navegación" : "Contraer navegación"}
       >

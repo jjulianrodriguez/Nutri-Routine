@@ -99,10 +99,12 @@ function serviceTone(client: ClientAccountListItem) {
 }
 
 export default async function ClientsPage({ searchParams }: ClientsPageProps) {
-  await requireRouteAccess("/app/clientes");
-  const params = await searchParams;
+  const [access, params] = await Promise.all([
+    requireRouteAccess("/app/clientes"),
+    searchParams,
+  ]);
   const activeFilter = normalizeFilter(params?.filter);
-  const data = await listClientActivationData(activeFilter);
+  const data = await listClientActivationData(activeFilter, access);
 
   return (
     <AppScreen>

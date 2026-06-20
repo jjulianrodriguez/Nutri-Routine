@@ -204,7 +204,7 @@ export const getCurrentUserAccess = cache(async () => {
   const role = normalizeRole(profile?.role);
   const isClient = role === "client";
   const isProfessional = role === "professional";
-  const isAdmin = role === "admin" || isProfessional;
+  const isAdmin = role === "admin";
   const displayName = getDisplayName(user, profile);
   const email = readString(user.email);
 
@@ -235,18 +235,17 @@ export const getCurrentUserAccess = cache(async () => {
     (isProfessional && isProfessionalActive) ||
     role === "admin";
   const isGeneralAdmin = role === "admin";
+  const isActiveProfessional = isProfessional && isProfessionalActive;
   const canManageNutrition =
-    isAdmin &&
-    isProfessionalActive &&
-    (isGeneralAdmin ||
-      professionalSpecialty === "nutrition" ||
-      professionalSpecialty === "both");
+    isGeneralAdmin ||
+    (isActiveProfessional &&
+      (professionalSpecialty === "nutrition" ||
+        professionalSpecialty === "both"));
   const canManageTraining =
-    isAdmin &&
-    isProfessionalActive &&
-    (isGeneralAdmin ||
-      professionalSpecialty === "training" ||
-      professionalSpecialty === "both");
+    isGeneralAdmin ||
+    (isActiveProfessional &&
+      (professionalSpecialty === "training" ||
+        professionalSpecialty === "both"));
   const canManageClientPlans = canManageNutrition || canManageTraining;
   const canManageProfessionalAccounts = isGeneralAdmin;
   const canViewNutrition = isClient

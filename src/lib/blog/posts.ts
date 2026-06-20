@@ -8,7 +8,7 @@ export type BlogPost = {
   title: string;
   slug: string;
   excerpt: string;
-  content: string[];
+  content: string;
   author: string;
   category: string;
   date: string;
@@ -32,18 +32,11 @@ function formatPostDate(value: string | null) {
   }).format(new Date(value));
 }
 
-function splitContent(content: string) {
-  return content
-    .split(/\r?\n\s*\r?\n/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
-}
-
 function mapBlogPost(post: BlogPostRow): BlogPost {
   return {
     author: FALLBACK_AUTHOR,
     category: post.category,
-    content: splitContent(post.content),
+    content: post.content,
     date: formatPostDate(post.published_at ?? post.created_at),
     excerpt: post.excerpt,
     isPinned: post.is_pinned,

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { normalizeExerciseMultimediaUrls } from "@/lib/exercises/multimedia";
 import type { Json } from "@/types/database";
 import type { RoutineDetail } from "@/types/routine";
 
@@ -9,17 +10,31 @@ const difficultySchema = z.enum([
   "advanced",
 ]);
 
-const exerciseSchema = z.object({
-  category: z.string(),
-  description: z.string().nullable(),
-  difficulty: difficultySchema.nullable(),
-  exerciseType: z.string(),
-  id: z.string().uuid(),
-  isActive: z.boolean(),
-  multimediaUrl: z.string().nullable(),
-  muscleGroup: z.string(),
-  name: z.string(),
-});
+const exerciseSchema = z
+  .object({
+    category: z.string(),
+    description: z.string().nullable(),
+    difficulty: difficultySchema.nullable(),
+    exerciseType: z.string(),
+    id: z.string().uuid(),
+    isActive: z.boolean(),
+    multimediaUrl: z.string().nullable().optional(),
+    multimediaUrls: z.array(z.string()).max(3).optional(),
+    muscleGroup: z.string(),
+    name: z.string(),
+  })
+  .transform((exercise) => {
+    const multimediaUrls = normalizeExerciseMultimediaUrls(
+      exercise.multimediaUrls,
+      exercise.multimediaUrl,
+    );
+
+    return {
+      ...exercise,
+      multimediaUrl: exercise.multimediaUrl ?? multimediaUrls[0] ?? null,
+      multimediaUrls,
+    };
+  });
 
 const routineExerciseSchema = z.object({
   durationMinutes: z.number().int().nullable(),
@@ -45,7 +60,6 @@ const routineSnapshotSchema = z.object({
     description: z.string(),
     difficulty: difficultySchema,
     id: z.string().uuid(),
-    identifier: z.string().nullable(),
     isActive: z.boolean(),
     name: z.string(),
     targetAudience: z.string(),
@@ -85,7 +99,6 @@ export function parseRoutineSnapshot(
       difficulty: parsed.data.routine.difficulty,
       exercises: parsed.data.exercises,
       id: parsed.data.routine.id,
-      identifier: parsed.data.routine.identifier,
       isActive: parsed.data.routine.isActive,
       name: parsed.data.routine.name,
       targetAudience: parsed.data.routine.targetAudience,

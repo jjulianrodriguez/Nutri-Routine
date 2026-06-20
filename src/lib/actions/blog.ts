@@ -3,6 +3,10 @@
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 
+import {
+  getBlogTextContent,
+  sanitizeBlogHtml,
+} from "@/lib/blog/content";
 import { createClient } from "@/lib/supabase/server";
 import {
   blogDeleteSchema,
@@ -62,8 +66,8 @@ function normalizeCategory(value: string) {
   );
 }
 
-function createExcerpt(content: string) {
-  const normalized = content.replace(/\s+/g, " ").trim();
+function createExcerpt(textContent: string) {
+  const normalized = textContent.replace(/\s+/g, " ").trim();
 
   if (normalized.length <= 240) {
     return normalized;
@@ -72,10 +76,58 @@ function createExcerpt(content: string) {
   return `${normalized.slice(0, 237).trimEnd()}...`;
 }
 
-function getReadTime(content: string) {
-  const words = content.trim().split(/\s+/).filter(Boolean).length;
+function getReadTime(textContent: string) {
+  const words = textContent.trim().split(/\s+/).filter(Boolean).length;
 
   return Math.max(1, Math.ceil(words / 200));
+}
+
+type PreparedContent =
+  | {
+      content: string;
+      status: "success";
+      textContent: string;
+    }
+  | {
+      result: BlogActionResult;
+      status: "error";
+    };
+
+function prepareContent(content: string): PreparedContent {
+  const safeContent = sanitizeBlogHtml(content);
+  const textContent = getBlogTextContent(safeContent);
+
+  if (!textContent) {
+    return {
+      result: {
+        fieldErrors: {
+          content: "Escribe el contenido del blog.",
+        },
+        message: "Revisa los campos marcados.",
+        status: "error",
+      },
+      status: "error",
+    };
+  }
+
+  if (safeContent.length > 50000) {
+    return {
+      result: {
+        fieldErrors: {
+          content: "El contenido no puede superar 50 000 caracteres.",
+        },
+        message: "Revisa los campos marcados.",
+        status: "error",
+      },
+      status: "error",
+    };
+  }
+
+  return {
+    content: safeContent,
+    status: "success",
+    textContent,
+  };
 }
 
 function revalidateBlogPaths(slug?: string) {
@@ -161,18 +213,23 @@ export async function createBlogPost(
 
   const published = parsed.data.published || parsed.data.isPinned;
   const slug = await createUniqueSlug(context.supabase, parsed.data.title);
+  const preparedContent = prepareContent(parsed.data.content);
+
+  if (preparedContent.status === "error") {
+    return preparedContent.result;
+  }
 
   const { data, error } = await context.supabase
     .from("blog_posts")
     .insert({
       author_id: context.user.id,
       category: normalizeCategory(parsed.data.category),
-      content: parsed.data.content,
-      excerpt: createExcerpt(parsed.data.content),
+      content: preparedContent.content,
+      excerpt: createExcerpt(preparedContent.textContent),
       is_pinned: parsed.data.isPinned,
       published,
       published_at: published ? new Date().toISOString() : null,
-      read_time_minutes: getReadTime(parsed.data.content),
+      read_time_minutes: getReadTime(preparedContent.textContent),
       slug,
       title: parsed.data.title,
     })
@@ -220,15 +277,21 @@ export async function updateBlogPost(
   }
 
   const published = parsed.data.published || parsed.data.isPinned;
+  const preparedContent = prepareContent(parsed.data.content);
+
+  if (preparedContent.status === "error") {
+    return preparedContent.result;
+  }
+
   const { data, error } = await context.supabase
     .from("blog_posts")
     .update({
       category: normalizeCategory(parsed.data.category),
-      content: parsed.data.content,
-      excerpt: createExcerpt(parsed.data.content),
+      content: preparedContent.content,
+      excerpt: createExcerpt(preparedContent.textContent),
       is_pinned: parsed.data.isPinned,
       published,
-      read_time_minutes: getReadTime(parsed.data.content),
+      read_time_minutes: getReadTime(preparedContent.textContent),
       title: parsed.data.title,
     })
     .eq("id", parsed.data.id)

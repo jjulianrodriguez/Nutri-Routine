@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BlogContentRenderer } from "@/components/blog/BlogContentRenderer";
 import { getPostBySlug } from "@/lib/blog/posts";
 
 type BlogPostPageProps = {
@@ -79,14 +80,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </header>
 
         <div className="mx-auto mt-12 max-w-[68ch]">
-          {post.content.map((paragraph) => (
-            <p
-              key={paragraph}
-              className="mb-7 text-lg leading-9 text-warm-brown"
-            >
-              {paragraph}
-            </p>
-          ))}
+          <BlogContentRenderer content={post.content} />
         </div>
       </div>
     </article>

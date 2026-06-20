@@ -194,7 +194,7 @@ async function listTrainingPlans(
     .order("created_at", { ascending: false });
 
   if (error) {
-    throw new Error("No se pudieron cargar las rutinas asignadas.");
+    throw new Error("No se pudieron cargar los planes de entrenamiento.");
   }
 
   return (data ?? []).map((plan) => ({

@@ -26,12 +26,12 @@ function BrandSigil() {
       aria-label="Nutrición Con Enfoque · Inicio"
       className="group grid grid-cols-[2.5rem_1fr] items-center gap-3"
     >
-      <span className="relative flex size-10 items-center justify-center overflow-hidden rounded-full border border-charcoal/12 bg-cream text-charcoal shadow-soft">
+      <span className="relative flex size-10 items-center justify-center overflow-hidden rounded-full border border-border bg-surface text-charcoal shadow-soft">
         <span className="absolute h-8 w-5 rotate-45 rounded-[100%_0_100%_0] bg-sage transition-transform duration-300 group-hover:scale-110" />
         <span className="relative size-1.5 rounded-full bg-charcoal" />
       </span>
       <span className="leading-none">
-        <span className="block font-serif text-lg font-semibold text-charcoal">
+        <span className="block font-heading text-lg font-bold text-charcoal">
           Nutrición
         </span>
         <span className="block text-[0.68rem] font-bold uppercase text-warm-brown">
@@ -60,11 +60,11 @@ export function Navbar() {
         style={reduceMotion ? undefined : { y, opacity: navOpacity }}
         className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6"
       >
-        <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-4 rounded-full border border-charcoal/10 bg-white/72 px-3 py-3 shadow-card backdrop-blur-2xl sm:grid-cols-[1fr_auto_1fr] sm:px-4">
+        <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-4 rounded-full border border-border bg-surface/76 px-3 py-3 shadow-card backdrop-blur-2xl sm:grid-cols-[1fr_auto_1fr] sm:px-4">
           <BrandSigil />
 
           <nav
-            className="hidden items-center rounded-full border border-charcoal/10 bg-cream/80 px-2 py-1 md:flex"
+            className="hidden items-center rounded-full border border-border bg-surface/72 px-2 py-1 shadow-soft backdrop-blur-xl md:flex"
             aria-label="Navegación principal"
           >
             {navLinks.map((link) => (
@@ -86,7 +86,7 @@ export function Navbar() {
               rel="noopener noreferrer"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.99 }}
-              className="hidden items-center justify-center gap-2 rounded-full bg-sage px-5 py-3 text-sm font-extrabold text-charcoal shadow-soft transition-none sm:inline-flex"
+              className="hidden items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-extrabold text-white shadow-soft transition-none sm:inline-flex"
             >
               Agendar consulta
               <ArrowUpRight className="size-4" />
@@ -94,7 +94,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMenuOpen((value) => !value)}
-              className="inline-flex size-11 items-center justify-center rounded-full bg-charcoal text-cream shadow-soft transition-transform hover:scale-[1.02] md:hidden"
+              className="inline-flex size-11 items-center justify-center rounded-full bg-charcoal text-white shadow-soft transition-transform hover:scale-[1.02] md:hidden"
               aria-expanded={menuOpen}
               aria-controls="nce-mobile-menu"
               aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
@@ -118,7 +118,7 @@ export function Navbar() {
               initial={reduceMotion ? { y: 0 } : { y: -12 }}
               animate={{ y: 0 }}
               exit={reduceMotion ? { y: 0 } : { y: -12 }}
-              className="overflow-hidden rounded-[28px] border border-charcoal/10 bg-cream p-4 shadow-premium"
+              className="overflow-hidden rounded-[28px] border border-border bg-surface/88 p-4 shadow-premium backdrop-blur-2xl"
               aria-label="Navegación móvil"
             >
               {navLinks.map((link, index) => (
@@ -126,7 +126,7 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="flex items-center justify-between border-b border-charcoal/10 px-2 py-4 font-serif text-3xl font-semibold text-charcoal last:border-b-0"
+                  className="flex items-center justify-between border-b border-border px-2 py-4 font-heading text-3xl font-bold text-charcoal last:border-b-0"
                 >
                   <span>{link.label}</span>
                   <span className="text-sm font-bold text-warm-brown">
@@ -139,7 +139,7 @@ export function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
-                className="mt-4 flex items-center justify-center gap-2 rounded-full bg-sage px-5 py-3.5 text-sm font-extrabold text-charcoal shadow-soft"
+                className="mt-4 flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-extrabold text-white shadow-soft"
               >
                 Agendar consulta
                 <ArrowUpRight className="size-4" />

@@ -27,7 +27,7 @@ export function DeleteRoutineButton({ routineId }: { routineId: string }) {
       router.refresh();
     } catch {
       toast.error(
-        "Ocurrio un error inesperado al eliminar la rutina. Intentalo de nuevo.",
+        "Ocurrio un error inesperado al eliminar el entrenamiento. Intentalo de nuevo.",
       );
     }
   }
@@ -41,15 +41,15 @@ export function DeleteRoutineButton({ routineId }: { routineId: string }) {
         onClick={() => setIsConfirming(true)}
       >
         <Trash2 className="size-4" />
-        Eliminar rutina
+        Eliminar entrenamiento
       </Button>
 
       <ConfirmationDialog
         open={isConfirming}
         onOpenChange={setIsConfirming}
-        title="Eliminar rutina"
-        description="Esta acción eliminará la rutina y su configuración de ejercicios. Las asignaciones de clientes se archivarán y dejarán de mostrarla como activa."
-        confirmLabel="Eliminar rutina"
+        title="Eliminar entrenamiento"
+        description="Esta acción eliminará el entrenamiento y su configuración de ejercicios. No se podrá eliminar mientras forme parte de una plantilla."
+        confirmLabel="Eliminar entrenamiento"
         pendingLabel="Eliminando…"
         tone="destructive"
         onConfirm={handleDelete}

@@ -35,6 +35,7 @@ import {
   deleteResource,
   updateResource,
 } from "@/lib/actions/resources";
+import { getExternalResourcePresentation } from "@/lib/exercises/multimedia";
 import type { MultimediaResource } from "@/lib/resources/data";
 import {
   resourceValuesSchema,
@@ -48,7 +49,10 @@ type ResourceFilter = ResourceArea | "all";
 
 type ResourceManagerProps = {
   activeFilter: ResourceFilter;
+  availableFilters?: ResourceFilter[];
   canManage: boolean;
+  emptyHint?: string;
+  emptyMessage?: string;
   resources: MultimediaResource[];
 };
 
@@ -100,42 +104,19 @@ function formatDate(value: string) {
 }
 
 function getUrlPresentation(value: string) {
-  try {
-    const url = new URL(value);
-    const hostname = url.hostname.replace(/^www\./, "");
-    const pathname = url.pathname.toLowerCase();
-    const isVideo =
-      hostname.includes("youtube.com") ||
-      hostname === "youtu.be" ||
-      hostname.includes("vimeo.com") ||
-      /\.(mp4|webm|mov)$/.test(pathname);
-    const isImage = /\.(avif|gif|jpe?g|png|webp)$/.test(pathname);
-    const isDocument = /\.(docx?|pdf|pptx?|xlsx?)$/.test(pathname);
+  const presentation = getExternalResourcePresentation(value);
+  const iconByType = {
+    document: FileText,
+    external: Link2,
+    image: ImageIcon,
+    video: PlaySquare,
+  };
 
-    return {
-      domain: hostname,
-      icon: isVideo
-        ? PlaySquare
-        : isImage
-          ? ImageIcon
-          : isDocument
-            ? FileText
-            : Link2,
-      kind: isVideo
-        ? "Video"
-        : isImage
-          ? "Imagen"
-          : isDocument
-            ? "Documento"
-            : "Enlace externo",
-    };
-  } catch {
-    return {
-      domain: "Enlace externo",
-      icon: Link2,
-      kind: "Recurso",
-    };
-  }
+  return {
+    domain: presentation.domain,
+    icon: iconByType[presentation.type],
+    kind: presentation.label,
+  };
 }
 
 function FieldError({ id, message }: { id: string; message?: string }) {
@@ -163,6 +144,12 @@ function ResourceCard({
 }) {
   const area = AREA_DETAILS[resource.area];
   const AreaIcon = area.icon;
+  const areaLabel =
+    !canManage && resource.area === "general" ? "General" : area.label;
+  const areaSummary =
+    !canManage && resource.area === "general"
+      ? "Material para tus planes activos"
+      : area.summary;
   const presentation = getUrlPresentation(resource.file_url);
   const PreviewIcon = presentation.icon;
 
@@ -182,7 +169,7 @@ function ResourceCard({
         <div className="absolute inset-x-5 top-4 flex items-center justify-between gap-3">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-charcoal/10 bg-surface/90 px-3 py-1 text-xs font-extrabold text-charcoal shadow-soft">
             <AreaIcon className="size-3.5" aria-hidden="true" />
-            {area.label}
+            {areaLabel}
           </span>
           <span className="rounded-full bg-charcoal/80 px-3 py-1 text-xs font-bold text-white">
             {presentation.kind}
@@ -234,7 +221,7 @@ function ResourceCard({
           />
         </div>
         <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted">
-          {resource.description || area.summary}
+          {resource.description || areaSummary}
         </p>
 
         <dl className="mt-5 grid gap-3 border-t border-border pt-4 text-xs font-bold text-warm-brown sm:grid-cols-2">
@@ -259,7 +246,10 @@ function ResourceCard({
 
 export function ResourceManager({
   activeFilter,
+  availableFilters = FILTERS.map((filter) => filter.value),
   canManage,
+  emptyHint,
+  emptyMessage,
   resources,
 }: ResourceManagerProps) {
   const router = useRouter();
@@ -287,6 +277,9 @@ export function ResourceManager({
     resolver: zodResolver(resourceValuesSchema),
   });
   const selectedArea = useWatch({ control, name: "area" });
+  const visibleFilters = FILTERS.filter((filter) =>
+    availableFilters.includes(filter.value),
+  );
 
   function clearForm() {
     setEditingResource(null);
@@ -404,8 +397,9 @@ export function ResourceManager({
             Recursos disponibles
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            Las tarjetas usan una vista previa segura con el tipo y dominio del
-            enlace. Una URL sin portada nunca rompe la biblioteca.
+            {canManage
+              ? "Cada tarjeta muestra el tipo de material y el sitio de origen para identificarlo rapido."
+              : "Abre los materiales compartidos para acompanar tu plan. Los enlaces externos se abren en una nueva pestana."}
           </p>
         </div>
       </div>
@@ -414,11 +408,15 @@ export function ResourceManager({
         className="mt-5 flex flex-wrap gap-2"
         aria-label="Filtrar recursos por acceso"
       >
-        {FILTERS.map((filter) => {
+        {visibleFilters.map((filter) => {
           const href =
             filter.value === "all"
               ? "/app/recursos"
               : `/app/recursos?area=${filter.value}`;
+          const label =
+            !canManage && filter.value === "general"
+              ? "General"
+              : filter.label;
 
           return (
             <Button
@@ -433,7 +431,7 @@ export function ResourceManager({
                   activeFilter === filter.value ? "page" : undefined
                 }
               >
-                {filter.label}
+                {label}
               </Link>
             </Button>
           );
@@ -455,12 +453,13 @@ export function ResourceManager({
       ) : (
         <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
           <p className="font-extrabold text-charcoal">
-            No hay recursos en este filtro.
+            {emptyMessage ?? "Aun no hay recursos disponibles."}
           </p>
           <p className="mt-2 text-sm leading-6 text-muted">
-            {canManage
-              ? "Crea el primer recurso o selecciona otra categoria."
-              : "Selecciona otra categoria para revisar el contenido disponible."}
+            {emptyHint ??
+              (canManage
+                ? "Crea el primer recurso o selecciona otra categoria."
+                : "Tu entrenador puede compartir recursos contigo.")}
           </p>
         </div>
       )}

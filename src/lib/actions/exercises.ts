@@ -199,7 +199,7 @@ export async function deleteExercise(
   if ((count ?? 0) > 0) {
     return {
       message:
-        "No puedes eliminar este ejercicio porque forma parte de una o mas rutinas. Desactivalo si ya no debe utilizarse.",
+        "No puedes eliminar este ejercicio porque forma parte de uno o mas entrenamientos. Desactivalo si ya no debe utilizarse.",
       status: "error",
     };
   }
@@ -214,7 +214,7 @@ export async function deleteExercise(
   if (error?.code === "23503") {
     return {
       message:
-        "No puedes eliminar este ejercicio porque esta vinculado a una rutina.",
+        "No puedes eliminar este ejercicio porque esta vinculado a un entrenamiento.",
       status: "error",
     };
   }

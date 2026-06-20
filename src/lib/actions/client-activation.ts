@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import type { CurrentUserAccess } from "@/lib/auth/access-rules";
+import { listAuthEmailsByUserId } from "@/lib/auth/auth-user-emails";
 import { createClient } from "@/lib/supabase/server";
 import {
   clientActivationSchema,
@@ -268,6 +270,28 @@ async function getCurrentActivationActor() {
   };
 }
 
+async function getActivationActorFromAccess(access: CurrentUserAccess) {
+  if (!access.canManageNutrition && !access.canManageTraining) {
+    return {
+      activationSupabase: null,
+      canManageNutrition: false,
+      canManageTraining: false,
+      currentUserId: access.userId,
+      error: "Tu cuenta no puede gestionar planes de nutricion ni entrenamiento.",
+      role: access.role,
+    };
+  }
+
+  return {
+    activationSupabase: await createClient(),
+    canManageNutrition: access.canManageNutrition,
+    canManageTraining: access.canManageTraining,
+    currentUserId: access.userId,
+    error: null,
+    role: access.role,
+  };
+}
+
 async function validateAssignableProfessional({
   activationSupabase,
   professionalId,
@@ -377,6 +401,40 @@ export async function activateClientAccount(
       },
       message:
         "Selecciona un profesional en entrenamiento para activar el plan.",
+      status: "error",
+    };
+  }
+
+  if (
+    actor.canManageNutrition &&
+    wantsNutrition &&
+    actor.role !== "admin" &&
+    nutritionistId !== actor.currentUserId
+  ) {
+    return {
+      fieldErrors: {
+        assignedNutritionistId:
+          "Solo puedes asignarte clientes de nutricion a tu propia cuenta.",
+      },
+      message:
+        "Solo puedes asignar clientes de nutricion a tu propia cuenta.",
+      status: "error",
+    };
+  }
+
+  if (
+    actor.canManageTraining &&
+    wantsTraining &&
+    actor.role !== "admin" &&
+    trainerId !== actor.currentUserId
+  ) {
+    return {
+      fieldErrors: {
+        assignedTrainerId:
+          "Solo puedes asignarte clientes de entrenamiento a tu propia cuenta.",
+      },
+      message:
+        "Solo puedes asignar clientes de entrenamiento a tu propia cuenta.",
       status: "error",
     };
   }
@@ -516,9 +574,12 @@ function buildCounts(clients: ClientAccountListItem[]) {
 
 export async function listClientActivationData(
   rawFilter?: string | null,
+  access?: CurrentUserAccess,
 ): Promise<ClientActivationData> {
   const filter = normalizeFilter(rawFilter);
-  const actor = await getCurrentActivationActor();
+  const actor = access
+    ? await getActivationActorFromAccess(access)
+    : await getCurrentActivationActor();
 
   if (actor.error || !actor.activationSupabase) {
     return emptyClientActivationData(actor.error ?? "No se pudo validar tu sesion.");
@@ -531,14 +592,14 @@ export async function listClientActivationData(
   }
 
   const [
-    { data: clientProfiles, error: clientsError },
+    { data: profileRows, error: profilesError },
     { data: clientAssignments, error: assignmentsError },
     { data: professionalRows, error: professionalsError },
   ] = await Promise.all([
     actor.activationSupabase
       .from("profiles")
       .select("id, full_name, avatar_url, created_at, role")
-      .eq("role", "client")
+      .in("role", ["admin", "client", "professional"])
       .order("created_at", { ascending: false }),
     actor.activationSupabase
       .from("client_profiles")
@@ -548,9 +609,16 @@ export async function listClientActivationData(
       .select("profile_id, specialty, is_active"),
   ]);
 
-  if (clientsError || assignmentsError || professionalsError) {
+  if (profilesError || assignmentsError || professionalsError) {
     return emptyClientActivationData("No se pudo cargar la lista de clientes.");
   }
+
+  const clientProfiles = (profileRows ?? []).filter(
+    (profile) => profile.role === "client",
+  );
+  const professionalProfiles = (profileRows ?? []).filter(
+    (profile) => profile.role === "admin" || profile.role === "professional",
+  );
 
   const professionalById = new Map<
     string,
@@ -570,18 +638,6 @@ export async function listClientActivationData(
         specialty: item.specialty,
       });
     }
-  }
-
-  const { data: professionalProfiles, error: professionalProfilesError } =
-    await actor.activationSupabase
-      .from("profiles")
-      .select("id, full_name, role")
-      .in("role", ["admin", "professional"]);
-
-  if (professionalProfilesError) {
-    return emptyClientActivationData(
-      "No se pudo cargar la lista de profesionales.",
-    );
   }
 
   for (const profile of professionalProfiles ?? []) {
@@ -619,6 +675,10 @@ export async function listClientActivationData(
         !PRIVILEGED_ROLES.has(profile.role) ||
         !item.is_active
       ) {
+        return null;
+      }
+
+      if (actor.role !== "admin" && item.profile_id !== actor.currentUserId) {
         return null;
       }
 
@@ -663,18 +723,34 @@ export async function listClientActivationData(
       }),
     } satisfies ClientAccountListItem;
   });
-  const counts = buildCounts(allClients);
+  const emailsById = await listAuthEmailsByUserId([
+    ...allClients.map((client) => client.id),
+    ...assignableProfessionals.map((professional) => professional.id),
+  ]);
+  const clientsWithEmails = allClients.map((client) => ({
+    ...client,
+    email: emailsById.get(client.id) ?? "",
+  }));
+  const professionalsWithEmails = assignableProfessionals.map(
+    (professional) => ({
+      ...professional,
+      email: emailsById.get(professional.id) ?? "",
+    }),
+  );
+  const counts = buildCounts(clientsWithEmails);
 
   return {
     canManageNutrition: actor.canManageNutrition,
     canManageTraining: actor.canManageTraining,
-    clients: allClients.filter((client) => matchesFilter(client, filter)),
+    clients: clientsWithEmails.filter((client) =>
+      matchesFilter(client, filter),
+    ),
     counts,
     currentUserId: actor.currentUserId,
-    nutritionists: assignableProfessionals.filter((professional) =>
+    nutritionists: professionalsWithEmails.filter((professional) =>
       isProfessionalAllowedForService(professional.specialty, "nutrition"),
     ),
-    trainers: assignableProfessionals.filter((professional) =>
+    trainers: professionalsWithEmails.filter((professional) =>
       isProfessionalAllowedForService(professional.specialty, "training"),
     ),
   };

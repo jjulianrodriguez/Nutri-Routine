@@ -17,7 +17,7 @@ export default function TrainingError({
     <AppScreen>
       <div className="grid min-h-[70dvh] place-items-center">
         <RecoveryState
-          description="No pudimos cargar los ejercicios, rutinas o asignaciones de entrenamiento. Puedes intentar nuevamente."
+          description="No pudimos cargar los ejercicios, entrenamientos, plantillas o asignaciones. Puedes intentar nuevamente."
           eyebrow="Error de entrenamiento"
           fallbackHref="/app/entrenamiento"
           fallbackLabel="Ir a entrenamiento"

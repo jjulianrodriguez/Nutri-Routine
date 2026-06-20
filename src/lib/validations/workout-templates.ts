@@ -1,8 +1,11 @@
 import { z } from "zod";
 
+import { WORKOUT_WEEKDAY_VALUES } from "@/lib/workout-templates/weekdays";
+
 export const workoutTemplateDaySchema = z.object({
   dayNumber: z.number().int().min(1).max(31),
   routineId: z.string().uuid("Selecciona un entrenamiento."),
+  weekday: z.enum(WORKOUT_WEEKDAY_VALUES).or(z.literal("")),
 });
 
 export const workoutTemplateFormSchema = z
@@ -20,6 +23,10 @@ export const workoutTemplateFormSchema = z
       .string()
       .trim()
       .max(2000, "La descripción no puede superar 2000 caracteres."),
+    identifier: z
+      .string()
+      .trim()
+      .max(160, "El identificador no puede superar 160 caracteres."),
     isActive: z.boolean(),
     name: z
       .string()
@@ -50,6 +57,18 @@ export const workoutTemplateFormSchema = z
       context.addIssue({
         code: "custom",
         message: "Los días del ciclo no son válidos.",
+        path: ["days"],
+      });
+    }
+
+    const configuredWeekdays = template.days
+      .map((day) => day.weekday)
+      .filter(Boolean);
+
+    if (new Set(configuredWeekdays).size !== configuredWeekdays.length) {
+      context.addIssue({
+        code: "custom",
+        message: "No puedes repetir un día específico en la misma plantilla.",
         path: ["days"],
       });
     }

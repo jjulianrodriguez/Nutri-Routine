@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { type FormEvent, useState, useTransition } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -31,11 +31,22 @@ import {
   setExerciseActive,
 } from "@/lib/actions/exercises";
 import {
+  exerciseCategoryOptions,
+  exerciseMuscleGroupOptions,
+  exerciseTypeOptions,
+  getExerciseSelectOptions,
+  resolveExerciseOption,
+} from "@/lib/exercises/options";
+import {
   exerciseFormSchema,
   type ExerciseFormValues,
 } from "@/lib/validations/exercises";
 import { cn } from "@/lib/utils";
-import type { ExerciseListItem } from "@/types/exercise";
+import type {
+  ExerciseFilterOptions,
+  ExerciseListFilters,
+  ExerciseListItem,
+} from "@/types/exercise";
 
 const difficultyLabels = {
   advanced: "Avanzado",
@@ -45,6 +56,7 @@ const difficultyLabels = {
 
 const inputClasses =
   "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+const libraryPath = "/app/entrenamiento/ejercicios";
 
 const defaultValues: ExerciseFormValues = {
   category: "",
@@ -67,6 +79,21 @@ type ExerciseConfirmation =
       values: ExerciseFormValues;
     };
 
+type ExerciseFilterDraft = {
+  category: string;
+  difficulty: string;
+  exerciseType: string;
+  muscleGroup: string;
+  query: string;
+  status: string;
+};
+
+const statusFilterLabels = {
+  active: "Activos",
+  all: "Todos",
+  inactive: "Inactivos",
+} as const;
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("es-CR", {
     day: "2-digit",
@@ -87,13 +114,78 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
+function getDraftFilters(filters: ExerciseListFilters): ExerciseFilterDraft {
+  return {
+    category: filters.category || "all",
+    difficulty: filters.difficulty || "all",
+    exerciseType: filters.exerciseType || "all",
+    muscleGroup: filters.muscleGroup || "all",
+    query: filters.query ?? "",
+    status: filters.status || "all",
+  };
+}
+
+function buildExerciseLibraryUrl(
+  filters: ExerciseFilterDraft,
+  page: number,
+) {
+  const params = new URLSearchParams();
+  const query = filters.query.trim();
+
+  if (query) {
+    params.set("q", query);
+  }
+
+  if (filters.muscleGroup !== "all") {
+    params.set("muscle", filters.muscleGroup);
+  }
+
+  if (filters.difficulty !== "all") {
+    params.set("difficulty", filters.difficulty);
+  }
+
+  if (filters.status !== "all") {
+    params.set("status", filters.status);
+  }
+
+  if (filters.category !== "all") {
+    params.set("category", filters.category);
+  }
+
+  if (filters.exerciseType !== "all") {
+    params.set("type", filters.exerciseType);
+  }
+
+  if (page > 1) {
+    params.set("page", String(page));
+  }
+
+  const search = params.toString();
+
+  return search ? `${libraryPath}?${search}` : libraryPath;
+}
+
 export function ExerciseManager({
   exercises,
+  filterOptions,
+  filters,
+  pagination,
 }: {
   exercises: ExerciseListItem[];
+  filterOptions: ExerciseFilterOptions;
+  filters: ExerciseListFilters;
+  pagination: {
+    hasMore: boolean;
+    page: number;
+    pageSize: number;
+    totalCount: number;
+  };
 }) {
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const [draftFilters, setDraftFilters] = useState(() =>
+    getDraftFilters(filters),
+  );
   const [statusMessage, setStatusMessage] = useState("");
   const [confirmation, setConfirmation] =
     useState<ExerciseConfirmation | null>(null);
@@ -113,22 +205,53 @@ export function ExerciseManager({
   const editingId = useWatch({ control, name: "id" });
   const multimediaUrls =
     useWatch({ control, name: "multimediaUrls" }) ?? [""];
-  const filteredExercises = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
+  const muscleGroup = useWatch({ control, name: "muscleGroup" });
+  const category = useWatch({ control, name: "category" });
+  const exerciseType = useWatch({ control, name: "exerciseType" });
 
-    if (!normalized) {
-      return exercises;
-    }
+  function updateDraftFilter(
+    field: keyof ExerciseFilterDraft,
+    value: string,
+  ) {
+    setDraftFilters((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  }
 
-    return exercises.filter((exercise) =>
-      [
-        exercise.name,
-        exercise.category,
-        exercise.muscleGroup,
-        exercise.exerciseType,
-      ].some((value) => value.toLowerCase().includes(normalized)),
-    );
-  }, [exercises, query]);
+  function applyLibraryFilters(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    startTransition(() => {
+      router.push(buildExerciseLibraryUrl(draftFilters, 1));
+    });
+  }
+
+  function clearLibraryFilters() {
+    const emptyFilters: ExerciseFilterDraft = {
+      category: "all",
+      difficulty: "all",
+      exerciseType: "all",
+      muscleGroup: "all",
+      query: "",
+      status: "all",
+    };
+
+    setDraftFilters(emptyFilters);
+    startTransition(() => {
+      router.push(libraryPath);
+    });
+  }
+
+  function loadMoreExercises() {
+    startTransition(() => {
+      router.push(
+        buildExerciseLibraryUrl(
+          getDraftFilters(filters),
+          pagination.page + 1,
+        ),
+      );
+    });
+  }
 
   function resetForm() {
     reset(defaultValues);
@@ -138,16 +261,25 @@ export function ExerciseManager({
 
   function editExercise(exercise: ExerciseListItem) {
     reset({
-      category: exercise.category,
+      category: resolveExerciseOption(
+        exercise.category,
+        exerciseCategoryOptions,
+      ),
       description: exercise.description ?? "",
       difficulty: exercise.difficulty ?? "beginner",
-      exerciseType: exercise.exerciseType,
+      exerciseType: resolveExerciseOption(
+        exercise.exerciseType,
+        exerciseTypeOptions,
+      ),
       id: exercise.id,
       multimediaUrls:
         exercise.multimediaUrls.length > 0
           ? exercise.multimediaUrls
           : [""],
-      muscleGroup: exercise.muscleGroup,
+      muscleGroup: resolveExerciseOption(
+        exercise.muscleGroup,
+        exerciseMuscleGroupOptions,
+      ),
       name: exercise.name,
     });
     setStatusMessage("");
@@ -293,11 +425,11 @@ export function ExerciseManager({
     confirmation?.type === "update"
       ? `Se actualizará "${confirmation.values.name}" con la información del formulario.`
       : confirmation?.type === "delete"
-        ? `Se eliminará "${confirmation.exercise.name}" definitivamente. Si forma parte de una rutina, la eliminación no se realizará.`
+        ? `Se eliminará "${confirmation.exercise.name}" definitivamente. Si forma parte de un entrenamiento, la eliminación no se realizará.`
         : confirmation?.exercise.isActive
-          ? `"${confirmation.exercise.name}" dejará de estar disponible para nuevas rutinas.`
+          ? `"${confirmation.exercise.name}" dejará de estar disponible para nuevos entrenamientos.`
           : confirmation
-            ? `"${confirmation.exercise.name}" volverá a estar disponible para nuevas rutinas.`
+            ? `"${confirmation.exercise.name}" volverá a estar disponible para nuevos entrenamientos.`
             : "";
   const confirmationLabel =
     confirmation?.type === "update"
@@ -408,13 +540,34 @@ export function ExerciseManager({
               >
                 Grupo muscular
               </Label>
-              <Input
+              <select
                 id="exercise-muscle-group"
-                className={inputClasses}
-                placeholder="Ej. Piernas"
+                className={cn(inputClasses, "h-11 w-full")}
                 aria-invalid={Boolean(errors.muscleGroup)}
+                aria-describedby={
+                  errors.muscleGroup
+                    ? "exercise-muscle-group-error"
+                    : undefined
+                }
                 {...register("muscleGroup")}
-              />
+              >
+                <option value="" disabled>
+                  Selecciona un grupo muscular
+                </option>
+                {getExerciseSelectOptions(
+                  exerciseMuscleGroupOptions,
+                  muscleGroup,
+                ).map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                    {!exerciseMuscleGroupOptions.includes(
+                      option as (typeof exerciseMuscleGroupOptions)[number],
+                    )
+                      ? " (valor existente)"
+                      : ""}
+                  </option>
+                ))}
+              </select>
               <FieldError
                 id="exercise-muscle-group-error"
                 message={errors.muscleGroup?.message}
@@ -428,13 +581,32 @@ export function ExerciseManager({
               >
                 Categoria
               </Label>
-              <Input
+              <select
                 id="exercise-category"
-                className={inputClasses}
-                placeholder="Ej. Fuerza"
+                className={cn(inputClasses, "h-11 w-full")}
                 aria-invalid={Boolean(errors.category)}
+                aria-describedby={
+                  errors.category ? "exercise-category-error" : undefined
+                }
                 {...register("category")}
-              />
+              >
+                <option value="" disabled>
+                  Selecciona una categoria
+                </option>
+                {getExerciseSelectOptions(
+                  exerciseCategoryOptions,
+                  category,
+                ).map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                    {!exerciseCategoryOptions.includes(
+                      option as (typeof exerciseCategoryOptions)[number],
+                    )
+                      ? " (valor existente)"
+                      : ""}
+                  </option>
+                ))}
+              </select>
               <FieldError
                 id="exercise-category-error"
                 message={errors.category?.message}
@@ -448,13 +620,32 @@ export function ExerciseManager({
               >
                 Tipo
               </Label>
-              <Input
+              <select
                 id="exercise-type"
-                className={inputClasses}
-                placeholder="Ej. Compuesto"
+                className={cn(inputClasses, "h-11 w-full")}
                 aria-invalid={Boolean(errors.exerciseType)}
+                aria-describedby={
+                  errors.exerciseType ? "exercise-type-error" : undefined
+                }
                 {...register("exerciseType")}
-              />
+              >
+                <option value="" disabled>
+                  Selecciona un tipo
+                </option>
+                {getExerciseSelectOptions(
+                  exerciseTypeOptions,
+                  exerciseType,
+                ).map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                    {!exerciseTypeOptions.includes(
+                      option as (typeof exerciseTypeOptions)[number],
+                    )
+                      ? " (valor existente)"
+                      : ""}
+                  </option>
+                ))}
+              </select>
               <FieldError
                 id="exercise-type-error"
                 message={errors.exerciseType?.message}
@@ -563,46 +754,198 @@ export function ExerciseManager({
       </section>
 
       <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted">
               Biblioteca
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-charcoal">
-              {exercises.length} ejercicios
+              {pagination.totalCount} ejercicios encontrados
             </h2>
+            <p className="mt-2 text-sm font-semibold text-muted">
+              Mostrando {exercises.length} de {pagination.totalCount}. Los
+              filtros se aplican antes de cargar mas resultados.
+            </p>
           </div>
-          <div className="relative w-full sm:max-w-xs">
+        </div>
+
+        <form
+          className="mt-5 rounded-[22px] border border-charcoal/10 bg-background p-4"
+          onSubmit={applyLibraryFilters}
+        >
+          <div className="relative">
             <Search
               className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted"
               aria-hidden="true"
             />
             <Input
               type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              className="rounded-control bg-background pl-10"
-              placeholder="Buscar ejercicio"
+              value={draftFilters.query}
+              onChange={(event) =>
+                updateDraftFilter("query", event.target.value)
+              }
+              className="rounded-control bg-surface pl-10"
+              placeholder="Buscar por nombre, grupo, categoria o tipo"
               aria-label="Buscar ejercicios"
             />
           </div>
-        </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            <div>
+              <Label
+                htmlFor="exercise-filter-muscle"
+                className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted"
+              >
+                Grupo muscular
+              </Label>
+              <select
+                id="exercise-filter-muscle"
+                value={draftFilters.muscleGroup}
+                onChange={(event) =>
+                  updateDraftFilter("muscleGroup", event.target.value)
+                }
+                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+              >
+                <option value="all">Todos</option>
+                {filterOptions.muscleGroups.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <Label
+                htmlFor="exercise-filter-difficulty"
+                className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted"
+              >
+                Dificultad
+              </Label>
+              <select
+                id="exercise-filter-difficulty"
+                value={draftFilters.difficulty}
+                onChange={(event) =>
+                  updateDraftFilter("difficulty", event.target.value)
+                }
+                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+              >
+                <option value="all">Todas</option>
+                {Object.entries(difficultyLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <Label
+                htmlFor="exercise-filter-status"
+                className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted"
+              >
+                Estado
+              </Label>
+              <select
+                id="exercise-filter-status"
+                value={draftFilters.status}
+                onChange={(event) =>
+                  updateDraftFilter("status", event.target.value)
+                }
+                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+              >
+                {Object.entries(statusFilterLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <Label
+                htmlFor="exercise-filter-category"
+                className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted"
+              >
+                Categoria
+              </Label>
+              <select
+                id="exercise-filter-category"
+                value={draftFilters.category}
+                onChange={(event) =>
+                  updateDraftFilter("category", event.target.value)
+                }
+                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+              >
+                <option value="all">Todas</option>
+                {filterOptions.categories.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <Label
+                htmlFor="exercise-filter-type"
+                className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted"
+              >
+                Tipo
+              </Label>
+              <select
+                id="exercise-filter-type"
+                value={draftFilters.exerciseType}
+                onChange={(event) =>
+                  updateDraftFilter("exerciseType", event.target.value)
+                }
+                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+              >
+                <option value="all">Todos</option>
+                {filterOptions.exerciseTypes.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={clearLibraryFilters}
+              disabled={isPending}
+            >
+              Limpiar filtros
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? (
+                <Loader2 className="animate-spin" aria-hidden="true" />
+              ) : (
+                <Search aria-hidden="true" />
+              )}
+              Aplicar filtros
+            </Button>
+          </div>
+        </form>
 
         <div className="mt-5 grid gap-4">
-          {filteredExercises.length > 0 ? (
-            filteredExercises.map((exercise) => (
+          {exercises.length > 0 ? (
+            exercises.map((exercise) => (
               <article
                 key={exercise.id}
                 className={cn(
-                  "relative rounded-[22px] border bg-background p-4 transition-colors hover:border-primary/45 hover:shadow-soft",
+                  "group relative overflow-hidden rounded-[24px] border bg-background p-4 shadow-[0_16px_40px_-34px_rgb(var(--espresso-rgb)/0.32)] transition-[background-color,border-color,box-shadow] hover:border-primary/45 hover:bg-surface-hover hover:shadow-soft sm:p-5",
                   exercise.isActive
                     ? "border-border"
-                    : "border-dashed border-stone/35 opacity-75",
+                    : "border-dashed border-border bg-stone-soft/40 opacity-90",
                 )}
               >
                 <Link
                   href={`/app/entrenamiento/ejercicios/${exercise.id}`}
-                  className="absolute inset-0 rounded-[22px] outline-none focus-visible:ring-3 focus-visible:ring-ring/35"
+                  className="absolute inset-0 z-0 rounded-[24px] outline-none focus-visible:ring-3 focus-visible:ring-ring/35"
                   aria-label={`Ver información completa de ${exercise.name}`}
                 >
                   <span className="sr-only">
@@ -610,28 +953,28 @@ export function ExerciseManager({
                   </span>
                 </Link>
 
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-semibold text-charcoal">
-                        {exercise.name}
-                      </h3>
-                      <span
-                        className={cn(
-                          "rounded-full px-2.5 py-1 text-[0.7rem] font-extrabold uppercase tracking-wide",
-                          exercise.isActive
-                            ? "bg-primary-soft text-charcoal"
-                            : "bg-stone-soft text-stone-hover",
-                        )}
-                      >
-                        {exercise.isActive ? "Activo" : "Inactivo"}
-                      </span>
-                    </div>
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted">
-                      {exercise.description}
-                    </p>
+                <div className="pointer-events-none relative z-10 flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <span
+                      className={cn(
+                        "inline-flex rounded-full border px-2.5 py-1 text-[0.68rem] font-extrabold uppercase tracking-[0.12em]",
+                        exercise.isActive
+                          ? "border-primary/35 bg-primary-soft text-charcoal"
+                          : "border-border bg-stone-soft text-muted",
+                      )}
+                    >
+                      {exercise.isActive ? "Activo" : "Inactivo"}
+                    </span>
+                    <h3 className="mt-3 text-xl font-semibold leading-snug text-charcoal transition-colors group-hover:text-foreground sm:text-2xl">
+                      {exercise.name}
+                    </h3>
+                    {exercise.description ? (
+                      <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-6 text-muted">
+                        {exercise.description}
+                      </p>
+                    ) : null}
                   </div>
-                  <div className="relative z-10">
+                  <div className="pointer-events-auto relative z-20 shrink-0">
                     <CardActionsMenu
                       label={exercise.name}
                       items={[
@@ -659,36 +1002,50 @@ export function ExerciseManager({
                   </div>
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-warm-brown">
-                  <span className="rounded-full bg-surface px-3 py-1.5">
+                <div className="pointer-events-none relative z-10 mt-4 flex flex-wrap items-center gap-2 text-xs font-bold text-charcoal">
+                  <span className="rounded-full border border-border bg-surface px-2.5 py-1">
                     {difficultyLabels[exercise.difficulty ?? "beginner"]}
                   </span>
-                  <span className="rounded-full bg-surface px-3 py-1.5">
+                  <span
+                    className="rounded-full border border-border bg-surface px-2.5 py-1"
+                    title="Grupo muscular"
+                  >
                     {exercise.muscleGroup}
                   </span>
-                  <span className="rounded-full bg-surface px-3 py-1.5">
+                  <span
+                    className="rounded-full border border-border bg-surface px-2.5 py-1"
+                    title="Categoria"
+                  >
                     {exercise.category}
                   </span>
-                  <span className="rounded-full bg-surface px-3 py-1.5">
+                  <span
+                    className="rounded-full border border-border bg-surface px-2.5 py-1"
+                    title="Tipo de ejercicio"
+                  >
                     {exercise.exerciseType}
+                  </span>
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1",
+                      exercise.multimediaUrls.length > 0
+                        ? "border-primary/30 bg-primary-soft text-charcoal"
+                        : "border-border bg-surface text-muted",
+                    )}
+                  >
+                    <Link2 className="size-3.5" aria-hidden="true" />
+                    {exercise.multimediaUrls.length}{" "}
+                    {exercise.multimediaUrls.length === 1
+                      ? "recurso"
+                      : "recursos"}
                   </span>
                 </div>
 
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3 text-xs text-muted">
-                  <div className="flex flex-wrap gap-x-4 gap-y-2">
+                <div className="pointer-events-none relative z-10 mt-4 rounded-[16px] border border-border-subtle bg-surface/70 px-3 py-2 text-[0.72rem] font-semibold leading-5 text-muted">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1">
                     <span>Creado por {exercise.creatorName}</span>
                     <span>Creado: {formatDate(exercise.createdAt)}</span>
                     <span>Actualizado: {formatDate(exercise.updatedAt)}</span>
                   </div>
-                  {exercise.multimediaUrls.length > 0 ? (
-                    <span className="inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown">
-                      <Link2 className="size-3.5" aria-hidden="true" />
-                      {exercise.multimediaUrls.length}{" "}
-                      {exercise.multimediaUrls.length === 1
-                        ? "recurso multimedia"
-                        : "recursos multimedia"}
-                    </span>
-                  ) : null}
                 </div>
               </article>
             ))
@@ -702,6 +1059,25 @@ export function ExerciseManager({
               </p>
             </div>
           )}
+
+          {pagination.hasMore ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11 w-full"
+              onClick={loadMoreExercises}
+              disabled={isPending}
+            >
+              {isPending ? (
+                <Loader2 className="animate-spin" aria-hidden="true" />
+              ) : null}
+              {isPending ? "Cargando..." : `Cargar ${pagination.pageSize} mas`}
+            </Button>
+          ) : exercises.length > 0 ? (
+            <p className="rounded-[18px] bg-background px-4 py-3 text-center text-sm font-semibold text-muted">
+              Ya estas viendo todos los ejercicios que coinciden.
+            </p>
+          ) : null}
         </div>
       </section>
 

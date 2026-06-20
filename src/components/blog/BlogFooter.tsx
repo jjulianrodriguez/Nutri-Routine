@@ -2,10 +2,10 @@ import Link from "next/link";
 
 export function BlogFooter() {
   return (
-    <footer className="border-t border-charcoal/10 bg-white">
+    <footer className="border-t border-border bg-surface/82 backdrop-blur-md">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-8 md:grid-cols-[1fr_auto] md:items-end lg:px-10">
         <div>
-          <p className="font-serif text-2xl font-semibold text-charcoal">
+          <p className="font-heading text-2xl font-bold text-charcoal">
             Nutrición Con Enfoque
           </p>
           <p className="mt-2 max-w-md text-sm leading-6 text-warm-brown">

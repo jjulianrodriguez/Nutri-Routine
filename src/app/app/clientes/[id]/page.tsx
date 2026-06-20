@@ -213,7 +213,7 @@ function PlanCard({
           plan.detailAvailable ? (
             <Button asChild size="sm" variant="outline">
               <Link href={`/app/entrenamiento/historial/${plan.id}`}>
-                Abrir rutina
+                Abrir plan
               </Link>
             </Button>
           ) : (
@@ -452,8 +452,8 @@ export default async function ClientProfilePage({
         />
         <PlansPanel
           canView={client.canViewTrainingPlans}
-          description="Rutina asignada actual e historial de entrenamiento del cliente."
-          emptyLabel="No hay rutinas asignadas para este cliente."
+          description="Plantilla actual e historial de entrenamiento del cliente."
+          emptyLabel="No hay plantillas asignadas para este cliente."
           plans={client.trainingPlans}
           showRoutineLink
           title="Entrenamiento"

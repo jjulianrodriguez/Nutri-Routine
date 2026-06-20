@@ -37,7 +37,7 @@ export function HomeMark({ className }: HomeMarkProps) {
         </svg>
       </span>
       <span className="flex flex-col leading-none">
-        <span className="font-serif text-lg font-semibold text-espresso">
+        <span className="font-heading text-lg font-bold text-espresso">
           Nutrición
         </span>
         <span className="mt-0.5 text-[0.7rem] font-semibold uppercase text-stone">

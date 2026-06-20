@@ -19,6 +19,7 @@ import { TrainingSectionNav } from "@/components/app/training-section-nav";
 import { Button } from "@/components/ui/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getExerciseDetail } from "@/lib/exercises/data";
+import { getExternalResourcePresentation } from "@/lib/exercises/multimedia";
 import type { ExerciseDifficulty } from "@/types/exercise";
 
 const difficultyLabels: Record<ExerciseDifficulty, string> = {
@@ -137,39 +138,51 @@ export default async function ExerciseDetailPage({
       </section>
 
       <AppPanel
-        title="Recursos multimedia"
-        description="Enlaces externos de apoyo disponibles para este ejercicio."
+        title="Materiales del ejercicio"
+        description="Recursos propios de este ejercicio para revisar tecnica o referencia."
       >
         {exercise.multimediaUrls.length > 0 ? (
           <div className="grid gap-3 lg:grid-cols-2">
-            {exercise.multimediaUrls.map((url, index) => (
-              <article
-                key={url}
-                className="rounded-[20px] border border-border bg-surface p-4 shadow-soft"
-              >
-                <ExternalLink
-                  className="size-4 text-warm-brown"
-                  aria-hidden="true"
-                />
-                <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
-                  Recurso {index + 1}
-                </p>
-                <p className="mt-2 break-all text-sm font-semibold leading-6 text-charcoal">
-                  {url}
-                </p>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="mt-4"
+            {exercise.multimediaUrls.map((url) => {
+              const resource = getExternalResourcePresentation(url);
+
+              return (
+                <article
+                  key={url}
+                  className="rounded-[20px] border border-border bg-surface p-4 shadow-soft"
                 >
-                  <a href={url} target="_blank" rel="noreferrer">
-                    <ExternalLink aria-hidden="true" />
-                    Abrir recurso
-                  </a>
-                </Button>
-              </article>
-            ))}
+                  <ExternalLink
+                    className="size-4 text-warm-brown"
+                    aria-hidden="true"
+                  />
+                  <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
+                    {resource.label}
+                  </p>
+                  <p
+                    className="mt-2 truncate text-sm font-semibold leading-6 text-charcoal"
+                    translate="no"
+                  >
+                    {resource.domain}
+                  </p>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="mt-4"
+                  >
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={resource.domain}
+                    >
+                      <ExternalLink aria-hidden="true" />
+                      Abrir {resource.label}
+                    </a>
+                  </Button>
+                </article>
+              );
+            })}
           </div>
         ) : (
           <div className="rounded-[20px] border border-border bg-surface p-4 shadow-soft">
@@ -184,8 +197,9 @@ export default async function ExerciseDetailPage({
         )}
       </AppPanel>
 
-      <AppPanel
-        title="Estado y registro"
+      {access.canManageTraining ? (
+        <AppPanel
+          title="Estado y registro"
         description="Información administrativa del ejercicio."
       >
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -210,7 +224,8 @@ export default async function ExerciseDetailPage({
             value={formatDate(exercise.updatedAt)}
           />
         </div>
-      </AppPanel>
+        </AppPanel>
+      ) : null}
     </AppScreen>
   );
 }

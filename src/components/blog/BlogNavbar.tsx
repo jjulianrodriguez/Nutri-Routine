@@ -10,12 +10,12 @@ function BlogMark() {
     >
       <span
         aria-hidden="true"
-        className="flex size-10 items-center justify-center rounded-full border border-charcoal/10 bg-sage text-charcoal shadow-soft"
+        className="flex size-10 items-center justify-center rounded-full border border-border bg-primary-soft text-charcoal shadow-soft"
       >
         <BookOpen className="size-4" />
       </span>
       <span className="leading-none">
-        <span className="block font-serif text-lg font-semibold text-charcoal">
+        <span className="block font-heading text-lg font-bold text-charcoal">
           Diario
         </span>
         <span className="block text-[0.68rem] font-bold uppercase text-warm-brown">
@@ -28,14 +28,14 @@ function BlogMark() {
 
 export function BlogNavbar() {
   return (
-    <header className="sticky top-0 z-40 border-b border-charcoal/10 bg-cream/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface/78 shadow-soft backdrop-blur-xl">
       <div className="mx-auto flex h-20 w-full max-w-6xl items-center justify-between px-5 sm:px-8 lg:px-10">
         <BlogMark />
 
         <nav className="flex items-center gap-2" aria-label="Blog">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-full border border-charcoal/10 bg-white px-4 py-2.5 text-sm font-bold text-warm-brown shadow-soft"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/82 px-4 py-2.5 text-sm font-bold text-warm-brown shadow-soft backdrop-blur-md transition-colors hover:bg-primary-soft hover:text-charcoal"
           >
             <ArrowLeft className="size-4" />
             <span className="hidden sm:inline">Volver al inicio</span>

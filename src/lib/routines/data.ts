@@ -1,6 +1,8 @@
 import "server-only";
 
 import type { CurrentUserAccess } from "@/lib/auth/access-rules";
+import { listAuthEmailsByUserId } from "@/lib/auth/auth-user-emails";
+import { normalizeExerciseMultimediaUrls } from "@/lib/exercises/multimedia";
 import { parseRoutineSnapshot } from "@/lib/routines/snapshot";
 import { createClient } from "@/lib/supabase/server";
 import { parseWorkoutTemplateSnapshot } from "@/lib/workout-templates/snapshot";
@@ -15,7 +17,10 @@ import type {
   RoutineDetail,
   RoutineDifficulty,
   RoutineManagementOverview,
+  WorkoutDayProgressSummary,
 } from "@/types/routine";
+
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
 function normalizeDifficulty(value: string | null): RoutineDifficulty {
   if (
@@ -37,6 +42,7 @@ function mapExercise(exercise: {
   id: string;
   is_active: boolean;
   multimedia_url: string | null;
+  multimedia_urls: string[] | null;
   muscle_group: string;
   name: string;
 }): ExerciseOption {
@@ -53,25 +59,13 @@ function mapExercise(exercise: {
     id: exercise.id,
     isActive: exercise.is_active,
     multimediaUrl: exercise.multimedia_url,
+    multimediaUrls: normalizeExerciseMultimediaUrls(
+      exercise.multimedia_urls,
+      exercise.multimedia_url,
+    ),
     muscleGroup: exercise.muscle_group,
     name: exercise.name,
   };
-}
-
-async function getRoutineIdentifiers(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-) {
-  const { data, error } = await supabase.rpc(
-    "list_manageable_routine_identifiers",
-  );
-
-  if (error) {
-    throw new Error("No se pudieron cargar los identificadores de rutinas.");
-  }
-
-  return new Map(
-    (data ?? []).map((routine) => [routine.id, routine.identifier]),
-  );
 }
 
 export async function listExerciseOptions(): Promise<ExerciseOption[]> {
@@ -79,7 +73,7 @@ export async function listExerciseOptions(): Promise<ExerciseOption[]> {
   const { data, error } = await supabase
     .from("exercises")
     .select(
-      "id, name, description, category, difficulty, muscle_group, exercise_type, multimedia_url, is_active",
+      "id, name, description, category, difficulty, muscle_group, exercise_type, multimedia_url, multimedia_urls, is_active",
     )
     .eq("is_active", true)
     .order("name");
@@ -93,24 +87,19 @@ export async function listExerciseOptions(): Promise<ExerciseOption[]> {
 
 export async function getRoutineManagementOverview(): Promise<RoutineManagementOverview> {
   const supabase = await createClient();
-  const [
-    routinesResult,
-    relationsResult,
-    exercisesResult,
-    routineIdentifiers,
-  ] = await Promise.all([
+  const [routinesResult, relationsResult, exercisesResult] = await Promise.all([
     supabase
       .from("routines")
       .select(
         "id, name, description, difficulty, category, target_audience, is_active, creator_id, created_at, updated_at",
       )
       .order("updated_at", { ascending: false }),
-    supabase.from("routine_exercises").select("routine_id"),
+    supabase
+      .from("routine_exercises")
+      .select("routine_id, exercise_id"),
     supabase
       .from("exercises")
-      .select("id", { count: "exact", head: true })
-      .eq("is_active", true),
-    getRoutineIdentifiers(supabase),
+      .select("id, is_active"),
   ]);
 
   if (routinesResult.error || relationsResult.error || exercisesResult.error) {
@@ -138,17 +127,33 @@ export async function getRoutineManagementOverview(): Promise<RoutineManagementO
     ]),
   );
   const exerciseCounts = new Map<string, number>();
+  const inactiveExerciseCounts = new Map<string, number>();
+  const exerciseStatusById = new Map(
+    (exercisesResult.data ?? []).map((exercise) => [
+      exercise.id,
+      exercise.is_active,
+    ]),
+  );
 
   (relationsResult.data ?? []).forEach((relation) => {
     exerciseCounts.set(
       relation.routine_id,
       (exerciseCounts.get(relation.routine_id) ?? 0) + 1,
     );
+
+    if (exerciseStatusById.get(relation.exercise_id) === false) {
+      inactiveExerciseCounts.set(
+        relation.routine_id,
+        (inactiveExerciseCounts.get(relation.routine_id) ?? 0) + 1,
+      );
+    }
   });
 
   return {
     activeCount: routines.filter((routine) => routine.is_active).length,
-    exerciseCount: exercisesResult.count ?? 0,
+    exerciseCount: (exercisesResult.data ?? []).filter(
+      (exercise) => exercise.is_active,
+    ).length,
     routines: routines.map((routine) => ({
       category: routine.category,
       createdAt: routine.created_at,
@@ -157,7 +162,8 @@ export async function getRoutineManagementOverview(): Promise<RoutineManagementO
       difficulty: normalizeDifficulty(routine.difficulty),
       exerciseCount: exerciseCounts.get(routine.id) ?? 0,
       id: routine.id,
-      identifier: routineIdentifiers.get(routine.id) ?? null,
+      inactiveExerciseCount:
+        inactiveExerciseCounts.get(routine.id) ?? 0,
       isActive: routine.is_active,
       name: routine.name,
       targetAudience: routine.target_audience,
@@ -166,103 +172,155 @@ export async function getRoutineManagementOverview(): Promise<RoutineManagementO
   };
 }
 
-export async function getRoutineDetail(
-  routineId: string,
-): Promise<RoutineDetail | null> {
+export async function getRoutineDetails(
+  routineIds: string[],
+): Promise<Map<string, RoutineDetail>> {
+  const uniqueRoutineIds = [...new Set(routineIds.filter(Boolean))];
+
+  if (uniqueRoutineIds.length === 0) {
+    return new Map();
+  }
+
   const supabase = await createClient();
-  const [routineResult, routineIdentifiers] = await Promise.all([
+  const [routinesResult, relationsResult] = await Promise.all([
     supabase
       .from("routines")
       .select(
         "id, name, description, difficulty, category, target_audience, is_active, creator_id, created_at, updated_at",
       )
-      .eq("id", routineId)
-      .maybeSingle(),
-    getRoutineIdentifiers(supabase),
-  ]);
-  const { data: routine, error: routineError } = routineResult;
-
-  if (routineError) {
-    throw new Error("No se pudo cargar la rutina.");
-  }
-
-  if (!routine) {
-    return null;
-  }
-
-  const [relationsResult, creatorResult] = await Promise.all([
+      .in("id", uniqueRoutineIds),
     supabase
       .from("routine_exercises")
       .select(
-        "id, exercise_id, series, repetitions, rest_seconds, duration_minutes, notes, position",
+        "id, routine_id, exercise_id, series, repetitions, rest_seconds, duration_minutes, notes, position",
       )
-      .eq("routine_id", routine.id)
+      .in("routine_id", uniqueRoutineIds)
       .order("position"),
-    supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("id", routine.creator_id)
-      .maybeSingle(),
   ]);
 
-  if (relationsResult.error || creatorResult.error) {
-    throw new Error("No se pudo cargar el detalle de la rutina.");
+  if (routinesResult.error || relationsResult.error) {
+    throw new Error("No se pudieron cargar los entrenamientos.");
   }
 
+  const routines = routinesResult.data ?? [];
   const relations = relationsResult.data ?? [];
-  const exerciseIds = relations.map((relation) => relation.exercise_id);
-  const exercisesResult =
+  const creatorIds = [
+    ...new Set(routines.map((routine) => routine.creator_id)),
+  ];
+  const exerciseIds = [
+    ...new Set(relations.map((relation) => relation.exercise_id)),
+  ];
+  const [creatorsResult, exercisesResult] = await Promise.all([
+    creatorIds.length > 0
+      ? supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", creatorIds)
+      : Promise.resolve({ data: [], error: null }),
     exerciseIds.length > 0
-      ? await supabase
+      ? supabase
           .from("exercises")
           .select(
-            "id, name, description, category, difficulty, muscle_group, exercise_type, multimedia_url, is_active",
+            "id, name, description, category, difficulty, muscle_group, exercise_type, multimedia_url, multimedia_urls, is_active",
           )
           .in("id", exerciseIds)
-      : { data: [], error: null };
+      : Promise.resolve({ data: [], error: null }),
+  ]);
 
-  if (exercisesResult.error) {
-    throw new Error("No se pudieron cargar los ejercicios de la rutina.");
+  if (creatorsResult.error || exercisesResult.error) {
+    throw new Error("No se pudo completar el detalle de los entrenamientos.");
   }
 
+  const creators = new Map(
+    (creatorsResult.data ?? []).map((profile) => [
+      profile.id,
+      profile.full_name ?? "Profesional",
+    ]),
+  );
   const exercises = new Map(
     (exercisesResult.data ?? []).map((exercise) => [
       exercise.id,
       mapExercise(exercise),
     ]),
   );
+  const relationsByRoutineId = new Map<string, typeof relations>();
+
+  relations.forEach((relation) => {
+    const current = relationsByRoutineId.get(relation.routine_id) ?? [];
+    current.push(relation);
+    relationsByRoutineId.set(relation.routine_id, current);
+  });
+
+  return new Map(
+    routines.map((routine) => [
+      routine.id,
+      {
+        category: routine.category,
+        createdAt: routine.created_at,
+        creatorId: routine.creator_id,
+        creatorName: creators.get(routine.creator_id) ?? "Profesional",
+        description: routine.description,
+        difficulty: normalizeDifficulty(routine.difficulty),
+        exercises: (relationsByRoutineId.get(routine.id) ?? []).flatMap(
+          (relation) => {
+            const exercise = exercises.get(relation.exercise_id);
+
+            return exercise
+              ? [
+                  {
+                    durationMinutes: relation.duration_minutes,
+                    exercise,
+                    id: relation.id,
+                    notes: relation.notes,
+                    position: relation.position,
+                    repetitions: relation.repetitions,
+                    restSeconds: relation.rest_seconds,
+                    series: relation.series,
+                  },
+                ]
+              : [];
+          },
+        ),
+        id: routine.id,
+        isActive: routine.is_active,
+        name: routine.name,
+        targetAudience: routine.target_audience,
+        updatedAt: routine.updated_at,
+      },
+    ]),
+  );
+}
+
+export async function getRoutineDetail(
+  routineId: string,
+): Promise<RoutineDetail | null> {
+  const routines = await getRoutineDetails([routineId]);
+
+  return routines.get(routineId) ?? null;
+}
+
+export async function getRoutineManagementStats(): Promise<{
+  exerciseCount: number;
+  routineCount: number;
+}> {
+  const supabase = await createClient();
+  const [routinesResult, exercisesResult] = await Promise.all([
+    supabase
+      .from("routines")
+      .select("id", { count: "exact", head: true }),
+    supabase
+      .from("exercises")
+      .select("id", { count: "exact", head: true })
+      .eq("is_active", true),
+  ]);
+
+  if (routinesResult.error || exercisesResult.error) {
+    throw new Error("No se pudieron cargar las estadisticas de entrenamiento.");
+  }
 
   return {
-    category: routine.category,
-    createdAt: routine.created_at,
-    creatorId: routine.creator_id,
-    creatorName: creatorResult.data?.full_name ?? "Profesional",
-    description: routine.description,
-    difficulty: normalizeDifficulty(routine.difficulty),
-    exercises: relations.flatMap((relation) => {
-      const exercise = exercises.get(relation.exercise_id);
-
-      return exercise
-        ? [
-            {
-              durationMinutes: relation.duration_minutes,
-              exercise,
-              id: relation.id,
-              notes: relation.notes,
-              position: relation.position,
-              repetitions: relation.repetitions,
-              restSeconds: relation.rest_seconds,
-              series: relation.series,
-            },
-          ]
-        : [];
-    }),
-    id: routine.id,
-    identifier: routineIdentifiers.get(routine.id) ?? null,
-    isActive: routine.is_active,
-    name: routine.name,
-    targetAudience: routine.target_audience,
-    updatedAt: routine.updated_at,
+    exerciseCount: exercisesResult.count ?? 0,
+    routineCount: routinesResult.count ?? 0,
   };
 }
 
@@ -334,9 +392,78 @@ type AssignmentSummaryRow = {
   title: string;
 };
 
+type WorkoutDayProgressRow = {
+  completed_at: string | null;
+  completed_exercise_ids: string[];
+  cycle_day: number;
+  id: string;
+  workout_date: string;
+  workout_plan_id: string;
+};
+
+function mapWorkoutDayProgress(
+  row: WorkoutDayProgressRow,
+): WorkoutDayProgressSummary {
+  return {
+    completedAt: row.completed_at,
+    completedExerciseIds: row.completed_exercise_ids ?? [],
+    cycleDay: row.cycle_day,
+    id: row.id,
+    workoutDate: row.workout_date,
+    workoutPlanId: row.workout_plan_id,
+  };
+}
+
+function getCompletedDayCountMap(
+  progressRows: WorkoutDayProgressSummary[],
+) {
+  const completedDaysByPlan = new Map<string, Set<string>>();
+
+  progressRows.forEach((row) => {
+    if (!row.completedAt) {
+      return;
+    }
+
+    const completedDays =
+      completedDaysByPlan.get(row.workoutPlanId) ?? new Set<string>();
+
+    completedDays.add(`${row.workoutDate}:${row.cycleDay}`);
+    completedDaysByPlan.set(row.workoutPlanId, completedDays);
+  });
+
+  return new Map(
+    [...completedDaysByPlan.entries()].map(([planId, days]) => [
+      planId,
+      days.size,
+    ]),
+  );
+}
+
+async function getCompletedDayCountForPlan(
+  supabase: SupabaseServerClient,
+  clientId: string,
+  workoutPlanId: string,
+) {
+  const { data, error } = await supabase
+    .from("workout_day_progress")
+    .select("workout_date, cycle_day")
+    .eq("client_id", clientId)
+    .eq("workout_plan_id", workoutPlanId)
+    .not("completed_at", "is", null);
+
+  if (error) {
+    throw new Error("No se pudo cargar el avance del entrenamiento.");
+  }
+
+  return new Set(
+    (data ?? []).map((row) => `${row.workout_date}:${row.cycle_day}`),
+  ).size;
+}
+
 function mapAssignmentSummary(
   plan: AssignmentSummaryRow,
   today: string,
+  completedDayCount = 0,
 ): RoutineAssignmentSummary {
   const routineSnapshot = parseRoutineSnapshot(plan.routine_snapshot);
   const state = getAssignmentState(
@@ -350,6 +477,7 @@ function mapAssignmentSummary(
     assignmentType: plan.template_snapshot
       ? "template"
       : "legacy-training",
+    completedDayCount,
     createdAt: plan.created_at,
     daysRemaining: getDaysRemaining(plan.end_date, state),
     description: routineSnapshot?.routine.description ?? plan.description,
@@ -373,75 +501,86 @@ export async function listAssignableTrainingClients(
   access: CurrentUserAccess,
 ): Promise<AssignableTrainingClient[]> {
   const supabase = await createClient();
-  let clientIds: string[];
+  let clientAssignments: {
+    assigned_trainer_id: string | null;
+    profile_id: string;
+  }[];
 
   if (isGeneralAdmin(access)) {
-    const { data: clientProfiles, error: profilesError } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("role", "client");
+    const { data, error } = await supabase
+      .from("client_profiles")
+      .select("profile_id, assigned_trainer_id")
+      .not("assigned_trainer_id", "is", null);
 
-    if (profilesError) {
+    if (error) {
       throw new Error("No se pudieron cargar los clientes.");
     }
 
-    clientIds = (clientProfiles ?? []).map((profile) => profile.id);
+    clientAssignments = data ?? [];
   } else {
-    const { data: clientAssignments, error: assignmentsError } = await supabase
+    const { data, error } = await supabase
       .from("client_profiles")
-      .select("profile_id")
+      .select("profile_id, assigned_trainer_id")
       .eq("assigned_trainer_id", access.userId);
 
-    if (assignmentsError) {
+    if (error) {
       throw new Error("No se pudieron cargar los clientes asignados.");
     }
 
-    clientIds = (clientAssignments ?? []).map(
-      (assignment) => assignment.profile_id,
-    );
+    clientAssignments = data ?? [];
   }
+
+  const trainerIdByClientId = new Map(
+    clientAssignments
+      .filter((assignment) => assignment.assigned_trainer_id)
+      .map((assignment) => [
+        assignment.profile_id,
+        assignment.assigned_trainer_id as string,
+      ]),
+  );
+  const clientIds = [...trainerIdByClientId.keys()];
 
   if (clientIds.length === 0) {
     return [];
   }
 
-  const [profilesResult, plansResult, personalDetailsResult] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("id, full_name, avatar_url")
-      .in("id", clientIds),
-    supabase
-      .from("workout_plans")
-      .select(
-        "id, client_id, routine_id, routine_snapshot, template_id, template_snapshot, title, description, status, start_date, end_date, duration_weeks, created_at",
-      )
-      .in("client_id", clientIds)
-      .eq("status", "active")
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("profile_personal_details")
-      .select("profile_id, phone")
-      .in("profile_id", clientIds),
-  ]);
+  const trainerIds = [...new Set(trainerIdByClientId.values())];
+  const [profilesResult, plansResult, trainersResult, emailsById] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .eq("role", "client")
+        .in("id", clientIds),
+      supabase
+        .from("workout_plans")
+        .select(
+          "id, client_id, routine_id, routine_snapshot, template_id, template_snapshot, title, description, status, start_date, end_date, duration_weeks, created_at",
+        )
+        .in("client_id", clientIds)
+        .eq("status", "active")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", trainerIds),
+      listAuthEmailsByUserId(clientIds),
+    ]);
 
-  if (
-    profilesResult.error ||
-    plansResult.error ||
-    personalDetailsResult.error
-  ) {
+  if (profilesResult.error || plansResult.error || trainersResult.error) {
     throw new Error("No se pudo completar la lista de clientes.");
   }
 
+  const trainerNameById = new Map(
+    (trainersResult.data ?? []).map((profile) => [
+      profile.id,
+      profile.full_name ?? "Profesional en entrenamiento",
+    ]),
+  );
   const currentAssignmentByClient = new Map<
     string,
     RoutineAssignmentSummary
   >();
-  const contactByClient = new Map(
-    (personalDetailsResult.data ?? []).map((details) => [
-      details.profile_id,
-      details.phone,
-    ]),
-  );
   const today = getTodayDateKey();
 
   (plansResult.data ?? []).forEach((plan) => {
@@ -458,10 +597,14 @@ export async function listAssignableTrainingClients(
   return (profilesResult.data ?? [])
     .map((profile) => ({
       avatarUrl: profile.avatar_url,
-      contact: contactByClient.get(profile.id) ?? null,
+      assignedTrainerName:
+        trainerNameById.get(trainerIdByClientId.get(profile.id) ?? "") ??
+        "Profesional en entrenamiento",
+      contact: emailsById.get(profile.id) || null,
       currentAssignment: currentAssignmentByClient.get(profile.id) ?? null,
       id: profile.id,
       name: profile.full_name ?? "Cliente",
+      trainingPlanStatus: "active" as const,
     }))
     .sort((left, right) => left.name.localeCompare(right.name, "es"));
 }
@@ -479,7 +622,7 @@ export async function getClientTrainingOverview(
     .order("created_at", { ascending: false });
 
   if (error) {
-    throw new Error("No se pudieron cargar tus rutinas asignadas.");
+    throw new Error("No se pudieron cargar tus planes de entrenamiento.");
   }
 
   const routineIds = [
@@ -498,7 +641,9 @@ export async function getClientTrainingOverview(
       .in("id", routineIds);
 
     if (routinesError) {
-      throw new Error("No se pudo verificar el historial de rutinas.");
+      throw new Error(
+        "No se pudo verificar el historial de entrenamientos.",
+      );
     }
 
     (availableRoutines ?? []).forEach((routine) => {
@@ -511,18 +656,40 @@ export async function getClientTrainingOverview(
     parseRoutineSnapshot(plan.routine_snapshot),
   );
   const today = getTodayDateKey();
+  const planIds = planRows.map((plan) => plan.id);
+  const progressResult =
+    planIds.length > 0
+      ? await supabase
+          .from("workout_day_progress")
+          .select(
+            "id, workout_plan_id, workout_date, cycle_day, completed_exercise_ids, completed_at",
+          )
+          .eq("client_id", clientId)
+          .in("workout_plan_id", planIds)
+          .order("workout_date", { ascending: false })
+      : { data: [], error: null };
+
+  if (progressResult.error) {
+    throw new Error("No se pudo cargar el avance de entrenamiento.");
+  }
+
+  const progress = (progressResult.data ?? []).map(mapWorkoutDayProgress);
+  const completedDayCountByPlan = getCompletedDayCountMap(progress);
   const assignments: RoutineAssignmentSummary[] = planRows.map((plan, index) => {
-    const assignment = mapAssignmentSummary(plan, today);
+    const assignment = mapAssignmentSummary(
+      plan,
+      today,
+      completedDayCountByPlan.get(plan.id) ?? 0,
+    );
 
     return {
       ...assignment,
-      detailAvailable: assignment.templateId
-        ? Boolean(plan.template_snapshot)
-        : Boolean(
-            routineSnapshots[index] ||
-              (assignment.routineId &&
-                availableRoutineIds.has(assignment.routineId)),
-          ),
+      detailAvailable: Boolean(
+        plan.template_snapshot ||
+          routineSnapshots[index] ||
+          (assignment.routineId &&
+            availableRoutineIds.has(assignment.routineId)),
+      ),
       routineId:
         assignment.routineId &&
         availableRoutineIds.has(assignment.routineId)
@@ -557,6 +724,8 @@ export async function getClientTrainingOverview(
     currentRoutine,
     currentTemplate,
     history: assignments.filter((_, index) => index !== currentIndex),
+    progress,
+    today,
   };
 }
 
@@ -581,7 +750,7 @@ export async function getRoutineAssignmentDetail(
     .maybeSingle();
 
   if (error) {
-    throw new Error("No se pudo cargar la asignacion de rutina.");
+    throw new Error("No se pudo cargar la asignacion de entrenamiento.");
   }
 
   if (!plan) {
@@ -597,11 +766,21 @@ export async function getRoutineAssignmentDetail(
     return null;
   }
 
+  const completedDayCount = await getCompletedDayCountForPlan(
+    supabase,
+    plan.client_id,
+    plan.id,
+  );
+  const assignment = mapAssignmentSummary(
+    plan,
+    getTodayDateKey(),
+    completedDayCount,
+  );
   const template = parseWorkoutTemplateSnapshot(plan.template_snapshot);
 
   if (template) {
     return {
-      assignment: mapAssignmentSummary(plan, getTodayDateKey()),
+      assignment,
       routine: null,
       routineSource: null,
       template,
@@ -612,7 +791,7 @@ export async function getRoutineAssignmentDetail(
 
   if (routineSnapshot) {
     return {
-      assignment: mapAssignmentSummary(plan, getTodayDateKey()),
+      assignment,
       routine: routineSnapshot.routine,
       routineSource: "snapshot",
       template: null,
@@ -624,7 +803,7 @@ export async function getRoutineAssignmentDetail(
     : null;
 
   return {
-    assignment: mapAssignmentSummary(plan, getTodayDateKey()),
+    assignment,
     routine,
     routineSource: routine ? "live" : null,
     template: null,

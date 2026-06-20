@@ -67,7 +67,7 @@ export function ConfirmationDialog({
         />
         <AlertDialogPrimitive.Content
           className={cn(
-            "fixed left-1/2 top-1/2 z-[110] max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto overscroll-contain rounded-[28px] border border-border bg-surface p-5 shadow-premium focus-visible:outline-none sm:p-6",
+            "fixed left-1/2 top-1/2 z-[110] max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto overscroll-contain rounded-[28px] border border-border bg-surface/88 p-5 shadow-premium backdrop-blur-xl focus-visible:outline-none sm:p-6",
             "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
             "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
           )}
@@ -84,7 +84,7 @@ export function ConfirmationDialog({
             <Icon className="size-5" aria-hidden="true" />
           </div>
 
-          <AlertDialogPrimitive.Title className="mt-5 break-words text-2xl font-semibold text-charcoal">
+          <AlertDialogPrimitive.Title className="mt-5 break-words text-2xl font-extrabold text-charcoal">
             {title}
           </AlertDialogPrimitive.Title>
           <AlertDialogPrimitive.Description className="mt-3 text-pretty text-sm leading-6 text-muted">

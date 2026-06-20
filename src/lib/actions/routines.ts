@@ -37,7 +37,7 @@ async function getTrainingManagerContext() {
 
   if (userError || !user) {
     return {
-      error: "Debes iniciar sesion para gestionar rutinas.",
+      error: "Debes iniciar sesion para gestionar entrenamientos.",
       supabase,
       user: null,
     };
@@ -81,33 +81,34 @@ async function getTrainingManagerContext() {
   return {
     error: canManageTraining
       ? null
-      : "No tienes permisos para gestionar rutinas.",
+      : "No tienes permisos para gestionar entrenamientos.",
     supabase,
     user,
   };
 }
 
 function getRoutineErrorMessage(code?: string, message?: string) {
-  if (
-    code === "23505" &&
-    message?.includes("routines_identifier_unique_idx")
-  ) {
-    return "Ese identificador ya esta usado por otra rutina.";
-  }
-
   if (code === "23505") {
     return "Un ejercicio esta repetido o tiene un orden duplicado.";
   }
 
+  if (code === "55000") {
+    return "No puedes agregar ejercicios desactivados nuevos. Puedes conservarlos solo si ya pertenecian a este entrenamiento.";
+  }
+
+  if (code === "P0002" && message?.includes("ejercicios")) {
+    return "Uno de los ejercicios ya no existe. Retiralo del entrenamiento y vuelve a guardar.";
+  }
+
   if (code === "23503") {
-    return "Uno de los ejercicios ya no esta disponible.";
+    return "Uno de los ejercicios ya no esta disponible. Retiralo o selecciona otro.";
   }
 
   if (code === "42501") {
-    return "No tienes permisos para gestionar rutinas.";
+    return "No tienes permisos para gestionar entrenamientos.";
   }
 
-  return "No se pudo guardar la rutina. Revisa los datos e intentalo de nuevo.";
+  return "No se pudo guardar el entrenamiento. Revisa los datos e intentalo de nuevo.";
 }
 
 function getRoutineAssignmentErrorMessage(code?: string, message?: string) {
@@ -148,7 +149,7 @@ export async function saveRoutine(
 
   if (routineId && !/^[0-9a-f-]{36}$/i.test(routineId)) {
     return {
-      message: "La rutina indicada no es valida.",
+      message: "El entrenamiento indicado no es valido.",
       status: "error",
     };
   }
@@ -157,7 +158,8 @@ export async function saveRoutine(
 
   if (context.error || !context.user) {
     return {
-      message: context.error ?? "No tienes permisos para gestionar rutinas.",
+      message:
+        context.error ?? "No tienes permisos para gestionar entrenamientos.",
       status: "error",
     };
   }
@@ -180,7 +182,6 @@ export async function saveRoutine(
     p_description: parsed.data.description,
     p_difficulty: parsed.data.difficulty,
     p_exercises: exercises,
-    p_identifier: parsed.data.identifier,
     p_is_active: parsed.data.isActive,
     p_name: parsed.data.name,
     p_routine_id: routineId,
@@ -201,8 +202,8 @@ export async function saveRoutine(
   return {
     id: data,
     message: routineId
-      ? "Rutina actualizada correctamente."
-      : "Rutina creada correctamente.",
+      ? "Entrenamiento actualizado correctamente."
+      : "Entrenamiento creado correctamente.",
     status: "success",
   };
 }
@@ -212,7 +213,7 @@ export async function deleteRoutine(
 ): Promise<RoutineActionResult> {
   if (!/^[0-9a-f-]{36}$/i.test(routineId)) {
     return {
-      message: "La rutina indicada no es valida.",
+      message: "El entrenamiento indicado no es valido.",
       status: "error",
     };
   }
@@ -221,7 +222,8 @@ export async function deleteRoutine(
 
   if (context.error || !context.user) {
     return {
-      message: context.error ?? "No tienes permisos para gestionar rutinas.",
+      message:
+        context.error ?? "No tienes permisos para gestionar entrenamientos.",
       status: "error",
     };
   }
@@ -235,7 +237,7 @@ export async function deleteRoutine(
 
   if (error?.code === "42501") {
     return {
-      message: "No tienes permisos para eliminar esta rutina.",
+      message: "No tienes permisos para eliminar este entrenamiento.",
       status: "error",
     };
   }
@@ -244,8 +246,8 @@ export async function deleteRoutine(
     return {
       message:
         error?.code === "23503"
-          ? "No se pudo eliminar la rutina por una relacion de datos inesperada."
-          : "No se pudo eliminar la rutina. Intentalo de nuevo.",
+          ? "No se puede eliminar el entrenamiento porque forma parte de una plantilla."
+          : "No se pudo eliminar el entrenamiento. Intentalo de nuevo.",
       status: "error",
     };
   }
@@ -257,7 +259,7 @@ export async function deleteRoutine(
   return {
     id: data.id,
     message:
-      "Rutina eliminada correctamente. Sus asignaciones quedaron archivadas.",
+      "Entrenamiento eliminado correctamente.",
     status: "success",
   };
 }
@@ -268,7 +270,7 @@ export async function setRoutineActive(
 ): Promise<RoutineActionResult> {
   if (!/^[0-9a-f-]{36}$/i.test(routineId)) {
     return {
-      message: "La rutina indicada no es valida.",
+      message: "El entrenamiento indicado no es valido.",
       status: "error",
     };
   }
@@ -277,7 +279,8 @@ export async function setRoutineActive(
 
   if (context.error || !context.user) {
     return {
-      message: context.error ?? "No tienes permisos para gestionar rutinas.",
+      message:
+        context.error ?? "No tienes permisos para gestionar entrenamientos.",
       status: "error",
     };
   }
@@ -291,7 +294,7 @@ export async function setRoutineActive(
 
   if (error || !data) {
     return {
-      message: "No se pudo cambiar el estado de la rutina.",
+      message: "No se pudo cambiar el estado del entrenamiento.",
       status: "error",
     };
   }
@@ -302,7 +305,9 @@ export async function setRoutineActive(
 
   return {
     id: data.id,
-    message: isActive ? "Rutina activada." : "Rutina desactivada.",
+    message: isActive
+      ? "Entrenamiento activado."
+      : "Entrenamiento desactivado.",
     status: "success",
   };
 }

@@ -33,7 +33,7 @@ export default async function EditRoutinePage({
   return (
     <AppScreen>
       <AppHeader
-        eyebrow="Editar rutina"
+        eyebrow="Editar entrenamiento"
         title={routine.name}
         description="Actualiza la informacion general, cambia el orden o ajusta la configuracion de cada ejercicio."
       />

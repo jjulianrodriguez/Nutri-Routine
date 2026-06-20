@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { hasBlogTextContent } from "@/lib/blog/content";
+
 export const blogPostValuesSchema = z.object({
   category: z
     .string()
@@ -10,7 +12,8 @@ export const blogPostValuesSchema = z.object({
     .string()
     .trim()
     .min(1, "Escribe el contenido del blog.")
-    .max(50000, "El contenido no puede superar 50 000 caracteres."),
+    .max(50000, "El contenido no puede superar 50 000 caracteres.")
+    .refine(hasBlogTextContent, "Escribe el contenido del blog."),
   isPinned: z.boolean(),
   published: z.boolean(),
   title: z

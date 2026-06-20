@@ -1,5 +1,6 @@
 import { Sidebar } from "@/components/app/Sidebar";
 import { requireCurrentUserAccess } from "@/lib/auth/current-user-access";
+import { getUnreadNotificationCount } from "@/lib/notifications/data";
 
 export default async function PrivateAppLayout({
   children,
@@ -7,9 +8,13 @@ export default async function PrivateAppLayout({
   children: React.ReactNode;
 }>) {
   const access = await requireCurrentUserAccess();
+  const unreadNotifications = await getUnreadNotificationCount(access.userId);
 
   return (
-    <Sidebar access={access}>
+    <Sidebar
+      access={access}
+      unreadNotifications={unreadNotifications}
+    >
       {children}
     </Sidebar>
   );

@@ -1,8 +1,10 @@
 import {
+  ArrowRight,
   CalendarDays,
   Dumbbell,
   Leaf,
   NotebookTabs,
+  Play,
   Settings,
   Users,
 } from "lucide-react";
@@ -52,6 +54,53 @@ function RecordList({
   );
 }
 
+function TrainingActionCard({
+  record,
+}: {
+  record: AppRecordSummary | null;
+}) {
+  if (!record) {
+    return (
+      <EmptyState>
+        No hay una plantilla visible por ahora. Cuando tu entrenador la asigne,
+        podras empezar desde aqui.
+      </EmptyState>
+    );
+  }
+
+  return (
+    <Link
+      href="/app/entrenamiento"
+      className="group block rounded-[22px] border border-primary/30 bg-primary-soft/65 p-5 transition hover:border-primary/60 hover:shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/35"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <span className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-charcoal">
+            <Play className="size-3.5" aria-hidden="true" />
+            Entrenamiento de hoy
+          </span>
+          <h3 className="mt-4 text-xl font-semibold text-charcoal">
+            {record.title}
+          </h3>
+          {record.detail ? (
+            <p className="mt-2 text-sm leading-6 text-muted">
+              {record.detail}
+            </p>
+          ) : null}
+        </div>
+        <ArrowRight
+          className="mt-1 size-5 shrink-0 text-warm-brown transition group-hover:translate-x-1 group-hover:text-charcoal"
+          aria-hidden="true"
+        />
+      </div>
+      <span className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-warm-brown transition group-hover:text-charcoal">
+        Empezar entrenamiento de hoy
+        <ArrowRight className="size-4" aria-hidden="true" />
+      </span>
+    </Link>
+  );
+}
+
 function QuickLink({
   description,
   href,
@@ -80,11 +129,16 @@ function ServicesSummary({ access }: { access: CurrentUserAccess }) {
     access.hasNutritionService ? "Nutricion" : null,
     access.hasTrainingService ? "Entrenamiento" : null,
   ].filter(Boolean);
+  const description = access.hasTrainingService && !access.hasNutritionService
+    ? "Tu plan de entrenamiento esta activo y esta vista se enfoca en tu avance."
+    : access.hasNutritionService && !access.hasTrainingService
+      ? "Tu plan de nutricion esta activo y esta vista se enfoca en tu seguimiento."
+      : "Tus secciones activas aparecen segun los servicios asignados a tu cuenta.";
 
   return (
     <AppPanel
       title="Resumen personal"
-      description="Tus secciones se activan segun los servicios y profesionales asignados a tu cuenta."
+      description={description}
       tone="primary"
     >
       {services.length > 0 ? (
@@ -100,12 +154,24 @@ function ServicesSummary({ access }: { access: CurrentUserAccess }) {
         </div>
       ) : (
         <EmptyState>
-          Todavia no tenes servicios asignados. Cuando se asigne nutricion o
-          entrenamiento, apareceran aca y en tu sidebar.
+          Todavia no tenes servicios asignados. Cuando un profesional active tu
+          plan, aparecera aqui y en tu sidebar.
         </EmptyState>
       )}
     </AppPanel>
   );
+}
+
+function getClientDashboardDescription(access: CurrentUserAccess) {
+  if (access.canViewTraining && !access.canViewNutrition) {
+    return "Tu plan de entrenamiento esta activo. Aqui veras tu entrenamiento actual, recursos y recordatorios.";
+  }
+
+  if (access.canViewNutrition && !access.canViewTraining) {
+    return "Tu plan de nutricion esta activo. Aqui veras tu plan actual, recursos y recordatorios.";
+  }
+
+  return "Aqui veras tus planes activos, recursos y recordatorios en un solo lugar.";
 }
 
 function ClientDashboard({
@@ -126,7 +192,7 @@ function ClientDashboard({
         <AppHeader
           eyebrow={access.roleLabel}
           title={`Hola, ${access.displayName}. Tu panel esta listo.`}
-          description="Esta vista muestra solo las areas que tenes asignadas: nutricion, entrenamiento o ambas."
+          description={getClientDashboardDescription(access)}
         />
       </FadeIn>
 
@@ -149,7 +215,7 @@ function ClientDashboard({
           ) : null}
           {access.canViewTraining ? (
             <StatTile
-              label="Rutinas"
+              label="Plantillas"
               value={String(data.workoutPlansCount)}
               detail="Visibles para tu cuenta"
             />
@@ -200,14 +266,11 @@ function ClientDashboard({
         {access.canViewTraining ? (
           <FadeIn delay={0.22}>
             <AppPanel
-              title="Rutina activa"
-              description="Rutina actual e historial de entrenamiento."
+              title="Tu entrenamiento actual"
+              description="Hoy te toca revisar la plantilla asignada por tu entrenador."
               tone="accent"
             >
-              <RecordList
-                empty="No hay una rutina visible por ahora."
-                records={data.currentWorkoutPlan ? [data.currentWorkoutPlan] : []}
-              />
+              <TrainingActionCard record={data.currentWorkoutPlan} />
             </AppPanel>
           </FadeIn>
         ) : null}
@@ -265,7 +328,8 @@ function AdminDashboard({
       : null,
     access.canManageTraining
       ? {
-          description: "Clientes, rutinas, planes de entrenamiento y recursos.",
+          description:
+            "Clientes, entrenamientos, plantillas y recursos.",
           href: "/app/entrenamiento",
           icon: Dumbbell,
           label: "Entrenamiento",

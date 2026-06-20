@@ -2,6 +2,7 @@
 
 import {
   Activity,
+  Bell,
   BookOpen,
   CalendarDays,
   Dumbbell,
@@ -33,6 +34,7 @@ const iconMap: Record<AppNavIcon, LucideIcon> = {
   clients: Users,
   dashboard: Home,
   nutrition: Leaf,
+  notifications: Bell,
   pending: Sparkles,
   profile: Sparkles,
   progress: Activity,
@@ -45,6 +47,7 @@ type SidebarNavProps = {
   access: CurrentUserAccess;
   collapsed: boolean;
   onNavigate?: () => void;
+  unreadNotifications: number;
 };
 
 function SidebarLink({
@@ -54,6 +57,7 @@ function SidebarLink({
   isActive,
   label,
   onNavigate,
+  unreadCount = 0,
 }: {
   collapsed: boolean;
   href: string;
@@ -61,6 +65,7 @@ function SidebarLink({
   isActive: boolean;
   label: string;
   onNavigate?: () => void;
+  unreadCount?: number;
 }) {
   return (
     <Tooltip>
@@ -69,18 +74,30 @@ function SidebarLink({
           href={href}
           onClick={onNavigate}
           className={cn(
-            "flex h-11 min-w-0 items-center gap-3 rounded-control border px-3 text-sm font-bold transition-[background-color,border-color,color,box-shadow] duration-200",
+            "relative flex h-11 min-w-0 items-center gap-3 rounded-control border px-3 text-sm font-bold transition-[background-color,border-color,color,box-shadow] duration-200",
             "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
             collapsed && "mx-auto size-11 w-11 justify-center gap-0 px-0",
             isActive
-              ? "border-primary/30 bg-primary text-charcoal shadow-soft"
-              : "border-transparent text-warm-brown hover:border-charcoal/10 hover:bg-primary-soft hover:text-charcoal",
+              ? "border-primary/45 bg-primary-soft text-charcoal shadow-soft"
+              : "border-transparent text-warm-brown hover:border-primary/25 hover:bg-surface/72 hover:text-charcoal hover:shadow-soft",
           )}
           aria-current={isActive ? "page" : undefined}
           aria-label={collapsed ? label : undefined}
         >
           <Icon className="size-4 shrink-0" aria-hidden="true" />
           {!collapsed ? <span className="min-w-0 truncate">{label}</span> : null}
+          {unreadCount > 0 ? (
+            <span
+              className={cn(
+                "ml-auto grid min-w-5 place-items-center rounded-full bg-accent px-1.5 py-0.5 text-[0.65rem] font-extrabold leading-none text-charcoal",
+                collapsed &&
+                  "absolute -right-1 -top-1 ml-0 min-w-4 border-2 border-surface px-1",
+              )}
+              aria-label={`${unreadCount} notificaciones sin leer`}
+            >
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          ) : null}
         </Link>
       </TooltipTrigger>
       {collapsed ? (
@@ -90,7 +107,12 @@ function SidebarLink({
   );
 }
 
-export function SidebarNav({ access, collapsed, onNavigate }: SidebarNavProps) {
+export function SidebarNav({
+  access,
+  collapsed,
+  onNavigate,
+  unreadNotifications,
+}: SidebarNavProps) {
   const pathname = usePathname();
   const sections = buildNavigationForUser(access);
 
@@ -124,6 +146,11 @@ export function SidebarNav({ access, collapsed, onNavigate }: SidebarNavProps) {
                   isActive={isActive}
                   label={item.label}
                   onNavigate={onNavigate}
+                  unreadCount={
+                    item.route === "notifications"
+                      ? unreadNotifications
+                      : undefined
+                  }
                 />
               );
             })}

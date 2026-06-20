@@ -1,24 +1,15 @@
-import {
-  ArrowLeft,
-  CalendarDays,
-  Dumbbell,
-  Layers3,
-  UserRound,
-} from "lucide-react";
+import { ArrowLeft, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import {
-  AppHeader,
-  AppPanel,
-  AppScreen,
-  EmptyState,
-} from "@/components/app/AppScreen";
+import { AppHeader, AppPanel, AppScreen } from "@/components/app/AppScreen";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import { TemplateOverview } from "@/components/app/workout-template-overview";
 import { WorkoutTemplateActions } from "@/components/app/workout-template-actions";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
-import { getWorkoutTemplateDetail } from "@/lib/workout-templates/data";
+import { getWorkoutTemplateDetailWithMeta } from "@/lib/workout-templates/data";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("es-CR", {
@@ -40,7 +31,7 @@ export default async function WorkoutTemplateDetailPage({
   }
 
   const { id } = await params;
-  const template = await getWorkoutTemplateDetail(id);
+  const { template, warning } = await getWorkoutTemplateDetailWithMeta(id);
 
   if (!template) {
     notFound();
@@ -49,11 +40,19 @@ export default async function WorkoutTemplateDetailPage({
   return (
     <AppScreen>
       <AppHeader
-        eyebrow="Detalle de plantilla"
-        title={template.name}
-        description={template.description || "Ciclo de entrenamiento sin descripción adicional."}
+        eyebrow="Entrenamiento"
+        title="Plantilla de entrenamiento"
+        description="Revisa el resumen del ciclo y el entrenamiento asignado a cada dia."
       />
       <TrainingSectionNav active="templates" />
+
+      {warning ? (
+        <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">
+          <AlertDescription className="font-semibold text-warm-brown">
+            {warning}
+          </AlertDescription>
+        </Alert>
+      ) : null}
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <Button asChild variant="outline" size="lg">
@@ -69,75 +68,15 @@ export default async function WorkoutTemplateDetailPage({
         />
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <DetailValue
-          icon={Layers3}
-          label="Días del ciclo"
-          value={String(template.cycleDays)}
-        />
-        <DetailValue
-          icon={Dumbbell}
-          label="Entrenamientos"
-          value={String(template.days.length)}
-        />
-        <DetailValue
-          icon={UserRound}
-          label="Creador"
-          value={template.creatorName}
-        />
-        <DetailValue
-          icon={CalendarDays}
-          label="Estado"
-          value={template.isActive ? "Activa" : "Inactiva"}
-        />
-      </section>
-
-      <AppPanel
-        title="Ciclo completo"
-        description="Entrenamiento diario asignado a cada posición del ciclo."
-      >
-        {template.days.length > 0 ? (
-          <div className="space-y-4">
-            {template.days.map((day) => (
-              <article
-                key={day.id}
-                className="rounded-[24px] border border-border bg-background p-5"
-              >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
-                      Día {day.dayNumber}
-                    </p>
-                    <h2 className="mt-2 text-2xl font-semibold text-charcoal">
-                      {day.routine.name}
-                    </h2>
-                    <p className="mt-2 text-sm font-bold text-warm-brown">
-                      {day.routine.category} · {day.routine.difficulty} ·{" "}
-                      {day.routine.exercises.length} ejercicios
-                    </p>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
-                      {day.routine.description}
-                    </p>
-                  </div>
-                  <Button asChild variant="outline">
-                    <Link
-                      href={`/app/entrenamiento/rutinas/${day.routine.id}`}
-                    >
-                      Ver entrenamiento
-                    </Link>
-                  </Button>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <EmptyState>Esta plantilla no tiene días configurados.</EmptyState>
-        )}
-      </AppPanel>
+      <TemplateOverview
+        routineHref={(routineId) => `/app/entrenamiento/rutinas/${routineId}`}
+        template={template}
+        viewer="professional"
+      />
 
       <AppPanel
         title="Registro"
-        description="Fechas de creación y última actualización."
+        description="Fechas de creacion y ultima actualizacion."
         tone="accent"
       >
         <div className="grid gap-3 sm:grid-cols-2">

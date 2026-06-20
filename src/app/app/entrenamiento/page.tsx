@@ -1,15 +1,11 @@
 import {
-  AlertTriangle,
   ArrowRight,
-  CalendarDays,
-  CheckCircle2,
   ClipboardCheck,
-  Clock3,
+  Dumbbell,
   History,
   Layers3,
   ListChecks,
   NotebookTabs,
-  Dumbbell,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -20,26 +16,26 @@ import {
   EmptyState,
   StatTile,
 } from "@/components/app/AppScreen";
-import { RoutineExerciseList } from "@/components/app/routine-exercise-list";
+import { ClientTodayTraining } from "@/components/app/client-today-training";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
-import { WorkoutTemplateSnapshotView } from "@/components/app/workout-template-snapshot-view";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
   getClientTrainingOverview,
-  getRoutineManagementOverview,
+  getRoutineManagementStats,
 } from "@/lib/routines/data";
-import { listWorkoutTemplates } from "@/lib/workout-templates/data";
-import { cn } from "@/lib/utils";
+import { getWorkoutTemplateStats } from "@/lib/workout-templates/data";
 import type {
   RoutineAssignmentState,
   RoutineAssignmentSummary,
+  RoutineDetail,
 } from "@/types/routine";
+import type { WorkoutTemplateSnapshot } from "@/types/workout-template";
 
 const assignmentStateLabels: Record<RoutineAssignmentState, string> = {
   active: "Vigente",
-  archived: "Anterior",
-  expired: "Caducada",
-  upcoming: "Proxima",
+  archived: "Archivada",
+  expired: "Vencida",
+  upcoming: "Programada",
 };
 
 function formatDate(value: string | null) {
@@ -47,16 +43,68 @@ function formatDate(value: string | null) {
     return "Sin fecha";
   }
 
+  const normalizedValue = value.includes("T")
+    ? value
+    : `${value}T12:00:00`;
+
   return new Intl.DateTimeFormat("es-CR", {
     day: "2-digit",
     month: "long",
     year: "numeric",
-  }).format(new Date(`${value}T12:00:00`));
+  }).format(new Date(normalizedValue));
+}
+
+function formatRelativeDate(value: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const normalizedValue = value.includes("T")
+    ? value
+    : `${value}T12:00:00`;
+  const date = new Date(normalizedValue);
+  const diffDays = Math.round(
+    (Date.now() - date.getTime()) / 86_400_000,
+  );
+
+  if (diffDays === 0) {
+    return "Hoy";
+  }
+
+  if (diffDays > 0) {
+    if (diffDays < 14) {
+      return `Hace ${diffDays} ${diffDays === 1 ? "dia" : "dias"}`;
+    }
+
+    const weeks = Math.round(diffDays / 7);
+
+    return `Hace ${weeks} ${weeks === 1 ? "semana" : "semanas"}`;
+  }
+
+  const futureDays = Math.abs(diffDays);
+
+  if (futureDays < 14) {
+    return `En ${futureDays} ${futureDays === 1 ? "dia" : "dias"}`;
+  }
+
+  const futureWeeks = Math.round(futureDays / 7);
+
+  return `En ${futureWeeks} ${futureWeeks === 1 ? "semana" : "semanas"}`;
+}
+
+function isFutureDate(value: string | null) {
+  if (!value) {
+    return false;
+  }
+
+  const date = new Date(value.includes("T") ? value : `${value}T12:00:00`);
+
+  return date.getTime() > Date.now();
 }
 
 function remainingLabel(assignment: RoutineAssignmentSummary) {
   if (assignment.state === "expired") {
-    return "El periodo termino. Sigue asignada hasta que tu entrenador la renueve o archive.";
+    return "Tu plantilla vencio. Consulta a tu entrenador para actualizarla.";
   }
 
   if (assignment.state === "upcoming") {
@@ -68,18 +116,23 @@ function remainingLabel(assignment: RoutineAssignmentSummary) {
   }
 
   if (assignment.daysRemaining !== null) {
-    return `${assignment.daysRemaining} ${
-      assignment.daysRemaining === 1 ? "dia restante" : "dias restantes"
+    if (assignment.daysRemaining >= 14) {
+      const weeks = Math.round(assignment.daysRemaining / 7);
+
+      return `Vence en ${weeks} ${
+        weeks === 1 ? "semana" : "semanas"
+      }.`;
+    }
+
+    return `Vence en ${assignment.daysRemaining} ${
+      assignment.daysRemaining === 1 ? "dia" : "dias"
     }.`;
   }
 
   return "Vigencia sin fecha de cierre.";
 }
 
-function getCurrentCycleDay(
-  startDate: string | null,
-  cycleDays: number,
-) {
+function getCurrentCycleDay(startDate: string | null, cycleDays: number) {
   if (!startDate || cycleDays < 1) {
     return 1;
   }
@@ -100,6 +153,37 @@ function getCurrentCycleDay(
   return (elapsedDays % cycleDays) + 1;
 }
 
+function getClientTrainingSnapshot(
+  assignment: RoutineAssignmentSummary | null,
+  routine: RoutineDetail | null,
+  template: WorkoutTemplateSnapshot | null,
+): WorkoutTemplateSnapshot | null {
+  if (template) {
+    return template;
+  }
+
+  if (!assignment || !routine) {
+    return null;
+  }
+
+  return {
+    days: [
+      {
+        dayNumber: 1,
+        routine,
+        weekday: null,
+      },
+    ],
+    template: {
+      cycleDays: 1,
+      description: assignment.description,
+      id: assignment.id,
+      name: assignment.title,
+    },
+    version: 1,
+  };
+}
+
 async function ClientTrainingPage({
   access,
 }: {
@@ -107,20 +191,55 @@ async function ClientTrainingPage({
 }) {
   const overview = await getClientTrainingOverview(access.userId);
   const current = overview.currentAssignment;
-  const currentCycleDay = overview.currentTemplate
+  const trainingSnapshot = getClientTrainingSnapshot(
+    current,
+    overview.currentRoutine,
+    overview.currentTemplate,
+  );
+  const currentCycleDay = trainingSnapshot
     ? getCurrentCycleDay(
         current?.startDate ?? null,
-        overview.currentTemplate.template.cycleDays,
+        trainingSnapshot.template.cycleDays,
       )
     : null;
+  const currentProgress =
+    current && currentCycleDay
+      ? (overview.progress.find(
+          (progress) =>
+            progress.workoutPlanId === current.id &&
+            progress.workoutDate === overview.today &&
+            progress.cycleDay === currentCycleDay,
+        ) ?? null)
+      : null;
 
   return (
     <AppScreen>
       <AppHeader
         eyebrow="Mi entrenamiento"
-        title="Entrenamiento"
-        description="Plantilla actual, ciclo diario e historial de entrenamiento asignado a tu cuenta."
+        title="Entrenamiento de hoy"
+        description="Tu entrenamiento actual, el dia que te toca y tu historial de plantillas."
       />
+
+      {current && trainingSnapshot ? (
+        <ClientTodayTraining
+          assignment={current}
+          currentDayNumber={currentCycleDay}
+          progress={currentProgress}
+          snapshot={trainingSnapshot}
+          today={overview.today}
+        />
+      ) : (
+        <AppPanel
+          title="Entrenamiento actual"
+          description="Aqui aparecera tu entrenamiento cuando tengas una plantilla asignada."
+          tone="primary"
+        >
+          <EmptyState>
+            No hay una plantilla asignada actualmente. Cuando tu entrenador
+            te asigne una plantilla, aparecera aqui con el entrenamiento de hoy.
+          </EmptyState>
+        </AppPanel>
+      )}
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatTile
@@ -129,7 +248,7 @@ async function ClientTrainingPage({
           detail={
             current
               ? remainingLabel(current)
-              : "Tu entrenador aún no ha asignado una plantilla"
+              : "Tu entrenador aun no ha asignado una plantilla"
           }
         />
         <StatTile
@@ -142,113 +261,30 @@ async function ClientTrainingPage({
           detail={
             current
               ? `${formatDate(current.startDate)} - ${formatDate(current.endDate)}`
-              : "Se mostrara al recibir una asignacion"
+              : "Se mostrara cuando recibas una plantilla"
           }
         />
         <StatTile
           label="Plantillas anteriores"
           value={String(overview.history.length)}
-          detail="Historial conservado"
+          detail="Historial y dias completados"
         />
       </section>
 
       <AppPanel
-        title="Plantilla actual"
-        description="Consulta la vigencia, el día actual del ciclo y los entrenamientos indicados."
-      >
-        {current ? (
-          <div className="space-y-5">
-            <article
-              className={cn(
-                "rounded-[24px] border p-5",
-                current.state === "expired"
-                  ? "border-danger/25 bg-danger/5"
-                  : "border-primary/30 bg-primary-soft/55",
-              )}
-            >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {current.state === "expired" ? (
-                      <AlertTriangle
-                        className="size-5 text-danger"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <CheckCircle2
-                        className="size-5 text-warm-brown"
-                        aria-hidden="true"
-                      />
-                    )}
-                    <span className="rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-charcoal">
-                      {assignmentStateLabels[current.state]}
-                    </span>
-                  </div>
-                  <h2 className="mt-4 text-3xl font-semibold text-charcoal">
-                    {current.title}
-                  </h2>
-                  {current.description ? (
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
-                      {current.description}
-                    </p>
-                  ) : null}
-                </div>
-                <div className="rounded-[18px] border border-border bg-surface px-4 py-3 text-sm font-extrabold text-charcoal">
-                  {remainingLabel(current)}
-                </div>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 border-t border-charcoal/10 pt-4 text-sm font-bold text-warm-brown">
-                <span className="inline-flex items-center gap-2">
-                  <CalendarDays className="size-4" aria-hidden="true" />
-                  Inicio: {formatDate(current.startDate)}
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <Clock3 className="size-4" aria-hidden="true" />
-                  Fin: {formatDate(current.endDate)}
-                </span>
-              </div>
-            </article>
-
-            {overview.currentTemplate ? (
-              <>
-                <div className="rounded-[20px] border border-primary/25 bg-primary-soft/45 p-4">
-                  <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
-                    Ciclo actual
-                  </p>
-                  <p className="mt-2 text-xl font-extrabold text-charcoal">
-                    Día {currentCycleDay} de{" "}
-                    {overview.currentTemplate.template.cycleDays}
-                  </p>
-                </div>
-                <WorkoutTemplateSnapshotView
-                  currentDayNumber={currentCycleDay}
-                  snapshot={overview.currentTemplate}
-                />
-              </>
-            ) : (
-              <RoutineExerciseList
-                emptyMessage="Esta asignación heredada no tiene ejercicios disponibles."
-                exercises={overview.currentRoutine?.exercises ?? []}
-              />
-            )}
-          </div>
-        ) : (
-          <EmptyState>
-            No hay una plantilla asignada actualmente. Cuando tu entrenador
-            cree una asignación aparecerá aquí.
-          </EmptyState>
-        )}
-      </AppPanel>
-
-      <AppPanel
         title="Historial de plantillas"
-        description="Las asignaciones anteriores permanecen visibles con sus fechas y estado."
+        description="Tus plantillas anteriores permanecen visibles con sus fechas y estado."
         tone="accent"
       >
         {overview.history.length > 0 ? (
           <div className="grid gap-4 lg:grid-cols-2">
             {overview.history.map((assignment) => {
+              const relativeCreatedLabel = formatRelativeDate(
+                assignment.createdAt,
+              );
+              const isArchivedBeforeEnd =
+                assignment.state === "archived" &&
+                isFutureDate(assignment.endDate);
               const content = (
                 <>
                   <div className="flex items-start justify-between gap-3">
@@ -272,6 +308,27 @@ async function ClientTrainingPage({
                     {formatDate(assignment.startDate)} -{" "}
                     {formatDate(assignment.endDate)}
                   </p>
+                  <p className="mt-2 text-sm font-semibold leading-6 text-muted">
+                    Esta es una copia historica de la plantilla asignada.
+                  </p>
+                  {relativeCreatedLabel ? (
+                    <p className="mt-2 text-xs font-extrabold uppercase tracking-[0.12em] text-warm-brown">
+                      Asignada {relativeCreatedLabel}
+                    </p>
+                  ) : null}
+                  {isArchivedBeforeEnd ? (
+                    <p className="mt-2 rounded-[14px] bg-primary-soft px-3 py-2 text-xs font-bold leading-5 text-charcoal">
+                      Archivada antes de terminar su periodo original.
+                    </p>
+                  ) : null}
+                  {assignment.completedDayCount > 0 ? (
+                    <p className="mt-3 text-sm font-extrabold text-charcoal">
+                      {assignment.completedDayCount}{" "}
+                      {assignment.completedDayCount === 1
+                        ? "dia completado"
+                        : "dias completados"}
+                    </p>
+                  ) : null}
                   {assignment.detailAvailable ? (
                     <span className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-warm-brown transition group-hover:text-charcoal">
                       Ver detalle
@@ -311,7 +368,7 @@ async function ClientTrainingPage({
           <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">
             <NotebookTabs className="size-5 text-warm-brown" />
             <p className="mt-4 text-sm font-semibold leading-6 text-muted">
-              Todavía no hay plantillas anteriores.
+              Todavia no hay plantillas anteriores.
             </p>
           </div>
         )}
@@ -327,37 +384,45 @@ export default async function TrainingPage() {
     return <ClientTrainingPage access={access} />;
   }
 
-  const overview = await getRoutineManagementOverview();
+  const [overview, templateStats] = await Promise.all([
+    getRoutineManagementStats(),
+    getWorkoutTemplateStats(),
+  ]);
 
   return (
     <AppScreen>
       <AppHeader
         eyebrow="Entrenamiento"
         title="Gestion de entrenamiento"
-        description="Administra primero la biblioteca de ejercicios y luego construye rutinas con esos ejercicios."
+        description="Crea ejercicios, combinalos en entrenamientos diarios y organiza esos entrenamientos dentro de plantillas."
       />
 
       <TrainingSectionNav active="overview" />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           label="Ejercicios activos"
           value={String(overview.exerciseCount)}
-          detail="Disponibles para construir rutinas"
+          detail="Disponibles para crear entrenamientos"
         />
         <StatTile
-          label="Rutinas"
-          value={String(overview.routines.length)}
-          detail="Plantillas creadas"
+          label="Entrenamientos"
+          value={String(overview.routineCount)}
+          detail="Sesiones diarias creadas"
         />
         <StatTile
-          label="Rutinas activas"
-          value={String(overview.activeCount)}
-          detail="Listas para utilizar"
+          label="Plantillas"
+          value={String(templateStats.totalCount)}
+          detail="Ciclos semanales creados"
+        />
+        <StatTile
+          label="Plantillas activas"
+          value={String(templateStats.activeCount)}
+          detail="Disponibles para asignar"
         />
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         <Link
           href="/app/entrenamiento/ejercicios"
           className="group rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
@@ -385,13 +450,35 @@ export default async function TrainingPage() {
           <div className="grid size-12 place-items-center rounded-full bg-surface text-charcoal">
             <ListChecks className="size-5" aria-hidden="true" />
           </div>
-          <h2 className="mt-5 text-3xl font-semibold text-charcoal">Rutinas</h2>
+          <h2 className="mt-5 text-3xl font-semibold text-charcoal">
+            Entrenamientos
+          </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
-            Construye rutinas seleccionando ejercicios previamente creados y
-            configura series, repeticiones, descanso, notas y orden.
+            Construye sesiones para un dia seleccionando ejercicios y
+            configurando series, repeticiones, descanso, notas y orden.
           </p>
           <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
-            Gestionar rutinas
+            Gestionar entrenamientos
+            <ArrowRight className="size-4 transition group-hover:translate-x-1" />
+          </span>
+        </Link>
+
+        <Link
+          href="/app/entrenamiento/plantillas"
+          className="group rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
+        >
+          <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-charcoal">
+            <Layers3 className="size-5" aria-hidden="true" />
+          </div>
+          <h2 className="mt-5 text-3xl font-semibold text-charcoal">
+            Plantillas
+          </h2>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
+            Organiza entrenamientos por dias para crear ciclos semanales o
+            personalizados que puedas reutilizar.
+          </p>
+          <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
+            Gestionar plantillas
             <ArrowRight className="size-4 transition group-hover:translate-x-1" />
           </span>
         </Link>
@@ -407,8 +494,8 @@ export default async function TrainingPage() {
             Asignaciones
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
-            Consulta los clientes disponibles, asigna rutinas activas y
-            archiva asignaciones sin perder el historial.
+            Consulta los clientes disponibles, asigna plantillas activas y
+            conserva el historial de cada periodo.
           </p>
           <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
             Gestionar asignaciones

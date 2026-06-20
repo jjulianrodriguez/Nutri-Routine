@@ -53,7 +53,7 @@ export function CardActionsMenu({ items, label }: CardActionsMenuProps) {
           align="end"
           sideOffset={8}
           collisionPadding={12}
-          className="z-[120] max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-52 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-[18px] border border-border bg-surface p-1.5 shadow-premium outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+          className="z-[120] max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-52 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-[18px] border border-border bg-surface/88 p-1.5 shadow-premium backdrop-blur-xl outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
         >
           {items.map((item) => {
             const Icon = item.icon;

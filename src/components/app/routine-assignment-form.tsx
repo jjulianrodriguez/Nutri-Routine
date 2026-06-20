@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Layers3,
   Loader2,
+  TriangleAlert,
   UserRound,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -84,12 +85,23 @@ export function WorkoutTemplateAssignmentForm({
   });
   const selectedClientId = useWatch({ control, name: "clientId" });
   const selectedTemplateId = useWatch({ control, name: "templateId" });
+  const selectedDurationWeeks = useWatch({
+    control,
+    name: "durationWeeks",
+  });
+  const selectedStartDate = useWatch({ control, name: "startDate" });
   const selectedClient = clients.find(
     (client) => client.id === selectedClientId,
   );
   const selectedTemplate = templates.find(
     (template) => template.id === selectedTemplateId,
   );
+  const missingAssignmentReasons = [
+    !selectedClient ? "Falta seleccionar cliente." : null,
+    !selectedTemplate ? "Falta seleccionar plantilla." : null,
+    !selectedStartDate?.trim() ? "Falta fecha de inicio." : null,
+    !selectedDurationWeeks?.trim() ? "Falta duracion." : null,
+  ].filter(Boolean) as string[];
   const filteredClients = useMemo(() => {
     const query = normalizeSearch(clientQuery.trim());
 
@@ -102,6 +114,8 @@ export function WorkoutTemplateAssignmentForm({
         [
           client.name,
           client.contact,
+          client.assignedTrainerName,
+          client.trainingPlanStatus,
           client.currentAssignment?.title,
           client.id,
         ]
@@ -122,6 +136,7 @@ export function WorkoutTemplateAssignmentForm({
         [
           template.name,
           template.description,
+          template.identifier,
           template.cycleDays,
         ]
           .filter(Boolean)
@@ -201,12 +216,21 @@ export function WorkoutTemplateAssignmentForm({
       await assignTemplate(pendingReplacement.values);
     }
   }
+  const replacementTemplate = pendingReplacement
+    ? templates.find(
+        (template) => template.id === pendingReplacement.values.templateId,
+      )
+    : null;
 
   if (clients.length === 0) {
     return (
       <Alert className="rounded-[18px] border-border bg-background px-4 py-3">
-        <AlertDescription className="font-semibold text-muted">
-          No tienes clientes de entrenamiento asignados actualmente.
+        <AlertDescription className="space-y-1 font-semibold text-muted">
+          <p>No hay clientes con plan de entrenamiento activo.</p>
+          <p>
+            Activa el plan de entrenamiento de un cliente antes de asignarle
+            una plantilla.
+          </p>
         </AlertDescription>
       </Alert>
     );
@@ -265,7 +289,7 @@ export function WorkoutTemplateAssignmentForm({
           resultCount={filteredTemplates.length}
           totalCount={templates.length}
           visibleCount={templateResults.visibleItems.length}
-          searchPlaceholder="Buscar por nombre o cantidad de días..."
+          searchPlaceholder="Buscar por nombre, identificador o cantidad de días..."
           emptyMessage="No encontramos plantillas activas que coincidan con la búsqueda."
           error={errors.templateId?.message}
           isLoading={templateResults.isLoading}
@@ -297,11 +321,9 @@ export function WorkoutTemplateAssignmentForm({
             selected={Boolean(selectedClient)}
             value={selectedClient?.name ?? "Selecciona un cliente"}
             detail={
-              selectedClient?.currentAssignment
-                ? `Plantilla actual: ${selectedClient.currentAssignment.title}`
-                : selectedClient
-                  ? "Sin plantilla activa"
-                  : "Usa el buscador de clientes"
+              selectedClient
+                ? `Entrenamiento activo / ${selectedClient.assignedTrainerName ?? "Profesional en entrenamiento"}`
+                : "Usa el buscador de clientes"
             }
           />
           <SelectedEntity
@@ -311,7 +333,14 @@ export function WorkoutTemplateAssignmentForm({
             value={selectedTemplate?.name ?? "Selecciona una plantilla"}
             detail={
               selectedTemplate
-                ? `Ciclo de ${selectedTemplate.cycleDays} días`
+                ? [
+                    `Ciclo de ${selectedTemplate.cycleDays} días`,
+                    selectedTemplate.identifier
+                      ? `ID: ${selectedTemplate.identifier}`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")
                 : "Usa el buscador de plantillas"
             }
           />
@@ -372,7 +401,7 @@ export function WorkoutTemplateAssignmentForm({
         <Button
           type="submit"
           size="lg"
-          disabled={isSubmitting || !selectedClient || !selectedTemplate}
+          disabled={isSubmitting || missingAssignmentReasons.length > 0}
         >
           {isSubmitting ? (
             <Loader2 className="animate-spin" aria-hidden="true" />
@@ -382,6 +411,19 @@ export function WorkoutTemplateAssignmentForm({
           {isSubmitting ? "Asignando..." : "Confirmar asignacion"}
         </Button>
       </div>
+
+      {missingAssignmentReasons.length > 0 ? (
+        <Alert className="rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3">
+          <TriangleAlert
+            className="size-5 text-warm-brown"
+            aria-hidden="true"
+          />
+          <AlertDescription className="font-semibold leading-6 text-charcoal">
+            Para confirmar la asignacion:{" "}
+            {missingAssignmentReasons.join(" ")}
+          </AlertDescription>
+        </Alert>
+      ) : null}
 
       {errors.root?.message ? (
         <Alert
@@ -404,7 +446,7 @@ export function WorkoutTemplateAssignmentForm({
         title="Reemplazar plantilla activa"
         description={
           pendingReplacement
-            ? `${pendingReplacement.client.name} ya tiene "${pendingReplacement.client.currentAssignment?.title}" asignada actualmente. La asignación anterior se archivará antes de guardar la nueva plantilla.`
+            ? `${pendingReplacement.client.name} tiene "${pendingReplacement.client.currentAssignment?.title}" como plantilla actual. Se archivara en su historial y se reemplazara por "${replacementTemplate?.name ?? "la nueva plantilla"}" desde ${pendingReplacement.values.startDate}.`
             : ""
         }
         confirmLabel="Reemplazar plantilla"

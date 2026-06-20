@@ -186,6 +186,57 @@ export type Database = {
           },
         ];
       };
+      notifications: {
+        Row: {
+          actor_id: string | null;
+          created_at: string;
+          destination_path: string;
+          event_type: string;
+          id: string;
+          message: string;
+          metadata: Json;
+          read_at: string | null;
+          recipient_id: string;
+        };
+        Insert: {
+          actor_id?: string | null;
+          created_at?: string;
+          destination_path: string;
+          event_type: string;
+          id?: string;
+          message: string;
+          metadata?: Json;
+          read_at?: string | null;
+          recipient_id: string;
+        };
+        Update: {
+          actor_id?: string | null;
+          created_at?: string;
+          destination_path?: string;
+          event_type?: string;
+          id?: string;
+          message?: string;
+          metadata?: Json;
+          read_at?: string | null;
+          recipient_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notifications_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey";
+            columns: ["recipient_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       diet_plans: {
         Row: {
           client_id: string;
@@ -628,6 +679,7 @@ export type Database = {
           routine_id: string;
           template_id: string;
           updated_at: string;
+          weekday: string | null;
         };
         Insert: {
           created_at?: string;
@@ -636,6 +688,7 @@ export type Database = {
           routine_id: string;
           template_id: string;
           updated_at?: string;
+          weekday?: string | null;
         };
         Update: {
           created_at?: string;
@@ -644,6 +697,7 @@ export type Database = {
           routine_id?: string;
           template_id?: string;
           updated_at?: string;
+          weekday?: string | null;
         };
         Relationships: [
           {
@@ -669,6 +723,7 @@ export type Database = {
           cycle_days: number;
           description: string | null;
           id: string;
+          identifier: string | null;
           is_active: boolean;
           name: string;
           updated_at: string;
@@ -679,6 +734,7 @@ export type Database = {
           cycle_days: number;
           description?: string | null;
           id?: string;
+          identifier?: string | null;
           is_active?: boolean;
           name: string;
           updated_at?: string;
@@ -689,6 +745,7 @@ export type Database = {
           cycle_days?: number;
           description?: string | null;
           id?: string;
+          identifier?: string | null;
           is_active?: boolean;
           name?: string;
           updated_at?: string;
@@ -699,6 +756,57 @@ export type Database = {
             columns: ["creator_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_day_progress: {
+        Row: {
+          client_id: string;
+          completed_at: string | null;
+          completed_exercise_ids: string[];
+          created_at: string;
+          cycle_day: number;
+          id: string;
+          updated_at: string;
+          workout_date: string;
+          workout_plan_id: string;
+        };
+        Insert: {
+          client_id: string;
+          completed_at?: string | null;
+          completed_exercise_ids?: string[];
+          created_at?: string;
+          cycle_day: number;
+          id?: string;
+          updated_at?: string;
+          workout_date: string;
+          workout_plan_id: string;
+        };
+        Update: {
+          client_id?: string;
+          completed_at?: string | null;
+          completed_exercise_ids?: string[];
+          created_at?: string;
+          cycle_day?: number;
+          id?: string;
+          updated_at?: string;
+          workout_date?: string;
+          workout_plan_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_day_progress_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_day_progress_workout_plan_id_fkey";
+            columns: ["workout_plan_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_plans";
             referencedColumns: ["id"];
           },
         ];
@@ -826,7 +934,17 @@ export type Database = {
         };
         Returns: boolean;
       };
-      list_manageable_routine_identifiers: {
+      mark_all_notifications_read: {
+        Args: never;
+        Returns: number;
+      };
+      mark_notification_read: {
+        Args: {
+          p_notification_id: string;
+        };
+        Returns: string;
+      };
+      list_manageable_workout_template_identifiers: {
         Args: never;
         Returns: {
           id: string;
@@ -839,7 +957,6 @@ export type Database = {
           p_description: string;
           p_difficulty: string;
           p_exercises: Json;
-          p_identifier: string;
           p_is_active: boolean;
           p_name: string;
           p_routine_id: string | null;
@@ -852,6 +969,7 @@ export type Database = {
           p_cycle_days: number;
           p_days: Json;
           p_description: string;
+          p_identifier: string;
           p_is_active: boolean;
           p_name: string;
           p_template_id: string | null;

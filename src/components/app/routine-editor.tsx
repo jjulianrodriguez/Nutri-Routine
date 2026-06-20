@@ -5,10 +5,12 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
+  CheckCircle2,
   Dumbbell,
   Loader2,
   Save,
   Trash2,
+  TriangleAlert,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -41,6 +43,32 @@ const difficultyLabels = {
   beginner: "Principiante",
   intermediate: "Intermedio",
 } as const;
+
+const routineCategoryOptions = [
+  "Fuerza",
+  "Hipertrofia",
+  "Resistencia",
+  "Cardio",
+  "Movilidad",
+  "Tecnica",
+  "Recuperacion",
+  "Ganar masa muscular",
+  "Perdida de grasa",
+  "General",
+] as const;
+
+const routineTargetAudienceOptions = [
+  "General",
+  "Principiantes",
+  "Intermedio",
+  "Avanzado",
+  "Adultos",
+  "Adultos mayores",
+  "Deportistas",
+  "Postura y movilidad",
+  "Reacondicionamiento",
+  "Otro",
+] as const;
 
 const inputClasses =
   "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
@@ -92,6 +120,22 @@ function toFormExercise(
   };
 }
 
+function getRoutineSelectOptions(
+  options: readonly string[],
+  currentValue: string | undefined,
+) {
+  const normalizedCurrent = currentValue?.trim();
+
+  if (
+    normalizedCurrent &&
+    !options.some((option) => option === normalizedCurrent)
+  ) {
+    return [...options, normalizedCurrent];
+  }
+
+  return [...options];
+}
+
 function getDefaultValues(routine?: RoutineDetail): RoutineFormValues {
   return {
     category: routine?.category ?? "",
@@ -107,10 +151,32 @@ function getDefaultValues(routine?: RoutineDetail): RoutineFormValues {
           series: item.series,
         }),
       ) ?? [],
-    identifier: routine?.identifier ?? "",
     isActive: routine?.isActive ?? true,
     name: routine?.name ?? "",
     targetAudience: routine?.targetAudience ?? "General",
+  };
+}
+
+function getExerciseSetupState(
+  exercise: RoutineExerciseFormValues | undefined,
+) {
+  const missing = [];
+
+  if (!exercise?.series.trim()) {
+    missing.push("series");
+  }
+
+  if (!exercise?.repetitions.trim()) {
+    missing.push("repeticiones");
+  }
+
+  if (!exercise?.restValue.trim()) {
+    missing.push("descanso");
+  }
+
+  return {
+    isConfigured: missing.length === 0,
+    missing,
   };
 }
 
@@ -123,6 +189,35 @@ function FieldError({ message }: { message?: string }) {
     <p className="mt-2 text-sm font-semibold text-danger" role="alert">
       {message}
     </p>
+  );
+}
+
+function RoutineBuilderStat({
+  detail,
+  label,
+  tone = "neutral",
+  value,
+}: {
+  detail: string;
+  label: string;
+  tone?: "neutral" | "ready" | "warning";
+  value: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[18px] border p-4",
+        tone === "neutral" && "border-border bg-background",
+        tone === "ready" && "border-primary/40 bg-primary-soft/45",
+        tone === "warning" && "border-danger/25 bg-danger/5",
+      )}
+    >
+      <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
+        {label}
+      </p>
+      <p className="mt-2 text-3xl font-black text-charcoal">{value}</p>
+      <p className="mt-1 text-sm font-semibold text-warm-brown">{detail}</p>
+    </div>
   );
 }
 
@@ -150,6 +245,11 @@ export function RoutineEditor({
   const { append, fields, move, remove } = useFieldArray({
     control,
     name: "exercises",
+  });
+  const selectedCategory = useWatch({ control, name: "category" });
+  const selectedTargetAudience = useWatch({
+    control,
+    name: "targetAudience",
   });
   const watchedItems = useWatch({ control, name: "exercises" });
   const selectedItems = useMemo(() => watchedItems ?? [], [watchedItems]);
@@ -192,7 +292,7 @@ export function RoutineEditor({
           exercise.difficulty,
           exercise.category,
           exercise.exerciseType,
-          exercise.isActive ? "activo" : "inactivo",
+          exercise.isActive ? "activo" : "desactivado",
         ]
           .filter(Boolean)
           .join(" "),
@@ -200,11 +300,16 @@ export function RoutineEditor({
     });
   }, [exerciseQuery, listedExercises]);
   const exerciseResults = useProgressiveResults(filteredExercises, 10);
-  const inactiveSelected = selectedItems.some(
+  const inactiveSelectedCount = selectedItems.filter(
     (item) =>
       catalogExercises.find((exercise) => exercise.id === item.exerciseId)
         ?.isActive === false,
-  );
+  ).length;
+  const configuredExerciseCount = selectedItems.filter(
+    (item) => getExerciseSetupState(item).isConfigured,
+  ).length;
+  const pendingExerciseCount =
+    selectedItems.length - configuredExerciseCount;
 
   function updateExerciseQuery(value: string) {
     setExerciseQuery(value);
@@ -248,14 +353,6 @@ export function RoutineEditor({
   }
 
   async function onSubmit(values: RoutineFormValues) {
-    if (inactiveSelected) {
-      const message =
-        "Retira los ejercicios inactivos antes de guardar la rutina.";
-      setServerMessage(message);
-      toast.error(message);
-      return;
-    }
-
     if (routine) {
       setPendingUpdate(values);
       return;
@@ -276,7 +373,7 @@ export function RoutineEditor({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted">
-              {routine ? "Editar rutina" : "Nueva rutina"}
+              {routine ? "Editar entrenamiento" : "Nuevo entrenamiento"}
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-charcoal">
               Datos generales
@@ -307,37 +404,34 @@ export function RoutineEditor({
 
           <div>
             <Label
-              htmlFor="routine-identifier"
-              className="font-extrabold text-charcoal"
-            >
-              Identificador interno
-            </Label>
-            <Input
-              id="routine-identifier"
-              className={inputClasses}
-              aria-invalid={Boolean(errors.identifier)}
-              {...register("identifier")}
-            />
-            <p className="mt-2 text-xs leading-5 text-muted">
-              Opcional, unico y visible solo para profesionales.
-            </p>
-            <FieldError message={errors.identifier?.message} />
-          </div>
-
-          <div>
-            <Label
               htmlFor="routine-category"
               className="font-extrabold text-charcoal"
             >
               Categoria
             </Label>
-            <Input
+            <select
               id="routine-category"
-              className={inputClasses}
-              placeholder="Ej. Fuerza"
+              className={cn(inputClasses, "h-11 w-full")}
               aria-invalid={Boolean(errors.category)}
               {...register("category")}
-            />
+            >
+              <option value="" disabled>
+                Selecciona una categoria
+              </option>
+              {getRoutineSelectOptions(
+                routineCategoryOptions,
+                selectedCategory,
+              ).map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                  {!routineCategoryOptions.includes(
+                    option as (typeof routineCategoryOptions)[number],
+                  )
+                    ? " (valor existente)"
+                    : ""}
+                </option>
+              ))}
+            </select>
             <FieldError message={errors.category?.message} />
           </div>
 
@@ -368,16 +462,48 @@ export function RoutineEditor({
             >
               Publico objetivo
             </Label>
-            <Input
+            <select
               id="routine-audience"
-              className={inputClasses}
-              placeholder="Ej. Principiantes"
+              className={cn(inputClasses, "h-11 w-full")}
               aria-invalid={Boolean(errors.targetAudience)}
               {...register("targetAudience")}
-            />
+            >
+              <option value="" disabled>
+                Selecciona el publico objetivo
+              </option>
+              {getRoutineSelectOptions(
+                routineTargetAudienceOptions,
+                selectedTargetAudience,
+              ).map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                  {!routineTargetAudienceOptions.includes(
+                    option as (typeof routineTargetAudienceOptions)[number],
+                  )
+                    ? " (valor existente)"
+                    : ""}
+                </option>
+              ))}
+            </select>
             <FieldError message={errors.targetAudience?.message} />
           </div>
         </div>
+
+        {inactiveSelectedCount > 0 ? (
+          <Alert className="mt-5 rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-charcoal">
+            <TriangleAlert
+              className="size-5 text-warm-brown"
+              aria-hidden="true"
+            />
+            <AlertDescription className="font-semibold leading-6 text-charcoal">
+              {inactiveSelectedCount === 1
+                ? "Este entrenamiento contiene 1 ejercicio desactivado."
+                : `Este entrenamiento contiene ${inactiveSelectedCount} ejercicios desactivados.`}{" "}
+              Puedes conservarlos o quitarlos. Si los quitas, no podras volver
+              a agregarlos mientras sigan desactivados.
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
         <div className="mt-5">
           <Label
@@ -393,7 +519,7 @@ export function RoutineEditor({
               inputClasses,
               "w-full resize-y py-3 text-sm outline-none",
             )}
-            placeholder="Objetivo, recomendaciones y contexto de la rutina."
+            placeholder="Objetivo, recomendaciones y contexto del entrenamiento."
             aria-invalid={Boolean(errors.description)}
             {...register("description")}
           />
@@ -406,7 +532,7 @@ export function RoutineEditor({
             className="size-4 accent-[var(--primary)]"
             {...register("isActive")}
           />
-          Rutina activa
+          Entrenamiento activo
         </label>
       </section>
 
@@ -416,11 +542,11 @@ export function RoutineEditor({
             Constructor
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-charcoal">
-            Ejercicios de la rutina
+            Ejercicios del entrenamiento
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted">
             Agrega ejercicios de la biblioteca y define series, repeticiones,
-            descanso y notas. El orden de esta lista sera el orden de la rutina.
+            descanso y notas. El orden de esta lista sera el orden del entrenamiento.
           </p>
         </div>
 
@@ -451,6 +577,44 @@ export function RoutineEditor({
           </AssignmentEntitySelector>
         </div>
 
+        {selectedItems.length > 0 ? (
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <RoutineBuilderStat
+              label="Seleccionados"
+              value={String(selectedItems.length)}
+              detail="En el orden del entrenamiento"
+            />
+            <RoutineBuilderStat
+              label="Configurados"
+              value={String(configuredExerciseCount)}
+              detail="Con series, reps. y descanso"
+            />
+            <RoutineBuilderStat
+              label="Pendientes"
+              value={String(pendingExerciseCount)}
+              detail="Revisa antes de guardar"
+              tone={pendingExerciseCount > 0 ? "warning" : "ready"}
+            />
+          </div>
+        ) : null}
+
+        {pendingExerciseCount > 0 ? (
+          <Alert className="mt-4 rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-charcoal">
+            <TriangleAlert
+              className="size-5 text-warm-brown"
+              aria-hidden="true"
+            />
+            <AlertDescription className="font-semibold leading-6 text-charcoal">
+              Hay {pendingExerciseCount}{" "}
+              {pendingExerciseCount === 1
+                ? "ejercicio pendiente"
+                : "ejercicios pendientes"}{" "}
+              de series, repeticiones o descanso. No pierdes lo avanzado, pero
+              este resumen te ayuda a cerrar la configuracion antes de usarlo.
+            </AlertDescription>
+          </Alert>
+        ) : null}
+
         <div className="mt-5 space-y-4">
           {fields.length > 0 ? (
             fields.map((field, index) => {
@@ -458,6 +622,9 @@ export function RoutineEditor({
                 (exercise) => exercise.id === field.exerciseId,
               );
               const isInactive = sourceExercise && !sourceExercise.isActive;
+              const setupState = getExerciseSetupState(
+                selectedItems[index],
+              );
 
               return (
                 <article
@@ -508,9 +675,34 @@ export function RoutineEditor({
                         <Dumbbell className="size-4" aria-hidden="true" />
                       </div>
                       <div>
-                        <p className="text-xs font-extrabold uppercase tracking-wide text-muted">
-                          Ejercicio {index + 1}
-                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-xs font-extrabold uppercase tracking-wide text-muted">
+                            Ejercicio {index + 1}
+                          </p>
+                          <span
+                            className={cn(
+                              "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-extrabold",
+                              setupState.isConfigured
+                                ? "bg-primary-soft text-charcoal"
+                                : "bg-danger/10 text-danger",
+                            )}
+                          >
+                            {setupState.isConfigured ? (
+                              <CheckCircle2
+                                className="size-3.5"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <TriangleAlert
+                                className="size-3.5"
+                                aria-hidden="true"
+                              />
+                            )}
+                            {setupState.isConfigured
+                              ? "Configurado"
+                              : `Pendiente: ${setupState.missing.join(", ")}`}
+                          </span>
+                        </div>
                         <h3 className="mt-1 text-lg font-semibold text-charcoal">
                           {field.name}
                         </h3>
@@ -518,9 +710,15 @@ export function RoutineEditor({
                           {field.muscleGroup} - {field.exerciseType}
                         </p>
                         {isInactive ? (
-                          <p className="mt-2 text-sm font-semibold text-danger">
-                            Este ejercicio esta inactivo. Retiralo o reactivalo.
-                          </p>
+                          <div className="mt-2">
+                            <span className="inline-flex rounded-full bg-danger/10 px-2.5 py-1 text-xs font-extrabold text-danger">
+                              Desactivado
+                            </span>
+                            <p className="mt-2 text-sm font-semibold leading-6 text-muted">
+                              Se puede conservar en este entrenamiento, pero no
+                              esta disponible para nuevos entrenamientos.
+                            </p>
+                          </div>
                         ) : null}
                       </div>
                     </div>
@@ -657,7 +855,7 @@ export function RoutineEditor({
             <div className="rounded-[22px] border border-dashed border-border bg-background p-8 text-center">
               <Dumbbell className="mx-auto size-6 text-warm-brown" />
               <p className="mt-3 font-extrabold text-charcoal">
-                La rutina aun no tiene ejercicios.
+                El entrenamiento aun no tiene ejercicios.
               </p>
               <p className="mt-2 text-sm text-muted">
                 Selecciona al menos uno de la biblioteca.
@@ -691,7 +889,7 @@ export function RoutineEditor({
           ) : (
             <>
               <Save aria-hidden="true" />
-              {routine ? "Guardar cambios" : "Crear rutina"}
+              {routine ? "Guardar cambios" : "Crear entrenamiento"}
             </>
           )}
         </Button>
@@ -704,8 +902,8 @@ export function RoutineEditor({
             setPendingUpdate(null);
           }
         }}
-        title="Guardar cambios de la rutina"
-        description={`Se actualizará "${pendingUpdate?.name ?? routine?.name ?? "esta rutina"}" y la configuración de sus ejercicios.`}
+        title="Guardar cambios del entrenamiento"
+        description={`Se actualizará "${pendingUpdate?.name ?? routine?.name ?? "este entrenamiento"}" y la configuración de sus ejercicios.`}
         confirmLabel="Guardar cambios"
         pendingLabel="Guardando…"
         onConfirm={confirmUpdate}

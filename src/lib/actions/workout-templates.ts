@@ -82,13 +82,20 @@ async function getTrainingManagerContext() {
   };
 }
 
-function getSaveError(code?: string) {
+function getSaveError(code?: string, message?: string) {
   if (code === "42501") {
     return "No tienes permisos para gestionar plantillas.";
   }
 
   if (code === "23503") {
     return "Uno de los entrenamientos ya no está disponible.";
+  }
+
+  if (
+    code === "23505" &&
+    message?.includes("workout_templates_identifier_unique_idx")
+  ) {
+    return "Ese identificador ya está usado por otra plantilla.";
   }
 
   if (code === "23505") {
@@ -137,6 +144,7 @@ export async function saveWorkoutTemplate(
       p_cycle_days: Number(parsed.data.cycleDays),
       p_days: parsed.data.days satisfies Json[],
       p_description: parsed.data.description,
+      p_identifier: parsed.data.identifier,
       p_is_active: parsed.data.isActive,
       p_name: parsed.data.name,
       p_template_id: templateId,
@@ -145,7 +153,7 @@ export async function saveWorkoutTemplate(
 
   if (error || !data) {
     return {
-      message: getSaveError(error?.code),
+      message: getSaveError(error?.code, error?.message),
       status: "error",
     };
   }
@@ -264,6 +272,24 @@ export async function assignWorkoutTemplateToClient(
     };
   }
 
+  const { data: clientTrainingPlan, error: clientTrainingPlanError } =
+    await context.supabase
+      .from("client_profiles")
+      .select("assigned_trainer_id")
+      .eq("profile_id", parsed.data.clientId)
+      .maybeSingle();
+
+  if (
+    clientTrainingPlanError ||
+    !clientTrainingPlan?.assigned_trainer_id
+  ) {
+    return {
+      message:
+        "El cliente seleccionado no tiene un plan de entrenamiento activo.",
+      status: "error",
+    };
+  }
+
   const { data, error } = await context.supabase.rpc(
     "assign_workout_template_to_client",
     {
@@ -280,8 +306,9 @@ export async function assignWorkoutTemplateToClient(
     if (error?.code === "42501") {
       message = "Solo puedes asignar plantillas a clientes vinculados contigo.";
     } else if (error?.code === "23503") {
-      message =
-        "La plantilla está incompleta o contiene entrenamientos inactivos.";
+      message = error.message.includes("plan de entrenamiento activo")
+        ? "El cliente seleccionado no tiene un plan de entrenamiento activo."
+        : "La plantilla está incompleta o contiene entrenamientos inactivos.";
     } else if (error?.code === "P0002") {
       message = "La plantilla no existe o está inactiva.";
     }

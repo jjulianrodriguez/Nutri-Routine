@@ -173,7 +173,7 @@ function summarizeProgress(record: ProgressEntryRow): SectionRecord {
 }
 
 async function countAssignedClients(access: CurrentUserAccess) {
-  if (!access.isAdmin) {
+  if (!access.canManageClientPlans) {
     return 0;
   }
 

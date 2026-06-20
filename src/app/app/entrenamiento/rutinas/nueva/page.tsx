@@ -27,8 +27,8 @@ export default async function NewRoutinePage() {
   return (
     <AppScreen>
       <AppHeader
-        eyebrow="Nueva rutina"
-        title="Crear rutina de entrenamiento"
+        eyebrow="Nuevo entrenamiento"
+        title="Crear entrenamiento"
         description="Selecciona ejercicios de la biblioteca y configura su orden, series, repeticiones, descanso y notas."
       />
       <TrainingSectionNav active="routines" />
@@ -37,7 +37,7 @@ export default async function NewRoutinePage() {
       ) : (
         <AppPanel
           title="Primero crea ejercicios"
-          description="Las rutinas solo pueden construirse con ejercicios existentes."
+          description="Los entrenamientos solo pueden construirse con ejercicios existentes."
         >
           <EmptyState>
             La biblioteca esta vacia. Crea al menos un ejercicio antes de

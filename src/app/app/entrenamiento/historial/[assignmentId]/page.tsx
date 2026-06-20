@@ -15,7 +15,7 @@ import {
   AppScreen,
   EmptyState,
 } from "@/components/app/AppScreen";
-import { RoutineExerciseList } from "@/components/app/routine-exercise-list";
+import { WorkoutTemplateSnapshotView } from "@/components/app/workout-template-snapshot-view";
 import { Button } from "@/components/ui/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getRoutineAssignmentDetail } from "@/lib/routines/data";
@@ -23,18 +23,26 @@ import type {
   RoutineAssignmentState,
   RoutineDifficulty,
 } from "@/types/routine";
+import type { WorkoutTemplateSnapshot } from "@/types/workout-template";
 
 const assignmentStateLabels: Record<RoutineAssignmentState, string> = {
   active: "Vigente",
-  archived: "Finalizada",
+  archived: "Archivada",
   expired: "Vencida",
   upcoming: "Programada",
 };
 
+const assignmentStateTones = {
+  active: "active",
+  archived: "inactive",
+  expired: "warning",
+  upcoming: "neutral",
+} as const satisfies Record<RoutineAssignmentState, "active" | "inactive" | "neutral" | "warning">;
+
 const difficultyLabels: Record<RoutineDifficulty, string> = {
-  advanced: "Avanzada",
+  advanced: "Avanzado",
   beginner: "Principiante",
-  intermediate: "Intermedia",
+  intermediate: "Intermedio",
 };
 
 function formatDate(value: string | null) {
@@ -69,13 +77,33 @@ export default async function HistoricalRoutineDetailPage({
   }
 
   const { assignment, routine, routineSource, template } = detail;
+  const legacyRoutineSnapshot: WorkoutTemplateSnapshot | null =
+    !template && routine
+      ? {
+          days: [
+            {
+              dayNumber: 1,
+              routine,
+              weekday: null,
+            },
+          ],
+          template: {
+            cycleDays: 1,
+            description: assignment.description ?? routine.description,
+            id: assignment.id,
+            name: assignment.title,
+          },
+          version: 1,
+        }
+      : null;
+  const historicalSnapshot = template ?? legacyRoutineSnapshot;
   const historicalMessage = template
-    ? "Esta vista usa la copia guardada cuando se asigno la plantilla. Los cambios posteriores no alteran este historial."
+    ? "Esta es una copia historica de la plantilla asignada. Los cambios posteriores no alteran este historial."
     : routineSource === "snapshot"
-      ? "Esta vista usa la copia guardada cuando se asigno la rutina. Los cambios posteriores no alteran este historial."
+      ? "Esta es una copia historica del entrenamiento asignado. Los cambios posteriores no alteran este historial."
       : routineSource === "live"
-        ? "Esta asignacion antigua no tenia una copia guardada. Se muestra la version actual disponible."
-        : "No fue posible reconstruir el contenido original de esta asignacion.";
+        ? "Esta plantilla antigua no tenia una copia guardada. Se muestra la version actual disponible."
+        : "No fue posible reconstruir el contenido original de esta plantilla.";
 
   return (
     <AppScreen>
@@ -86,7 +114,7 @@ export default async function HistoricalRoutineDetailPage({
           assignment.description ||
           routine?.description ||
           template?.template.description ||
-          "Detalle de la rutina asignada."
+          "Detalle del plan de entrenamiento asignado."
         }
       />
 
@@ -128,6 +156,13 @@ export default async function HistoricalRoutineDetailPage({
             assignment.endDate,
           )}`}
         />
+        {assignment.completedDayCount > 0 ? (
+          <DetailValue
+            icon={ListChecks}
+            label="Dias completados"
+            value={String(assignment.completedDayCount)}
+          />
+        ) : null}
         {routine ? (
           <>
             <DetailValue
@@ -157,35 +192,16 @@ export default async function HistoricalRoutineDetailPage({
         ) : null}
       </section>
 
-      {routine ? (
-        <AppPanel
-          title="Ejercicios de la rutina"
-          description={`${routine.exercises.length} ejercicios en el orden definido para esta rutina.`}
-        >
-          <RoutineExerciseList
-            emptyMessage="Esta rutina historica no tiene ejercicios disponibles."
-            exercises={routine.exercises}
-          />
-        </AppPanel>
-      ) : template ? (
-        <div className="space-y-6">
-          {template.days.map((day) => (
-            <AppPanel
-              key={`${day.dayNumber}-${day.routine.id}`}
-              title={`Dia ${day.dayNumber}: ${day.routine.name}`}
-              description={day.routine.description}
-            >
-              <RoutineExerciseList
-                emptyMessage="Este dia no tiene ejercicios disponibles."
-                exercises={day.routine.exercises}
-              />
-            </AppPanel>
-          ))}
-        </div>
+      {historicalSnapshot ? (
+        <WorkoutTemplateSnapshotView
+          snapshot={historicalSnapshot}
+          statusLabel={assignmentStateLabels[assignment.state]}
+          statusTone={assignmentStateTones[assignment.state]}
+        />
       ) : (
         <AppPanel
           title="Detalle historico"
-          description="La asignacion se conserva, pero su contenido original no pudo recuperarse."
+          description="La plantilla se conserva, pero su contenido original no pudo recuperarse."
         >
           <EmptyState>Informacion historica no disponible.</EmptyState>
         </AppPanel>

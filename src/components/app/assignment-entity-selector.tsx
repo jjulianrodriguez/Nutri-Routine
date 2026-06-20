@@ -26,9 +26,9 @@ import type {
 import type { AssignableWorkoutTemplate } from "@/types/workout-template";
 
 const difficultyLabels: Record<RoutineDifficulty, string> = {
-  advanced: "Avanzada",
+  advanced: "Avanzado",
   beginner: "Principiante",
-  intermediate: "Intermedia",
+  intermediate: "Intermedio",
 };
 
 export function AssignmentEntitySelector({
@@ -182,8 +182,15 @@ export function ClientSearchCard({
             </div>
 
             <p className="mt-3 text-xs font-bold text-warm-brown">
+              Plan de entrenamiento activo
+            </p>
+            <p className="mt-1 truncate text-xs font-semibold text-muted">
+              Profesional:{" "}
+              {client.assignedTrainerName ?? "No asignado"}
+            </p>
+            <p className="mt-2 text-xs font-bold text-warm-brown">
               {client.currentAssignment
-                ? `Plan actual: ${client.currentAssignment.title}`
+                ? `Plantilla actual: ${client.currentAssignment.title}`
                 : "Sin plantilla activa"}
             </p>
           </div>
@@ -260,11 +267,6 @@ export function RoutineSearchCard({
               {routine.description}
             </p>
 
-            {routine.identifier ? (
-              <p className="mt-3 w-fit max-w-full truncate rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
-                ID: {routine.identifier}
-              </p>
-            ) : null}
           </div>
         </div>
       </Link>
@@ -341,6 +343,11 @@ export function WorkoutTemplateSearchCard({
             <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted">
               {template.description || "Sin descripción adicional."}
             </p>
+            {template.identifier ? (
+              <p className="mt-3 w-fit max-w-full truncate rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                ID: {template.identifier}
+              </p>
+            ) : null}
           </div>
         </div>
       </Link>
@@ -425,7 +432,7 @@ export function ExerciseSearchCard({
                       : "bg-danger/10 text-danger",
                   )}
                 >
-                  {exercise.isActive ? "Activo" : "Inactivo"}
+                  {exercise.isActive ? "Activo" : "Desactivado"}
                 </span>
                 <ChevronRight
                   className="size-4 text-muted transition group-hover:translate-x-0.5 group-hover:text-charcoal"

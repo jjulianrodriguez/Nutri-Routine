@@ -15,11 +15,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 import { CardActionsMenu } from "@/components/app/card-actions-menu";
+import { BlogRichTextEditor } from "@/components/app/blog-rich-text-editor";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
@@ -33,6 +34,7 @@ import {
   updateBlogVisibility,
   type BlogActionResult,
 } from "@/lib/actions/blog";
+import { getEditableBlogContent } from "@/lib/blog/content";
 import type { AdminBlogPost } from "@/lib/blog/admin-posts";
 import {
   blogPostValuesSchema,
@@ -40,7 +42,8 @@ import {
 } from "@/lib/validations/blog";
 
 type BlogManagerProps = {
-  initialPosts: AdminBlogPost[];
+  initialPosts?: AdminBlogPost[];
+  mode?: "create" | "manage";
 };
 
 type BlogConfirmation =
@@ -73,7 +76,10 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
-export function BlogManager({ initialPosts }: BlogManagerProps) {
+export function BlogManager({
+  initialPosts = [],
+  mode = "manage",
+}: BlogManagerProps) {
   const router = useRouter();
   const formRef = useRef<HTMLDivElement>(null);
   const [editingPost, setEditingPost] = useState<AdminBlogPost | null>(null);
@@ -89,6 +95,7 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
     reset,
     setError,
     setValue,
+    trigger,
   } = useForm<BlogPostValues>({
     defaultValues: {
       category: "Bienestar",
@@ -100,6 +107,15 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
     resolver: zodResolver(blogPostValuesSchema),
   });
   const isPinned = useWatch({ control, name: "isPinned" });
+  const contentValue = useWatch({ control, name: "content" });
+  const isManageMode = mode === "manage";
+  const showEditor = mode === "create" || Boolean(editingPost);
+
+  useEffect(() => {
+    if (editingPost) {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [editingPost]);
 
   function startEditing(post: AdminBlogPost) {
     setEditingPost(post);
@@ -107,12 +123,11 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
     clearErrors();
     reset({
       category: post.category,
-      content: post.content,
+      content: getEditableBlogContent(post.content),
       isPinned: post.is_pinned,
       published: post.published,
       title: post.title,
     });
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function clearForm() {
@@ -269,11 +284,21 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
             : "Anclar";
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] xl:items-start">
-      <div
-        ref={formRef}
-        className="scroll-mt-6 rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6"
-      >
+    <div
+      className={[
+        "grid gap-6",
+        showEditor && isManageMode
+          ? "xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] xl:items-start"
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {showEditor ? (
+        <div
+          ref={formRef}
+          className="scroll-mt-6 rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6"
+        >
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
@@ -359,19 +384,39 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
               Contenido
             </Label>
             <p className="mt-2 text-sm leading-6 text-muted">
-              Solo texto. Separa parrafos dejando una linea en blanco.
+              Escribe y da formato al contenido sin tocar codigo ni Markdown.
             </p>
-            <textarea
-              id="blog-content"
-              rows={16}
-              maxLength={50000}
-              className="mt-3 w-full resize-y rounded-[22px] border border-input bg-surface/90 px-4 py-4 text-base leading-7 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 disabled:opacity-50"
-              aria-describedby={
-                errors.content ? "blog-content-error" : undefined
-              }
-              aria-invalid={Boolean(errors.content)}
-              {...register("content")}
-            />
+            <input type="hidden" {...register("content")} />
+            <div className="mt-3">
+              <BlogRichTextEditor
+                id="blog-content"
+                describedBy={[
+                  "blog-content-help",
+                  errors.content ? "blog-content-error" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                disabled={isSubmitting}
+                error={Boolean(errors.content)}
+                value={contentValue ?? ""}
+                onBlur={() => {
+                  void trigger("content");
+                }}
+                onChange={(nextContent) => {
+                  setValue("content", nextContent, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: Boolean(errors.content),
+                  });
+                }}
+              />
+            </div>
+            <p
+              id="blog-content-help"
+              className="mt-2 text-sm leading-6 text-muted"
+            >
+              Usa la vista previa para revisar como se vera publicado.
+            </p>
             <FieldError
               id="blog-content-error"
               message={errors.content?.message}
@@ -456,9 +501,11 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
             )}
           </Button>
         </form>
-      </div>
+        </div>
+      ) : null}
 
-      <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+      {isManageMode ? (
+        <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
@@ -573,7 +620,8 @@ export function BlogManager({ initialPosts }: BlogManagerProps) {
             </p>
           </div>
         )}
-      </section>
+        </section>
+      ) : null}
 
       <ConfirmationDialog
         open={Boolean(confirmation)}

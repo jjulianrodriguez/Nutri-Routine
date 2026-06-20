@@ -1,20 +1,18 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { Manrope, Sora } from "next/font/google";
 
 import { Providers } from "./providers";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
+const display = Sora({
   subsets: ["latin"],
-  variable: "--font-cormorant",
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  variable: "--font-display",
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-manrope",
   display: "swap",
 });
 
@@ -33,7 +31,7 @@ export default function RootLayout({
     <html
       lang="es"
       data-scroll-behavior="smooth"
-      className={`${cormorant.variable} ${dmSans.variable}`}
+      className={`${display.variable} ${manrope.variable}`}
     >
       <body>
         <Providers>{children}</Providers>

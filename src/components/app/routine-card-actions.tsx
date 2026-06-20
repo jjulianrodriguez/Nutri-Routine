@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  ClipboardCheck,
   Eye,
+  Layers3,
   Pencil,
   Power,
   PowerOff,
@@ -65,9 +65,9 @@ export function RoutineCardActions({
           ...(isActive
             ? [
                 {
-                  href: `/app/entrenamiento/asignaciones?routine=${routineId}`,
-                  icon: ClipboardCheck,
-                  label: "Asignar rutina",
+                  href: `/app/entrenamiento/plantillas/nueva?training=${routineId}`,
+                  icon: Layers3,
+                  label: "Usar en plantilla",
                 },
               ]
             : []),
@@ -101,14 +101,14 @@ export function RoutineCardActions({
         }
         description={
           confirmation === "delete"
-            ? "La rutina se eliminara definitivamente. Sus asignaciones existentes quedaran archivadas."
+            ? "El entrenamiento se eliminara definitivamente. Las plantillas que lo utilizan impediran la eliminacion."
             : isActive
-              ? "La rutina dejara de estar disponible para nuevas asignaciones."
-              : "La rutina volvera a estar disponible para nuevas asignaciones."
+              ? "El entrenamiento dejara de estar disponible para nuevas plantillas."
+              : "El entrenamiento volvera a estar disponible para nuevas plantillas."
         }
         confirmLabel={
           confirmation === "delete"
-            ? "Eliminar rutina"
+            ? "Eliminar entrenamiento"
             : isActive
               ? "Desactivar"
               : "Activar"

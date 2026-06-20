@@ -14,7 +14,7 @@ export type RoutineListItem = {
   difficulty: RoutineDifficulty;
   exerciseCount: number;
   id: string;
-  identifier: string | null;
+  inactiveExerciseCount: number;
   isActive: boolean;
   name: string;
   targetAudience: string;
@@ -41,7 +41,6 @@ export type RoutineDetail = {
   difficulty: RoutineDifficulty;
   exercises: RoutineExerciseDetail[];
   id: string;
-  identifier: string | null;
   isActive: boolean;
   name: string;
   targetAudience: string;
@@ -62,6 +61,7 @@ export type RoutineAssignmentState =
 
 export type RoutineAssignmentSummary = {
   assignmentType: "legacy-training" | "template";
+  completedDayCount: number;
   createdAt: string;
   daysRemaining: number | null;
   description: string | null;
@@ -76,6 +76,15 @@ export type RoutineAssignmentSummary = {
   title: string;
 };
 
+export type WorkoutDayProgressSummary = {
+  completedAt: string | null;
+  completedExerciseIds: string[];
+  cycleDay: number;
+  id: string;
+  workoutDate: string;
+  workoutPlanId: string;
+};
+
 export type RoutineAssignmentDetail = {
   assignment: RoutineAssignmentSummary;
   routine: RoutineDetail | null;
@@ -88,16 +97,17 @@ export type AssignableRoutine = {
   description: string;
   difficulty: RoutineDifficulty;
   id: string;
-  identifier: string | null;
   name: string;
 };
 
 export type AssignableTrainingClient = {
+  assignedTrainerName: string | null;
   avatarUrl: string | null;
   contact: string | null;
   currentAssignment: RoutineAssignmentSummary | null;
   id: string;
   name: string;
+  trainingPlanStatus: "active";
 };
 
 export type ClientTrainingOverview = {
@@ -105,4 +115,6 @@ export type ClientTrainingOverview = {
   currentRoutine: RoutineDetail | null;
   currentTemplate: WorkoutTemplateSnapshot | null;
   history: RoutineAssignmentSummary[];
+  progress: WorkoutDayProgressSummary[];
+  today: string;
 };

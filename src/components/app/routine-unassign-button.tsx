@@ -55,7 +55,7 @@ export function RoutineUnassignButton({
         open={isConfirming}
         onOpenChange={setIsConfirming}
         title="Desasignar plantilla"
-        description={`Se desasignará "${assignmentName}" de ${clientName}. La asignación quedará archivada en su historial.`}
+        description={`Se desasignara "${assignmentName}" de ${clientName}. El cliente dejara de verla como plantilla actual y la asignacion quedara archivada en su historial.`}
         confirmLabel="Desasignar"
         pendingLabel="Desasignando…"
         tone="destructive"

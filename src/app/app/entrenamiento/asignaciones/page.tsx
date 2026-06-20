@@ -17,11 +17,12 @@ import {
 import { WorkoutTemplateAssignmentForm } from "@/components/app/routine-assignment-form";
 import { RoutineUnassignButton } from "@/components/app/routine-unassign-button";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
   listAssignableTrainingClients,
 } from "@/lib/routines/data";
-import { listAssignableWorkoutTemplates } from "@/lib/workout-templates/data";
+import { listAssignableWorkoutTemplatesWithMeta } from "@/lib/workout-templates/data";
 import { cn } from "@/lib/utils";
 import type {
   RoutineAssignmentState,
@@ -83,11 +84,12 @@ export default async function RoutineAssignmentsPage({
     redirect("/app/entrenamiento");
   }
 
-  const [clients, templates, query] = await Promise.all([
+  const [clients, templateResult, query] = await Promise.all([
     listAssignableTrainingClients(access),
-    listAssignableWorkoutTemplates(),
+    listAssignableWorkoutTemplatesWithMeta(),
     searchParams,
   ]);
+  const { templates, warning } = templateResult;
   const requestedTemplateId =
     typeof query.template === "string" ? query.template : "";
   const requestedClientId =
@@ -119,14 +121,22 @@ export default async function RoutineAssignmentsPage({
 
       <TrainingSectionNav active="assignments" />
 
+      {warning ? (
+        <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">
+          <AlertDescription className="font-semibold text-warm-brown">
+            {warning}
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <section className="grid gap-4 sm:grid-cols-3">
         <StatTile
           label="Clientes disponibles"
           value={String(clients.length)}
           detail={
             access.role === "admin"
-              ? "Todas las cuentas cliente"
-              : "Vinculados con entrenamiento"
+              ? "Con plan de entrenamiento activo"
+              : "Vinculados con entrenamiento activo"
           }
         />
         <StatTile
@@ -165,7 +175,13 @@ export default async function RoutineAssignmentsPage({
       >
         {clients.length === 0 ? (
           <EmptyState>
-            No hay clientes de entrenamiento vinculados con tu cuenta.
+            <span className="block">
+              No hay clientes con plan de entrenamiento activo.
+            </span>
+            <span className="mt-1 block">
+              Activa el plan de entrenamiento de un cliente antes de asignarle
+              una plantilla.
+            </span>
           </EmptyState>
         ) : (
           <div className="grid gap-4 lg:grid-cols-2">
@@ -189,6 +205,11 @@ export default async function RoutineAssignmentsPage({
                         <h2 className="truncate text-xl font-semibold text-charcoal">
                           {client.name}
                         </h2>
+                        {client.contact ? (
+                          <p className="mt-1 truncate text-sm font-semibold text-muted">
+                            {client.contact}
+                          </p>
+                        ) : null}
                       </div>
                     </div>
                     <span
@@ -207,6 +228,26 @@ export default async function RoutineAssignmentsPage({
                         ? stateLabels[assignment.state]
                         : "Sin plantilla"}
                     </span>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-2">
+                    <div>
+                      <p className="text-xs font-extrabold uppercase tracking-wide text-muted">
+                        Plan de entrenamiento
+                      </p>
+                      <p className="mt-1 text-sm font-extrabold text-charcoal">
+                        Activo
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-extrabold uppercase tracking-wide text-muted">
+                        Profesional asignado
+                      </p>
+                      <p className="mt-1 truncate text-sm font-extrabold text-charcoal">
+                        {client.assignedTrainerName ??
+                          "Profesional en entrenamiento"}
+                      </p>
+                    </div>
                   </div>
 
                   {assignment ? (

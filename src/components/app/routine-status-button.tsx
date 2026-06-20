@@ -62,11 +62,13 @@ export function RoutineStatusButton({
       <ConfirmationDialog
         open={isConfirming}
         onOpenChange={setIsConfirming}
-        title={isActive ? "Desactivar rutina" : "Activar rutina"}
+        title={
+          isActive ? "Desactivar entrenamiento" : "Activar entrenamiento"
+        }
         description={
           isActive
-            ? `"${routineName}" dejará de estar disponible para nuevas asignaciones.`
-            : `"${routineName}" volverá a estar disponible para asignaciones.`
+            ? `"${routineName}" dejará de estar disponible para nuevas plantillas.`
+            : `"${routineName}" volverá a estar disponible para plantillas.`
         }
         confirmLabel={isActive ? "Desactivar" : "Activar"}
         pendingLabel={isActive ? "Desactivando…" : "Activando…"}

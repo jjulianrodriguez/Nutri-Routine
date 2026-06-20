@@ -2,7 +2,6 @@ import {
   ArrowRight,
   CalendarClock,
   CalendarDays,
-  Layers3,
   Plus,
   UserRound,
 } from "lucide-react";
@@ -19,8 +18,9 @@ import {
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
 import { WorkoutTemplateActions } from "@/components/app/workout-template-actions";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
-import { listWorkoutTemplates } from "@/lib/workout-templates/data";
+import { listWorkoutTemplatesWithMeta } from "@/lib/workout-templates/data";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("es-CR", {
@@ -37,8 +37,11 @@ export default async function WorkoutTemplatesPage() {
     redirect("/app/entrenamiento");
   }
 
-  const templates = await listWorkoutTemplates();
+  const { templates, warning } = await listWorkoutTemplatesWithMeta();
   const activeCount = templates.filter((template) => template.isActive).length;
+  const incompleteCount = templates.filter(
+    (template) => !template.isComplete,
+  ).length;
   const averageDays =
     templates.length > 0
       ? Math.round(
@@ -59,6 +62,14 @@ export default async function WorkoutTemplatesPage() {
 
       <TrainingSectionNav active="templates" />
 
+      {warning ? (
+        <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">
+          <AlertDescription className="font-semibold text-warm-brown">
+            {warning}
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <div className="flex justify-end">
         <Button asChild size="lg">
           <Link href="/app/entrenamiento/plantillas/nueva">
@@ -68,7 +79,7 @@ export default async function WorkoutTemplatesPage() {
         </Button>
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           label="Plantillas"
           value={String(templates.length)}
@@ -78,6 +89,11 @@ export default async function WorkoutTemplatesPage() {
           label="Plantillas activas"
           value={String(activeCount)}
           detail="Disponibles para asignar"
+        />
+        <StatTile
+          label="Incompletas"
+          value={String(incompleteCount)}
+          detail="Con dias pendientes"
         />
         <StatTile
           label="Duración promedio"
@@ -111,6 +127,11 @@ export default async function WorkoutTemplatesPage() {
                       <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
                         Ciclo de {template.cycleDays} días
                       </span>
+                      {template.identifier ? (
+                        <span className="max-w-full truncate rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-charcoal">
+                          ID: {template.identifier}
+                        </span>
+                      ) : null}
                       <span
                         className={
                           template.isActive
@@ -120,6 +141,14 @@ export default async function WorkoutTemplatesPage() {
                       >
                         {template.isActive ? "Activa" : "Inactiva"}
                       </span>
+                      {!template.isComplete ? (
+                        <span className="rounded-full bg-danger/10 px-3 py-1 text-xs font-extrabold text-danger">
+                          Incompleta: {template.missingDayCount}{" "}
+                          {template.missingDayCount === 1
+                            ? "dia pendiente"
+                            : "dias pendientes"}
+                        </span>
+                      ) : null}
                     </div>
                     <h2 className="mt-4 text-2xl font-semibold text-charcoal">
                       {template.name}
@@ -143,7 +172,7 @@ export default async function WorkoutTemplatesPage() {
                 <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 border-t border-border pt-4 text-sm text-muted">
                   <span className="inline-flex items-center gap-2">
                     <CalendarDays className="size-4" aria-hidden="true" />
-                    {template.cycleDays} días
+                    {template.assignedDayCount}/{template.cycleDays} dias
                   </span>
                   <span className="inline-flex items-center gap-2">
                     <UserRound className="size-4" aria-hidden="true" />

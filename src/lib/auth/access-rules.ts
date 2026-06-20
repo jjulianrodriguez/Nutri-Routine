@@ -8,6 +8,7 @@ export type AppRouteKind =
   | "progress"
   | "clients"
   | "nutrition"
+  | "notifications"
   | "pending"
   | "professionalAccounts"
   | "training"
@@ -21,6 +22,7 @@ export type AppNavIcon =
   | "progress"
   | "clients"
   | "nutrition"
+  | "notifications"
   | "training"
   | "resources"
   | "calendar"
@@ -72,6 +74,7 @@ const ROUTE_PATHS: Record<AppRouteKind, string> = {
   clients: "/app/clientes",
   dashboard: "/app/dashboard",
   nutrition: "/app/nutricion",
+  notifications: "/app/notificaciones",
   pending: "/app/pending",
   profile: "/app/perfil",
   professionalAccounts: "/app/configuracion/profesionales",
@@ -108,7 +111,10 @@ export function buildNavigationForUser(
   if (access.canAccessOnlyBasicSettings) {
     return [
       {
-        items: [item("settings", "settings", "Configuracion")],
+        items: [
+          item("notifications", "notifications", "Notificaciones"),
+          item("settings", "settings", "Configuracion"),
+        ],
         label: "Cuenta",
       },
     ];
@@ -136,6 +142,7 @@ export function buildNavigationForUser(
       },
       {
         items: [
+          item("notifications", "notifications", "Notificaciones"),
           item("resources", "resources", "Recursos"),
           item("calendar", "calendar", "Calendario"),
         ],
@@ -175,6 +182,7 @@ export function buildNavigationForUser(
     },
     {
       items: [
+        item("notifications", "notifications", "Notificaciones"),
         item("resources", "resources", "Recursos"),
         item("calendar", "calendar", "Calendario"),
       ],
@@ -239,7 +247,7 @@ export function canAccessRoute(
   }
 
   if (access.canAccessOnlyBasicSettings) {
-    return route === "settings";
+    return route === "notifications" || route === "settings";
   }
 
   if (access.isClient && !access.isClientActivated) {
@@ -250,6 +258,7 @@ export function canAccessRoute(
     case "dashboard":
     case "resources":
     case "calendar":
+    case "notifications":
     case "settings":
       return true;
     case "pending":

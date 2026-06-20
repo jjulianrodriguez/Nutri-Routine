@@ -5,9 +5,9 @@ import {
   ArrowLeft,
   CalendarDays,
   CheckCircle2,
-  Layers3,
   Loader2,
   Save,
+  TriangleAlert,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -31,6 +31,7 @@ import {
   workoutTemplateFormSchema,
   type WorkoutTemplateFormValues,
 } from "@/lib/validations/workout-templates";
+import { WORKOUT_WEEKDAYS } from "@/lib/workout-templates/weekdays";
 import { cn } from "@/lib/utils";
 import type { RoutineListItem } from "@/types/routine";
 import type { WorkoutTemplateDetail } from "@/types/workout-template";
@@ -55,8 +56,10 @@ function getDefaultValues(
       days: template.days.map((day) => ({
         dayNumber: day.dayNumber,
         routineId: day.routine.id,
+        weekday: day.weekday ?? "",
       })),
       description: template.description ?? "",
+      identifier: template.identifier ?? "",
       isActive: template.isActive,
       name: template.name,
     };
@@ -67,8 +70,10 @@ function getDefaultValues(
     days: Array.from({ length: 7 }, (_, index) => ({
       dayNumber: index + 1,
       routineId: index === 0 ? defaultRoutineId ?? "" : "",
+      weekday: "",
     })),
     description: "",
+    identifier: "",
     isActive: true,
     name: "",
   };
@@ -108,10 +113,18 @@ export function WorkoutTemplateEditor({
     resolver: zodResolver(workoutTemplateFormSchema),
   });
   const cycleDaysValue = useWatch({ control, name: "cycleDays" });
-  const watchedDays = useWatch({ control, name: "days" }) ?? [];
+  const watchedDaysValue = useWatch({ control, name: "days" });
+  const watchedDays = useMemo(
+    () => watchedDaysValue ?? [],
+    [watchedDaysValue],
+  );
   const cycleDays = Number(cycleDaysValue);
+  const effectiveActiveDay =
+    Number.isInteger(cycleDays) && cycleDays >= 1
+      ? Math.min(activeDay, cycleDays)
+      : 1;
   const selectedForActiveDay = watchedDays.find(
-    (day) => day.dayNumber === activeDay,
+    (day) => day.dayNumber === effectiveActiveDay,
   )?.routineId;
   const selectedIds = useMemo(
     () => new Set(watchedDays.map((day) => day.routineId).filter(Boolean)),
@@ -144,6 +157,14 @@ export function WorkoutTemplateEditor({
     );
   }, [availableRoutines, query]);
   const results = useProgressiveResults(filteredRoutines, 5);
+  const completedDayCount = watchedDays.filter((day) =>
+    Boolean(day.routineId),
+  ).length;
+  const pendingDayCount = Math.max(
+    (Number.isInteger(cycleDays) ? cycleDays : watchedDays.length) -
+      completedDayCount,
+    0,
+  );
 
   useEffect(() => {
     if (!Number.isInteger(cycleDays) || cycleDays < 1 || cycleDays > 31) {
@@ -158,17 +179,14 @@ export function WorkoutTemplateEditor({
           (day) => day.dayNumber === dayNumber,
         );
 
-        return existing ?? { dayNumber, routineId: "" };
+        return existing ?? { dayNumber, routineId: "", weekday: "" };
       }),
       { shouldDirty: true, shouldValidate: false },
     );
 
-    if (activeDay > cycleDays) {
-      setActiveDay(cycleDays);
-    }
     // watchedDays is intentionally excluded to avoid rebuilding on selection.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeDay, cycleDays, setValue]);
+  }, [cycleDays, setValue]);
 
   function updateQuery(value: string) {
     setQuery(value);
@@ -185,7 +203,7 @@ export function WorkoutTemplateEditor({
     setValue(
       "days",
       watchedDays.map((day) =>
-        day.dayNumber === activeDay
+        day.dayNumber === effectiveActiveDay
           ? {
               ...day,
               routineId:
@@ -251,7 +269,7 @@ export function WorkoutTemplateEditor({
           </Button>
         </div>
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(10rem,0.35fr)]">
+        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)_minmax(10rem,0.35fr)]">
           <div>
             <Label
               htmlFor="template-name"
@@ -267,6 +285,25 @@ export function WorkoutTemplateEditor({
               {...register("name")}
             />
             <FieldError message={errors.name?.message} />
+          </div>
+
+          <div>
+            <Label
+              htmlFor="template-identifier"
+              className="font-extrabold text-charcoal"
+            >
+              Identificador interno
+            </Label>
+            <Input
+              id="template-identifier"
+              className={inputClasses}
+              aria-invalid={Boolean(errors.identifier)}
+              {...register("identifier")}
+            />
+            <p className="mt-2 text-xs leading-5 text-muted">
+              Opcional, único y visible solo para profesionales.
+            </p>
+            <FieldError message={errors.identifier?.message} />
           </div>
 
           <div>
@@ -337,12 +374,50 @@ export function WorkoutTemplateEditor({
           </div>
         </div>
 
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <TemplateCompletionStat
+            label="Dias del ciclo"
+            value={String(Number.isInteger(cycleDays) ? cycleDays : 0)}
+            detail="Total configurado"
+          />
+          <TemplateCompletionStat
+            label="Completos"
+            value={String(completedDayCount)}
+            detail="Con entrenamiento asignado"
+            tone="ready"
+          />
+          <TemplateCompletionStat
+            label="Pendientes"
+            value={String(pendingDayCount)}
+            detail="Faltan antes de guardar"
+            tone={pendingDayCount > 0 ? "warning" : "ready"}
+          />
+        </div>
+
+        {pendingDayCount > 0 ? (
+          <Alert className="mt-4 rounded-[18px] border-danger/25 bg-danger/5 px-4 py-3">
+            <TriangleAlert className="size-5 text-danger" aria-hidden="true" />
+            <AlertDescription className="font-semibold leading-6 text-danger">
+              Completa {pendingDayCount}{" "}
+              {pendingDayCount === 1 ? "dia pendiente" : "dias pendientes"}{" "}
+              antes de guardar. Cada dia del ciclo necesita un entrenamiento
+              asignado.
+            </AlertDescription>
+          </Alert>
+        ) : null}
+
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {watchedDays.map((day) => {
             const routine = routines.find(
               (item) => item.id === day.routineId,
             );
-            const isSelected = activeDay === day.dayNumber;
+            const isSelected = effectiveActiveDay === day.dayNumber;
+            const configuredByAnotherDay = new Set(
+              watchedDays
+                .filter((item) => item.dayNumber !== day.dayNumber)
+                .map((item) => item.weekday)
+                .filter(Boolean),
+            );
 
             return (
               <article
@@ -366,9 +441,32 @@ export function WorkoutTemplateEditor({
                 />
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
-                      Día {day.dayNumber}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
+                        Dia {day.dayNumber}
+                      </p>
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-extrabold",
+                          routine
+                            ? "bg-primary-soft text-charcoal"
+                            : "bg-danger/10 text-danger",
+                        )}
+                      >
+                        {routine ? (
+                          <CheckCircle2
+                            className="size-3.5"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <TriangleAlert
+                            className="size-3.5"
+                            aria-hidden="true"
+                          />
+                        )}
+                        {routine ? "Listo" : "Pendiente"}
+                      </span>
+                    </div>
                     <h3 className="mt-2 break-words font-extrabold text-charcoal">
                       {routine?.name ?? "Sin entrenamiento"}
                     </h3>
@@ -389,6 +487,41 @@ export function WorkoutTemplateEditor({
                       <X aria-hidden="true" />
                     </Button>
                   ) : null}
+                </div>
+                <div className="mt-4">
+                  <Label
+                    htmlFor={`template-day-${day.dayNumber}-weekday`}
+                    className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted"
+                  >
+                    Día específico
+                  </Label>
+                  <select
+                    id={`template-day-${day.dayNumber}-weekday`}
+                    className={cn(
+                      inputClasses,
+                      "min-h-11 w-full appearance-none pr-10 text-sm font-semibold text-charcoal outline-none",
+                    )}
+                    aria-invalid={Boolean(
+                      errors.days?.[day.dayNumber - 1]?.weekday,
+                    )}
+                    {...register(`days.${day.dayNumber - 1}.weekday`)}
+                  >
+                    <option value="">Sin día específico</option>
+                    {WORKOUT_WEEKDAYS.map((option) => (
+                      <option
+                        key={option.value}
+                        value={option.value}
+                        disabled={configuredByAnotherDay.has(option.value)}
+                      >
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <FieldError
+                    message={
+                      errors.days?.[day.dayNumber - 1]?.weekday?.message
+                    }
+                  />
                 </div>
                 <Button
                   type="button"
@@ -414,7 +547,7 @@ export function WorkoutTemplateEditor({
         <div className="mt-6">
           <AssignmentEntitySelector
             id="template-training-search"
-            label={`Entrenamiento para el día ${activeDay}`}
+            label={`Entrenamiento para el día ${effectiveActiveDay}`}
             query={query}
             onQueryChange={updateQuery}
             resultCount={filteredRoutines.length}
@@ -449,7 +582,11 @@ export function WorkoutTemplateEditor({
         <Button asChild type="button" variant="outline" size="lg">
           <Link href="/app/entrenamiento/plantillas">Cancelar</Link>
         </Button>
-        <Button type="submit" size="lg" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          size="lg"
+          disabled={isSubmitting || pendingDayCount > 0}
+        >
           {isSubmitting ? (
             <Loader2 className="animate-spin" aria-hidden="true" />
           ) : template ? (
@@ -483,5 +620,34 @@ export function WorkoutTemplateEditor({
         }}
       />
     </form>
+  );
+}
+
+function TemplateCompletionStat({
+  detail,
+  label,
+  tone = "neutral",
+  value,
+}: {
+  detail: string;
+  label: string;
+  tone?: "neutral" | "ready" | "warning";
+  value: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[18px] border p-4",
+        tone === "neutral" && "border-border bg-background",
+        tone === "ready" && "border-primary/40 bg-primary-soft/45",
+        tone === "warning" && "border-danger/25 bg-danger/5",
+      )}
+    >
+      <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
+        {label}
+      </p>
+      <p className="mt-2 text-3xl font-black text-charcoal">{value}</p>
+      <p className="mt-1 text-sm font-semibold text-warm-brown">{detail}</p>
+    </div>
   );
 }

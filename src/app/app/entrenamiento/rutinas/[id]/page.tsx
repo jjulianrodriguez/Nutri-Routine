@@ -1,12 +1,9 @@
 import {
   ArrowLeft,
   CalendarDays,
-  ClipboardCheck,
-  Clock3,
-  Dumbbell,
+  Layers3,
   Pencil,
-  Repeat2,
-  TimerReset,
+  TriangleAlert,
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
@@ -19,17 +16,19 @@ import {
   EmptyState,
 } from "@/components/app/AppScreen";
 import { DeleteRoutineButton } from "@/components/app/delete-routine-button";
+import { GroupedRoutineExercises } from "@/components/app/grouped-routine-exercises";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import { WorkoutExerciseCard } from "@/components/app/workout-exercise-card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getRoutineDetail } from "@/lib/routines/data";
-import { formatRestTime } from "@/lib/routines/format";
 import type { RoutineDifficulty } from "@/types/routine";
 
 const difficultyLabels: Record<RoutineDifficulty, string> = {
-  advanced: "Avanzada",
+  advanced: "Avanzado",
   beginner: "Principiante",
-  intermediate: "Intermedia",
+  intermediate: "Intermedio",
 };
 
 function formatDate(value: string) {
@@ -58,56 +57,62 @@ export default async function RoutineDetailPage({
     notFound();
   }
 
+  const inactiveExerciseCount = routine.exercises.filter(
+    (item) => !item.exercise.isActive,
+  ).length;
+
   return (
     <AppScreen>
       <AppHeader
-        eyebrow="Detalle de rutina"
+        eyebrow="Detalle de entrenamiento"
         title={routine.name}
         description={routine.description}
       />
       <TrainingSectionNav active="routines" />
 
+      {inactiveExerciseCount > 0 ? (
+        <Alert className="rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-charcoal">
+          <TriangleAlert
+            className="size-5 text-warm-brown"
+            aria-hidden="true"
+          />
+          <AlertDescription className="font-semibold leading-6 text-charcoal">
+            {inactiveExerciseCount === 1
+              ? "Este entrenamiento contiene 1 ejercicio desactivado."
+              : `Este entrenamiento contiene ${inactiveExerciseCount} ejercicios desactivados.`}{" "}
+            Se conserva en este entrenamiento, pero no esta disponible para
+            agregarlo a entrenamientos nuevos.
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-between">
         <Button asChild variant="outline" size="lg">
-          <Link href="/app/entrenamiento">
+          <Link href="/app/entrenamiento/rutinas">
             <ArrowLeft className="size-4" />
-            Volver a rutinas
+            Volver a entrenamientos
           </Link>
         </Button>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild variant="outline" size="lg">
             <Link
-              href={`/app/entrenamiento/asignaciones?routine=${routine.id}`}
+              href={`/app/entrenamiento/plantillas/nueva?training=${routine.id}`}
             >
-              <ClipboardCheck className="size-4" />
-              Asignar rutina
+              <Layers3 className="size-4" />
+              Usar en plantilla
             </Link>
           </Button>
           <DeleteRoutineButton routineId={routine.id} />
           <Button asChild size="lg">
             <Link href={`/app/entrenamiento/rutinas/${routine.id}/editar`}>
               <Pencil className="size-4" />
-              Editar rutina
+              Editar entrenamiento
             </Link>
           </Button>
         </div>
       </div>
 
-      <section
-        className={`grid gap-4 sm:grid-cols-2 ${
-          routine.identifier ? "xl:grid-cols-5" : "xl:grid-cols-4"
-        }`}
-      >
-        {routine.identifier ? (
-          <div className="rounded-[24px] border border-border bg-accent-soft p-5 shadow-soft">
-            <p className="text-sm font-bold text-muted">
-              Identificador interno
-            </p>
-            <p className="mt-3 break-words text-xl font-extrabold text-charcoal">
-              {routine.identifier}
-            </p>
-          </div>
-        ) : null}
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Dificultad</p>
           <p className="mt-3 text-xl font-extrabold text-charcoal">
@@ -129,7 +134,7 @@ export default async function RoutineDetailPage({
         <div className="rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Estado</p>
           <p className="mt-3 text-xl font-extrabold text-charcoal">
-            {routine.isActive ? "Activa" : "Inactiva"}
+            {routine.isActive ? "Activo" : "Inactivo"}
           </p>
         </div>
       </section>
@@ -139,84 +144,28 @@ export default async function RoutineDetailPage({
         description={`${routine.exercises.length} ejercicios configurados en orden de ejecucion.`}
       >
         {routine.exercises.length === 0 ? (
-          <EmptyState>Esta rutina todavia no tiene ejercicios.</EmptyState>
+          <EmptyState>
+            Este entrenamiento todavia no tiene ejercicios.
+          </EmptyState>
         ) : (
-          <div className="space-y-4">
-            {routine.exercises.map((item, index) => (
-              <article
+          <GroupedRoutineExercises
+            exercises={routine.exercises}
+            itemsClassName="space-y-4"
+            renderExercise={(item, index) => (
+              <WorkoutExerciseCard
                 key={item.id}
-                className="rounded-[24px] border border-border bg-background p-5"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="grid size-11 shrink-0 place-items-center rounded-full bg-primary text-sm font-extrabold text-charcoal">
-                    {index + 1}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-2xl font-semibold text-charcoal">
-                      {item.exercise.name}
-                    </h2>
-                    <p className="mt-1 text-sm font-bold text-warm-brown">
-                      {item.exercise.category} / {item.exercise.muscleGroup} /{" "}
-                      {item.exercise.exerciseType}
-                    </p>
-                    {item.exercise.description ? (
-                      <p className="mt-3 text-sm leading-6 text-muted">
-                        {item.exercise.description}
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-
-                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                  <ConfigValue
-                    icon={Dumbbell}
-                    label="Series"
-                    value={item.series?.toString() ?? "Opcional"}
-                  />
-                  <ConfigValue
-                    icon={Repeat2}
-                    label="Repeticiones"
-                    value={item.repetitions ?? "Opcional"}
-                  />
-                  <ConfigValue
-                    icon={TimerReset}
-                    label="Descanso"
-                    value={
-                      item.restSeconds === null
-                        ? "Opcional"
-                        : formatRestTime(item.restSeconds)
-                    }
-                  />
-                  <ConfigValue
-                    icon={Clock3}
-                    label="Duracion"
-                    value={
-                      item.durationMinutes === null
-                        ? "Opcional"
-                        : `${item.durationMinutes} min`
-                    }
-                  />
-                </div>
-
-                {item.notes ? (
-                  <div className="mt-4 rounded-[18px] border border-primary/20 bg-primary-soft p-4">
-                    <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
-                      Notas
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-charcoal">
-                      {item.notes}
-                    </p>
-                  </div>
-                ) : null}
-              </article>
-            ))}
-          </div>
+                context="professional"
+                exercise={item}
+                order={index + 1}
+              />
+            )}
+          />
         )}
       </AppPanel>
 
       <AppPanel
         title="Registro"
-        description="Informacion de autoria y mantenimiento de la plantilla."
+        description="Informacion de autoria y mantenimiento del entrenamiento."
         tone="accent"
       >
         <div className="grid gap-3 sm:grid-cols-3">
@@ -238,26 +187,6 @@ export default async function RoutineDetailPage({
         </div>
       </AppPanel>
     </AppScreen>
-  );
-}
-
-function ConfigValue({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Dumbbell;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-[18px] border border-border bg-surface p-4">
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
-      <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
-        {label}
-      </p>
-      <p className="mt-1 font-extrabold text-charcoal">{value}</p>
-    </div>
   );
 }
 
