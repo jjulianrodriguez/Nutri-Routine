@@ -7,6 +7,7 @@ import {
   EmptyState,
   StatTile,
 } from "@/components/app/AppScreen";
+import { AssignedProfessionalCards } from "@/components/app/relationship-badges";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getDashboardData } from "@/lib/app/dashboard-data";
 
@@ -17,12 +18,12 @@ export default async function NutritionPage() {
   return (
     <AppScreen>
       <AppHeader
-        eyebrow={access.isClient ? "Mi nutricion" : "Area profesional"}
-        title={access.isClient ? "Nutricion" : "Gestion de nutricion"}
+        eyebrow={access.isClient ? "Mi nutrición" : "Área profesional"}
+        title={access.isClient ? "Nutrición" : "Gestión de nutrición"}
         description={
           access.isClient
-            ? "Plan alimenticio actual, historial de planes y recursos de nutricion asignados a tu cuenta."
-            : "Clientes de nutricion, dietas, planes alimenticios y recursos enviados."
+            ? "Plan alimenticio actual, historial de planes y recursos de nutrición asignados a tu cuenta."
+            : "Clientes de nutrición, dietas, planes alimenticios y recursos enviados."
         }
       />
 
@@ -31,11 +32,11 @@ export default async function NutritionPage() {
           <StatTile
             label="Planes visibles"
             value={String(data.dietPlansCount)}
-            detail="Segun tu asignacion de nutricion"
+            detail="Según tu asignación de nutrición"
           />
         ) : (
           <StatTile
-            label="Clientes de nutricion"
+            label="Clientes de nutrición"
             value={String(data.assignedClientsCount)}
             detail="Asignados a tu perfil"
           />
@@ -57,33 +58,47 @@ export default async function NutritionPage() {
           title={access.isClient ? "Plan alimenticio actual" : "Planes alimenticios"}
           description={
             access.isClient
-              ? "Aqui encontraras tu plan vigente cuando este disponible para tu cuenta."
+              ? `Aquí encontrarás tu plan vigente${
+                  access.assignedNutritionistName
+                    ? ` con ${access.assignedNutritionistName}`
+                    : ""
+                }.`
               : "Crea, revisa y actualiza los planes alimenticios de tus clientes."
           }
         >
-          {data.currentDietPlan ? (
-            <article className="rounded-[20px] border border-border bg-background p-4">
-              <Leaf className="size-5 text-warm-brown" />
-              <h2 className="mt-4 font-extrabold text-charcoal">
-                {data.currentDietPlan.title}
-              </h2>
-              {data.currentDietPlan.detail ? (
-                <p className="mt-2 text-sm text-muted">
-                  {data.currentDietPlan.detail}
-                </p>
-              ) : null}
-            </article>
-          ) : (
-            <EmptyState>No hay planes alimenticios visibles por ahora.</EmptyState>
-          )}
+          <div className="space-y-4">
+            {access.isClient ? (
+              <AssignedProfessionalCards
+                assignedNutritionistId={access.assignedNutritionistId}
+                assignedNutritionistName={access.assignedNutritionistName}
+                assignedTrainerId={null}
+                assignedTrainerName={null}
+              />
+            ) : null}
+            {data.currentDietPlan ? (
+              <article className="rounded-[20px] border border-border bg-background p-4">
+                <Leaf className="size-5 text-warm-brown" />
+                <h2 className="mt-4 font-extrabold text-charcoal">
+                  {data.currentDietPlan.title}
+                </h2>
+                {data.currentDietPlan.detail ? (
+                  <p className="mt-2 text-sm text-muted">
+                    {data.currentDietPlan.detail}
+                  </p>
+                ) : null}
+              </article>
+            ) : (
+              <EmptyState>No hay planes alimenticios visibles por ahora.</EmptyState>
+            )}
+          </div>
         </AppPanel>
 
         <AppPanel
           title={access.isClient ? "Historial y recursos" : "Clientes y recursos"}
           description={
             access.isClient
-              ? "Acceso a planes anteriores y materiales de nutricion."
-              : "Herramientas de seguimiento para clientes de nutricion y envio de recursos."
+              ? "Acceso a planes anteriores y materiales de nutrición."
+              : "Herramientas de seguimiento para clientes de nutrición y envío de recursos."
           }
           tone="accent"
         >
@@ -96,17 +111,17 @@ export default async function NutritionPage() {
               <p className="mt-2 text-sm leading-6 text-muted">
                 {access.isClient
                   ? "Solo tus planes alimenticios quedan disponibles en esta vista."
-                  : "Disponible para profesionales autorizados en nutricion."}
+                  : "Disponible para profesionales autorizados en nutrición."}
               </p>
             </div>
             {!access.isClient ? (
               <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">
                 <Users className="size-5 text-warm-brown" />
                 <h3 className="mt-4 font-extrabold text-charcoal">
-                  Clientes de nutricion
+                  Clientes de nutrición
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-muted">
-                  Solo se muestran los clientes asignados a tu area de nutricion.
+                  Solo se muestran los clientes asignados a tu área de nutrición.
                 </p>
               </div>
             ) : null}

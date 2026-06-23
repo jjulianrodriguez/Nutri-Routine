@@ -42,7 +42,7 @@ export default async function WorkoutTemplateDetailPage({
       <AppHeader
         eyebrow="Entrenamiento"
         title="Plantilla de entrenamiento"
-        description="Revisa el resumen del ciclo y el entrenamiento asignado a cada dia."
+        description="Revisa el resumen del ciclo y el entrenamiento asignado a cada día."
       />
       <TrainingSectionNav active="templates" />
 
@@ -76,7 +76,7 @@ export default async function WorkoutTemplateDetailPage({
 
       <AppPanel
         title="Registro"
-        description="Fechas de creacion y ultima actualizacion."
+        description="Fechas de creación y última actualización."
         tone="accent"
       >
         <div className="grid gap-3 sm:grid-cols-2">

@@ -52,21 +52,21 @@ function getLoginErrorMessage(message: string, code?: string) {
     normalized.includes("invalid_credentials") ||
     normalized.includes("invalid login credentials")
   ) {
-    return "El email o la contrasena no son correctos.";
+    return "El email o la contraseña no son correctos.";
   }
 
   if (
     normalized.includes("email_not_confirmed") ||
     normalized.includes("email not confirmed")
   ) {
-    return "Tu email aun no esta confirmado. Revisa tu correo antes de entrar.";
+    return "Tu email aún no está confirmado. Revisa tu correo antes de entrar.";
   }
 
   if (normalized.includes("missing supabase")) {
-    return "El servicio de acceso no esta disponible en este momento.";
+    return "El servicio de acceso no está disponible en este momento.";
   }
 
-  return "No se pudo iniciar sesion. Intentalo de nuevo.";
+  return "No se pudo iniciar sesión. Inténtalo de nuevo.";
 }
 
 function getRegisterErrorMessage(message: string, code?: string) {
@@ -77,25 +77,25 @@ function getRegisterErrorMessage(message: string, code?: string) {
     normalized.includes("already registered") ||
     normalized.includes("already exists")
   ) {
-    return "Ya existe una cuenta con este email. Inicia sesion para continuar.";
+    return "Ya existe una cuenta con este email. Inicia sesión para continuar.";
   }
 
   if (
     normalized.includes("weak_password") ||
     normalized.includes("password")
   ) {
-    return "La contrasena no cumple los requisitos de seguridad.";
+    return "La contraseña no cumple los requisitos de seguridad.";
   }
 
   if (normalized.includes("signup") && normalized.includes("disabled")) {
-    return "El registro no esta disponible en este momento.";
+    return "El registro no está disponible en este momento.";
   }
 
   if (normalized.includes("missing supabase")) {
-    return "El servicio de acceso no esta disponible en este momento.";
+    return "El servicio de acceso no está disponible en este momento.";
   }
 
-  return "No se pudo crear la cuenta. Intentalo de nuevo.";
+  return "No se pudo crear la cuenta. Inténtalo de nuevo.";
 }
 
 async function getEmailRedirectTo() {
@@ -169,7 +169,7 @@ export async function loginProfessional(
 
     if (!data.user) {
       return {
-        message: "No se pudo confirmar la sesion. Intentalo de nuevo.",
+        message: "No se pudo confirmar la sesión. Inténtalo de nuevo.",
         status: "error",
       };
     }
@@ -185,7 +185,7 @@ export async function loginProfessional(
     if (profileError) {
       return {
         message:
-          "Sesion iniciada, pero no se pudo preparar tu perfil. Intentalo de nuevo.",
+          "Sesión iniciada, pero no se pudo preparar tu perfil. Inténtalo de nuevo.",
         status: "error",
       };
     }
@@ -220,7 +220,7 @@ export async function loginProfessional(
     revalidatePath("/", "layout");
 
     return {
-      message: "Sesion iniciada.",
+      message: "Sesión iniciada.",
       redirectTo: APP_PATH,
       status: "success",
     };
@@ -228,7 +228,7 @@ export async function loginProfessional(
     const message =
       error instanceof Error
         ? getLoginErrorMessage(error.message)
-        : "No se pudo iniciar sesion. Intentalo de nuevo.";
+        : "No se pudo iniciar sesión. Inténtalo de nuevo.";
 
     return {
       message,
@@ -254,7 +254,7 @@ export async function registerProfessional(
 
   if (!expectedCode) {
     return {
-      message: "El registro de nuevas cuentas no esta disponible en este momento.",
+      message: "El registro de nuevas cuentas no está disponible en este momento.",
       status: "error",
     };
   }
@@ -262,9 +262,9 @@ export async function registerProfessional(
   if (parsed.data.accessCode !== expectedCode) {
     return {
       fieldErrors: {
-        accessCode: "Codigo de acceso invalido.",
+        accessCode: "Código de acceso inválido.",
       },
-      message: "Codigo de acceso invalido.",
+      message: "Código de acceso inválido.",
       status: "error",
     };
   }
@@ -292,7 +292,7 @@ export async function registerProfessional(
     if (data.user?.identities && data.user.identities.length === 0) {
       return {
         message:
-          "Ya existe una cuenta con este email. Inicia sesion para continuar.",
+          "Ya existe una cuenta con este email. Inicia sesión para continuar.",
         status: "error",
       };
     }
@@ -307,7 +307,7 @@ export async function registerProfessional(
       if (profileError) {
         return {
           message:
-            "La cuenta se creo, pero no se pudo preparar tu perfil. Intenta iniciar sesion.",
+            "La cuenta se creó, pero no se pudo preparar tu perfil. Intenta iniciar sesión.",
           status: "error",
         };
       }
@@ -323,14 +323,14 @@ export async function registerProfessional(
 
     return {
       message:
-        "Cuenta creada. Revisa tu correo para confirmar el email antes de iniciar sesion.",
+        "Cuenta creada. Revisa tu correo para confirmar el email antes de iniciar sesión.",
       status: "email_confirmation_required",
     };
   } catch (error) {
     const message =
       error instanceof Error
         ? getRegisterErrorMessage(error.message)
-        : "No se pudo crear la cuenta. Intentalo de nuevo.";
+        : "No se pudo crear la cuenta. Inténtalo de nuevo.";
 
     return {
       message,

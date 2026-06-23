@@ -11,6 +11,11 @@ import {
   type CurrentUserAccess,
   type ProfessionalSpecialty,
 } from "@/lib/auth/access-rules";
+import {
+  getProfileDirectory,
+  getProfileDisplayName,
+  type ProfileDirectoryEntry,
+} from "@/lib/auth/profile-directory";
 import { hasSupabaseConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
@@ -223,6 +228,30 @@ export const getCurrentUserAccess = cache(async () => {
   const clientProfileExists = Boolean(clientProfile);
   const assignedNutritionistId = clientProfile?.assigned_nutritionist_id ?? null;
   const assignedTrainerId = clientProfile?.assigned_trainer_id ?? null;
+  const professionalProfilesById: Map<string, ProfileDirectoryEntry> = isClient
+    ? await getProfileDirectory(
+        [
+          assignedNutritionistId ?? "",
+          assignedTrainerId ?? "",
+        ],
+        {
+          includeEmails: true,
+          includeProfessionalProfiles: true,
+        },
+      )
+    : new Map<string, ProfileDirectoryEntry>();
+  const assignedNutritionistProfile = assignedNutritionistId
+    ? professionalProfilesById.get(assignedNutritionistId)
+    : null;
+  const assignedTrainerProfile = assignedTrainerId
+    ? professionalProfilesById.get(assignedTrainerId)
+    : null;
+  const assignedNutritionistName = assignedNutritionistId
+    ? getProfileDisplayName(assignedNutritionistProfile)
+    : null;
+  const assignedTrainerName = assignedTrainerId
+    ? getProfileDisplayName(assignedTrainerProfile)
+    : null;
   const hasNutritionService = assignedNutritionistId !== null;
   const hasTrainingService = assignedTrainerId !== null;
   const isClientActivated =
@@ -246,6 +275,8 @@ export const getCurrentUserAccess = cache(async () => {
     (isActiveProfessional &&
       (professionalSpecialty === "training" ||
         professionalSpecialty === "both"));
+  const canManageBlogPosts = isGeneralAdmin || isActiveProfessional;
+  const canManageResources = isGeneralAdmin || isActiveProfessional;
   const canManageClientPlans = canManageNutrition || canManageTraining;
   const canManageProfessionalAccounts = isGeneralAdmin;
   const canViewNutrition = isClient
@@ -264,12 +295,21 @@ export const getCurrentUserAccess = cache(async () => {
 
   return {
     assignedNutritionistId,
+    assignedNutritionistEmail: assignedNutritionistProfile?.email ?? null,
+    assignedNutritionistName,
+    assignedNutritionistSpecialty:
+      assignedNutritionistProfile?.specialty ?? null,
     assignedTrainerId,
+    assignedTrainerEmail: assignedTrainerProfile?.email ?? null,
+    assignedTrainerName,
+    assignedTrainerSpecialty: assignedTrainerProfile?.specialty ?? null,
     canAccessApp,
     canAccessOnlyBasicSettings,
+    canManageBlogPosts,
     canManageClientPlans,
     canManageNutrition,
     canManageProfessionalAccounts,
+    canManageResources,
     canManageTraining,
     canViewNutrition,
     canViewTraining,

@@ -101,7 +101,7 @@ export function RoutineCardActions({
         }
         description={
           confirmation === "delete"
-            ? "El entrenamiento se eliminara definitivamente. Las plantillas que lo utilizan impediran la eliminacion."
+            ? "El entrenamiento se eliminará definitivamente. Las plantillas que lo utilizan impedirán la eliminación."
             : isActive
               ? "El entrenamiento dejara de estar disponible para nuevas plantillas."
               : "El entrenamiento volvera a estar disponible para nuevas plantillas."

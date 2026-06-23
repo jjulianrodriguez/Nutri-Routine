@@ -17,7 +17,7 @@ export default function ClientsError({
     <AppScreen>
       <div className="grid min-h-[70dvh] place-items-center">
         <RecoveryState
-          description="No pudimos cargar la informacion de clientes o sus planes. Intenta nuevamente sin abandonar la seccion."
+          description="No pudimos cargar la información de clientes o sus planes. Intenta nuevamente sin abandonar la sección."
           eyebrow="Error de clientes"
           fallbackHref="/app/clientes"
           fallbackLabel="Ir a clientes"

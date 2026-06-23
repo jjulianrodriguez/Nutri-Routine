@@ -20,7 +20,7 @@ export default function BlogError({
         fallbackHref="/blog"
         fallbackLabel="Ir al blog"
         retry={unstable_retry ?? reset}
-        title="Ocurrio un error inesperado"
+        title="Ocurrió un error inesperado"
       />
     </div>
   );

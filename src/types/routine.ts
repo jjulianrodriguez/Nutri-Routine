@@ -101,6 +101,7 @@ export type AssignableRoutine = {
 };
 
 export type AssignableTrainingClient = {
+  assignedTrainerId: string | null;
   assignedTrainerName: string | null;
   avatarUrl: string | null;
   contact: string | null;

@@ -10,7 +10,7 @@ export const routineAssignmentSchema = z.object({
       (value) => Number(value) >= 1 && Number(value) <= 104,
       "La duracion debe estar entre 1 y 104 semanas.",
     ),
-  routineId: z.string().uuid("La rutina indicada no es valida."),
+  routineId: z.string().uuid("La rutina indicada no es válida."),
   startDate: z
     .string()
     .trim()

@@ -15,12 +15,12 @@ export default function RootError({
   return (
     <main className="grid min-h-dvh place-items-center bg-[radial-gradient(circle_at_top_right,var(--primary-soft),transparent_30rem)] px-4 py-10 sm:px-6">
       <RecoveryState
-        description="No pudimos cargar esta pagina correctamente. Puedes intentarlo otra vez o regresar a un lugar seguro."
-        eyebrow="Error de la pagina"
+        description="No pudimos cargar esta página correctamente. Puedes intentarlo otra vez o regresar a un lugar seguro."
+        eyebrow="Error de la página"
         fallbackHref="/"
         fallbackLabel="Ir al inicio"
         retry={unstable_retry ?? reset}
-        title="Ocurrio un error inesperado"
+        title="Ocurrió un error inesperado"
       />
     </main>
   );

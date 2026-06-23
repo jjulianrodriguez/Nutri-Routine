@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 
 import { createClient } from "@/lib/supabase/server";
 import {
+  changePasswordSchema,
+  type ChangePasswordValues,
   updateBasicAccountSchema,
   type UpdateBasicAccountValues,
 } from "@/lib/validations/account";
@@ -13,6 +15,9 @@ import {
 } from "@/lib/validations/personal-details";
 
 type AccountFieldErrors = Partial<Record<keyof UpdateBasicAccountValues, string>>;
+type ChangePasswordFieldErrors = Partial<
+  Record<keyof ChangePasswordValues, string>
+>;
 
 export type UpdateBasicAccountResult =
   | {
@@ -21,6 +26,17 @@ export type UpdateBasicAccountResult =
     }
   | {
       fieldErrors?: AccountFieldErrors;
+      message: string;
+      status: "error";
+    };
+
+export type ChangePasswordResult =
+  | {
+      message: string;
+      status: "success";
+    }
+  | {
+      fieldErrors?: ChangePasswordFieldErrors;
       message: string;
       status: "error";
     };
@@ -40,6 +56,7 @@ export type PersonalDetailsActionResult =
       status: "error";
     };
 
+
 function getFieldErrors(error: {
   flatten: () => { fieldErrors: Record<string, string[] | undefined> };
 }) {
@@ -49,6 +66,17 @@ function getFieldErrors(error: {
       messages?.[0],
     ]),
   ) as AccountFieldErrors;
+}
+
+function getChangePasswordFieldErrors(error: {
+  flatten: () => { fieldErrors: Record<string, string[] | undefined> };
+}) {
+  return Object.fromEntries(
+    Object.entries(error.flatten().fieldErrors).map(([field, messages]) => [
+      field,
+      messages?.[0],
+    ]),
+  ) as ChangePasswordFieldErrors;
 }
 
 function getPersonalDetailsFieldErrors(error: {
@@ -77,7 +105,83 @@ function nullableNumber(value: string) {
 function revalidateAccountPaths() {
   revalidatePath("/app/pending");
   revalidatePath("/app/configuracion");
+  revalidatePath("/app/perfil");
   revalidatePath("/app", "layout");
+}
+
+function getPasswordUpdateError(message: string, code?: string) {
+  const normalized = `${code ?? ""} ${message}`.toLowerCase();
+
+  if (
+    normalized.includes("current_password") ||
+    normalized.includes("current password") ||
+    (normalized.includes("current") && normalized.includes("password"))
+  ) {
+    return {
+      fieldErrors: {
+        currentPassword: "Revisa la contraseña actual.",
+      },
+      message: "La contraseña actual no es correcta o es requerida.",
+    };
+  }
+
+  if (
+    normalized.includes("same_password") ||
+    normalized.includes("different from")
+  ) {
+    return {
+      fieldErrors: {
+        newPassword: "Usa una contraseña diferente a la actual.",
+      },
+      message: "La nueva contraseña debe ser diferente a la actual.",
+    };
+  }
+
+  if (
+    normalized.includes("weak_password") ||
+    normalized.includes("weak password") ||
+    normalized.includes("password requirements") ||
+    normalized.includes("password should") ||
+    normalized.includes("at least")
+  ) {
+    return {
+      fieldErrors: {
+        newPassword: "La nueva contraseña no cumple los requisitos.",
+      },
+      message: "La nueva contraseña no cumple los requisitos de seguridad.",
+    };
+  }
+
+  if (
+    normalized.includes("reauth") ||
+    normalized.includes("nonce") ||
+    normalized.includes("recently")
+  ) {
+    return {
+      message:
+        "Por seguridad, vuelve a iniciar sesión e intenta cambiar la contraseña de nuevo.",
+    };
+  }
+
+  if (
+    normalized.includes("session") ||
+    normalized.includes("jwt") ||
+    normalized.includes("not logged")
+  ) {
+    return {
+      message: "Debes iniciar sesión para actualizar tu contraseña.",
+    };
+  }
+
+  if (normalized.includes("missing supabase")) {
+    return {
+      message: "El servicio de acceso no está disponible en este momento.",
+    };
+  }
+
+  return {
+    message: "No se pudo actualizar tu contraseña. Inténtalo de nuevo.",
+  };
 }
 
 export async function updateBasicAccount(
@@ -101,7 +205,7 @@ export async function updateBasicAccount(
 
   if (userError || !user) {
     return {
-      message: "Debes iniciar sesion para actualizar tu cuenta.",
+      message: "Debes iniciar sesión para actualizar tu cuenta.",
       status: "error",
     };
   }
@@ -115,7 +219,7 @@ export async function updateBasicAccount(
 
   if (error) {
     return {
-      message: "No se pudo actualizar tu nombre. Intentalo de nuevo.",
+      message: "No se pudo actualizar tu nombre. Inténtalo de nuevo.",
       status: "error",
     };
   }
@@ -124,6 +228,54 @@ export async function updateBasicAccount(
 
   return {
     message: "Cuenta actualizada correctamente.",
+    status: "success",
+  };
+}
+
+export async function changePassword(
+  values: ChangePasswordValues,
+): Promise<ChangePasswordResult> {
+  const parsed = changePasswordSchema.safeParse(values);
+
+  if (!parsed.success) {
+    return {
+      fieldErrors: getChangePasswordFieldErrors(parsed.error),
+      message: "Revisa los campos marcados.",
+      status: "error",
+    };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      message: "Debes iniciar sesión para actualizar tu contraseña.",
+      status: "error",
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    current_password: parsed.data.currentPassword || undefined,
+    password: parsed.data.newPassword,
+  });
+
+  if (error) {
+    const mappedError = getPasswordUpdateError(error.message, error.code);
+
+    return {
+      ...mappedError,
+      status: "error",
+    };
+  }
+
+  revalidatePath("/app/configuracion");
+
+  return {
+    message: "Contraseña actualizada correctamente.",
     status: "success",
   };
 }
@@ -149,21 +301,28 @@ export async function updatePersonalDetails(
 
   if (userError || !user) {
     return {
-      message: "Debes iniciar sesion para actualizar tu informacion.",
+      message: "Debes iniciar sesión para actualizar tu información.",
       status: "error",
     };
   }
 
   const details = {
+    allergies: nullableText(parsed.data.allergies),
     birth_date: nullableText(parsed.data.birthDate),
+    body_fat_percentage: nullableNumber(parsed.data.bodyFatPercentage),
+    body_measurements: nullableText(parsed.data.bodyMeasurements),
+    dietary_restrictions: nullableText(parsed.data.dietaryRestrictions),
     gender: nullableText(parsed.data.gender),
     gender_description:
       parsed.data.gender === "self_described"
         ? nullableText(parsed.data.genderDescription)
         : null,
     height_cm: nullableNumber(parsed.data.heightCm),
+    important_medications: nullableText(parsed.data.importantMedications),
+    injuries: nullableText(parsed.data.injuries),
     medical_conditions: nullableText(parsed.data.medicalConditions),
     phone: nullableText(parsed.data.phone),
+    professional_notes: nullableText(parsed.data.professionalNotes),
     weight_kg: nullableNumber(parsed.data.weightKg),
   };
   const hasDetails = Object.values(details).some((value) => value !== null);
@@ -184,7 +343,7 @@ export async function updatePersonalDetails(
   if (error) {
     return {
       message:
-        "No se pudo guardar tu informacion personal. Revisa los datos e intentalo de nuevo.",
+        "No se pudo guardar tu información personal. Revisa los datos e inténtalo de nuevo.",
       status: "error",
     };
   }
@@ -193,8 +352,8 @@ export async function updatePersonalDetails(
 
   return {
     message: hasDetails
-      ? "Informacion personal actualizada."
-      : "Informacion personal eliminada.",
+      ? "Información personal actualizada."
+      : "Información personal eliminada.",
     status: "success",
   };
 }
@@ -208,7 +367,7 @@ export async function deletePersonalDetails(): Promise<PersonalDetailsActionResu
 
   if (userError || !user) {
     return {
-      message: "Debes iniciar sesion para eliminar tu informacion.",
+      message: "Debes iniciar sesión para eliminar tu información.",
       status: "error",
     };
   }
@@ -220,7 +379,7 @@ export async function deletePersonalDetails(): Promise<PersonalDetailsActionResu
 
   if (error) {
     return {
-      message: "No se pudo eliminar tu informacion personal.",
+      message: "No se pudo eliminar tu información personal.",
       status: "error",
     };
   }
@@ -228,7 +387,7 @@ export async function deletePersonalDetails(): Promise<PersonalDetailsActionResu
   revalidateAccountPaths();
 
   return {
-    message: "Informacion personal eliminada.",
+    message: "Información personal eliminada.",
     status: "success",
   };
 }

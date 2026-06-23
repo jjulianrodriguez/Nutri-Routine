@@ -4,6 +4,10 @@ import type { User } from "@supabase/supabase-js";
 
 import type { CurrentUserAccess } from "@/lib/auth/access-rules";
 import {
+  getProfileDirectory,
+  getProfileDisplayName,
+} from "@/lib/auth/profile-directory";
+import {
   createAdminClient,
   hasSupabaseAdminConfig,
 } from "@/lib/supabase/admin";
@@ -44,7 +48,9 @@ export type ClientPlanSummary = {
 
 export type ClientAdministrativeProfile = {
   accountStatus: ClientAccountStatus;
+  assignedNutritionistId: string | null;
   assignedNutritionistName: string | null;
+  assignedTrainerId: string | null;
   assignedTrainerName: string | null;
   avatarUrl: string | null;
   birthDate: string | null;
@@ -163,7 +169,7 @@ async function listDietPlans(
     .order("created_at", { ascending: false });
 
   if (error) {
-    throw new Error("No se pudieron cargar los planes de nutricion.");
+    throw new Error("No se pudieron cargar los planes de nutrición.");
   }
 
   return (data ?? []).map((plan) => ({
@@ -278,21 +284,16 @@ export async function getClientAdministrativeProfile(
   ].filter((id): id is string => Boolean(id));
 
   const [
-    professionalProfilesResult,
+    professionalProfilesById,
     personalDetailsResult,
     nutritionPlans,
     trainingPlans,
     auth,
   ] = await Promise.all([
-      professionalIds.length > 0
-        ? supabase
-            .from("profiles")
-            .select("id, full_name")
-            .in("id", professionalIds)
-        : Promise.resolve({
-            data: [] as Pick<Tables<"profiles">, "full_name" | "id">[],
-            error: null,
-          }),
+      getProfileDirectory(professionalIds, {
+        includeEmails: true,
+        includeProfessionalProfiles: true,
+      }),
       supabase
         .from("profile_personal_details")
         .select(
@@ -309,25 +310,23 @@ export async function getClientAdministrativeProfile(
       getAuthAccount(clientId),
     ]);
 
-  if (professionalProfilesResult.error || personalDetailsResult.error) {
+  if (personalDetailsResult.error) {
     throw new Error("No se pudo completar el perfil administrativo.");
   }
 
   const personalDetails = personalDetailsResult.data;
-  const professionalNameById = new Map(
-    (professionalProfilesResult.data ?? []).map((professional) => [
-      professional.id,
-      professional.full_name ?? "Profesional sin nombre",
-    ]),
-  );
 
   return {
     accountStatus: auth.accountStatus,
+    assignedNutritionistId,
     assignedNutritionistName: assignedNutritionistId
-      ? professionalNameById.get(assignedNutritionistId) ?? null
+      ? getProfileDisplayName(
+          professionalProfilesById.get(assignedNutritionistId),
+        )
       : null,
+    assignedTrainerId,
     assignedTrainerName: assignedTrainerId
-      ? professionalNameById.get(assignedTrainerId) ?? null
+      ? getProfileDisplayName(professionalProfilesById.get(assignedTrainerId))
       : null,
     avatarUrl: profile.avatar_url,
     birthDate: personalDetails?.birth_date ?? null,
@@ -335,7 +334,7 @@ export async function getClientAdministrativeProfile(
     canViewTrainingPlans,
     createdAt: profile.created_at,
     email: auth.email,
-    fullName: profile.full_name ?? "Cliente sin nombre",
+    fullName: profile.full_name?.trim() || auth.email || "Perfil incompleto",
     gender: personalDetails?.gender ?? null,
     genderDescription: personalDetails?.gender_description ?? null,
     hasNutritionService: assignedNutritionistId !== null,

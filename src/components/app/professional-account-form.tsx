@@ -21,15 +21,15 @@ import { cn } from "@/lib/utils";
 
 const specialtyOptions = [
   {
-    label: "Profesional en nutricion",
+    label: "Nutricionista",
     value: "nutrition",
   },
   {
-    label: "Profesional en entrenamiento",
+    label: "Entrenadora",
     value: "training",
   },
   {
-    label: "Profesional en ambas areas",
+    label: "Entrenadora y nutricionista",
     value: "both",
   },
 ] as const;
@@ -187,7 +187,7 @@ export function ProfessionalAccountForm() {
             visibilityLabel="confirmación de contraseña temporal"
             autoComplete="new-password"
             className={inputClasses}
-            placeholder="Repite la contrasena"
+            placeholder="Repite la contraseña"
             aria-describedby={
               errors.confirmTemporaryPassword
                 ? "professional-confirm-password-error"
@@ -234,14 +234,14 @@ export function ProfessionalAccountForm() {
             htmlFor="adminAccessCode"
             className="font-extrabold text-charcoal"
           >
-            Codigo de acceso administrativo
+            Código de acceso administrativo
           </Label>
           <PasswordInput
             id="adminAccessCode"
             visibilityLabel="código administrativo"
             autoComplete="off"
             className="mt-2 h-12 rounded-control border-primary/20 bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20"
-            placeholder="Codigo privado de administracion"
+            placeholder="Código privado de administración"
             aria-describedby={
               errors.adminAccessCode
                 ? "professional-admin-code-error"

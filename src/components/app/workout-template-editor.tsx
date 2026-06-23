@@ -399,8 +399,8 @@ export function WorkoutTemplateEditor({
             <TriangleAlert className="size-5 text-danger" aria-hidden="true" />
             <AlertDescription className="font-semibold leading-6 text-danger">
               Completa {pendingDayCount}{" "}
-              {pendingDayCount === 1 ? "dia pendiente" : "dias pendientes"}{" "}
-              antes de guardar. Cada dia del ciclo necesita un entrenamiento
+              {pendingDayCount === 1 ? "día pendiente" : "días pendientes"}{" "}
+              antes de guardar. Cada día del ciclo necesita un entrenamiento
               asignado.
             </AlertDescription>
           </Alert>

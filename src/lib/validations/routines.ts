@@ -59,13 +59,13 @@ export const routineFormSchema = z
     category: z
       .string()
       .trim()
-      .min(2, "Ingresa la categoria.")
-      .max(80, "La categoria no puede superar 80 caracteres."),
+      .min(2, "Ingresa la categoría.")
+      .max(80, "La categoría no puede superar 80 caracteres."),
     description: z
       .string()
       .trim()
-      .min(2, "Ingresa una descripcion.")
-      .max(2000, "La descripcion no puede superar 2000 caracteres."),
+      .min(2, "Ingresa una descripción.")
+      .max(2000, "La descripción no puede superar 2000 caracteres."),
     difficulty: difficultySchema,
     exercises: z
       .array(routineExerciseSchema)
@@ -80,8 +80,8 @@ export const routineFormSchema = z
     targetAudience: z
       .string()
       .trim()
-      .min(2, "Ingresa el publico objetivo.")
-      .max(160, "El publico objetivo no puede superar 160 caracteres."),
+      .min(2, "Ingresa el público objetivo.")
+      .max(160, "El público objetivo no puede superar 160 caracteres."),
   })
   .superRefine((routine, context) => {
     const exerciseIds = routine.exercises

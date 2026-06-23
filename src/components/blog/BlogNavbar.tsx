@@ -1,6 +1,8 @@
 import { ArrowLeft, BookOpen } from "lucide-react";
 import Link from "next/link";
 
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+
 function BlogMark() {
   return (
     <Link
@@ -33,6 +35,7 @@ export function BlogNavbar() {
         <BlogMark />
 
         <nav className="flex items-center gap-2" aria-label="Blog">
+          <ThemeToggle showLabel={false} />
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/82 px-4 py-2.5 text-sm font-bold text-warm-brown shadow-soft backdrop-blur-md transition-colors hover:bg-primary-soft hover:text-charcoal"

@@ -130,7 +130,7 @@ export async function setExerciseActive(
 ): Promise<ExerciseActionResult> {
   if (!/^[0-9a-f-]{36}$/i.test(exerciseId)) {
     return {
-      message: "El ejercicio indicado no es valido.",
+      message: "El ejercicio indicado no es válido.",
       status: "error",
     };
   }
@@ -171,7 +171,7 @@ export async function deleteExercise(
 ): Promise<ExerciseActionResult> {
   if (!/^[0-9a-f-]{36}$/i.test(exerciseId)) {
     return {
-      message: "El ejercicio indicado no es valido.",
+      message: "El ejercicio indicado no es válido.",
       status: "error",
     };
   }
@@ -191,7 +191,7 @@ export async function deleteExercise(
 
   if (usageError) {
     return {
-      message: "No se pudo comprobar si el ejercicio esta en uso.",
+      message: "No se pudo comprobar si el ejercicio está en uso.",
       status: "error",
     };
   }
@@ -199,7 +199,7 @@ export async function deleteExercise(
   if ((count ?? 0) > 0) {
     return {
       message:
-        "No puedes eliminar este ejercicio porque forma parte de uno o mas entrenamientos. Desactivalo si ya no debe utilizarse.",
+        "No puedes eliminar este ejercicio porque forma parte de uno o más entrenamientos. Desactívalo si ya no debe utilizarse.",
       status: "error",
     };
   }
@@ -214,7 +214,7 @@ export async function deleteExercise(
   if (error?.code === "23503") {
     return {
       message:
-        "No puedes eliminar este ejercicio porque esta vinculado a un entrenamiento.",
+        "No puedes eliminar este ejercicio porque está vinculado a un entrenamiento.",
       status: "error",
     };
   }

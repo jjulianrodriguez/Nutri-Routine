@@ -25,6 +25,11 @@ import {
   EmptyState,
 } from "@/components/app/AppScreen";
 import { Button } from "@/components/ui/button";
+import {
+  getAssignedRelationBadge,
+  getPlanBadgeLabel,
+  RelationshipBadge,
+} from "@/components/app/relationship-badges";
 import { requireCurrentUserAccess } from "@/lib/auth/current-user-access";
 import {
   getClientAdministrativeProfile,
@@ -81,7 +86,7 @@ function formatGender(
     case "prefer_not_to_say":
       return "Prefiere no indicarlo";
     case "self_described":
-      return description ?? "Autodescripcion no indicada";
+      return description ?? "Autodescripción no indicada";
     default:
       return "No indicado";
   }
@@ -140,15 +145,32 @@ function DetailItem({
 
 function ServiceCard({
   active,
+  assignedId,
+  currentUserId,
   icon: Icon,
+  isAdmin,
+  isProfessional,
   label,
+  planLabel,
   professional,
 }: {
   active: boolean;
+  assignedId: string | null;
+  currentUserId: string;
   icon: typeof Leaf;
+  isAdmin: boolean;
+  isProfessional: boolean;
   label: string;
+  planLabel: string;
   professional: string | null;
 }) {
+  const relationBadge = getAssignedRelationBadge({
+    assignedId: active ? assignedId : null,
+    currentUserId,
+    isAdmin,
+    isProfessional,
+  });
+
   return (
     <div
       className={cn(
@@ -173,8 +195,16 @@ function ServiceCard({
         {label}
       </p>
       <p className="mt-1 font-bold text-charcoal">
-        {professional ?? "Sin profesional asignado"}
+        {active ? professional ?? "Sin profesional asignado" : "Sin plan activo"}
       </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <RelationshipBadge tone={active ? "primary" : "muted"}>
+          {active ? planLabel : `Sin ${planLabel.toLowerCase()}`}
+        </RelationshipBadge>
+        <RelationshipBadge tone={relationBadge.tone}>
+          {relationBadge.label}
+        </RelationshipBadge>
+      </div>
     </div>
   );
 }
@@ -218,7 +248,7 @@ function PlanCard({
             </Button>
           ) : (
             <span className="rounded-full bg-surface px-3 py-2 text-xs font-extrabold text-muted">
-              Informacion historica no disponible
+              Información histórica no disponible
             </span>
           )
         ) : null}
@@ -254,8 +284,8 @@ function PlansPanel({
     <AppPanel title={title} description={description}>
       {!canView ? (
         <EmptyState>
-          El detalle esta disponible solo para el profesional asignado a esta
-          area y el administrador universal.
+          El detalle está disponible solo para el profesional asignado a esta
+          área y el administrador universal.
         </EmptyState>
       ) : plans.length === 0 ? (
         <EmptyState>{emptyLabel}</EmptyState>
@@ -339,9 +369,13 @@ export default async function ClientProfilePage({
               {client.fullName}
             </h1>
             <div className="mt-4 flex flex-wrap gap-2">
-              <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-extrabold text-charcoal">
-                Rol: Cliente
-              </span>
+              <RelationshipBadge tone="primary">Cliente</RelationshipBadge>
+              <RelationshipBadge tone="accent">
+                {getPlanBadgeLabel({
+                  hasNutritionService: client.hasNutritionService,
+                  hasTrainingService: client.hasTrainingService,
+                })}
+              </RelationshipBadge>
               <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
                 Cuenta: {accountStatusLabels[client.accountStatus]}
               </span>
@@ -353,22 +387,32 @@ export default async function ClientProfilePage({
       <section className="grid gap-4 md:grid-cols-2">
         <ServiceCard
           active={client.hasNutritionService}
+          assignedId={client.assignedNutritionistId}
+          currentUserId={access.userId}
           icon={Leaf}
-          label="Plan de nutricion"
+          isAdmin={access.role === "admin"}
+          isProfessional={!access.isClient}
+          label="Plan de nutrición"
+          planLabel="Nutrición"
           professional={client.assignedNutritionistName}
         />
         <ServiceCard
           active={client.hasTrainingService}
+          assignedId={client.assignedTrainerId}
+          currentUserId={access.userId}
           icon={Dumbbell}
+          isAdmin={access.role === "admin"}
+          isProfessional={!access.isClient}
           label="Plan de entrenamiento"
+          planLabel="Entrenamiento"
           professional={client.assignedTrainerName}
         />
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <AppPanel
-          title="Informacion personal"
-          description="Datos opcionales visibles solo para profesionales asignados y administracion."
+          title="Información personal"
+          description="Datos opcionales visibles solo para profesionales asignados y administración."
         >
           <div className="grid gap-3 sm:grid-cols-2">
             <DetailItem
@@ -378,7 +422,7 @@ export default async function ClientProfilePage({
             />
             <DetailItem
               icon={Phone}
-              label="Telefono"
+              label="Teléfono"
               value={client.phone ?? "No indicado"}
             />
             <DetailItem
@@ -435,7 +479,7 @@ export default async function ClientProfilePage({
             />
             <DetailItem
               icon={Clock3}
-              label="Ultima actualizacion"
+              label="Última actualización"
               value={formatDate(client.updatedAt, true)}
             />
           </div>
@@ -445,10 +489,10 @@ export default async function ClientProfilePage({
       <div className="grid gap-6 xl:grid-cols-2">
         <PlansPanel
           canView={client.canViewNutritionPlans}
-          description="Plan actual e historial alimenticio visible segun la asignacion profesional."
-          emptyLabel="No hay planes de nutricion registrados para este cliente."
+          description="Plan actual e historial alimenticio visible según la asignación profesional."
+          emptyLabel="No hay planes de nutrición registrados para este cliente."
           plans={client.nutritionPlans}
-          title="Nutricion"
+          title="Nutrición"
         />
         <PlansPanel
           canView={client.canViewTrainingPlans}

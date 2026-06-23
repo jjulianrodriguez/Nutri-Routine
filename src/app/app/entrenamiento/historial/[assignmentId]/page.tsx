@@ -98,9 +98,9 @@ export default async function HistoricalRoutineDetailPage({
       : null;
   const historicalSnapshot = template ?? legacyRoutineSnapshot;
   const historicalMessage = template
-    ? "Esta es una copia historica de la plantilla asignada. Los cambios posteriores no alteran este historial."
+    ? "Esta es una copia histórica de la plantilla asignada. Los cambios posteriores no alteran este historial."
     : routineSource === "snapshot"
-      ? "Esta es una copia historica del entrenamiento asignado. Los cambios posteriores no alteran este historial."
+      ? "Esta es una copia histórica del entrenamiento asignado. Los cambios posteriores no alteran este historial."
       : routineSource === "live"
         ? "Esta plantilla antigua no tenia una copia guardada. Se muestra la version actual disponible."
         : "No fue posible reconstruir el contenido original de esta plantilla.";
@@ -131,7 +131,7 @@ export default async function HistoricalRoutineDetailPage({
           aria-hidden="true"
         />
         <div>
-          <p className="font-extrabold text-charcoal">Copia historica</p>
+          <p className="font-extrabold text-charcoal">Copia histórica</p>
           <p className="mt-1 text-sm leading-6 text-muted">
             {historicalMessage}
           </p>
@@ -172,7 +172,7 @@ export default async function HistoricalRoutineDetailPage({
             />
             <DetailValue
               icon={Tags}
-              label="Categoria"
+              label="Categoría"
               value={routine.category}
             />
           </>
@@ -203,7 +203,7 @@ export default async function HistoricalRoutineDetailPage({
           title="Detalle historico"
           description="La plantilla se conserva, pero su contenido original no pudo recuperarse."
         >
-          <EmptyState>Informacion historica no disponible.</EmptyState>
+          <EmptyState>Información histórica no disponible.</EmptyState>
         </AppPanel>
       )}
     </AppScreen>

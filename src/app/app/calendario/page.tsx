@@ -1,79 +1,81 @@
-import { CalendarDays } from "lucide-react";
-
-import { AppHeader, AppPanel, AppScreen, EmptyState } from "@/components/app/AppScreen";
-import { getCalendarData } from "@/lib/app/dashboard-data";
+import { CalendarManager } from "@/components/app/calendar-manager";
+import {
+  AppHeader,
+  AppScreen,
+  StatTile,
+} from "@/components/app/AppScreen";
+import { getCalendarPageData } from "@/lib/calendar/data";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 
-function AppointmentRecords({
-  records,
-}: {
-  records: Awaited<ReturnType<typeof getCalendarData>>["records"];
-}) {
-  if (records.length === 0) {
-    return <EmptyState>No hay citas programadas todavia.</EmptyState>;
-  }
+export const dynamic = "force-dynamic";
 
-  return (
-    <div className="space-y-3">
-      {records.map((record) => (
-        <article
-          key={record.id}
-          className="rounded-[20px] border border-border bg-background p-4"
-        >
-          <h2 className="font-extrabold text-charcoal">{record.title}</h2>
-          {record.detail ? (
-            <p className="mt-2 text-sm text-muted">{record.detail}</p>
-          ) : null}
-          {record.meta ? (
-            <p className="mt-2 text-xs font-bold uppercase tracking-[0.14em] text-warm-brown">
-              {record.meta}
-            </p>
-          ) : null}
-        </article>
-      ))}
-    </div>
-  );
-}
+type CalendarPageProps = {
+  searchParams?: Promise<{
+    area?: string;
+    client?: string;
+    month?: string;
+    professional?: string;
+    status?: string;
+  }>;
+};
 
-export default async function CalendarPage() {
-  const access = await requireRouteAccess("/app/calendario");
-  const data = await getCalendarData(access);
+export default async function CalendarPage({
+  searchParams,
+}: CalendarPageProps) {
+  const [access, params] = await Promise.all([
+    requireRouteAccess("/app/calendario"),
+    searchParams,
+  ]);
+  const data = await getCalendarPageData(access, params ?? {});
+  const pendingEvents = data.events.filter(
+    (event) => event.status === "scheduled",
+  ).length;
+  const completedEvents = data.events.filter(
+    (event) => event.status === "completed",
+  ).length;
+  const cancelledEvents = data.events.filter(
+    (event) => event.status === "cancelled",
+  ).length;
 
   return (
     <AppScreen>
       <AppHeader
-        eyebrow={access.isClient ? "Mi acompanamiento" : "Operacion"}
+        eyebrow={access.isClient ? "Mi acompañamiento" : "Operación"}
         title="Calendario"
         description={
           access.isClient
-            ? "Citas, recordatorios y proximos pasos relacionados con tus servicios activos."
-            : "Agenda compartida para consultas y seguimientos de clientes."
+            ? "Consulta tus citas, recordatorios, seguimientos y revisiones relacionadas con tus servicios activos."
+            : "Organiza citas, recordatorios y seguimientos mensuales para clientes según rol, área y permisos."
         }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-        <AppPanel
-          title={access.isClient ? "Proximas citas" : "Agenda administrativa"}
-          description={`${data.count} ${
-            data.count === 1 ? "registro visible" : "registros visibles"
-          }.`}
-        >
-          <AppointmentRecords records={data.records} />
-        </AppPanel>
+      <section
+        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        aria-label="Resumen del calendario"
+      >
+        <StatTile
+          label="Eventos del mes"
+          value={String(data.events.length)}
+          detail="Visibles segun tus permisos"
+        />
+        <StatTile
+          label="Pendientes"
+          value={String(pendingEvents)}
+          detail="Citas y recordatorios por atender"
+        />
+        <StatTile
+          label="Completados"
+          value={String(completedEvents)}
+          detail="Seguimientos marcados como cerrados"
+        />
+        <StatTile
+          label="Cancelados"
+          value={String(cancelledEvents)}
+          detail="Eventos anulados del mes"
+        />
+      </section>
 
-        <AppPanel title="Recordatorios" tone="primary">
-          <div className="rounded-[20px] border border-primary/30 bg-surface p-4">
-            <CalendarDays className="size-5 text-warm-brown" />
-            <h2 className="mt-4 font-extrabold text-charcoal">
-              {access.isClient ? "Seguimiento personal" : "Seguimiento de clientes"}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-muted">
-              La vista se adapta al rol sin exponer secciones administrativas a
-              clientes.
-            </p>
-          </div>
-        </AppPanel>
-      </div>
+      <CalendarManager data={data} />
     </AppScreen>
   );
 }

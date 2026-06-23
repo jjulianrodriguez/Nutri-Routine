@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { canManageResourceArea } from "@/lib/auth/access-rules";
+import { getCurrentUserAccess } from "@/lib/auth/current-user-access";
 import { createClient } from "@/lib/supabase/server";
 import {
   resourceDeleteSchema,
@@ -44,39 +46,30 @@ function revalidateResourcePaths() {
   revalidatePath(DASHBOARD_PATH);
 }
 
-async function getResourceAdminContext() {
+async function getResourceManagerContext() {
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const access = await getCurrentUserAccess();
 
-  if (userError || !user) {
+  if (!access) {
     return {
-      error: "Debes iniciar sesion para administrar recursos.",
+      access: null,
+      error: "Debes iniciar sesión para gestionar recursos.",
       supabase,
-      user: null,
     };
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError || profile?.role !== "admin") {
+  if (!access.canManageResources) {
     return {
-      error: "No tienes permisos de administrador para gestionar recursos.",
+      access: null,
+      error: "No tienes permisos para gestionar recursos.",
       supabase,
-      user: null,
     };
   }
 
   return {
+    access,
     error: null,
     supabase,
-    user,
   };
 }
 
@@ -93,11 +86,18 @@ export async function createResource(
     };
   }
 
-  const context = await getResourceAdminContext();
+  const context = await getResourceManagerContext();
 
-  if (context.error || !context.user) {
+  if (context.error || !context.access) {
     return {
       message: context.error ?? "No se pudo validar tu cuenta.",
+      status: "error",
+    };
+  }
+
+  if (!canManageResourceArea(context.access, parsed.data.area)) {
+    return {
+      message: "No tienes permisos para crear recursos en esta área.",
       status: "error",
     };
   }
@@ -109,14 +109,14 @@ export async function createResource(
       description: parsed.data.description || null,
       file_url: parsed.data.url,
       title: parsed.data.title,
-      uploaded_by: context.user.id,
+      uploaded_by: context.access.userId,
     })
     .select("id")
     .single();
 
   if (error || !data) {
     return {
-      message: "No se pudo crear el recurso. Intentalo de nuevo.",
+      message: "No se pudo crear el recurso. Inténtalo de nuevo.",
       status: "error",
     };
   }
@@ -143,11 +143,18 @@ export async function updateResource(
     };
   }
 
-  const context = await getResourceAdminContext();
+  const context = await getResourceManagerContext();
 
-  if (context.error || !context.user) {
+  if (context.error || !context.access) {
     return {
       message: context.error ?? "No se pudo validar tu cuenta.",
+      status: "error",
+    };
+  }
+
+  if (!canManageResourceArea(context.access, parsed.data.area)) {
+    return {
+      message: "No tienes permisos para mover recursos a esta área.",
       status: "error",
     };
   }
@@ -166,7 +173,7 @@ export async function updateResource(
 
   if (error || !data) {
     return {
-      message: "No se pudo actualizar el recurso. Intentalo de nuevo.",
+      message: "No se pudo actualizar el recurso. Inténtalo de nuevo.",
       status: "error",
     };
   }
@@ -187,14 +194,14 @@ export async function deleteResource(
 
   if (!parsed.success) {
     return {
-      message: "El recurso seleccionado no es valido.",
+      message: "El recurso seleccionado no es válido.",
       status: "error",
     };
   }
 
-  const context = await getResourceAdminContext();
+  const context = await getResourceManagerContext();
 
-  if (context.error || !context.user) {
+  if (context.error || !context.access) {
     return {
       message: context.error ?? "No se pudo validar tu cuenta.",
       status: "error",

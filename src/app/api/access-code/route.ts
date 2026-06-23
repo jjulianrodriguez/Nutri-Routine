@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     payload = (await request.json()) as AccessCodePayload;
   } catch {
     return NextResponse.json(
-      { error: "Solicitud invalida." },
+      { error: "Solicitud inválida." },
       { status: 400 },
     );
   }
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "El registro de nuevas cuentas no esta disponible en este momento.",
+          "El registro de nuevas cuentas no está disponible en este momento.",
       },
       { status: 500 },
     );
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
   if (!accessCode || accessCode !== expectedCode) {
     return NextResponse.json(
-      { error: "Codigo de acceso invalido." },
+      { error: "Código de acceso inválido." },
       { status: 403 },
     );
   }

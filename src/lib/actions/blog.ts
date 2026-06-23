@@ -7,6 +7,7 @@ import {
   getBlogTextContent,
   sanitizeBlogHtml,
 } from "@/lib/blog/content";
+import { getCurrentUserAccess } from "@/lib/auth/current-user-access";
 import { createClient } from "@/lib/supabase/server";
 import {
   blogDeleteSchema,
@@ -19,6 +20,7 @@ import {
 } from "@/lib/validations/blog";
 
 const ADMIN_BLOG_PATH = "/app/blog";
+const ADMIN_BLOG_LIST_PATH = "/app/blog/listado";
 const PUBLIC_BLOG_PATH = "/blog";
 
 type BlogFieldErrors = Partial<Record<keyof BlogPostValues, string>>;
@@ -132,6 +134,7 @@ function prepareContent(content: string): PreparedContent {
 
 function revalidateBlogPaths(slug?: string) {
   revalidatePath(ADMIN_BLOG_PATH);
+  revalidatePath(ADMIN_BLOG_LIST_PATH);
   revalidatePath(PUBLIC_BLOG_PATH);
 
   if (slug) {
@@ -139,39 +142,30 @@ function revalidateBlogPaths(slug?: string) {
   }
 }
 
-async function getBlogAdminContext() {
+async function getBlogManagerContext() {
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const access = await getCurrentUserAccess();
 
-  if (userError || !user) {
+  if (!access) {
     return {
-      error: "Debes iniciar sesion para administrar blogs.",
+      error: "Debes iniciar sesión para gestionar blogs.",
       supabase,
-      user: null,
+      userId: null,
     };
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError || profile?.role !== "admin") {
+  if (!access.canManageBlogPosts) {
     return {
-      error: "No tienes permisos de administrador para gestionar blogs.",
+      error: "No tienes permisos para gestionar blogs.",
       supabase,
-      user: null,
+      userId: null,
     };
   }
 
   return {
     error: null,
     supabase,
-    user,
+    userId: access.userId,
   };
 }
 
@@ -202,9 +196,9 @@ export async function createBlogPost(
     };
   }
 
-  const context = await getBlogAdminContext();
+  const context = await getBlogManagerContext();
 
-  if (context.error || !context.user) {
+  if (context.error || !context.userId) {
     return {
       message: context.error ?? "No se pudo validar tu cuenta.",
       status: "error",
@@ -222,7 +216,7 @@ export async function createBlogPost(
   const { data, error } = await context.supabase
     .from("blog_posts")
     .insert({
-      author_id: context.user.id,
+      author_id: context.userId,
       category: normalizeCategory(parsed.data.category),
       content: preparedContent.content,
       excerpt: createExcerpt(preparedContent.textContent),
@@ -238,7 +232,7 @@ export async function createBlogPost(
 
   if (error || !data) {
     return {
-      message: "No se pudo crear el blog. Intentalo de nuevo.",
+      message: "No se pudo crear el blog. Inténtalo de nuevo.",
       status: "error",
     };
   }
@@ -267,9 +261,9 @@ export async function updateBlogPost(
     };
   }
 
-  const context = await getBlogAdminContext();
+  const context = await getBlogManagerContext();
 
-  if (context.error || !context.user) {
+  if (context.error || !context.userId) {
     return {
       message: context.error ?? "No se pudo validar tu cuenta.",
       status: "error",
@@ -300,7 +294,7 @@ export async function updateBlogPost(
 
   if (error || !data) {
     return {
-      message: "No se pudo actualizar el blog. Intentalo de nuevo.",
+      message: "No se pudo actualizar el blog. Inténtalo de nuevo.",
       status: "error",
     };
   }
@@ -322,14 +316,14 @@ export async function updateBlogVisibility(
 
   if (!parsed.success) {
     return {
-      message: "El blog seleccionado no es valido.",
+      message: "El blog seleccionado no es válido.",
       status: "error",
     };
   }
 
-  const context = await getBlogAdminContext();
+  const context = await getBlogManagerContext();
 
-  if (context.error || !context.user) {
+  if (context.error || !context.userId) {
     return {
       message: context.error ?? "No se pudo validar tu cuenta.",
       status: "error",
@@ -356,7 +350,7 @@ export async function updateBlogVisibility(
   revalidateBlogPaths(data.slug);
 
   return {
-    message: published ? "Blog visible publicamente." : "Blog ocultado.",
+    message: published ? "Blog visible públicamente." : "Blog ocultado.",
     status: "success",
   };
 }
@@ -369,14 +363,14 @@ export async function updateBlogPinned(
 
   if (!parsed.success) {
     return {
-      message: "El blog seleccionado no es valido.",
+      message: "El blog seleccionado no es válido.",
       status: "error",
     };
   }
 
-  const context = await getBlogAdminContext();
+  const context = await getBlogManagerContext();
 
-  if (context.error || !context.user) {
+  if (context.error || !context.userId) {
     return {
       message: context.error ?? "No se pudo validar tu cuenta.",
       status: "error",
@@ -417,14 +411,14 @@ export async function deleteBlogPost(
 
   if (!parsed.success) {
     return {
-      message: "El blog seleccionado no es valido.",
+      message: "El blog seleccionado no es válido.",
       status: "error",
     };
   }
 
-  const context = await getBlogAdminContext();
+  const context = await getBlogManagerContext();
 
-  if (context.error || !context.user) {
+  if (context.error || !context.userId) {
     return {
       message: context.error ?? "No se pudo validar tu cuenta.",
       status: "error",

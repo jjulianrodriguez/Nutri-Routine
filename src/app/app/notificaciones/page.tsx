@@ -20,7 +20,7 @@ export default async function NotificationsPage() {
     ? access.canViewTraining && !access.canViewNutrition
       ? "Consulta avisos sobre tu entrenamiento, calendario y recursos."
       : access.canViewNutrition && !access.canViewTraining
-        ? "Consulta avisos sobre tu nutricion, calendario y recursos."
+        ? "Consulta avisos sobre tu nutrición, calendario y recursos."
         : "Consulta avisos sobre tus planes, calendario y recursos."
     : "Consulta cambios importantes en tus clientes, planes, asignaciones, citas y recursos.";
 
@@ -35,7 +35,7 @@ export default async function NotificationsPage() {
       {result.error ? (
         <AppPanel
           title="No pudimos cargar tus notificaciones"
-          description="Ocurrio un problema al consultar tu actividad. Actualiza la pagina para intentarlo de nuevo."
+          description="Ocurrió un problema al consultar tu actividad. Actualiza la página para intentarlo de nuevo."
           tone="accent"
         />
       ) : (
@@ -65,11 +65,13 @@ export default async function NotificationsPage() {
             title="Actividad reciente"
             description={
               access.isClient
-                ? "Selecciona una notificacion para abrir el detalle relacionado."
-                : "Selecciona una notificacion para abrir la seccion exacta relacionada."
+                ? "Selecciona una notificación para abrir el detalle relacionado."
+                : "Selecciona una notificación para abrir la sección exacta relacionada."
             }
           >
             <NotificationCenter
+              assignedNutritionistName={access.assignedNutritionistName}
+              assignedTrainerName={access.assignedTrainerName}
               hasNutrition={access.canViewNutrition}
               hasTraining={access.canViewTraining}
               notifications={result.items}

@@ -6,7 +6,7 @@ export default function PrivateAppNotFound() {
     <AppScreen>
       <div className="grid min-h-[70dvh] place-items-center">
         <RecoveryState
-          description="El contenido no existe, ya no esta disponible o tu cuenta no tiene permisos para consultarlo."
+          description="El contenido no existe, ya no está disponible o tu cuenta no tiene permisos para consultarlo."
           eyebrow="Recurso no disponible"
           fallbackHref="/app/dashboard"
           fallbackLabel="Ir al dashboard"

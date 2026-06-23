@@ -1,6 +1,7 @@
 import { TrendingUp } from "lucide-react";
 
 import { AppHeader, AppPanel, AppScreen, EmptyState, StatTile } from "@/components/app/AppScreen";
+import { AssignedProfessionalCards } from "@/components/app/relationship-badges";
 import { getProgressData } from "@/lib/app/dashboard-data";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 
@@ -10,7 +11,7 @@ function ProgressRecords({
   records: Awaited<ReturnType<typeof getProgressData>>["records"];
 }) {
   if (records.length === 0) {
-    return <EmptyState>No hay registros de progreso todavia.</EmptyState>;
+    return <EmptyState>No hay registros de progreso todavía.</EmptyState>;
   }
 
   return (
@@ -61,14 +62,22 @@ export default async function ProgressPage() {
         {access.role !== "admin" ? (
           <>
             <StatTile
-              label="Nutricion"
+              label="Nutrición"
               value={access.hasNutritionService ? "Activa" : "No asignada"}
-              detail="Disponible si hay un profesional en nutricion asignado"
+              detail={
+                access.assignedNutritionistName
+                  ? `Con ${access.assignedNutritionistName}`
+                  : "Sin profesional asignado"
+              }
             />
             <StatTile
               label="Entrenamiento"
               value={access.hasTrainingService ? "Activo" : "No asignado"}
-              detail="Disponible si hay un profesional en entrenamiento asignado"
+              detail={
+                access.assignedTrainerName
+                  ? `Con ${access.assignedTrainerName}`
+                  : "Sin profesional asignado"
+              }
             />
           </>
         ) : null}
@@ -82,6 +91,15 @@ export default async function ProgressPage() {
           }
         />
       </section>
+
+      {access.role !== "admin" ? (
+        <AssignedProfessionalCards
+          assignedNutritionistId={access.assignedNutritionistId}
+          assignedNutritionistName={access.assignedNutritionistName}
+          assignedTrainerId={access.assignedTrainerId}
+          assignedTrainerName={access.assignedTrainerName}
+        />
+      ) : null}
 
       <AppPanel
         title="Registro de avances"

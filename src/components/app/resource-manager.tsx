@@ -53,6 +53,7 @@ type ResourceManagerProps = {
   canManage: boolean;
   emptyHint?: string;
   emptyMessage?: string;
+  manageableAreas?: ResourceArea[];
   resources: MultimediaResource[];
 };
 
@@ -74,12 +75,12 @@ const AREA_DETAILS: Record<
   general: {
     icon: Layers3,
     label: "Ambos",
-    summary: "Entrenamiento y nutricion",
+    summary: "Entrenamiento y nutrición",
   },
   nutrition: {
     icon: Leaf,
-    label: "Nutricion",
-    summary: "Solo plan de nutricion",
+    label: "Nutrición",
+    summary: "Solo plan de nutrición",
   },
   training: {
     icon: Dumbbell,
@@ -91,7 +92,7 @@ const AREA_DETAILS: Record<
 const FILTERS: Array<{ label: string; value: ResourceFilter }> = [
   { label: "Todos", value: "all" },
   { label: "Entrenamiento", value: "training" },
-  { label: "Nutricion", value: "nutrition" },
+  { label: "Nutrición", value: "nutrition" },
   { label: "Ambos", value: "general" },
 ];
 
@@ -250,6 +251,7 @@ export function ResourceManager({
   canManage,
   emptyHint,
   emptyMessage,
+  manageableAreas = ["training", "nutrition", "general"],
   resources,
 }: ResourceManagerProps) {
   const router = useRouter();
@@ -399,7 +401,7 @@ export function ResourceManager({
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
             {canManage
               ? "Cada tarjeta muestra el tipo de material y el sitio de origen para identificarlo rapido."
-              : "Abre los materiales compartidos para acompanar tu plan. Los enlaces externos se abren en una nueva pestana."}
+              : "Abre los materiales compartidos para acompañar tu plan. Los enlaces externos se abren en una nueva pestaña."}
           </p>
         </div>
       </div>
@@ -458,8 +460,8 @@ export function ResourceManager({
           <p className="mt-2 text-sm leading-6 text-muted">
             {emptyHint ??
               (canManage
-                ? "Crea el primer recurso o selecciona otra categoria."
-                : "Tu entrenador puede compartir recursos contigo.")}
+                ? "Crea el primer recurso o selecciona otra categoría."
+                : "Tu profesional asignado puede compartir recursos contigo.")}
           </p>
         </div>
       )}
@@ -479,7 +481,7 @@ export function ResourceManager({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
-              {editingResource ? "Edicion" : "Nuevo recurso"}
+              {editingResource ? "Edición" : "Nuevo recurso"}
             </p>
             <h2 className="mt-2 text-3xl font-semibold text-charcoal">
               {editingResource ? "Editar recurso" : "Crear recurso"}
@@ -527,7 +529,7 @@ export function ResourceManager({
               htmlFor="resource-description"
               className="font-extrabold text-charcoal"
             >
-              Descripcion opcional
+              Descripción opcional
             </Label>
             <textarea
               id="resource-description"
@@ -597,9 +599,7 @@ export function ResourceManager({
               Tipo de acceso
             </legend>
             <div className="mt-3 grid gap-3">
-              {(
-                ["training", "nutrition", "general"] as ResourceArea[]
-              ).map((areaValue) => {
+              {manageableAreas.map((areaValue) => {
                 const details = AREA_DETAILS[areaValue];
                 const Icon = details.icon;
 

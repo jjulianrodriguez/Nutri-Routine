@@ -96,7 +96,7 @@ function toSnapshot(model: TemplateOverviewModel): WorkoutTemplateSnapshot {
 
 export function TemplateOverview({
   currentDayNumber,
-  emptyMessage = "Esta plantilla no tiene dias configurados.",
+  emptyMessage = "Esta plantilla no tiene días configurados.",
   routineHref,
   showExerciseDetails,
   statusLabel,

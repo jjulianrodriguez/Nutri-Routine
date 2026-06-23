@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 function makeQueryClient() {
@@ -34,9 +35,11 @@ export function Providers({ children }: { children: ReactNode }) {
   const queryClient = getQueryClient();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-      <Toaster richColors closeButton />
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        {children}
+        <Toaster richColors closeButton />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

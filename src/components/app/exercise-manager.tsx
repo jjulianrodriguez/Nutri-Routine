@@ -449,7 +449,7 @@ export function ExerciseManager({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted">
-              {editingId ? "Edicion" : "Nuevo ejercicio"}
+              {editingId ? "Edición" : "Nuevo ejercicio"}
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-charcoal">
               {editingId ? "Actualizar ejercicio" : "Crear ejercicio"}
@@ -490,7 +490,7 @@ export function ExerciseManager({
               htmlFor="exercise-description"
               className="font-extrabold text-charcoal"
             >
-              Descripcion e instrucciones
+              Descripción e instrucciones
             </Label>
             <textarea
               id="exercise-description"
@@ -579,7 +579,7 @@ export function ExerciseManager({
                 htmlFor="exercise-category"
                 className="font-extrabold text-charcoal"
               >
-                Categoria
+                Categoría
               </Label>
               <select
                 id="exercise-category"
@@ -591,7 +591,7 @@ export function ExerciseManager({
                 {...register("category")}
               >
                 <option value="" disabled>
-                  Selecciona una categoria
+                  Selecciona una categoría
                 </option>
                 {getExerciseSelectOptions(
                   exerciseCategoryOptions,
@@ -721,7 +721,7 @@ export function ExerciseManager({
               </Button>
             ) : (
               <p className="mt-4 text-xs font-bold text-muted">
-                Alcanzaste el maximo de 3 recursos multimedia.
+                Alcanzaste el máximo de 3 recursos multimedia.
               </p>
             )}
           </fieldset>
@@ -764,7 +764,7 @@ export function ExerciseManager({
             </h2>
             <p className="mt-2 text-sm font-semibold text-muted">
               Mostrando {exercises.length} de {pagination.totalCount}. Los
-              filtros se aplican antes de cargar mas resultados.
+              filtros se aplican antes de cargar más resultados.
             </p>
           </div>
         </div>
@@ -785,7 +785,7 @@ export function ExerciseManager({
                 updateDraftFilter("query", event.target.value)
               }
               className="rounded-control bg-surface pl-10"
-              placeholder="Buscar por nombre, grupo, categoria o tipo"
+              placeholder="Buscar por nombre, grupo, categoría o tipo"
               aria-label="Buscar ejercicios"
             />
           </div>
@@ -867,7 +867,7 @@ export function ExerciseManager({
                 htmlFor="exercise-filter-category"
                 className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted"
               >
-                Categoria
+                Categoría
               </Label>
               <select
                 id="exercise-filter-category"
@@ -1014,7 +1014,7 @@ export function ExerciseManager({
                   </span>
                   <span
                     className="rounded-full border border-border bg-surface px-2.5 py-1"
-                    title="Categoria"
+                    title="Categoría"
                   >
                     {exercise.category}
                   </span>
@@ -1071,7 +1071,7 @@ export function ExerciseManager({
               {isPending ? (
                 <Loader2 className="animate-spin" aria-hidden="true" />
               ) : null}
-              {isPending ? "Cargando..." : `Cargar ${pagination.pageSize} mas`}
+              {isPending ? "Cargando..." : `Cargar ${pagination.pageSize} más`}
             </Button>
           ) : exercises.length > 0 ? (
             <p className="rounded-[18px] bg-background px-4 py-3 text-center text-sm font-semibold text-muted">

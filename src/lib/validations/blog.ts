@@ -6,8 +6,8 @@ export const blogPostValuesSchema = z.object({
   category: z
     .string()
     .trim()
-    .min(1, "Escribe o selecciona una categoria.")
-    .max(80, "La categoria no puede superar 80 caracteres."),
+    .min(1, "Escribe o selecciona una categoría.")
+    .max(80, "La categoría no puede superar 80 caracteres."),
   content: z
     .string()
     .trim()
@@ -25,22 +25,22 @@ export const blogPostValuesSchema = z.object({
 
 export const updateBlogPostValuesSchema = blogPostValuesSchema.and(
   z.object({
-    id: z.string().uuid("El blog seleccionado no es valido."),
+    id: z.string().uuid("El blog seleccionado no es válido."),
   }),
 );
 
 export const blogVisibilitySchema = z.object({
-  id: z.string().uuid("El blog seleccionado no es valido."),
+  id: z.string().uuid("El blog seleccionado no es válido."),
   published: z.boolean(),
 });
 
 export const blogPinnedSchema = z.object({
-  id: z.string().uuid("El blog seleccionado no es valido."),
+  id: z.string().uuid("El blog seleccionado no es válido."),
   isPinned: z.boolean(),
 });
 
 export const blogDeleteSchema = z.object({
-  id: z.string().uuid("El blog seleccionado no es valido."),
+  id: z.string().uuid("El blog seleccionado no es válido."),
 });
 
 export type BlogPostValues = z.infer<typeof blogPostValuesSchema>;

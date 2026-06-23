@@ -7,7 +7,7 @@ const externalResourceUrlSchema = z
   .trim()
   .min(1, "Escribe la URL del recurso.")
   .max(2048, "La URL no puede superar 2048 caracteres.")
-  .url("Escribe una URL completa y valida.")
+  .url("Escribe una URL completa y válida.")
   .refine((value) => {
     const url = new URL(value);
     const hostname = url.hostname.toLowerCase();
@@ -28,7 +28,7 @@ export const resourceValuesSchema = z.object({
   description: z
     .string()
     .trim()
-    .max(2000, "La descripcion no puede superar 2000 caracteres."),
+    .max(2000, "La descripción no puede superar 2000 caracteres."),
   title: z
     .string()
     .trim()
@@ -39,12 +39,12 @@ export const resourceValuesSchema = z.object({
 
 export const updateResourceValuesSchema = resourceValuesSchema.and(
   z.object({
-    id: z.string().uuid("El recurso seleccionado no es valido."),
+    id: z.string().uuid("El recurso seleccionado no es válido."),
   }),
 );
 
 export const resourceDeleteSchema = z.object({
-  id: z.string().uuid("El recurso seleccionado no es valido."),
+  id: z.string().uuid("El recurso seleccionado no es válido."),
 });
 
 export type ResourceValues = z.infer<typeof resourceValuesSchema>;

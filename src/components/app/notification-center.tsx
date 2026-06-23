@@ -9,6 +9,7 @@ import {
   HeartPulse,
   Leaf,
   LoaderCircle,
+  MessageCircle,
   UserRoundCheck,
   type LucideIcon,
 } from "lucide-react";
@@ -33,10 +34,14 @@ type NotificationViewer = "client" | "professional";
 
 const DEFAULT_PRESENTATION: EventPresentation = {
   icon: Bell,
-  label: "Actualizacion",
+  label: "Actualización",
 };
 
 function getEventPresentation(eventType: string): EventPresentation {
+  if (eventType.startsWith("chat_")) {
+    return { icon: MessageCircle, label: "Mensajes" };
+  }
+
   if (eventType.startsWith("appointment_")) {
     return { icon: CalendarClock, label: "Calendario" };
   }
@@ -50,11 +55,11 @@ function getEventPresentation(eventType: string): EventPresentation {
   }
 
   if (eventType.startsWith("nutrition_")) {
-    return { icon: Leaf, label: "Nutricion" };
+    return { icon: Leaf, label: "Nutrición" };
   }
 
   if (eventType.includes("professional_")) {
-    return { icon: UserRoundCheck, label: "Asignacion" };
+    return { icon: UserRoundCheck, label: "Asignación" };
   }
 
   if (eventType === "progress_recorded") {
@@ -119,7 +124,7 @@ function getResourceAreaMessage(
   }
 
   if (area === "nutrition" || (hasNutrition && !hasTraining)) {
-    return "Tienes nuevos recursos de nutricion.";
+    return "Tienes nuevos recursos de nutrición.";
   }
 
   return "Tienes nuevos recursos disponibles.";
@@ -127,9 +132,15 @@ function getResourceAreaMessage(
 
 function getClientNotificationMessage(
   notification: AppNotification,
+  assignedNutritionistName: string | null,
+  assignedTrainerName: string | null,
   hasNutrition: boolean,
   hasTraining: boolean,
 ) {
+  const trainerLabel =
+    assignedTrainerName ?? "Tu profesional de entrenamiento";
+  const nutritionistLabel =
+    assignedNutritionistName ?? "Tu profesional de nutrición";
   const title =
     getMetadataString(notification, [
       "templateName",
@@ -143,8 +154,8 @@ function getClientNotificationMessage(
   switch (notification.event_type) {
     case "workout_template_assigned":
       return title
-        ? `Tu entrenador te asigno la plantilla "${title}".`
-        : "Tu entrenador te asigno una plantilla.";
+        ? `${trainerLabel} te asigno la plantilla "${title}".`
+        : `${trainerLabel} te asigno una plantilla.`;
     case "workout_template_unassigned":
       return title
         ? `La plantilla "${title}" se archivo en tu historial.`
@@ -153,8 +164,8 @@ function getClientNotificationMessage(
       return "Tu entrenamiento fue actualizado.";
     case "routine_assigned":
       return title
-        ? `Tu entrenador te asigno el entrenamiento "${title}".`
-        : "Tu entrenador te asigno un entrenamiento.";
+        ? `${trainerLabel} te asigno el entrenamiento "${title}".`
+        : `${trainerLabel} te asigno un entrenamiento.`;
     case "routine_unassigned":
       return title
         ? `El entrenamiento "${title}" se archivo en tu historial.`
@@ -165,20 +176,24 @@ function getClientNotificationMessage(
       return "Tu plan de entrenamiento fue desactivado.";
     case "training_professional_changed":
     case "training_professional_assigned":
-      return "Tu entrenador fue actualizado.";
+      return assignedTrainerName
+        ? `${assignedTrainerName} es tu profesional de entrenamiento.`
+        : "Tu profesional de entrenamiento fue actualizado.";
     case "resource_available":
       return getResourceAreaMessage(notification, hasNutrition, hasTraining);
     case "nutrition_plan_assigned":
-      return "Tu profesional te asigno un plan de nutricion.";
+      return `${nutritionistLabel} te asignó un plan de nutrición.`;
     case "nutrition_plan_archived":
-      return "Tu plan de nutricion se archivo en tu historial.";
+      return "Tu plan de nutrición se archivó en tu historial.";
     case "nutrition_plan_activated":
-      return "Tu plan de nutricion esta activo.";
+      return "Tu plan de nutrición está activo.";
     case "nutrition_plan_deactivated":
-      return "Tu plan de nutricion fue desactivado.";
+      return "Tu plan de nutrición fue desactivado.";
     case "nutrition_professional_changed":
     case "nutrition_professional_assigned":
-      return "Tu profesional de nutricion fue actualizado.";
+      return assignedNutritionistName
+        ? `${assignedNutritionistName} es tu nutricionista.`
+        : "Tu profesional de nutrición fue actualizado.";
     default:
       if (
         notification.event_type.startsWith("workout_") ||
@@ -194,30 +209,40 @@ function getClientNotificationMessage(
 
 function getEmptyMessage(
   viewer: NotificationViewer,
+  assignedNutritionistName: string | null,
+  assignedTrainerName: string | null,
   hasNutrition: boolean,
   hasTraining: boolean,
 ) {
   if (viewer !== "client") {
-    return "No tienes notificaciones por ahora. La actividad reciente aparecera aqui.";
+    return "No tienes notificaciones por ahora. La actividad reciente aparecerá aquí.";
   }
 
   if (hasTraining && !hasNutrition) {
-    return "No tienes notificaciones por ahora. Tu entrenador te avisara aqui cuando haya cambios en tu entrenamiento o recursos nuevos.";
+    return `No tienes notificaciones por ahora. ${
+      assignedTrainerName ?? "Tu profesional de entrenamiento"
+    } te avisará aquí cuando haya cambios en tu entrenamiento o recursos nuevos.`;
   }
 
   if (hasNutrition && !hasTraining) {
-    return "No tienes notificaciones por ahora. Tu profesional te avisara aqui cuando haya cambios en tu plan o recursos nuevos.";
+    return `No tienes notificaciones por ahora. ${
+      assignedNutritionistName ?? "Tu profesional de nutrición"
+    } te avisará aquí cuando haya cambios en tu plan o recursos nuevos.`;
   }
 
-  return "No tienes notificaciones por ahora. Aqui veras avisos sobre tus planes, calendario y recursos.";
+  return "No tienes notificaciones por ahora. Aquí verás avisos sobre tus planes, calendario y recursos.";
 }
 
 export function NotificationCenter({
+  assignedNutritionistName = null,
+  assignedTrainerName = null,
   hasNutrition = false,
   hasTraining = false,
   notifications,
   viewer = "professional",
 }: {
+  assignedNutritionistName?: string | null;
+  assignedTrainerName?: string | null;
   hasNutrition?: boolean;
   hasTraining?: boolean;
   notifications: AppNotification[];
@@ -276,7 +301,13 @@ export function NotificationCenter({
   if (notifications.length === 0) {
     return (
       <EmptyState>
-        {getEmptyMessage(viewer, hasNutrition, hasTraining)}
+        {getEmptyMessage(
+          viewer,
+          assignedNutritionistName,
+          assignedTrainerName,
+          hasNutrition,
+          hasTraining,
+        )}
       </EmptyState>
     );
   }
@@ -286,9 +317,9 @@ export function NotificationCenter({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm font-semibold text-muted" aria-live="polite">
           {unreadCount === 0
-            ? "Estas al dia."
+            ? "Estás al día."
             : `${unreadCount} ${
-                unreadCount === 1 ? "notificacion nueva" : "notificaciones nuevas"
+                unreadCount === 1 ? "notificación nueva" : "notificaciones nuevas"
               }`}
         </p>
         {unreadCount > 0 ? (
@@ -327,6 +358,8 @@ export function NotificationCenter({
             viewer === "client"
               ? getClientNotificationMessage(
                   notification,
+                  assignedNutritionistName,
+                  assignedTrainerName,
                   hasNutrition,
                   hasTraining,
                 )

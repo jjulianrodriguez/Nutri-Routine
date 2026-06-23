@@ -17,12 +17,12 @@ export default function PrivateAppError({
     <AppScreen>
       <div className="grid min-h-[70dvh] place-items-center">
         <RecoveryState
-          description="No pudimos cargar la informacion de esta seccion. Tus datos y cambios guardados no se han mostrado de forma publica."
+          description="No pudimos cargar la información de esta sección. Tus datos y cambios guardados no se han mostrado de forma pública."
           eyebrow="Error en la aplicacion"
           fallbackHref="/app/dashboard"
           fallbackLabel="Ir al dashboard"
           retry={unstable_retry ?? reset}
-          title="Ocurrio un error inesperado"
+          title="Ocurrió un error inesperado"
         />
       </div>
     </AppScreen>

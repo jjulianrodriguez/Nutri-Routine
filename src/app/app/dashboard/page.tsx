@@ -17,6 +17,10 @@ import {
   EmptyState,
   StatTile,
 } from "@/components/app/AppScreen";
+import {
+  AssignedProfessionalCards,
+  RelationshipBadge,
+} from "@/components/app/relationship-badges";
 import { FadeIn } from "@/components/motion/fade-in";
 import type { CurrentUserAccess } from "@/lib/auth/access-rules";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
@@ -56,14 +60,17 @@ function RecordList({
 
 function TrainingActionCard({
   record,
+  trainerName,
 }: {
   record: AppRecordSummary | null;
+  trainerName: string | null;
 }) {
   if (!record) {
     return (
       <EmptyState>
-        No hay una plantilla visible por ahora. Cuando tu entrenador la asigne,
-        podras empezar desde aqui.
+        No hay una plantilla visible por ahora. Cuando{" "}
+        {trainerName ?? "tu profesional de entrenamiento"} la asigne, podras
+        empezar desde aquí.
       </EmptyState>
     );
   }
@@ -126,14 +133,14 @@ function QuickLink({
 
 function ServicesSummary({ access }: { access: CurrentUserAccess }) {
   const services = [
-    access.hasNutritionService ? "Nutricion" : null,
+    access.hasNutritionService ? "Nutrición" : null,
     access.hasTrainingService ? "Entrenamiento" : null,
   ].filter(Boolean);
   const description = access.hasTrainingService && !access.hasNutritionService
     ? "Tu plan de entrenamiento esta activo y esta vista se enfoca en tu avance."
     : access.hasNutritionService && !access.hasTrainingService
-      ? "Tu plan de nutricion esta activo y esta vista se enfoca en tu seguimiento."
-      : "Tus secciones activas aparecen segun los servicios asignados a tu cuenta.";
+      ? "Tu plan de nutrición está activo y esta vista se enfoca en tu seguimiento."
+      : "Tus secciones activas aparecen según los servicios asignados a tu cuenta.";
 
   return (
     <AppPanel
@@ -142,20 +149,29 @@ function ServicesSummary({ access }: { access: CurrentUserAccess }) {
       tone="primary"
     >
       {services.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {services.map((service) => (
-            <span
-              key={service}
-              className="rounded-full bg-surface px-4 py-2 text-sm font-extrabold text-charcoal"
-            >
-              {service}
-            </span>
-          ))}
+        <div className="space-y-4">
+          <AssignedProfessionalCards
+            assignedNutritionistId={access.assignedNutritionistId}
+            assignedNutritionistName={access.assignedNutritionistName}
+            assignedTrainerId={access.assignedTrainerId}
+            assignedTrainerName={access.assignedTrainerName}
+          />
+          <div className="flex flex-wrap gap-2">
+            {services.map((service) => (
+              <RelationshipBadge
+                key={service}
+                className="px-3 py-1.5 text-sm"
+                tone="neutral"
+              >
+                {service}
+              </RelationshipBadge>
+            ))}
+          </div>
         </div>
       ) : (
         <EmptyState>
           Todavia no tenes servicios asignados. Cuando un profesional active tu
-          plan, aparecera aqui y en tu sidebar.
+          plan, aparecerá aquí y en tu sidebar.
         </EmptyState>
       )}
     </AppPanel>
@@ -164,14 +180,14 @@ function ServicesSummary({ access }: { access: CurrentUserAccess }) {
 
 function getClientDashboardDescription(access: CurrentUserAccess) {
   if (access.canViewTraining && !access.canViewNutrition) {
-    return "Tu plan de entrenamiento esta activo. Aqui veras tu entrenamiento actual, recursos y recordatorios.";
+    return "Tu plan de entrenamiento está activo. Aquí verás tu entrenamiento actual, recursos y recordatorios.";
   }
 
   if (access.canViewNutrition && !access.canViewTraining) {
-    return "Tu plan de nutricion esta activo. Aqui veras tu plan actual, recursos y recordatorios.";
+    return "Tu plan de nutrición está activo. Aquí verás tu plan actual, recursos y recordatorios.";
   }
 
-  return "Aqui veras tus planes activos, recursos y recordatorios en un solo lugar.";
+  return "Aquí verás tus planes activos, recursos y recordatorios en un solo lugar.";
 }
 
 function ClientDashboard({
@@ -208,7 +224,7 @@ function ClientDashboard({
           />
           {access.canViewNutrition ? (
             <StatTile
-              label="Planes de nutricion"
+              label="Planes de nutrición"
               value={String(data.dietPlansCount)}
               detail="Visibles para tu cuenta"
             />
@@ -236,7 +252,7 @@ function ClientDashboard({
         <FadeIn delay={0.14}>
           <AppPanel
             title="Progreso"
-            description="Consulta tus avances en un espacio separado de las areas de nutricion y entrenamiento."
+            description="Consulta tus avances en un espacio separado de las áreas de nutrición y entrenamiento."
           >
             <Link
               href="/app/progreso"
@@ -267,10 +283,15 @@ function ClientDashboard({
           <FadeIn delay={0.22}>
             <AppPanel
               title="Tu entrenamiento actual"
-              description="Hoy te toca revisar la plantilla asignada por tu entrenador."
+              description={`Hoy te toca revisar la plantilla asignada por ${
+                access.assignedTrainerName ?? "tu profesional de entrenamiento"
+              }.`}
               tone="accent"
             >
-              <TrainingActionCard record={data.currentWorkoutPlan} />
+              <TrainingActionCard
+                record={data.currentWorkoutPlan}
+                trainerName={access.assignedTrainerName}
+              />
             </AppPanel>
           </FadeIn>
         ) : null}
@@ -292,12 +313,12 @@ function ClientDashboard({
         <FadeIn delay={0.3}>
           <AppPanel
             title="Citas y recordatorios"
-            description="Accede a tus proximas citas y recordatorios desde el calendario."
+            description="Accede a tus próximas citas y recordatorios desde el calendario."
             tone="primary"
           >
             <div className="grid gap-3">
               <QuickLink
-                description="Ver proximas citas y recordatorios."
+                description="Ver próximas citas y recordatorios."
                 href="/app/calendario"
                 icon={CalendarDays}
                 label="Calendario"
@@ -323,7 +344,7 @@ function AdminDashboard({
           description: "Clientes, dietas, planes alimenticios y recursos.",
           href: "/app/nutricion",
           icon: Leaf,
-          label: "Nutricion",
+          label: "Nutrición",
         }
       : null,
     access.canManageTraining
@@ -361,8 +382,8 @@ function AdminDashboard({
       <FadeIn>
         <AppHeader
           eyebrow={access.roleLabel}
-          title={`Hola, ${access.displayName}. Tu gestion esta organizada por area.`}
-          description="Esta vista reune clientes, planes y accesos segun tu area profesional."
+          title={`Hola, ${access.displayName}. Tu gestión está organizada por área.`}
+          description="Esta vista reúne clientes, planes y accesos según tu área profesional."
         />
       </FadeIn>
 
@@ -380,14 +401,14 @@ function AdminDashboard({
             <StatTile
               label="Planes alimenticios"
               value={String(data.dietPlansCount)}
-              detail="Disponibles segun tu area profesional"
+              detail="Disponibles según tu área profesional"
             />
           ) : null}
           {access.canManageTraining ? (
             <StatTile
               label="Planes de entrenamiento"
               value={String(data.workoutPlansCount)}
-              detail="Disponibles segun tu area profesional"
+              detail="Disponibles según tu área profesional"
             />
           ) : null}
           <StatTile
@@ -402,7 +423,7 @@ function AdminDashboard({
         <FadeIn delay={0.1}>
           <AppPanel
             title="Accesos rapidos"
-            description="Solo aparecen las secciones disponibles para tu area profesional."
+            description="Solo aparecen las secciones disponibles para tu área profesional."
           >
             <div className="grid gap-3 sm:grid-cols-2">
               {quickLinks.map((link) => (
@@ -443,11 +464,11 @@ function AdminDashboard({
 
         <FadeIn delay={0.22}>
           <AppPanel
-            title="Configuracion"
+            title="Configuración"
             description="Perfil, cuenta y preferencias personales."
           >
             <QuickLink
-              description="Administrar tu configuracion."
+              description="Administrar tu configuración."
               href="/app/configuracion"
               icon={Settings}
               label="Configurar"

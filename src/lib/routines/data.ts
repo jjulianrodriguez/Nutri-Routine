@@ -1,7 +1,10 @@
 import "server-only";
 
 import type { CurrentUserAccess } from "@/lib/auth/access-rules";
-import { listAuthEmailsByUserId } from "@/lib/auth/auth-user-emails";
+import {
+  getProfileDirectory,
+  getProfileDisplayName,
+} from "@/lib/auth/profile-directory";
 import { normalizeExerciseMultimediaUrls } from "@/lib/exercises/multimedia";
 import { parseRoutineSnapshot } from "@/lib/routines/snapshot";
 import { createClient } from "@/lib/supabase/server";
@@ -79,7 +82,7 @@ export async function listExerciseOptions(): Promise<ExerciseOption[]> {
     .order("name");
 
   if (error) {
-    throw new Error("No se pudo cargar el catalogo de ejercicios.");
+    throw new Error("No se pudo cargar el catálogo de ejercicios.");
   }
 
   return (data ?? []).map(mapExercise);
@@ -103,29 +106,15 @@ export async function getRoutineManagementOverview(): Promise<RoutineManagementO
   ]);
 
   if (routinesResult.error || relationsResult.error || exercisesResult.error) {
-    throw new Error("No se pudo cargar la gestion de rutinas.");
+    throw new Error("No se pudo cargar la gestión de rutinas.");
   }
 
   const routines = routinesResult.data ?? [];
   const creatorIds = [...new Set(routines.map((routine) => routine.creator_id))];
-  const creatorsResult =
-    creatorIds.length > 0
-      ? await supabase
-          .from("profiles")
-          .select("id, full_name")
-          .in("id", creatorIds)
-      : { data: [], error: null };
-
-  if (creatorsResult.error) {
-    throw new Error("No se pudieron cargar los creadores de las rutinas.");
-  }
-
-  const creators = new Map(
-    (creatorsResult.data ?? []).map((profile) => [
-      profile.id,
-      profile.full_name ?? "Profesional",
-    ]),
-  );
+  const creators = await getProfileDirectory(creatorIds, {
+    includeEmails: true,
+    includeProfessionalProfiles: true,
+  });
   const exerciseCounts = new Map<string, number>();
   const inactiveExerciseCounts = new Map<string, number>();
   const exerciseStatusById = new Map(
@@ -157,7 +146,9 @@ export async function getRoutineManagementOverview(): Promise<RoutineManagementO
     routines: routines.map((routine) => ({
       category: routine.category,
       createdAt: routine.created_at,
-      creatorName: creators.get(routine.creator_id) ?? "Profesional",
+      creatorName:
+        getProfileDisplayName(creators.get(routine.creator_id)) ??
+        "Perfil incompleto",
       description: routine.description,
       difficulty: normalizeDifficulty(routine.difficulty),
       exerciseCount: exerciseCounts.get(routine.id) ?? 0,
@@ -210,13 +201,11 @@ export async function getRoutineDetails(
   const exerciseIds = [
     ...new Set(relations.map((relation) => relation.exercise_id)),
   ];
-  const [creatorsResult, exercisesResult] = await Promise.all([
-    creatorIds.length > 0
-      ? supabase
-          .from("profiles")
-          .select("id, full_name")
-          .in("id", creatorIds)
-      : Promise.resolve({ data: [], error: null }),
+  const [creators, exercisesResult] = await Promise.all([
+    getProfileDirectory(creatorIds, {
+      includeEmails: true,
+      includeProfessionalProfiles: true,
+    }),
     exerciseIds.length > 0
       ? supabase
           .from("exercises")
@@ -227,16 +216,9 @@ export async function getRoutineDetails(
       : Promise.resolve({ data: [], error: null }),
   ]);
 
-  if (creatorsResult.error || exercisesResult.error) {
+  if (exercisesResult.error) {
     throw new Error("No se pudo completar el detalle de los entrenamientos.");
   }
-
-  const creators = new Map(
-    (creatorsResult.data ?? []).map((profile) => [
-      profile.id,
-      profile.full_name ?? "Profesional",
-    ]),
-  );
   const exercises = new Map(
     (exercisesResult.data ?? []).map((exercise) => [
       exercise.id,
@@ -258,7 +240,9 @@ export async function getRoutineDetails(
         category: routine.category,
         createdAt: routine.created_at,
         creatorId: routine.creator_id,
-        creatorName: creators.get(routine.creator_id) ?? "Profesional",
+        creatorName:
+          getProfileDisplayName(creators.get(routine.creator_id)) ??
+          "Perfil incompleto",
         description: routine.description,
         difficulty: normalizeDifficulty(routine.difficulty),
         exercises: (relationsByRoutineId.get(routine.id) ?? []).flatMap(
@@ -545,13 +529,12 @@ export async function listAssignableTrainingClients(
   }
 
   const trainerIds = [...new Set(trainerIdByClientId.values())];
-  const [profilesResult, plansResult, trainersResult, emailsById] =
+  const [profilesById, plansResult] =
     await Promise.all([
-      supabase
-        .from("profiles")
-        .select("id, full_name, avatar_url")
-        .eq("role", "client")
-        .in("id", clientIds),
+      getProfileDirectory([...clientIds, ...trainerIds], {
+        includeEmails: true,
+        includeProfessionalProfiles: true,
+      }),
       supabase
         .from("workout_plans")
         .select(
@@ -560,23 +543,11 @@ export async function listAssignableTrainingClients(
         .in("client_id", clientIds)
         .eq("status", "active")
         .order("created_at", { ascending: false }),
-      supabase
-        .from("profiles")
-        .select("id, full_name")
-        .in("id", trainerIds),
-      listAuthEmailsByUserId(clientIds),
     ]);
 
-  if (profilesResult.error || plansResult.error || trainersResult.error) {
+  if (plansResult.error) {
     throw new Error("No se pudo completar la lista de clientes.");
   }
-
-  const trainerNameById = new Map(
-    (trainersResult.data ?? []).map((profile) => [
-      profile.id,
-      profile.full_name ?? "Profesional en entrenamiento",
-    ]),
-  );
   const currentAssignmentByClient = new Map<
     string,
     RoutineAssignmentSummary
@@ -594,18 +565,29 @@ export async function listAssignableTrainingClients(
     );
   });
 
-  return (profilesResult.data ?? [])
-    .map((profile) => ({
-      avatarUrl: profile.avatar_url,
-      assignedTrainerName:
-        trainerNameById.get(trainerIdByClientId.get(profile.id) ?? "") ??
-        "Profesional en entrenamiento",
-      contact: emailsById.get(profile.id) || null,
-      currentAssignment: currentAssignmentByClient.get(profile.id) ?? null,
-      id: profile.id,
-      name: profile.full_name ?? "Cliente",
-      trainingPlanStatus: "active" as const,
-    }))
+  return clientIds
+    .map((clientId) => {
+      const profile = profilesById.get(clientId);
+      const trainerId = trainerIdByClientId.get(clientId) ?? null;
+
+      if (profile?.role !== "client") {
+        return null;
+      }
+
+      return {
+        avatarUrl: profile.avatarUrl,
+        assignedTrainerId: trainerId,
+        assignedTrainerName: trainerId
+          ? getProfileDisplayName(profilesById.get(trainerId))
+          : null,
+        contact: profile.email,
+        currentAssignment: currentAssignmentByClient.get(clientId) ?? null,
+        id: clientId,
+        name: getProfileDisplayName(profile) ?? "Perfil incompleto",
+        trainingPlanStatus: "active" as const,
+      } satisfies AssignableTrainingClient;
+    })
+    .filter((client): client is AssignableTrainingClient => Boolean(client))
     .sort((left, right) => left.name.localeCompare(right.name, "es"));
 }
 
@@ -750,7 +732,7 @@ export async function getRoutineAssignmentDetail(
     .maybeSingle();
 
   if (error) {
-    throw new Error("No se pudo cargar la asignacion de entrenamiento.");
+    throw new Error("No se pudo cargar la asignación de entrenamiento.");
   }
 
   if (!plan) {

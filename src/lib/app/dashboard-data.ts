@@ -74,7 +74,7 @@ const PLAN_STATUS_LABELS: Record<Enums<"plan_status">, string> = {
 
 const AREA_LABELS: Record<Enums<"service_area">, string> = {
   general: "General",
-  nutrition: "Nutricion",
+  nutrition: "Nutrición",
   training: "Entrenamiento",
 };
 

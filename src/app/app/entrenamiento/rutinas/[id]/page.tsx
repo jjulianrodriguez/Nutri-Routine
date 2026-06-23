@@ -80,7 +80,7 @@ export default async function RoutineDetailPage({
             {inactiveExerciseCount === 1
               ? "Este entrenamiento contiene 1 ejercicio desactivado."
               : `Este entrenamiento contiene ${inactiveExerciseCount} ejercicios desactivados.`}{" "}
-            Se conserva en este entrenamiento, pero no esta disponible para
+            Se conserva en este entrenamiento, pero no está disponible para
             agregarlo a entrenamientos nuevos.
           </AlertDescription>
         </Alert>
@@ -120,7 +120,7 @@ export default async function RoutineDetailPage({
           </p>
         </div>
         <div className="rounded-[24px] border border-border bg-surface p-5 shadow-soft">
-          <p className="text-sm font-bold text-muted">Categoria</p>
+          <p className="text-sm font-bold text-muted">Categoría</p>
           <p className="mt-3 text-xl font-extrabold text-charcoal">
             {routine.category}
           </p>
@@ -145,7 +145,7 @@ export default async function RoutineDetailPage({
       >
         {routine.exercises.length === 0 ? (
           <EmptyState>
-            Este entrenamiento todavia no tiene ejercicios.
+            Este entrenamiento todavía no tiene ejercicios.
           </EmptyState>
         ) : (
           <GroupedRoutineExercises
@@ -165,7 +165,7 @@ export default async function RoutineDetailPage({
 
       <AppPanel
         title="Registro"
-        description="Informacion de autoria y mantenimiento del entrenamiento."
+        description="Información de autoría y mantenimiento del entrenamiento."
         tone="accent"
       >
         <div className="grid gap-3 sm:grid-cols-3">

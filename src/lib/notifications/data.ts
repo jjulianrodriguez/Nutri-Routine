@@ -60,8 +60,8 @@ function formatRelativeNotificationDate(value: string) {
 
   if (days < 14) {
     return future
-      ? `En ${days} ${days === 1 ? "dia" : "dias"}`
-      : `Hace ${days} ${days === 1 ? "dia" : "dias"}`;
+      ? `En ${days} ${days === 1 ? "día" : "días"}`
+      : `Hace ${days} ${days === 1 ? "día" : "días"}`;
   }
 
   return future

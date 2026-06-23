@@ -35,7 +35,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
           Pronto habra nuevas lecturas
         </h2>
         <p className="mx-auto mt-3 max-w-xl leading-7 text-warm-brown">
-          Los articulos visibles publicados por el equipo apareceran aqui.
+          Los artículos visibles publicados por el equipo aparecerán aquí.
         </p>
       </div>
     );

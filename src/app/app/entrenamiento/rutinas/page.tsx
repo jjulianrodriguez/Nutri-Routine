@@ -38,7 +38,7 @@ export default async function RoutinesPage() {
       <AppHeader
         eyebrow="Entrenamiento"
         title="Entrenamientos"
-        description="Crea sesiones de un dia usando exclusivamente los ejercicios disponibles en la biblioteca."
+        description="Crea sesiones de un día usando exclusivamente los ejercicios disponibles en la biblioteca."
       />
 
       <TrainingSectionNav active="routines" />
@@ -72,7 +72,7 @@ export default async function RoutinesPage() {
 
       <AppPanel
         title="Todos los entrenamientos"
-        description="Abre un entrenamiento para ver su detalle o editar la configuracion de sus ejercicios."
+        description="Abre un entrenamiento para ver su detalle o editar la configuración de sus ejercicios."
       >
         {overview.routines.length === 0 ? (
           <EmptyState>

@@ -10,10 +10,14 @@ import {
 import type { CSSProperties } from "react";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
+import { useTheme } from "@/components/theme/theme-provider";
+
 const Toaster = ({ ...props }: ToasterProps) => {
+  const { theme } = useTheme();
+
   return (
     <Sonner
-      theme="light"
+      theme={theme}
       position="top-right"
       className="toaster group"
       icons={{

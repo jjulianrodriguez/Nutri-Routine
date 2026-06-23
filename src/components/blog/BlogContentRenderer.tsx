@@ -33,6 +33,10 @@ export function BlogContentRenderer({
       className={cn(
         "max-w-none break-words text-warm-brown [overflow-wrap:anywhere]",
         "[&_a[href]]:font-bold [&_a[href]]:text-teal [&_a[href]]:underline [&_a[href]]:decoration-teal/40 [&_a[href]]:underline-offset-4 hover:[&_a[href]]:text-teal-hover",
+        "[&_.blog-align-center]:text-center [&_.blog-align-left]:text-left [&_.blog-align-right]:text-right",
+        "[&_.blog-color-accent]:text-lavender-dark [&_.blog-color-charcoal]:text-charcoal [&_.blog-color-teal]:text-teal [&_.blog-color-warm]:text-warm-brown",
+        "[&_.blog-highlight]:rounded-[8px] [&_.blog-highlight]:bg-accent-soft [&_.blog-highlight]:px-1.5 [&_.blog-highlight]:py-0.5 [&_.blog-highlight]:font-semibold [&_.blog-highlight]:text-charcoal",
+        "[&_.blog-text-large]:text-xl [&_.blog-text-large]:leading-9 [&_.blog-text-small]:text-sm [&_.blog-text-small]:leading-6",
         "[&_blockquote]:my-7 [&_blockquote]:rounded-[20px] [&_blockquote]:border-l-4 [&_blockquote]:border-sage [&_blockquote]:bg-white/70 [&_blockquote]:px-5 [&_blockquote]:py-4 [&_blockquote]:font-semibold [&_blockquote]:text-charcoal [&_blockquote]:shadow-soft",
         "[&_em]:text-charcoal [&_h1]:font-serif [&_h1]:font-semibold [&_h1]:leading-[1.02] [&_h1]:text-charcoal",
         "[&_h2]:font-serif [&_h2]:font-semibold [&_h2]:leading-[1.08] [&_h2]:text-charcoal [&_h3]:font-serif [&_h3]:font-semibold [&_h3]:leading-tight [&_h3]:text-charcoal",

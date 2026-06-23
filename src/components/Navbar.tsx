@@ -12,6 +12,8 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+
 const navLinks = [
   { href: "/#servicios", label: "Servicios" },
   { href: "/#enfoque", label: "Enfoque" },
@@ -79,7 +81,8 @@ export function Navbar() {
             ))}
           </nav>
 
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-2">
+            <ThemeToggle showLabel={false} className="hidden sm:inline-flex" />
             <motion.a
               href="https://wa.me/50688332426"
               target="_blank"
@@ -91,6 +94,7 @@ export function Navbar() {
               Agendar consulta
               <ArrowUpRight className="size-4" />
             </motion.a>
+            <ThemeToggle showLabel={false} className="sm:hidden" />
             <button
               type="button"
               onClick={() => setMenuOpen((value) => !value)}

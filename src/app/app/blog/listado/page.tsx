@@ -1,21 +1,16 @@
 import { BookOpenText, Eye, EyeOff, PenLine, Pin } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { AppHeader, AppScreen, StatTile } from "@/components/app/AppScreen";
 import { BlogManager } from "@/components/app/blog-manager";
 import { Button } from "@/components/ui/button";
-import { requireCurrentUserAccess } from "@/lib/auth/current-user-access";
+import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getAdminBlogPosts } from "@/lib/blog/admin-posts";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminBlogListPage() {
-  const access = await requireCurrentUserAccess();
-
-  if (access.role !== "admin") {
-    redirect("/app/dashboard");
-  }
+  await requireRouteAccess("/app/blog");
 
   const posts = await getAdminBlogPosts();
   const visiblePosts = posts.filter((post) => post.published).length;
@@ -27,16 +22,16 @@ export default async function AdminBlogListPage() {
       <AppHeader
         eyebrow="Contenido"
         title="Blogs creados"
-        description="Revisa, edita, oculta, ancla o elimina las publicaciones visibles en el blog publico."
+        description="Revisa, edita, oculta, ancla o elimina las publicaciones visibles en el blog público."
       />
 
       <section className="flex flex-wrap items-center justify-between gap-4 rounded-[24px] border border-border bg-surface p-5 shadow-soft">
         <div>
           <p className="text-sm font-extrabold text-charcoal">
-            Gestion de publicaciones
+            Gestión de publicaciones
           </p>
           <p className="mt-1 text-sm leading-6 text-muted">
-            Desde aqui puedes editar cualquier blog existente o volver al editor
+            Desde aquí puedes editar cualquier blog existente o volver al editor
             para crear uno nuevo.
           </p>
         </div>
@@ -50,7 +45,7 @@ export default async function AdminBlogListPage() {
           <Button asChild variant="outline">
             <Link href="/blog" target="_blank" rel="noreferrer">
               <Eye className="size-4" aria-hidden="true" />
-              Ver blog publico
+              Ver blog público
             </Link>
           </Button>
         </div>
@@ -73,7 +68,7 @@ export default async function AdminBlogListPage() {
         <StatTile
           label="Ocultos"
           value={String(hiddenPosts)}
-          detail="Fuera del blog publico"
+          detail="Fuera del blog público"
         />
         <div className="rounded-[24px] border border-primary/30 bg-primary-soft p-5 shadow-soft">
           <div className="flex items-center gap-2 text-sm font-bold text-muted">

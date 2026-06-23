@@ -17,6 +17,10 @@ import {
 import { WorkoutTemplateAssignmentForm } from "@/components/app/routine-assignment-form";
 import { RoutineUnassignButton } from "@/components/app/routine-unassign-button";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+  getAssignedRelationBadge,
+  RelationshipBadge,
+} from "@/components/app/relationship-badges";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
@@ -62,7 +66,7 @@ function getStatusDetail(assignment: RoutineAssignmentSummary) {
   }
 
   if (assignment.daysRemaining !== null) {
-    return `${assignment.daysRemaining} dias restantes`;
+    return `${assignment.daysRemaining} días restantes`;
   }
 
   return "Sin fecha de cierre";
@@ -142,7 +146,7 @@ export default async function RoutineAssignmentsPage({
         <StatTile
           label="Con plantilla actual"
           value={String(assignedCount)}
-          detail="Una asignacion abierta por cliente"
+          detail="Una asignación abierta por cliente"
         />
         <StatTile
           label="Plantillas vencidas"
@@ -152,15 +156,18 @@ export default async function RoutineAssignmentsPage({
       </section>
 
       <AppPanel
-        title="Nueva asignacion"
+        title="Nueva asignación"
         description="Al asignar una nueva plantilla se archiva la asignación activa anterior y se conserva en el historial del cliente."
         tone="primary"
       >
         <WorkoutTemplateAssignmentForm
           clients={clients}
+          currentUserId={access.userId}
           defaultClientId={defaultClientId}
           defaultTemplateId={defaultTemplateId}
           defaultStartDate={new Date().toISOString().slice(0, 10)}
+          isAdmin={access.role === "admin"}
+          isProfessional={!access.isClient}
           templates={templates}
         />
       </AppPanel>
@@ -170,7 +177,7 @@ export default async function RoutineAssignmentsPage({
         description={
           access.role === "admin"
             ? "El administrador universal puede gestionar cualquier cuenta cliente."
-            : "Solo se muestran los clientes asignados a tu area profesional."
+            : "Solo se muestran los clientes asignados a tu área profesional."
         }
       >
         {clients.length === 0 ? (
@@ -187,6 +194,12 @@ export default async function RoutineAssignmentsPage({
           <div className="grid gap-4 lg:grid-cols-2">
             {clients.map((client) => {
               const assignment = client.currentAssignment;
+              const relationBadge = getAssignedRelationBadge({
+                assignedId: client.assignedTrainerId,
+                currentUserId: access.userId,
+                isAdmin: access.role === "admin",
+                isProfessional: !access.isClient,
+              });
 
               return (
                 <article
@@ -210,6 +223,14 @@ export default async function RoutineAssignmentsPage({
                             {client.contact}
                           </p>
                         ) : null}
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <RelationshipBadge tone="primary">
+                            Entrenamiento
+                          </RelationshipBadge>
+                          <RelationshipBadge tone={relationBadge.tone}>
+                            {relationBadge.label}
+                          </RelationshipBadge>
+                        </div>
                       </div>
                     </div>
                     <span
@@ -241,11 +262,11 @@ export default async function RoutineAssignmentsPage({
                     </div>
                     <div>
                       <p className="text-xs font-extrabold uppercase tracking-wide text-muted">
-                        Profesional asignado
+                        Responsable
                       </p>
                       <p className="mt-1 truncate text-sm font-extrabold text-charcoal">
                         {client.assignedTrainerName ??
-                          "Profesional en entrenamiento"}
+                          "Sin profesional asignado"}
                       </p>
                     </div>
                   </div>

@@ -17,8 +17,10 @@ export type Database = {
           area: Database["public"]["Enums"]["service_area"];
           client_id: string;
           created_at: string;
+          created_by: string | null;
           description: string | null;
           ends_at: string | null;
+          event_type: Database["public"]["Enums"]["appointment_event_type"];
           id: string;
           professional_id: string;
           starts_at: string;
@@ -30,8 +32,10 @@ export type Database = {
           area?: Database["public"]["Enums"]["service_area"];
           client_id: string;
           created_at?: string;
+          created_by?: string | null;
           description?: string | null;
           ends_at?: string | null;
+          event_type?: Database["public"]["Enums"]["appointment_event_type"];
           id?: string;
           professional_id: string;
           starts_at: string;
@@ -43,8 +47,10 @@ export type Database = {
           area?: Database["public"]["Enums"]["service_area"];
           client_id?: string;
           created_at?: string;
+          created_by?: string | null;
           description?: string | null;
           ends_at?: string | null;
+          event_type?: Database["public"]["Enums"]["appointment_event_type"];
           id?: string;
           professional_id?: string;
           starts_at?: string;
@@ -53,6 +59,13 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "appointments_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "appointments_client_id_fkey";
             columns: ["client_id"];
@@ -181,6 +194,118 @@ export type Database = {
             foreignKeyName: "client_profiles_profile_id_fkey";
             columns: ["profile_id"];
             isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      chat_conversations: {
+        Row: {
+          area: Database["public"]["Enums"]["service_area"];
+          client_id: string;
+          created_at: string;
+          id: string;
+          last_message_at: string | null;
+          last_message_preview: string | null;
+          professional_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          area: Database["public"]["Enums"]["service_area"];
+          client_id: string;
+          created_at?: string;
+          id?: string;
+          last_message_at?: string | null;
+          last_message_preview?: string | null;
+          professional_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          area?: Database["public"]["Enums"]["service_area"];
+          client_id?: string;
+          created_at?: string;
+          id?: string;
+          last_message_at?: string | null;
+          last_message_preview?: string | null;
+          professional_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_conversations_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_conversations_professional_id_fkey";
+            columns: ["professional_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      chat_messages: {
+        Row: {
+          body: string;
+          conversation_id: string;
+          created_at: string;
+          deleted_at: string | null;
+          delivered_at: string;
+          edited_at: string | null;
+          id: string;
+          read_at: string | null;
+          read_by: string | null;
+          sender_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          body: string;
+          conversation_id: string;
+          created_at?: string;
+          deleted_at?: string | null;
+          delivered_at?: string;
+          edited_at?: string | null;
+          id?: string;
+          read_at?: string | null;
+          read_by?: string | null;
+          sender_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          body?: string;
+          conversation_id?: string;
+          created_at?: string;
+          deleted_at?: string | null;
+          delivered_at?: string;
+          edited_at?: string | null;
+          id?: string;
+          read_at?: string | null;
+          read_by?: string | null;
+          sender_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey";
+            columns: ["conversation_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_conversations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "chat_messages_read_by_fkey";
+            columns: ["read_by"];
+            isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
@@ -349,25 +474,49 @@ export type Database = {
       };
       professional_profiles: {
         Row: {
+          availability_days: string | null;
+          availability_note: string | null;
+          availability_schedule: string | null;
           bio: string | null;
+          certifications: string | null;
           created_at: string;
+          experience: string | null;
+          focus_areas: string[];
           is_active: boolean;
+          professional_links: string | null;
+          professional_phone: string | null;
           profile_id: string;
           specialty: Database["public"]["Enums"]["professional_specialty"];
           updated_at: string;
         };
         Insert: {
+          availability_days?: string | null;
+          availability_note?: string | null;
+          availability_schedule?: string | null;
           bio?: string | null;
+          certifications?: string | null;
           created_at?: string;
+          experience?: string | null;
+          focus_areas?: string[];
           is_active?: boolean;
+          professional_links?: string | null;
+          professional_phone?: string | null;
           profile_id: string;
           specialty: Database["public"]["Enums"]["professional_specialty"];
           updated_at?: string;
         };
         Update: {
+          availability_days?: string | null;
+          availability_note?: string | null;
+          availability_schedule?: string | null;
           bio?: string | null;
+          certifications?: string | null;
           created_at?: string;
+          experience?: string | null;
+          focus_areas?: string[];
           is_active?: boolean;
+          professional_links?: string | null;
+          professional_phone?: string | null;
           profile_id?: string;
           specialty?: Database["public"]["Enums"]["professional_specialty"];
           updated_at?: string;
@@ -384,37 +533,58 @@ export type Database = {
       };
       profile_personal_details: {
         Row: {
+          allergies: string | null;
           birth_date: string | null;
+          body_fat_percentage: number | null;
+          body_measurements: string | null;
           created_at: string;
+          dietary_restrictions: string | null;
           gender: string | null;
           gender_description: string | null;
           height_cm: number | null;
+          important_medications: string | null;
+          injuries: string | null;
           medical_conditions: string | null;
           phone: string | null;
+          professional_notes: string | null;
           profile_id: string;
           updated_at: string;
           weight_kg: number | null;
         };
         Insert: {
+          allergies?: string | null;
           birth_date?: string | null;
+          body_fat_percentage?: number | null;
+          body_measurements?: string | null;
           created_at?: string;
+          dietary_restrictions?: string | null;
           gender?: string | null;
           gender_description?: string | null;
           height_cm?: number | null;
+          important_medications?: string | null;
+          injuries?: string | null;
           medical_conditions?: string | null;
           phone?: string | null;
+          professional_notes?: string | null;
           profile_id: string;
           updated_at?: string;
           weight_kg?: number | null;
         };
         Update: {
+          allergies?: string | null;
           birth_date?: string | null;
+          body_fat_percentage?: number | null;
+          body_measurements?: string | null;
           created_at?: string;
+          dietary_restrictions?: string | null;
           gender?: string | null;
           gender_description?: string | null;
           height_cm?: number | null;
+          important_medications?: string | null;
+          injuries?: string | null;
           medical_conditions?: string | null;
           phone?: string | null;
+          professional_notes?: string | null;
           profile_id?: string;
           updated_at?: string;
           weight_kg?: number | null;
@@ -917,6 +1087,14 @@ export type Database = {
         };
         Returns: string;
       };
+      ensure_chat_conversation: {
+        Args: {
+          p_area: Database["public"]["Enums"]["service_area"];
+          p_client_id: string;
+          p_professional_id: string;
+        };
+        Returns: string;
+      };
       has_specialty: {
         Args: {
           required_specialty: Database["public"]["Enums"]["professional_specialty"];
@@ -938,6 +1116,18 @@ export type Database = {
         Args: never;
         Returns: number;
       };
+      mark_chat_conversation_read: {
+        Args: {
+          p_conversation_id: string;
+        };
+        Returns: number;
+      };
+      delete_chat_message: {
+        Args: {
+          p_message_id: string;
+        };
+        Returns: string;
+      };
       mark_notification_read: {
         Args: {
           p_notification_id: string;
@@ -950,6 +1140,20 @@ export type Database = {
           id: string;
           identifier: string | null;
         }[];
+      };
+      send_chat_message: {
+        Args: {
+          p_body: string;
+          p_conversation_id: string;
+        };
+        Returns: string;
+      };
+      update_chat_message: {
+        Args: {
+          p_body: string;
+          p_message_id: string;
+        };
+        Returns: string;
       };
       save_routine: {
         Args: {
@@ -978,6 +1182,14 @@ export type Database = {
       };
     };
     Enums: {
+      appointment_event_type:
+        | "appointment"
+        | "follow_up"
+        | "reminder"
+        | "review"
+        | "progress_check"
+        | "consultation"
+        | "other";
       appointment_status: "scheduled" | "completed" | "cancelled";
       plan_status: "draft" | "active" | "archived";
       professional_specialty: "nutrition" | "training" | "both";
@@ -1113,6 +1325,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      appointment_event_type: [
+        "appointment",
+        "follow_up",
+        "reminder",
+        "review",
+        "progress_check",
+        "consultation",
+        "other",
+      ],
       appointment_status: ["scheduled", "completed", "cancelled"],
       plan_status: ["draft", "active", "archived"],
       professional_specialty: ["nutrition", "training", "both"],

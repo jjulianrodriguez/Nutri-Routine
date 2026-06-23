@@ -13,7 +13,7 @@ export function PublicFooter() {
               Dra. Mariana Rodríguez Méndez · Profesional en nutrición funcional e
               integrativa
               <br />
-              Camila Rodríguez Méndez · Profesional en entrenamiento
+              Camila Rodríguez Méndez · Entrenadora
             </p>
           </div>
 

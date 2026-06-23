@@ -1,5 +1,9 @@
 import "server-only";
 
+import {
+  getProfileDirectory,
+  getProfileDisplayName,
+} from "@/lib/auth/profile-directory";
 import { normalizeExerciseMultimediaUrls } from "@/lib/exercises/multimedia";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -81,30 +85,18 @@ async function mapExerciseRows(
   }>,
 ): Promise<ExerciseListItem[]> {
   const creatorIds = [...new Set(exercises.map((exercise) => exercise.created_by))];
-  const creatorsResult =
-    creatorIds.length > 0
-      ? await supabase
-          .from("profiles")
-          .select("id, full_name")
-          .in("id", creatorIds)
-      : { data: [], error: null };
-
-  if (creatorsResult.error) {
-    throw new Error("No se pudieron cargar los creadores de los ejercicios.");
-  }
-
-  const creators = new Map(
-    (creatorsResult.data ?? []).map((profile) => [
-      profile.id,
-      profile.full_name ?? "Profesional",
-    ]),
-  );
+  const creators = await getProfileDirectory(creatorIds, {
+    includeEmails: true,
+    includeProfessionalProfiles: true,
+  });
 
   return exercises.map((exercise) => ({
     category: exercise.category,
     createdAt: exercise.created_at,
     createdBy: exercise.created_by,
-    creatorName: creators.get(exercise.created_by) ?? "Profesional",
+    creatorName:
+      getProfileDisplayName(creators.get(exercise.created_by)) ??
+      "Perfil incompleto",
     description: exercise.description,
     difficulty: normalizeDifficulty(exercise.difficulty),
     exerciseType: exercise.exercise_type,
@@ -183,7 +175,7 @@ export async function listExercises({
     .range(0, visibleCount - 1);
 
   if (error) {
-    throw new Error("No se pudo cargar el catalogo de ejercicios.");
+    throw new Error("No se pudo cargar el catálogo de ejercicios.");
   }
 
   const totalCount = count ?? 0;

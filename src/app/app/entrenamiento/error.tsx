@@ -22,7 +22,7 @@ export default function TrainingError({
           fallbackHref="/app/entrenamiento"
           fallbackLabel="Ir a entrenamiento"
           retry={unstable_retry ?? reset}
-          title="No pudimos cargar esta seccion"
+          title="No pudimos cargar esta sección"
         />
       </div>
     </AppScreen>

@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useRef, type ReactNode } from "react";
 
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 type AuthCardProps = {
   children: ReactNode;
@@ -100,13 +101,16 @@ export function AuthCard({ children, headline, subtitle }: AuthCardProps) {
         <div className="relative z-10 mx-auto grid min-h-dvh max-w-7xl grid-rows-[auto_1fr] px-5 py-6 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:grid-rows-1 lg:px-10">
           <section className="relative flex items-center justify-between lg:hidden">
             <AuthWordmark />
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-full border border-charcoal/10 bg-white/72 px-4 py-2 text-sm font-extrabold text-stone shadow-soft backdrop-blur-xl"
-            >
-              <ArrowLeft className="size-4" />
-              Inicio
-            </Link>
+            <div className="flex items-center gap-2">
+              <ThemeToggle showLabel={false} />
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 rounded-full border border-charcoal/10 bg-white/72 px-4 py-2 text-sm font-extrabold text-stone shadow-soft backdrop-blur-xl"
+              >
+                <ArrowLeft className="size-4" />
+                Inicio
+              </Link>
+            </div>
           </section>
 
           <section className="relative hidden min-h-dvh flex-col justify-between overflow-hidden border-r border-border bg-primary-soft/80 px-10 py-10 backdrop-blur-xl lg:flex xl:px-14">
@@ -117,8 +121,9 @@ export function AuthCard({ children, headline, subtitle }: AuthCardProps) {
               <AuthBotanical className="w-full" />
             </motion.div>
 
-            <div className="relative z-10">
+            <div className="relative z-10 flex items-center justify-between gap-4">
               <AuthWordmark />
+              <ThemeToggle showLabel={false} />
             </div>
 
             <motion.div

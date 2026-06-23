@@ -34,9 +34,9 @@ import {
 import { cn } from "@/lib/utils";
 
 const specialtyOptions = [
-  { label: "Nutricion", value: "nutrition" },
+  { label: "Nutrición", value: "nutrition" },
   { label: "Entrenamiento", value: "training" },
-  { label: "Ambas areas", value: "both" },
+  { label: "Ambas áreas", value: "both" },
 ] as const;
 
 const inputClasses =
@@ -189,18 +189,18 @@ export function ProfessionalAccountManager({
               message={errors.specialty?.message}
             />
             <p className="mt-2 text-sm leading-6 text-muted">
-              No se puede retirar un area mientras tenga clientes asignados en
+              No se puede retirar un área mientras tenga clientes asignados en
               ese servicio.
             </p>
           </div>
 
           <div>
-            <Label htmlFor="professional-bio">Descripcion interna</Label>
+            <Label htmlFor="professional-bio">Descripción interna</Label>
             <textarea
               id="professional-bio"
               rows={5}
               className="mt-2 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-primary/20"
-              placeholder="Notas o descripcion profesional opcional"
+              placeholder="Notas o descripción profesional opcional"
               aria-describedby={
                 errors.bio ? "professional-bio-error" : undefined
               }
@@ -241,7 +241,7 @@ export function ProfessionalAccountManager({
           description={
             professional.isActive
               ? "La cuenta puede usar sus funcionalidades profesionales."
-              : "La cuenta solo conserva acceso a configuracion basica."
+              : "La cuenta solo conserva acceso a configuración básica."
           }
           tone={professional.isActive ? "primary" : "accent"}
         >
@@ -289,7 +289,7 @@ export function ProfessionalAccountManager({
                 {professional.assignedNutritionClients}
               </p>
               <p className="mt-1 text-sm font-bold text-muted">
-                Clientes de nutricion
+                Clientes de nutrición
               </p>
             </div>
             <div className="rounded-[18px] border border-border bg-background p-4">
@@ -345,7 +345,7 @@ export function ProfessionalAccountManager({
         open={confirmAction === "delete"}
         onOpenChange={(open) => setConfirmAction(open ? "delete" : null)}
         title="Eliminar cuenta profesional"
-        description="Esta accion elimina la cuenta de acceso. Se bloqueara automaticamente si existen clientes, planes, citas, recursos u otros registros vinculados."
+        description="Esta acción elimina la cuenta de acceso. Se bloqueará automáticamente si existen clientes, planes, citas, recursos u otros registros vinculados."
         confirmLabel="Eliminar profesional"
         pendingLabel="Eliminando..."
         tone="destructive"

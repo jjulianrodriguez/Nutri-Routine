@@ -1,6 +1,56 @@
 import sanitizeHtml, { type IOptions } from "sanitize-html";
 
 const HTML_TAG_PATTERN = /<\/?[a-z][a-z0-9-]*(?:\s[^>]*)?>/i;
+const BLOCK_CLASS_NAMES = [
+  "blog-align-left",
+  "blog-align-center",
+  "blog-align-right",
+] as const;
+const INLINE_CLASS_NAMES = [
+  "blog-color-accent",
+  "blog-color-charcoal",
+  "blog-color-teal",
+  "blog-color-warm",
+  "blog-highlight",
+  "blog-text-large",
+  "blog-text-small",
+] as const;
+const BLOCK_CLASS_SET = new Set<string>(BLOCK_CLASS_NAMES);
+const INLINE_CLASS_SET = new Set<string>(INLINE_CLASS_NAMES);
+
+function sanitizeClassAttribute(
+  value: unknown,
+  allowedClasses: Set<string>,
+) {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const className = value
+    .split(/\s+/)
+    .filter((item) => allowedClasses.has(item))
+    .join(" ");
+
+  return className || undefined;
+}
+
+function transformClassedTag(
+  tagName: string,
+  attributes: Record<string, string>,
+  allowedClasses: Set<string>,
+) {
+  const className = sanitizeClassAttribute(attributes.class, allowedClasses);
+  const attribs: Record<string, string> = {};
+
+  if (className) {
+    attribs.class = className;
+  }
+
+  return {
+    attribs,
+    tagName,
+  };
+}
 
 const sanitizerOptions: IOptions = {
   allowedTags: [
@@ -15,12 +65,25 @@ const sanitizerOptions: IOptions = {
     "li",
     "ol",
     "p",
+    "span",
     "strong",
     "u",
     "ul",
   ],
   allowedAttributes: {
     a: ["href", "rel", "target", "title"],
+    h1: ["class"],
+    h2: ["class"],
+    h3: ["class"],
+    p: ["class"],
+    span: ["class"],
+  },
+  allowedClasses: {
+    h1: [...BLOCK_CLASS_NAMES],
+    h2: [...BLOCK_CLASS_NAMES],
+    h3: [...BLOCK_CLASS_NAMES],
+    p: [...BLOCK_CLASS_NAMES],
+    span: [...INLINE_CLASS_NAMES],
   },
   allowedSchemes: ["http", "https", "mailto", "tel"],
   allowProtocolRelative: false,
@@ -42,7 +105,7 @@ const sanitizerOptions: IOptions = {
         isExternal ||
         /^mailto:/i.test(href) ||
         /^tel:/i.test(href) ||
-        href.startsWith("/") ||
+        (href.startsWith("/") && !href.startsWith("//")) ||
         href.startsWith("#");
 
       if (!isAllowedHref) {
@@ -70,6 +133,16 @@ const sanitizerOptions: IOptions = {
         tagName,
       };
     },
+    h1: (tagName, attributes) =>
+      transformClassedTag(tagName, attributes, BLOCK_CLASS_SET),
+    h2: (tagName, attributes) =>
+      transformClassedTag(tagName, attributes, BLOCK_CLASS_SET),
+    h3: (tagName, attributes) =>
+      transformClassedTag(tagName, attributes, BLOCK_CLASS_SET),
+    p: (tagName, attributes) =>
+      transformClassedTag(tagName, attributes, BLOCK_CLASS_SET),
+    span: (tagName, attributes) =>
+      transformClassedTag(tagName, attributes, INLINE_CLASS_SET),
   },
 };
 
@@ -140,7 +213,7 @@ export function sanitizeBlogHtml(content: string) {
 
 export function getBlogTextContent(content: string) {
   const htmlWithBlockSpaces = sanitizeBlogHtml(content).replace(
-    /<\/?(?:blockquote|br|h1|h2|h3|hr|li|ol|p|ul)\b[^>]*>/gi,
+    /<\/?(?:blockquote|br|h1|h2|h3|hr|li|ol|p|span|ul)\b[^>]*>/gi,
     " ",
   );
 

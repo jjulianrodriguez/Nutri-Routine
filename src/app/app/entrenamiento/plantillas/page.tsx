@@ -93,7 +93,7 @@ export default async function WorkoutTemplatesPage() {
         <StatTile
           label="Incompletas"
           value={String(incompleteCount)}
-          detail="Con dias pendientes"
+          detail="Con días pendientes"
         />
         <StatTile
           label="Duración promedio"
@@ -145,8 +145,8 @@ export default async function WorkoutTemplatesPage() {
                         <span className="rounded-full bg-danger/10 px-3 py-1 text-xs font-extrabold text-danger">
                           Incompleta: {template.missingDayCount}{" "}
                           {template.missingDayCount === 1
-                            ? "dia pendiente"
-                            : "dias pendientes"}
+                            ? "día pendiente"
+                            : "días pendientes"}
                         </span>
                       ) : null}
                     </div>
@@ -172,7 +172,7 @@ export default async function WorkoutTemplatesPage() {
                 <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 border-t border-border pt-4 text-sm text-muted">
                   <span className="inline-flex items-center gap-2">
                     <CalendarDays className="size-4" aria-hidden="true" />
-                    {template.assignedDayCount}/{template.cycleDays} dias
+                    {template.assignedDayCount}/{template.cycleDays} días
                   </span>
                   <span className="inline-flex items-center gap-2">
                     <UserRound className="size-4" aria-hidden="true" />

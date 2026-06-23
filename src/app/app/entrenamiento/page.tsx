@@ -17,6 +17,7 @@ import {
   StatTile,
 } from "@/components/app/AppScreen";
 import { ClientTodayTraining } from "@/components/app/client-today-training";
+import { AssignedProfessionalCards } from "@/components/app/relationship-badges";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
@@ -73,7 +74,7 @@ function formatRelativeDate(value: string | null) {
 
   if (diffDays > 0) {
     if (diffDays < 14) {
-      return `Hace ${diffDays} ${diffDays === 1 ? "dia" : "dias"}`;
+      return `Hace ${diffDays} ${diffDays === 1 ? "día" : "días"}`;
     }
 
     const weeks = Math.round(diffDays / 7);
@@ -84,7 +85,7 @@ function formatRelativeDate(value: string | null) {
   const futureDays = Math.abs(diffDays);
 
   if (futureDays < 14) {
-    return `En ${futureDays} ${futureDays === 1 ? "dia" : "dias"}`;
+    return `En ${futureDays} ${futureDays === 1 ? "día" : "días"}`;
   }
 
   const futureWeeks = Math.round(futureDays / 7);
@@ -102,9 +103,14 @@ function isFutureDate(value: string | null) {
   return date.getTime() > Date.now();
 }
 
-function remainingLabel(assignment: RoutineAssignmentSummary) {
+function remainingLabel(
+  assignment: RoutineAssignmentSummary,
+  trainerName: string | null,
+) {
   if (assignment.state === "expired") {
-    return "Tu plantilla vencio. Consulta a tu entrenador para actualizarla.";
+    return `Tu plantilla vencio. Consulta a ${
+      trainerName ?? "tu profesional de entrenamiento"
+    } para actualizarla.`;
   }
 
   if (assignment.state === "upcoming") {
@@ -125,7 +131,7 @@ function remainingLabel(assignment: RoutineAssignmentSummary) {
     }
 
     return `Vence en ${assignment.daysRemaining} ${
-      assignment.daysRemaining === 1 ? "dia" : "dias"
+      assignment.daysRemaining === 1 ? "día" : "días"
     }.`;
   }
 
@@ -217,7 +223,17 @@ async function ClientTrainingPage({
       <AppHeader
         eyebrow="Mi entrenamiento"
         title="Entrenamiento de hoy"
-        description="Tu entrenamiento actual, el dia que te toca y tu historial de plantillas."
+        description={`Tu entrenamiento actual con ${
+          access.assignedTrainerName ?? "tu profesional de entrenamiento"
+        }, el día que te toca y tu historial de plantillas.`}
+      />
+
+      <AssignedProfessionalCards
+        assignedNutritionistId={null}
+        assignedNutritionistName={null}
+        assignedTrainerId={access.assignedTrainerId}
+        assignedTrainerName={access.assignedTrainerName}
+        className="mb-2"
       />
 
       {current && trainingSnapshot ? (
@@ -227,16 +243,18 @@ async function ClientTrainingPage({
           progress={currentProgress}
           snapshot={trainingSnapshot}
           today={overview.today}
+          trainerName={access.assignedTrainerName}
         />
       ) : (
         <AppPanel
           title="Entrenamiento actual"
-          description="Aqui aparecera tu entrenamiento cuando tengas una plantilla asignada."
+          description="Aquí aparecerá tu entrenamiento cuando tengas una plantilla asignada."
           tone="primary"
         >
           <EmptyState>
-            No hay una plantilla asignada actualmente. Cuando tu entrenador
-            te asigne una plantilla, aparecera aqui con el entrenamiento de hoy.
+            No hay una plantilla asignada actualmente. Cuando{" "}
+            {access.assignedTrainerName ?? "tu profesional de entrenamiento"} te
+            asigne una plantilla, aparecerá aquí con el entrenamiento de hoy.
           </EmptyState>
         </AppPanel>
       )}
@@ -247,8 +265,11 @@ async function ClientTrainingPage({
           value={current ? assignmentStateLabels[current.state] : "Sin plantilla"}
           detail={
             current
-              ? remainingLabel(current)
-              : "Tu entrenador aun no ha asignado una plantilla"
+              ? remainingLabel(current, access.assignedTrainerName)
+              : `${
+                  access.assignedTrainerName ??
+                  "Tu profesional de entrenamiento"
+                } aun no ha asignado una plantilla`
           }
         />
         <StatTile
@@ -267,7 +288,7 @@ async function ClientTrainingPage({
         <StatTile
           label="Plantillas anteriores"
           value={String(overview.history.length)}
-          detail="Historial y dias completados"
+          detail="Historial y días completados"
         />
       </section>
 
@@ -294,7 +315,7 @@ async function ClientTrainingPage({
                     />
                     <div className="flex flex-wrap justify-end gap-2">
                       <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-extrabold text-charcoal">
-                        Copia historica
+                        Copia histórica
                       </span>
                       <span className="rounded-full bg-background px-3 py-1 text-xs font-extrabold text-charcoal">
                         {assignmentStateLabels[assignment.state]}
@@ -309,7 +330,7 @@ async function ClientTrainingPage({
                     {formatDate(assignment.endDate)}
                   </p>
                   <p className="mt-2 text-sm font-semibold leading-6 text-muted">
-                    Esta es una copia historica de la plantilla asignada.
+                    Esta es una copia histórica de la plantilla asignada.
                   </p>
                   {relativeCreatedLabel ? (
                     <p className="mt-2 text-xs font-extrabold uppercase tracking-[0.12em] text-warm-brown">
@@ -325,8 +346,8 @@ async function ClientTrainingPage({
                     <p className="mt-3 text-sm font-extrabold text-charcoal">
                       {assignment.completedDayCount}{" "}
                       {assignment.completedDayCount === 1
-                        ? "dia completado"
-                        : "dias completados"}
+                        ? "día completado"
+                        : "días completados"}
                     </p>
                   ) : null}
                   {assignment.detailAvailable ? (
@@ -339,7 +360,7 @@ async function ClientTrainingPage({
                     </span>
                   ) : (
                     <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
-                      Informacion historica no disponible
+                      Información histórica no disponible
                     </p>
                   )}
                 </>
@@ -394,7 +415,7 @@ export default async function TrainingPage() {
       <AppHeader
         eyebrow="Entrenamiento"
         title="Gestion de entrenamiento"
-        description="Crea ejercicios, combinalos en entrenamientos diarios y organiza esos entrenamientos dentro de plantillas."
+        description="Crea ejercicios, combínalos en entrenamientos diarios y organiza esos entrenamientos dentro de plantillas."
       />
 
       <TrainingSectionNav active="overview" />
@@ -434,8 +455,8 @@ export default async function TrainingPage() {
             Ejercicios
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
-            Crea, edita y desactiva ejercicios. Aqui se guardan instrucciones,
-            dificultad, grupo muscular, categoria, tipo y recurso externo.
+            Crea, edita y desactiva ejercicios. Aquí se guardan instrucciones,
+            dificultad, grupo muscular, categoría, tipo y recurso externo.
           </p>
           <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
             Gestionar ejercicios
@@ -454,7 +475,7 @@ export default async function TrainingPage() {
             Entrenamientos
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
-            Construye sesiones para un dia seleccionando ejercicios y
+            Construye sesiones para un día seleccionando ejercicios y
             configurando series, repeticiones, descanso, notas y orden.
           </p>
           <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
@@ -474,7 +495,7 @@ export default async function TrainingPage() {
             Plantillas
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
-            Organiza entrenamientos por dias para crear ciclos semanales o
+            Organiza entrenamientos por días para crear ciclos semanales o
             personalizados que puedas reutilizar.
           </p>
           <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">

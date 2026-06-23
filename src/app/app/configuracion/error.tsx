@@ -17,12 +17,12 @@ export default function SettingsError({
     <AppScreen>
       <div className="grid min-h-[70dvh] place-items-center">
         <RecoveryState
-          description="No pudimos cargar la configuracion de tu cuenta. Ningun dato fue mostrado ni modificado por este error."
-          eyebrow="Error de configuracion"
+          description="No pudimos cargar la configuración de tu cuenta. Ningún dato fue mostrado ni modificado por este error."
+          eyebrow="Error de configuración"
           fallbackHref="/app/configuracion"
-          fallbackLabel="Ir a configuracion"
+          fallbackLabel="Ir a configuración"
           retry={unstable_retry ?? reset}
-          title="No pudimos cargar tu configuracion"
+          title="No pudimos cargar tu configuración"
         />
       </div>
     </AppScreen>

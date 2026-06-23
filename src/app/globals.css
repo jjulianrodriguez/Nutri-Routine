@@ -514,9 +514,11 @@ button,
   --surface-secondary: #202B27;
   --surface-elevated: #26322D;
   --surface-glass: rgb(25 34 31 / 0.78);
+  --surface-panel: #1C2622;
   --surface-hover: #22302B;
   --text-primary: #F8FAF8;
   --text-secondary: #CFD8D4;
+  --text-subtle: #9CAAA5;
   --text-muted: #AEBAB4;
   --border: rgb(248 250 248 / 0.12);
   --border-subtle: rgb(248 250 248 / 0.07);
@@ -545,10 +547,10 @@ button,
   --glass-border: rgb(255 255 255 / 0.08);
   --inner-highlight: 0 1px 0 rgb(255 255 255 / 0.05) inset;
   --inner-lowlight: 0 -1px 0 rgb(0 0 0 / 0.18) inset;
-  --elevation-soft: 0 18px 42px -30px rgb(0 0 0 / 0.64), var(--inner-highlight);
-  --elevation-card: 0 22px 52px -36px rgb(0 0 0 / 0.7), var(--inner-highlight);
-  --elevation-pop: 0 24px 64px -30px rgb(0 0 0 / 0.74), var(--inner-highlight);
-  --elevation-premium: 0 36px 90px -42px rgb(0 0 0 / 0.78), var(--inner-highlight);
+  --elevation-soft: 0 18px 42px -32px rgb(0 0 0 / 0.56), var(--inner-highlight);
+  --elevation-card: 0 22px 52px -38px rgb(0 0 0 / 0.62), var(--inner-highlight);
+  --elevation-pop: 0 24px 64px -32px rgb(0 0 0 / 0.68), var(--inner-highlight);
+  --elevation-premium: 0 36px 90px -46px rgb(0 0 0 / 0.7), var(--inner-highlight);
   --elevation-focus: 0 0 0 4px rgb(159 231 248 / 0.22), 0 0 0 1px rgb(159 231 248 / 0.28);
   --elevation-glow: 0 18px 42px -24px rgb(66 158 189 / 0.24);
   --shadow-soft: var(--elevation-soft);
@@ -727,7 +729,13 @@ textarea:focus-visible {
 .bg-primary.text-charcoal,
 .bg-teal.text-charcoal,
 .bg-terracotta.text-charcoal {
-  color: var(--white);
+  color: var(--primary-foreground);
+}
+
+.bg-accent.text-charcoal,
+.bg-lavender.text-charcoal,
+.bg-sage.text-charcoal {
+  color: var(--accent-foreground);
 }
 
 [data-slot="alert"] {
@@ -819,24 +827,134 @@ label,
     var(--surface-glass);
 }
 
+.dark body {
+  background:
+    radial-gradient(circle at 12% 0%, rgb(var(--sage-rgb) / 0.12), transparent 32rem),
+    radial-gradient(circle at 92% 8%, rgb(var(--teal-rgb) / 0.14), transparent 30rem),
+    linear-gradient(180deg, var(--surface-hover) 0%, var(--background) 46%, #101613 100%);
+}
+
 .dark .nce-glass {
   background:
     linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.015)),
     var(--surface-glass);
 }
 
+.dark .nce-grain::before {
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 30% 20%, rgb(var(--sand-rgb) / 0.12), transparent 26rem);
+}
+
+.dark .nce-text-outline {
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.28);
+  text-stroke: 1px rgb(255 255 255 / 0.28);
+}
+
 .dark [data-slot="input"],
 .dark select,
 .dark textarea {
+  color: var(--text-primary);
   background-color: rgb(25 34 31 / 0.84);
   box-shadow:
     0 1px 0 rgb(255 255 255 / 0.04) inset,
     0 16px 32px -24px rgb(0 0 0 / 0.7);
 }
 
+.dark [data-slot="input"]:hover,
+.dark select:hover,
+.dark textarea:hover {
+  border-color: rgb(var(--sage-rgb) / 0.3);
+  background-color: rgb(32 43 39 / 0.9);
+}
+
+.dark [data-slot="input"]:focus-visible,
+.dark select:focus-visible,
+.dark textarea:focus-visible {
+  border-color: rgb(var(--sage-rgb) / 0.5);
+  box-shadow: var(--shadow-focus);
+}
+
+.dark [data-slot="button"][data-variant="default"] {
+  color: var(--primary-foreground);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.18), rgb(255 255 255 / 0)),
+    var(--primary);
+}
+
+.dark [data-slot="button"][data-variant="secondary"] {
+  color: var(--text-primary);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.015)),
+    var(--surface-glass);
+}
+
 .dark [data-slot="button"][data-variant="outline"],
 .dark [data-slot="button"][data-variant="ghost"] {
-  background-color: rgb(25 34 31 / 0.68);
+  color: var(--text-secondary);
+  background-color: rgb(25 34 31 / 0.7);
+}
+
+.dark [data-slot="button"][data-variant="destructive"] {
+  background-color: rgb(var(--danger-rgb) / 0.16);
+}
+
+.dark [data-slot="tooltip-content"],
+.dark [role="alertdialog"] {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.018)),
+    var(--surface-glass);
+}
+
+.dark :where([class~="bg-white"], [class*="bg-white/"]) {
+  background-color: rgb(25 34 31 / 0.78);
+}
+
+.dark :where(.text-espresso, .hover\:text-espresso:hover) {
+  color: var(--text-primary);
+}
+
+.dark .text-espresso\/70 {
+  color: rgb(248 250 248 / 0.7);
+}
+
+.dark .text-espresso\/80 {
+  color: rgb(248 250 248 / 0.8);
+}
+
+.dark :where(.bg-sand.text-espresso, .bg-sage.text-espresso) {
+  color: var(--accent-foreground);
+}
+
+.dark :where(.bg-primary.text-white, .bg-terracotta.text-white) {
+  color: var(--primary-foreground);
+}
+
+.dark .bg-charcoal.text-white {
+  color: var(--cream);
+}
+
+.dark .bg-charcoal\/80.text-white {
+  color: var(--text-primary);
+}
+
+.dark .bg-charcoal\/24 {
+  background-color: rgb(0 0 0 / 0.46);
+}
+
+.dark .bg-charcoal\/45 {
+  background-color: rgb(0 0 0 / 0.58);
+}
+
+.dark .bg-charcoal\/80 {
+  background-color: rgb(0 0 0 / 0.42);
+}
+
+.dark .bg-espresso .text-cream,
+.dark .bg-espresso.text-cream {
+  color: var(--text-primary);
 }
 
 .dark .animate-pulse:is(div, span, section, article) {

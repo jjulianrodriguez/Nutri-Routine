@@ -21,9 +21,9 @@ import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import type { ProfessionalSpecialty } from "@/lib/validations/professional-accounts";
 
 const specialtyLabels: Record<ProfessionalSpecialty, string> = {
-  both: "Profesional en ambas areas",
-  nutrition: "Profesional en nutricion",
-  training: "Profesional en entrenamiento",
+  both: "Entrenadora y nutricionista",
+  nutrition: "Nutricionista",
+  training: "Entrenadora",
 };
 
 function formatCreatedAt(value: string) {
@@ -60,7 +60,7 @@ export default async function ProfessionalAccountsPage() {
               <ShieldCheck className="size-4" aria-hidden="true" />
             </div>
             <p className="text-sm font-extrabold leading-6 text-charcoal">
-              El codigo administrativo se verifica de forma segura.
+              El código administrativo se verifica de forma segura.
             </p>
           </div>
         </div>
@@ -69,7 +69,7 @@ export default async function ProfessionalAccountsPage() {
       <FadeIn delay={0.06}>
         <AppPanel
           title="Crear cuenta"
-          description="Las cuentas nuevas usan el rol profesional y reciben permisos solo para el area seleccionada."
+          description="Las cuentas nuevas usan el rol profesional y reciben permisos solo para el área seleccionada."
         >
           <ProfessionalAccountForm />
         </AppPanel>
@@ -138,7 +138,7 @@ export default async function ProfessionalAccountsPage() {
                   <div className="flex flex-wrap gap-2 text-xs font-extrabold text-charcoal">
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1.5">
                       <Utensils className="size-3.5" aria-hidden="true" />
-                      {item.assignedNutritionClients} nutricion
+                      {item.assignedNutritionClients} nutrición
                     </span>
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1.5">
                       <Dumbbell className="size-3.5" aria-hidden="true" />
@@ -162,7 +162,7 @@ export default async function ProfessionalAccountsPage() {
                 Aun no hay cuentas profesionales.
               </p>
               <p className="mt-2 text-sm text-muted">
-                Cuando completes el formulario, apareceran aqui.
+                Cuando completes el formulario, aparecerán aquí.
               </p>
             </div>
           )}

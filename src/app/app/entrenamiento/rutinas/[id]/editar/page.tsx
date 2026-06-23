@@ -35,7 +35,7 @@ export default async function EditRoutinePage({
       <AppHeader
         eyebrow="Editar entrenamiento"
         title={routine.name}
-        description="Actualiza la informacion general, cambia el orden o ajusta la configuracion de cada ejercicio."
+        description="Actualiza la información general, cambia el orden o ajusta la configuración de cada ejercicio."
       />
       <TrainingSectionNav active="routines" />
       <RoutineEditor exerciseOptions={catalog} routine={routine} />

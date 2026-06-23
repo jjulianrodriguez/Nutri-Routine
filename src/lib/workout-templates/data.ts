@@ -1,5 +1,9 @@
 import "server-only";
 
+import {
+  getProfileDirectory,
+  getProfileDisplayName,
+} from "@/lib/auth/profile-directory";
 import { createClient } from "@/lib/supabase/server";
 import { getRoutineDetails } from "@/lib/routines/data";
 import { parseWorkoutWeekday } from "@/lib/workout-templates/weekdays";
@@ -14,7 +18,7 @@ const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const IDENTIFIER_TIMEOUT_MS = 2_500;
 const TEMPLATE_IDENTIFIER_WARNING =
-  "Las plantillas cargaron, pero no pudimos mostrar sus identificadores internos. Intenta recargar la seccion.";
+  "Las plantillas cargaron, pero no pudimos mostrar sus identificadores internos. Intenta recargar la sección.";
 
 type WorkoutTemplateIdentifierResult = {
   identifiers: Map<string, string | null>;
@@ -152,24 +156,10 @@ export async function listWorkoutTemplatesWithMeta(): Promise<WorkoutTemplateLis
   const creatorIds = [
     ...new Set((templates ?? []).map((template) => template.creator_id)),
   ];
-  const creatorsResult =
-    creatorIds.length > 0
-      ? await supabase
-          .from("profiles")
-          .select("id, full_name")
-          .in("id", creatorIds)
-      : { data: [], error: null };
-
-  if (creatorsResult.error) {
-    throw new Error("No se pudieron cargar los creadores de las plantillas.");
-  }
-
-  const creatorNames = new Map(
-    (creatorsResult.data ?? []).map((creator) => [
-      creator.id,
-      creator.full_name?.trim() || "Profesional",
-    ]),
-  );
+  const creatorProfiles = await getProfileDirectory(creatorIds, {
+    includeEmails: true,
+    includeProfessionalProfiles: true,
+  });
   const assignedDayCounts = new Map<string, number>();
 
   (daysResult.data ?? []).forEach((day) => {
@@ -191,7 +181,8 @@ export async function listWorkoutTemplatesWithMeta(): Promise<WorkoutTemplateLis
         createdAt: template.created_at,
         creatorId: template.creator_id,
         creatorName:
-          creatorNames.get(template.creator_id) ?? "Profesional",
+          getProfileDisplayName(creatorProfiles.get(template.creator_id)) ??
+          "Perfil incompleto",
         cycleDays: template.cycle_days,
         description: template.description,
         id: template.id,
@@ -269,7 +260,7 @@ export async function listAssignableWorkoutTemplatesWithMeta(): Promise<
           incompleteCount === 1 ? "" : "s"
         } no aparece${
           incompleteCount === 1 ? "" : "n"
-        } para asignar porque tiene dias pendientes.`
+        } para asignar porque tiene días pendientes.`
       : null,
   ].filter(Boolean);
 
@@ -321,20 +312,19 @@ export async function getWorkoutTemplateDetailWithMeta(
     };
   }
 
-  const [daysResult, creatorResult] = await Promise.all([
+  const [daysResult, creatorProfiles] = await Promise.all([
     supabase
       .from("workout_template_days")
       .select("id, day_number, routine_id, weekday")
       .eq("template_id", template.id)
       .order("day_number"),
-    supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("id", template.creator_id)
-      .maybeSingle(),
+    getProfileDirectory([template.creator_id], {
+      includeEmails: true,
+      includeProfessionalProfiles: true,
+    }),
   ]);
 
-  if (daysResult.error || creatorResult.error) {
+  if (daysResult.error) {
     throw new Error("No se pudo cargar el detalle de la plantilla.");
   }
 
@@ -366,7 +356,9 @@ export async function getWorkoutTemplateDetailWithMeta(
       ...completeness,
       createdAt: template.created_at,
       creatorId: template.creator_id,
-      creatorName: creatorResult.data?.full_name?.trim() || "Profesional",
+      creatorName:
+        getProfileDisplayName(creatorProfiles.get(template.creator_id)) ??
+        "Perfil incompleto",
       cycleDays: template.cycle_days,
       days: resolvedDays,
       description: template.description,

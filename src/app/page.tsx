@@ -260,7 +260,7 @@ function Hero() {
           <div className="grid gap-3">
             {[
               { name: "Dra. Mariana Rodríguez Méndez", role: "Profesional en nutrición funcional", color: "bg-terracotta text-white" },
-              { name: "Camila Rodríguez Méndez", role: "Profesional en entrenamiento", color: "bg-sage text-espresso" },
+              { name: "Camila Rodríguez Méndez", role: "Entrenadora", color: "bg-sage text-espresso" },
             ].map((item, index) => (
               <div
                 key={item.name}
@@ -512,7 +512,7 @@ export default function Home() {
             number="02"
             label="Entrenamiento Personalizado"
             name="Camila Rodríguez Méndez"
-            subtitle="Profesional en entrenamiento"
+            subtitle="Entrenadora"
             description="Rutinas diseñadas para tu cuerpo, tu ritmo y tus metas. Desde casa o en el gimnasio, con seguimiento real y motivación constante."
             benefits={camilaBenefits}
             cta="Agendar sesión con Camila"

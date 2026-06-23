@@ -6,7 +6,7 @@ export default function HistoricalRoutineNotFound() {
     <AppScreen>
       <div className="grid min-h-[70dvh] place-items-center">
         <RecoveryState
-          description="El plan fue eliminado, ya no esta disponible o esta asignado a otra cuenta."
+          description="El plan fue eliminado, ya no está disponible o está asignado a otra cuenta."
           eyebrow="Plan historico no disponible"
           fallbackHref="/app/entrenamiento"
           fallbackLabel="Ir a entrenamiento"

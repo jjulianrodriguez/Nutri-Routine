@@ -18,7 +18,7 @@ export type BlogPost = {
 
 type BlogPostRow = Omit<Tables<"blog_posts">, "tags">;
 
-const FALLBACK_AUTHOR = "Nutricion Con Enfoque";
+const FALLBACK_AUTHOR = "Nutrición Con Enfoque";
 
 function formatPostDate(value: string | null) {
   if (!value) {
@@ -63,7 +63,7 @@ export const getPublishedBlogPosts = cache(async () => {
     .order("created_at", { ascending: false });
 
   if (error) {
-    throw new Error("No se pudieron cargar los articulos publicados.");
+    throw new Error("No se pudieron cargar los artículos publicados.");
   }
 
   return (data ?? []).map(mapBlogPost);
@@ -85,7 +85,7 @@ export const getPostBySlug = cache(async (slug: string) => {
     .maybeSingle();
 
   if (error) {
-    throw new Error("No se pudo cargar el articulo solicitado.");
+    throw new Error("No se pudo cargar el artículo solicitado.");
   }
 
   if (!data) {

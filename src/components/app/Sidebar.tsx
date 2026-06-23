@@ -10,10 +10,12 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
+import { ChatWidget } from "@/components/app/chat-widget";
 import { CurrentUserAccessProvider } from "@/components/app/current-user-access-provider";
 import { SidebarNav } from "@/components/app/SidebarNav";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
   Tooltip,
   TooltipContent,
@@ -179,9 +181,21 @@ export function Sidebar({
           <div
             className={cn(
               "border-t border-border py-4",
-              isCollapsed ? "flex justify-center px-3" : "px-4",
+              isCollapsed ? "flex flex-col items-center gap-3 px-3" : "space-y-3 px-4",
             )}
           >
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ThemeToggle
+                  showLabel={!isCollapsed}
+                  className={cn(!isCollapsed && "w-full")}
+                />
+              </TooltipTrigger>
+              {isCollapsed ? (
+                <TooltipContent side="right">Cambiar tema</TooltipContent>
+              ) : null}
+            </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -285,6 +299,10 @@ export function Sidebar({
           {children}
         </motion.div>
       </main>
+
+      <Suspense fallback={null}>
+        <ChatWidget />
+      </Suspense>
 
       <button
         type="button"

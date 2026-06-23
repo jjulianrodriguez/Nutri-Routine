@@ -302,7 +302,7 @@ export function BlogManager({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
-              {editingPost ? "Edicion" : "Nuevo contenido"}
+              {editingPost ? "Edición" : "Nuevo contenido"}
             </p>
             <h2 className="mt-2 text-3xl font-semibold text-charcoal">
               {editingPost ? "Editar blog" : "Crear blog"}
@@ -341,7 +341,7 @@ export function BlogManager({
               htmlFor="blog-category"
               className="font-extrabold text-charcoal"
             >
-              Categoria
+              Categoría
             </Label>
             <Input
               id="blog-category"
@@ -360,7 +360,7 @@ export function BlogManager({
             />
             <datalist id="blog-category-options">
               <option value="Bienestar" />
-              <option value="Nutricion" />
+              <option value="Nutrición" />
               <option value="Entrenamiento" />
               <option value="Consejos" />
             </datalist>
@@ -368,7 +368,7 @@ export function BlogManager({
               id="blog-category-help"
               className="mt-2 text-sm leading-6 text-muted"
             >
-              Esta categoria aparecera como filtro en el blog publico.
+              Esta categoría aparecerá como filtro en el blog público.
             </p>
             <FieldError
               id="blog-category-error"
@@ -384,7 +384,7 @@ export function BlogManager({
               Contenido
             </Label>
             <p className="mt-2 text-sm leading-6 text-muted">
-              Escribe y da formato al contenido sin tocar codigo ni Markdown.
+              Escribe y da formato al contenido sin tocar código ni Markdown.
             </p>
             <input type="hidden" {...register("content")} />
             <div className="mt-3">
@@ -415,7 +415,7 @@ export function BlogManager({
               id="blog-content-help"
               className="mt-2 text-sm leading-6 text-muted"
             >
-              Usa la vista previa para revisar como se vera publicado.
+              Usa la vista previa para revisar cómo se verá publicado.
             </p>
             <FieldError
               id="blog-content-error"
@@ -435,7 +435,7 @@ export function BlogManager({
                   Visible
                 </span>
                 <span className="mt-1 block text-xs leading-5 text-muted">
-                  Mostrar publicamente.
+                  Mostrar públicamente.
                 </span>
               </span>
             </label>
@@ -518,7 +518,7 @@ export function BlogManager({
           <Button asChild variant="outline">
             <Link href="/blog" target="_blank" rel="noreferrer">
               <Eye className="size-4" aria-hidden="true" />
-              Ver blog publico
+              Ver blog público
             </Link>
           </Button>
         </div>
@@ -616,7 +616,7 @@ export function BlogManager({
               Aun no hay blogs creados.
             </p>
             <p className="mt-2 text-sm leading-6 text-muted">
-              El primer blog que guardes aparecera en esta lista.
+              El primer blog que guardes aparecerá en esta lista.
             </p>
           </div>
         )}

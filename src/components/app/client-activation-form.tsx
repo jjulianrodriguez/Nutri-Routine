@@ -9,6 +9,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Label } from "@/components/ui/label";
+import {
+  getAssignedRelationBadge,
+  RelationshipBadge,
+} from "@/components/app/relationship-badges";
 import { activateClientAccount } from "@/lib/actions/client-activation";
 import type {
   AssignableProfessional,
@@ -22,8 +26,15 @@ type ClientActivationFormProps = {
   canManageTraining: boolean;
   client: ClientAccountListItem;
   currentUserId: string;
+  currentUserName: string;
+  isAdmin: boolean;
   nutritionists: AssignableProfessional[];
   trainers: AssignableProfessional[];
+};
+
+type ProfessionalPlanAction = {
+  enable: boolean;
+  service: "nutrition" | "training";
 };
 
 const selectClasses =
@@ -113,16 +124,137 @@ function PlanToggle({
   );
 }
 
+function ProfessionalAreaAction({
+  active,
+  assignedId,
+  assignedName,
+  assignedToCurrentUser,
+  currentUserId,
+  currentUserName,
+  disabled,
+  icon: Icon,
+  isPending,
+  label,
+  onAssign,
+  onRemove,
+  professionalLabel,
+}: {
+  active: boolean;
+  assignedId: string | null;
+  assignedName: string | null;
+  assignedToCurrentUser: boolean;
+  currentUserId: string;
+  currentUserName: string;
+  disabled: boolean;
+  icon: typeof Leaf;
+  isPending: boolean;
+  label: string;
+  onAssign: () => void;
+  onRemove: () => void;
+  professionalLabel: string;
+}) {
+  const blockedByOtherProfessional = active && !assignedToCurrentUser;
+  const assignedDisplayName = active
+    ? assignedName ?? (assignedToCurrentUser ? currentUserName : null)
+    : null;
+  const relationBadge = getAssignedRelationBadge({
+    assignedId: active ? assignedId : null,
+    currentUserId,
+    isProfessional: true,
+  });
+
+  return (
+    <div
+      className={cn(
+        "rounded-[18px] border p-4",
+        active
+          ? assignedToCurrentUser
+            ? "border-primary/35 bg-primary-soft/60"
+            : "border-warm-brown/25 bg-accent-soft/50"
+          : "border-border bg-surface",
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-background text-warm-brown">
+            <Icon className="size-5" aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-extrabold text-charcoal">
+              {active
+                ? assignedDisplayName ?? "Perfil incompleto"
+                : `Sin plan de ${label.toLowerCase()}`}
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <RelationshipBadge tone={active ? "primary" : "muted"}>
+                {active ? label : `Sin ${label.toLowerCase()}`}
+              </RelationshipBadge>
+              <RelationshipBadge tone={relationBadge.tone}>
+                {relationBadge.label}
+              </RelationshipBadge>
+              {active ? (
+                <RelationshipBadge tone="neutral">
+                  {professionalLabel}
+                </RelationshipBadge>
+              ) : null}
+            </div>
+            {!active ? (
+              <p className="mt-2 text-sm leading-5 text-muted">
+                Puedes activar {label.toLowerCase()} asignandote como
+                responsable.
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      {blockedByOtherProfessional ? (
+        <p className="mt-4 rounded-[14px] border border-border bg-background px-3 py-2 text-xs font-bold leading-5 text-warm-brown">
+          Este plan ya pertenece a{" "}
+          {assignedDisplayName ?? "otro profesional"}. No puedes cambiarlo
+          desde tu cuenta.
+        </p>
+      ) : (
+        <Button
+          type="button"
+          className="mt-4 w-full sm:w-auto"
+          disabled={disabled || isPending}
+          onClick={active ? onRemove : onAssign}
+          size="sm"
+          variant={active ? "destructive" : "default"}
+        >
+          {isPending ? (
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          ) : active ? (
+            <X className="size-4" aria-hidden="true" />
+          ) : (
+            <Check className="size-4" aria-hidden="true" />
+          )}
+          {active
+            ? `Quitar ${label.toLowerCase()}`
+            : `Asignar mi ${label.toLowerCase()}`}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 export function ClientActivationForm({
   canManageNutrition,
   canManageTraining,
   client,
   currentUserId,
+  currentUserName,
+  isAdmin,
   nutritionists,
   trainers,
 }: ClientActivationFormProps) {
   const router = useRouter();
+  const [confirmAction, setConfirmAction] =
+    useState<ProfessionalPlanAction | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [pendingAction, setPendingAction] =
+    useState<ProfessionalPlanAction | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [serverMessage, setServerMessage] = useState("");
   const [nutritionEnabled, setNutritionEnabled] = useState(
@@ -155,6 +287,55 @@ export function ClientActivationForm({
     client.hasNutritionService && !nutritionEnabled;
   const removesTraining = client.hasTrainingService && !trainingEnabled;
   const hasPlanSelection = serviceType !== "none" || client.isClientActivated;
+
+  async function saveProfessionalAction(action: ProfessionalPlanAction) {
+    const nextNutritionEnabled =
+      action.service === "nutrition"
+        ? action.enable
+        : client.hasNutritionService;
+    const nextTrainingEnabled =
+      action.service === "training" ? action.enable : client.hasTrainingService;
+
+    setServerMessage("");
+    setPendingAction(action);
+    setIsPending(true);
+
+    try {
+      const result = await activateClientAccount({
+        assignedNutritionistId:
+          action.service === "nutrition" && action.enable ? currentUserId : "",
+        assignedTrainerId:
+          action.service === "training" && action.enable ? currentUserId : "",
+        clientId: client.id,
+        serviceType: getServiceType(nextNutritionEnabled, nextTrainingEnabled),
+      });
+
+      if (result.status === "error") {
+        setServerMessage(result.message);
+        toast.error(result.message);
+        return;
+      }
+
+      toast.success(result.message);
+      router.refresh();
+    } catch {
+      toast.error(
+        "Ocurrió un error inesperado al guardar los planes. Inténtalo de nuevo.",
+      );
+    } finally {
+      setPendingAction(null);
+      setIsPending(false);
+    }
+  }
+
+  function requestProfessionalAction(action: ProfessionalPlanAction) {
+    if (!action.enable) {
+      setConfirmAction(action);
+      return;
+    }
+
+    void saveProfessionalAction(action);
+  }
 
   async function savePlans() {
     setServerMessage("");
@@ -204,6 +385,109 @@ export function ClientActivationForm({
     );
   }
 
+  if (!isAdmin) {
+    const canShowNutritionAction = canManageNutrition;
+    const canShowTrainingAction = canManageTraining;
+    const nutritionAssignedToCurrentUser =
+      client.assignedNutritionistId === currentUserId;
+    const trainingAssignedToCurrentUser =
+      client.assignedTrainerId === currentUserId;
+    const confirmLabel =
+      confirmAction?.service === "nutrition"
+        ? "Quitar nutrición"
+        : "Quitar entrenamiento";
+
+    return (
+      <div className="space-y-4 rounded-[22px] border border-border bg-background p-4">
+        <div className="grid gap-3 lg:grid-cols-2">
+          {canShowNutritionAction ? (
+            <ProfessionalAreaAction
+              active={client.hasNutritionService}
+              assignedId={client.assignedNutritionistId}
+              assignedName={client.assignedNutritionistName}
+              assignedToCurrentUser={nutritionAssignedToCurrentUser}
+              currentUserId={currentUserId}
+              currentUserName={currentUserName}
+              disabled={isPending}
+              icon={Leaf}
+              isPending={isPending && pendingAction?.service === "nutrition"}
+              label="Nutrición"
+              onAssign={() =>
+                requestProfessionalAction({
+                  enable: true,
+                  service: "nutrition",
+                })
+              }
+              onRemove={() =>
+                requestProfessionalAction({
+                  enable: false,
+                  service: "nutrition",
+                })
+              }
+              professionalLabel="Nutricionista"
+            />
+          ) : null}
+
+          {canShowTrainingAction ? (
+            <ProfessionalAreaAction
+              active={client.hasTrainingService}
+              assignedId={client.assignedTrainerId}
+              assignedName={client.assignedTrainerName}
+              assignedToCurrentUser={trainingAssignedToCurrentUser}
+              currentUserId={currentUserId}
+              currentUserName={currentUserName}
+              disabled={isPending}
+              icon={Dumbbell}
+              isPending={isPending && pendingAction?.service === "training"}
+              label="Entrenamiento"
+              onAssign={() =>
+                requestProfessionalAction({
+                  enable: true,
+                  service: "training",
+                })
+              }
+              onRemove={() =>
+                requestProfessionalAction({
+                  enable: false,
+                  service: "training",
+                })
+              }
+              professionalLabel="Entrenador"
+            />
+          ) : null}
+        </div>
+
+        {serverMessage ? (
+          <Alert
+            variant="destructive"
+            className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
+          >
+            <AlertDescription className="font-semibold text-danger">
+              {serverMessage}
+            </AlertDescription>
+          </Alert>
+        ) : null}
+
+        <ConfirmationDialog
+          open={Boolean(confirmAction)}
+          onOpenChange={(open) => {
+            if (!open) {
+              setConfirmAction(null);
+            }
+          }}
+          title={confirmLabel}
+          description="Este cambio retirará el acceso del cliente a esa sección. Solo se modificará tu área."
+          confirmLabel={confirmLabel}
+          pendingLabel="Guardando..."
+          tone="destructive"
+          onConfirm={() =>
+            confirmAction ? saveProfessionalAction(confirmAction) : undefined
+          }
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 rounded-[22px] border border-border bg-background p-4">
       <div className="grid gap-3 sm:grid-cols-2">
@@ -215,12 +499,12 @@ export function ClientActivationForm({
               (!nutritionEnabled && nutritionists.length === 0)
             }
             icon={Leaf}
-            label="Plan de nutricion"
+            label="Plan de nutrición"
             onToggle={() => setNutritionEnabled((current) => !current)}
           />
           {nutritionists.length === 0 ? (
             <p className="px-1 text-xs font-semibold leading-5 text-muted">
-              No hay profesionales de nutricion disponibles para nuevas
+              No hay profesionales de nutrición disponibles para nuevas
               activaciones.
             </p>
           ) : null}
@@ -253,7 +537,7 @@ export function ClientActivationForm({
                 htmlFor={`nutritionist-${client.id}`}
                 className="font-extrabold text-charcoal"
               >
-                Profesional en nutricion
+                Nutricionista
               </Label>
               <select
                 id={`nutritionist-${client.id}`}
@@ -267,6 +551,7 @@ export function ClientActivationForm({
                 {nutritionists.map((professional) => (
                   <option key={professional.id} value={professional.id}>
                     {professional.fullName}
+                    {professional.email ? ` - ${professional.email}` : ""}
                   </option>
                 ))}
               </select>
@@ -279,7 +564,7 @@ export function ClientActivationForm({
                 htmlFor={`trainer-${client.id}`}
                 className="font-extrabold text-charcoal"
               >
-                Profesional en entrenamiento
+                Entrenadora
               </Label>
               <select
                 id={`trainer-${client.id}`}
@@ -291,6 +576,7 @@ export function ClientActivationForm({
                 {trainers.map((professional) => (
                   <option key={professional.id} value={professional.id}>
                     {professional.fullName}
+                    {professional.email ? ` - ${professional.email}` : ""}
                   </option>
                 ))}
               </select>
@@ -300,7 +586,7 @@ export function ClientActivationForm({
       ) : (
         <Alert className="rounded-[18px] border-primary/25 bg-primary-soft px-4 py-3">
           <AlertDescription className="font-semibold text-charcoal">
-            Sin planes activos, el usuario solo podra entrar a configuracion.
+            Sin planes activos, el usuario solo podrá entrar a configuración.
           </AlertDescription>
         </Alert>
       )}

@@ -17,7 +17,7 @@ export default function GlobalError({
   return (
     <html lang="es">
       <body>
-        <title>Error inesperado | Nutricion Con Enfoque</title>
+        <title>Error inesperado | Nutrición Con Enfoque</title>
         <main className="grid min-h-dvh place-items-center bg-[radial-gradient(circle_at_top_right,var(--primary-soft),transparent_30rem)] px-4 py-10 sm:px-6">
           <RecoveryState
             description="La aplicacion no pudo iniciar correctamente. Intenta cargarla otra vez o vuelve al inicio."

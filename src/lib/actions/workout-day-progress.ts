@@ -41,19 +41,19 @@ function getTodayDateKey() {
 
 function getInvalidMessage(input: UpdateWorkoutDayProgressInput) {
   if (!UUID_PATTERN.test(input.workoutPlanId)) {
-    return "El plan de entrenamiento no es valido.";
+    return "El plan de entrenamiento no es válido.";
   }
 
   if (!input.exerciseId || input.exerciseId.length > 120) {
-    return "El ejercicio indicado no es valido.";
+    return "El ejercicio indicado no es válido.";
   }
 
   if (!DATE_PATTERN.test(input.workoutDate)) {
-    return "La fecha del entrenamiento no es valida.";
+    return "La fecha del entrenamiento no es válida.";
   }
 
   if (!Number.isInteger(input.cycleDay) || input.cycleDay < 1) {
-    return "El dia del ciclo no es valido.";
+    return "El día del ciclo no es válido.";
   }
 
   return null;
@@ -72,7 +72,7 @@ export async function updateWorkoutDayExerciseProgress(
 
   if (input.workoutDate !== today) {
     return {
-      message: "Solo puedes marcar el entrenamiento del dia actual.",
+      message: "Solo puedes marcar el entrenamiento del día actual.",
       status: "error",
     };
   }
@@ -85,7 +85,7 @@ export async function updateWorkoutDayExerciseProgress(
 
   if (userError || !user) {
     return {
-      message: "Debes iniciar sesion para actualizar tu entrenamiento.",
+      message: "Debes iniciar sesión para actualizar tu entrenamiento.",
       status: "error",
     };
   }
@@ -107,14 +107,14 @@ export async function updateWorkoutDayExerciseProgress(
 
   if (plan.status !== "active") {
     return {
-      message: "Este entrenamiento no esta activo.",
+      message: "Este entrenamiento no está activo.",
       status: "error",
     };
   }
 
   if (plan.start_date && plan.start_date > today) {
     return {
-      message: "Este entrenamiento aun no inicia.",
+      message: "Este entrenamiento aún no inicia.",
       status: "error",
     };
   }
@@ -122,7 +122,7 @@ export async function updateWorkoutDayExerciseProgress(
   if (plan.end_date && plan.end_date < today) {
     return {
       message:
-        "Tu entrenamiento esta vencido. Consulta a tu entrenador para actualizarlo.",
+        "Tu entrenamiento esta vencido. Consulta a tu profesional de entrenamiento para actualizarlo.",
       status: "error",
     };
   }
@@ -146,14 +146,14 @@ export async function updateWorkoutDayExerciseProgress(
 
   if (template && !templateDay) {
     return {
-      message: "El dia de entrenamiento indicado no existe en tu plantilla.",
+      message: "El día de entrenamiento indicado no existe en tu plantilla.",
       status: "error",
     };
   }
 
   if (!template && input.cycleDay !== 1) {
     return {
-      message: "Esta asignacion solo permite marcar el dia actual.",
+      message: "Esta asignación solo permite marcar el día actual.",
       status: "error",
     };
   }
@@ -234,7 +234,7 @@ export async function updateWorkoutDayExerciseProgress(
 
   if (mutationError) {
     return {
-      message: "No se pudo guardar tu avance. Intentalo de nuevo.",
+      message: "No se pudo guardar tu avance. Inténtalo de nuevo.",
       status: "error",
     };
   }

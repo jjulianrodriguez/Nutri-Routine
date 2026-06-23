@@ -153,7 +153,7 @@ export function WorkoutTemplateView({
   assignedDayCount,
   currentDayNumber,
   description,
-  emptyMessage = "Esta plantilla no tiene dias configurados.",
+  emptyMessage = "Esta plantilla no tiene días configurados.",
   focusCurrentDayFirst = false,
   headline,
   identifier,
@@ -223,7 +223,7 @@ export function WorkoutTemplateView({
   const resolvedDescription =
     description ??
     snapshot.template.description ??
-    "Ciclo de entrenamiento sin descripcion adicional.";
+    "Ciclo de entrenamiento sin descripción adicional.";
   const resolvedAssignedDayCount = assignedDayCount ?? snapshot.days.length;
   const summaryItems: WorkoutTemplateMetaItem[] = [
     {
@@ -312,7 +312,7 @@ export function WorkoutTemplateView({
               ) : null}
               <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-extrabold text-warm-brown">
                 {resolvedAssignedDayCount} de {snapshot.template.cycleDays}{" "}
-                {snapshot.template.cycleDays === 1 ? "dia" : "dias"}
+                {snapshot.template.cycleDays === 1 ? "día" : "días"}
               </span>
               {identifier && viewer === "professional" ? (
                 <span className="max-w-full truncate rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-warm-brown">
@@ -322,7 +322,7 @@ export function WorkoutTemplateView({
               {missingDayCount > 0 ? (
                 <span className="rounded-full bg-danger/10 px-3 py-1 text-xs font-extrabold text-danger">
                   Incompleta: {missingDayCount}{" "}
-                  {missingDayCount === 1 ? "dia pendiente" : "dias pendientes"}
+                  {missingDayCount === 1 ? "día pendiente" : "días pendientes"}
                 </span>
               ) : null}
             </div>
@@ -345,7 +345,7 @@ export function WorkoutTemplateView({
 
             {usedFallbackDay ? (
               <p className="mt-3 rounded-[18px] border border-warm-brown/20 bg-surface px-4 py-3 text-sm font-semibold leading-6 text-warm-brown">
-                No encontramos el dia calculado en la plantilla, asi que te
+                No encontramos el día calculado en la plantilla, así que te
                 mostramos el primer entrenamiento disponible. Consulta a tu
                 entrenador si algo no coincide.
               </p>
@@ -423,13 +423,13 @@ export function WorkoutTemplateView({
                   Vista de ciclo
                 </p>
                 <p className="mt-3 text-3xl font-black text-charcoal">
-                  {snapshot.template.cycleDays} dias
+                  {snapshot.template.cycleDays} días
                 </p>
                 <p className="mt-2 text-sm font-semibold leading-6 text-warm-brown">
                   {resolvedAssignedDayCount} de {snapshot.template.cycleDays}{" "}
                   {snapshot.template.cycleDays === 1
-                    ? "dia completo"
-                    : "dias completos"}
+                    ? "día completo"
+                    : "días completos"}
                 </p>
               </>
             )}
@@ -452,11 +452,11 @@ export function WorkoutTemplateView({
               Dias del ciclo
             </p>
             <h3 className="mt-1 text-2xl font-semibold text-charcoal">
-              Entrenamientos por dia
+              Entrenamientos por día
             </h3>
           </div>
           <p className="text-sm font-semibold text-muted">
-            Abre cada dia para revisar ejercicios, instrucciones y materiales.
+            Abre cada día para revisar ejercicios, instrucciones y materiales.
           </p>
         </div>
 
@@ -550,7 +550,7 @@ function WorkoutTemplateDaySection({
         />
       ) : (
         <div className="rounded-[20px] border border-dashed border-border bg-background/70 p-5 text-sm font-semibold text-muted">
-          Este dia no tiene ejercicios disponibles.
+          Este día no tiene ejercicios disponibles.
         </div>
       )}
     </WorkoutSummaryCard>

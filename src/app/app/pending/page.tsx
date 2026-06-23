@@ -18,7 +18,7 @@ export default async function PendingAccountPage() {
       <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
         <AppPanel
           title="Estado de activacion"
-          description="Tu rol sigue siendo cliente, pero todavia no hay profesionales de nutricion o entrenamiento asignados."
+          description="Tu rol sigue siendo cliente, pero todavía no hay profesionales de nutrición o entrenamiento asignados."
           tone="primary"
         >
           <div className="grid gap-3 sm:grid-cols-2">
@@ -28,8 +28,8 @@ export default async function PendingAccountPage() {
                 Servicios pendientes
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Cuando se active nutricion, entrenamiento o ambos, tu dashboard
-                mostrara solo esas secciones.
+                Cuando se active nutrición, entrenamiento o ambos, tu dashboard
+                mostrará solo esas secciones.
               </p>
             </div>
             <div className="rounded-[20px] border border-primary/30 bg-surface p-4">
@@ -42,7 +42,7 @@ export default async function PendingAccountPage() {
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted">
                 Por ahora solo podes revisar datos basicos de cuenta y cerrar
-                sesion.
+                sesión.
               </p>
             </div>
           </div>

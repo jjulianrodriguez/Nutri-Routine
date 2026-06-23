@@ -5,18 +5,18 @@ export const loginSchema = z.object({
     .string()
     .trim()
     .min(1, "Ingresa tu email.")
-    .email("Ingresa un email valido."),
-  password: z.string().min(1, "Ingresa tu contrasena."),
+    .email("Ingresa un email válido."),
+  password: z.string().min(1, "Ingresa tu contraseña."),
 });
 
 export const profileRoleSchema = z.enum(["client"]);
 
-const passwordSchema = z
+export const passwordSchema = z
   .string()
-  .min(8, "La contrasena debe tener al menos 8 caracteres.")
-  .max(72, "La contrasena no puede tener mas de 72 caracteres.")
-  .regex(/[A-Za-z]/, "La contrasena debe incluir al menos una letra.")
-  .regex(/[0-9]/, "La contrasena debe incluir al menos un numero.");
+  .min(8, "La contraseña debe tener al menos 8 caracteres.")
+  .max(72, "La contraseña no puede tener más de 72 caracteres.")
+  .regex(/[A-Za-z]/, "La contraseña debe incluir al menos una letra.")
+  .regex(/[0-9]/, "La contraseña debe incluir al menos un número.");
 
 export const registerSchema = z
   .object({
@@ -29,16 +29,16 @@ export const registerSchema = z
       .string()
       .trim()
       .min(1, "Ingresa tu email.")
-      .email("Ingresa un email valido."),
+      .email("Ingresa un email válido."),
     accessCode: z
       .string()
       .trim()
-      .min(1, "Ingresa el codigo de acceso."),
+      .min(1, "Ingresa el código de acceso."),
     password: passwordSchema,
-    confirmPassword: z.string().min(1, "Confirma la contrasena."),
+    confirmPassword: z.string().min(1, "Confirma la contraseña."),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contrasenas no coinciden.",
+    message: "Las contraseñas no coinciden.",
     path: ["confirmPassword"],
   });
 

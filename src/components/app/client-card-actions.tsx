@@ -6,12 +6,14 @@ import { CardActionsMenu } from "@/components/app/card-actions-menu";
 
 type ClientCardActionsProps = {
   canManagePlans: boolean;
+  canViewProfile: boolean;
   clientId: string;
   clientName: string;
 };
 
 export function ClientCardActions({
   canManagePlans,
+  canViewProfile,
   clientId,
   clientName,
 }: ClientCardActionsProps) {
@@ -19,11 +21,15 @@ export function ClientCardActions({
     <CardActionsMenu
       label={clientName}
       items={[
-        {
-          href: `/app/clientes/${clientId}`,
-          icon: UserRound,
-          label: "Ver perfil",
-        },
+        ...(canViewProfile
+          ? [
+              {
+                href: `/app/clientes/${clientId}`,
+                icon: UserRound,
+                label: "Ver perfil",
+              },
+            ]
+          : []),
         ...(canManagePlans
           ? [
               {

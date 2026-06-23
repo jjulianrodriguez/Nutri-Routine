@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Manrope, Sora } from "next/font/google";
+import Script from "next/script";
 
 import { Providers } from "./providers";
+import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
 const display = Sora({
@@ -31,8 +33,16 @@ export default function RootLayout({
     <html
       lang="es"
       data-scroll-behavior="smooth"
+      suppressHydrationWarning
       className={`${display.variable} ${manrope.variable}`}
     >
+      <head>
+        <Script
+          id="nce-theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+        />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

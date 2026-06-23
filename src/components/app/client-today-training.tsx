@@ -29,9 +29,14 @@ const stateTones: Record<RoutineAssignmentState, TemplateStatusTone> = {
   upcoming: "neutral",
 };
 
-function getStatusMessage(assignment: RoutineAssignmentSummary) {
+function getStatusMessage(
+  assignment: RoutineAssignmentSummary,
+  trainerName: string | null,
+) {
   if (assignment.state === "expired") {
-    return "Tu entrenamiento esta vencido. Consulta a tu entrenador para actualizarlo.";
+    return `Tu entrenamiento esta vencido. Consulta a ${
+      trainerName ?? "tu profesional de entrenamiento"
+    } para actualizarlo.`;
   }
 
   if (assignment.state === "upcoming") {
@@ -51,12 +56,14 @@ export function ClientTodayTraining({
   progress,
   snapshot,
   today,
+  trainerName,
 }: {
   assignment: RoutineAssignmentSummary;
   currentDayNumber: number | null;
   progress: WorkoutDayProgressSummary | null;
   snapshot: WorkoutTemplateSnapshot;
   today: string;
+  trainerName: string | null;
 }) {
   const todayDay = useMemo(
     () =>
@@ -113,7 +120,7 @@ export function ClientTodayTraining({
   return (
     <WorkoutTemplateView
       currentDayNumber={currentDayNumber}
-      description={getStatusMessage(assignment)}
+      description={getStatusMessage(assignment, trainerName)}
       focusCurrentDayFirst
       progress={{
         completedAt,

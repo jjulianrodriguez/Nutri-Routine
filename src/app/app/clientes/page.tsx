@@ -13,6 +13,12 @@ import { ClientActivationForm } from "@/components/app/client-activation-form";
 import { ClientAvatar } from "@/components/app/client-avatar";
 import { ClientCardActions } from "@/components/app/client-card-actions";
 import {
+  getAssignedRelationBadge,
+  getPlanBadgeLabel,
+  RelationshipBadge,
+  type RelationshipBadgeTone,
+} from "@/components/app/relationship-badges";
+import {
   AppHeader,
   AppPanel,
   AppScreen,
@@ -41,7 +47,7 @@ const filterOptions: Array<{
   { label: "Todos", value: "all" },
   { label: "Activos", value: "active" },
   { label: "Sin planes", value: "none" },
-  { label: "Solo nutricion", value: "nutrition" },
+  { label: "Solo nutrición", value: "nutrition" },
   { label: "Solo entrenamiento", value: "training" },
   { label: "Ambos planes", value: "both" },
 ];
@@ -71,31 +77,22 @@ function formatCreatedAt(value: string) {
 }
 
 function serviceLabel(client: ClientAccountListItem) {
-  if (client.hasNutritionService && client.hasTrainingService) {
-    return "Nutricion y entrenamiento";
-  }
-
-  if (client.hasNutritionService) {
-    return "Solo nutricion";
-  }
-
-  if (client.hasTrainingService) {
-    return "Solo entrenamiento";
-  }
-
-  return "Sin planes activos";
+  return getPlanBadgeLabel({
+    hasNutritionService: client.hasNutritionService,
+    hasTrainingService: client.hasTrainingService,
+  });
 }
 
-function serviceTone(client: ClientAccountListItem) {
+function serviceTone(client: ClientAccountListItem): RelationshipBadgeTone {
   if (!client.isClientActivated) {
-    return "bg-primary-soft text-charcoal";
+    return "muted";
   }
 
   if (client.hasNutritionService && client.hasTrainingService) {
-    return "bg-accent text-charcoal";
+    return "accent";
   }
 
-  return "bg-background text-warm-brown";
+  return "neutral";
 }
 
 export default async function ClientsPage({ searchParams }: ClientsPageProps) {
@@ -111,7 +108,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
       <AppHeader
         eyebrow="Administracion de usuarios"
         title="Usuarios y planes activos"
-        description="Consulta las cuentas registradas y controla de forma independiente el acceso a nutricion y entrenamiento."
+        description="Consulta las cuentas registradas y controla de forma independiente el acceso a nutrición y entrenamiento."
       />
 
       {data.error ? (
@@ -137,7 +134,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
           detail="Con al menos un plan activo"
         />
         <StatTile
-          label="Nutricion activa"
+          label="Nutrición activa"
           value={String(data.counts.nutritionActive)}
           detail="Incluye usuarios con ambos planes"
         />
@@ -180,57 +177,93 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
 
       <AppPanel
         title="Usuarios registrados"
-        description="Los planes determinan que secciones puede abrir cada cliente dentro de la app."
+        description="Los planes determinan qué secciones puede abrir cada cliente dentro de la app."
       >
         {data.clients.length > 0 ? (
           <div className="space-y-4">
-            {data.clients.map((client) => (
-              <article
-                key={client.id}
-                className="rounded-[26px] border border-border bg-surface p-5 shadow-soft"
-              >
+            {data.clients.map((client) => {
+              const canViewClientProfile =
+                data.isAdmin ||
+                client.assignedNutritionistId === data.currentUserId ||
+                client.assignedTrainerId === data.currentUserId;
+              const nutritionRelationBadge = getAssignedRelationBadge({
+                assignedId: client.hasNutritionService
+                  ? client.assignedNutritionistId
+                  : null,
+                currentUserId: data.currentUserId,
+                isAdmin: data.isAdmin,
+                isProfessional: data.isProfessional,
+              });
+              const trainingRelationBadge = getAssignedRelationBadge({
+                assignedId: client.hasTrainingService
+                  ? client.assignedTrainerId
+                  : null,
+                currentUserId: data.currentUserId,
+                isAdmin: data.isAdmin,
+                isProfessional: data.isProfessional,
+              });
+
+              return (
+                <article
+                  key={client.id}
+                  className="rounded-[26px] border border-border bg-surface p-5 shadow-soft"
+                >
                 <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1.2fr)] xl:items-start">
                   <div className="min-w-0 space-y-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <div className="flex items-center gap-3">
-                          <Link
-                            href={`/app/clientes/${client.id}`}
-                            aria-label={`Ver perfil de ${client.fullName}`}
-                          >
+                          {canViewClientProfile ? (
+                            <Link
+                              href={`/app/clientes/${client.id}`}
+                              aria-label={`Ver perfil de ${client.fullName}`}
+                            >
+                              <ClientAvatar
+                                name={client.fullName}
+                                src={client.avatarUrl}
+                              />
+                            </Link>
+                          ) : (
                             <ClientAvatar
                               name={client.fullName}
                               src={client.avatarUrl}
                             />
-                          </Link>
+                          )}
                           <div className="min-w-0">
-                            <Link
-                              href={`/app/clientes/${client.id}`}
-                              className="group block rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/35"
-                            >
-                              <h2 className="truncate text-lg font-extrabold text-charcoal transition group-hover:text-warm-brown">
-                                {client.fullName}
-                              </h2>
-                              <p className="mt-1 truncate text-sm text-muted">
-                                {client.email || "Correo no disponible"}
-                              </p>
-                            </Link>
+                            {canViewClientProfile ? (
+                              <Link
+                                href={`/app/clientes/${client.id}`}
+                                className="group block rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/35"
+                              >
+                                <h2 className="truncate text-lg font-extrabold text-charcoal transition group-hover:text-warm-brown">
+                                  {client.fullName}
+                                </h2>
+                                <p className="mt-1 truncate text-sm text-muted">
+                                  {client.email || "Correo no disponible"}
+                                </p>
+                              </Link>
+                            ) : (
+                              <div>
+                                <h2 className="truncate text-lg font-extrabold text-charcoal transition group-hover:text-warm-brown">
+                                  {client.fullName}
+                                </h2>
+                                <p className="mt-1 truncate text-sm text-muted">
+                                  {client.email || "Correo no disponible"}
+                                </p>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span
-                          className={cn(
-                            "w-fit rounded-full px-3 py-1 text-xs font-extrabold",
-                            serviceTone(client),
-                          )}
-                        >
+                        <RelationshipBadge tone={serviceTone(client)}>
                           {serviceLabel(client)}
-                        </span>
+                        </RelationshipBadge>
                         <ClientCardActions
                           canManagePlans={
                             data.canManageNutrition || data.canManageTraining
                           }
+                          canViewProfile={canViewClientProfile}
                           clientId={client.id}
                           clientName={client.fullName}
                         />
@@ -291,11 +324,28 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                           </span>
                         </div>
                         <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
-                          Nutricion
+                          Nutrición
                         </p>
                         <p className="mt-1 font-bold text-charcoal">
-                          {client.assignedNutritionistName ?? "No asignada"}
+                          {client.hasNutritionService
+                            ? client.assignedNutritionistName ??
+                              "Sin profesional asignado"
+                            : "Sin plan activo"}
                         </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <RelationshipBadge
+                            tone={
+                              client.hasNutritionService ? "primary" : "muted"
+                            }
+                          >
+                            {client.hasNutritionService
+                              ? "Nutrición"
+                              : "Sin nutrición"}
+                          </RelationshipBadge>
+                          <RelationshipBadge tone={nutritionRelationBadge.tone}>
+                            {nutritionRelationBadge.label}
+                          </RelationshipBadge>
+                        </div>
                       </div>
                       <div
                         className={cn(
@@ -326,18 +376,37 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                           Entrenamiento
                         </p>
                         <p className="mt-1 font-bold text-charcoal">
-                          {client.assignedTrainerName ?? "No asignado"}
+                          {client.hasTrainingService
+                            ? client.assignedTrainerName ??
+                              "Sin profesional asignado"
+                            : "Sin plan activo"}
                         </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <RelationshipBadge
+                            tone={
+                              client.hasTrainingService ? "primary" : "muted"
+                            }
+                          >
+                            {client.hasTrainingService
+                              ? "Entrenamiento"
+                              : "Sin entrenamiento"}
+                          </RelationshipBadge>
+                          <RelationshipBadge tone={trainingRelationBadge.tone}>
+                            {trainingRelationBadge.label}
+                          </RelationshipBadge>
+                        </div>
                       </div>
                     </div>
 
-                    <Link
-                      href={`/app/clientes/${client.id}`}
-                      className="inline-flex items-center gap-2 text-sm font-extrabold text-warm-brown transition hover:text-charcoal"
-                    >
-                      Ver perfil completo
-                      <ArrowRight className="size-4" aria-hidden="true" />
-                    </Link>
+                    {canViewClientProfile ? (
+                      <Link
+                        href={`/app/clientes/${client.id}`}
+                        className="inline-flex items-center gap-2 text-sm font-extrabold text-warm-brown transition hover:text-charcoal"
+                      >
+                        Ver perfil completo
+                        <ArrowRight className="size-4" aria-hidden="true" />
+                      </Link>
+                    ) : null}
                   </div>
 
                   <div id={`planes-${client.id}`} className="scroll-mt-6">
@@ -351,13 +420,16 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                       canManageTraining={data.canManageTraining}
                       client={client}
                       currentUserId={data.currentUserId}
+                      currentUserName={access.displayName}
+                      isAdmin={data.isAdmin}
                       nutritionists={data.nutritionists}
                       trainers={data.trainers}
                     />
                   </div>
                 </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         ) : (
           <EmptyState>
@@ -375,7 +447,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
           <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">
             <Leaf className="size-5 text-warm-brown" />
             <h2 className="mt-4 font-extrabold text-charcoal">
-              Profesionales en nutricion
+              Profesionales en nutrición
             </h2>
             <p className="mt-2 text-sm text-muted">
               {data.nutritionists.length} disponibles

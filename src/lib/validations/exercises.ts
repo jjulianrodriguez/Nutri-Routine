@@ -31,19 +31,19 @@ const optionalExternalUrlSchema = z
     } catch {
       return false;
     }
-  }, "Ingresa una URL externa valida con http o https.");
+  }, "Ingresa una URL externa válida con http o https.");
 
 export const exerciseFormSchema = z.object({
   category: z
     .string()
     .trim()
-    .min(2, "Ingresa una categoria.")
-    .max(80, "La categoria no puede superar 80 caracteres."),
+    .min(2, "Ingresa una categoría.")
+    .max(80, "La categoría no puede superar 80 caracteres."),
   description: z
     .string()
     .trim()
-    .min(2, "Ingresa una descripcion o instrucciones.")
-    .max(1200, "La descripcion no puede superar 1200 caracteres."),
+    .min(2, "Ingresa una descripción o instrucciones.")
+    .max(1200, "La descripción no puede superar 1200 caracteres."),
   difficulty: difficultySchema,
   exerciseType: z
     .string()
@@ -53,7 +53,7 @@ export const exerciseFormSchema = z.object({
   id: z.union([z.literal(""), z.string().uuid()]),
   multimediaUrls: z
     .array(optionalExternalUrlSchema)
-    .max(3, "Puedes agregar un maximo de 3 recursos multimedia.")
+    .max(3, "Puedes agregar un máximo de 3 recursos multimedia.")
     .superRefine((values, context) => {
       const seen = new Set<string>();
 

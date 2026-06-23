@@ -407,7 +407,7 @@ export function RoutineEditor({
               htmlFor="routine-category"
               className="font-extrabold text-charcoal"
             >
-              Categoria
+              Categoría
             </Label>
             <select
               id="routine-category"
@@ -416,7 +416,7 @@ export function RoutineEditor({
               {...register("category")}
             >
               <option value="" disabled>
-                Selecciona una categoria
+                Selecciona una categoría
               </option>
               {getRoutineSelectOptions(
                 routineCategoryOptions,
@@ -469,7 +469,7 @@ export function RoutineEditor({
               {...register("targetAudience")}
             >
               <option value="" disabled>
-                Selecciona el publico objetivo
+                Selecciona el público objetivo
               </option>
               {getRoutineSelectOptions(
                 routineTargetAudienceOptions,
@@ -510,7 +510,7 @@ export function RoutineEditor({
             htmlFor="routine-description"
             className="font-extrabold text-charcoal"
           >
-            Descripcion
+            Descripción
           </Label>
           <textarea
             id="routine-description"
@@ -559,11 +559,11 @@ export function RoutineEditor({
             resultCount={filteredExercises.length}
             totalCount={listedExercises.length}
             visibleCount={exerciseResults.visibleItems.length}
-            searchPlaceholder="Buscar por nombre, musculo, categoria o tipo..."
+            searchPlaceholder="Buscar por nombre, músculo, categoría o tipo..."
             emptyMessage="No encontramos ejercicios que coincidan con la busqueda."
             error={errors.exercises?.root?.message}
             isLoading={exerciseResults.isLoading}
-            loadMoreLabel="Cargar mas ejercicios"
+            loadMoreLabel="Cargar más ejercicios"
             onLoadMore={exerciseResults.loadMore}
           >
             {exerciseResults.visibleItems.map((exercise) => (
@@ -610,7 +610,7 @@ export function RoutineEditor({
                 ? "ejercicio pendiente"
                 : "ejercicios pendientes"}{" "}
               de series, repeticiones o descanso. No pierdes lo avanzado, pero
-              este resumen te ayuda a cerrar la configuracion antes de usarlo.
+              este resumen te ayuda a cerrar la configuración antes de usarlo.
             </AlertDescription>
           </Alert>
         ) : null}
@@ -716,7 +716,7 @@ export function RoutineEditor({
                             </span>
                             <p className="mt-2 text-sm font-semibold leading-6 text-muted">
                               Se puede conservar en este entrenamiento, pero no
-                              esta disponible para nuevos entrenamientos.
+                              está disponible para nuevos entrenamientos.
                             </p>
                           </div>
                         ) : null}

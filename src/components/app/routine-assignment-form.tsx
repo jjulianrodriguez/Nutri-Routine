@@ -48,15 +48,21 @@ function normalizeSearch(value: string) {
 
 export function WorkoutTemplateAssignmentForm({
   clients,
+  currentUserId,
   defaultClientId = "",
   defaultTemplateId = "",
   defaultStartDate,
+  isAdmin,
+  isProfessional,
   templates,
 }: {
   clients: AssignableTrainingClient[];
+  currentUserId: string;
   defaultClientId?: string;
   defaultTemplateId?: string;
   defaultStartDate: string;
+  isAdmin: boolean;
+  isProfessional: boolean;
   templates: AssignableWorkoutTemplate[];
 }) {
   const router = useRouter();
@@ -268,13 +274,16 @@ export function WorkoutTemplateAssignmentForm({
           emptyMessage="No encontramos clientes que coincidan con la busqueda."
           error={errors.clientId?.message}
           isLoading={clientResults.isLoading}
-          loadMoreLabel="Cargar mas clientes"
+          loadMoreLabel="Cargar más clientes"
           onLoadMore={clientResults.loadMore}
         >
           {clientResults.visibleItems.map((client) => (
             <ClientSearchCard
               key={client.id}
               client={client}
+              currentUserId={currentUserId}
+              isAdmin={isAdmin}
+              isProfessional={isProfessional}
               selected={client.id === selectedClientId}
               onSelect={toggleClient}
             />
@@ -322,7 +331,13 @@ export function WorkoutTemplateAssignmentForm({
             value={selectedClient?.name ?? "Selecciona un cliente"}
             detail={
               selectedClient
-                ? `Entrenamiento activo / ${selectedClient.assignedTrainerName ?? "Profesional en entrenamiento"}`
+                ? [
+                    selectedClient.contact ?? "Correo no disponible",
+                    `Responsable: ${
+                      selectedClient.assignedTrainerName ??
+                      "Sin profesional asignado"
+                    }`,
+                  ].join(" / ")
                 : "Usa el buscador de clientes"
             }
           />
@@ -408,7 +423,7 @@ export function WorkoutTemplateAssignmentForm({
           ) : (
             <CalendarPlus aria-hidden="true" />
           )}
-          {isSubmitting ? "Asignando..." : "Confirmar asignacion"}
+          {isSubmitting ? "Asignando..." : "Confirmar asignación"}
         </Button>
       </div>
 
@@ -419,7 +434,7 @@ export function WorkoutTemplateAssignmentForm({
             aria-hidden="true"
           />
           <AlertDescription className="font-semibold leading-6 text-charcoal">
-            Para confirmar la asignacion:{" "}
+            Para confirmar la asignación:{" "}
             {missingAssignmentReasons.join(" ")}
           </AlertDescription>
         </Alert>

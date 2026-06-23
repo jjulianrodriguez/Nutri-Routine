@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 
 import type { CurrentUserAccess } from "@/lib/auth/access-rules";
-import { listAuthEmailsByUserId } from "@/lib/auth/auth-user-emails";
+import {
+  getProfileDirectory,
+  getProfileDisplayName,
+} from "@/lib/auth/profile-directory";
 import { createClient } from "@/lib/supabase/server";
 import {
   clientActivationSchema,
@@ -69,6 +72,8 @@ export type ClientActivationData = {
   counts: ClientActivationCounts;
   currentUserId: string;
   error?: string;
+  isAdmin: boolean;
+  isProfessional: boolean;
   nutritionists: AssignableProfessional[];
   trainers: AssignableProfessional[];
 };
@@ -179,7 +184,7 @@ async function getCurrentActivationActor() {
       canManageNutrition: false,
       canManageTraining: false,
       currentUserId: "",
-      error: "Debes iniciar sesion para administrar clientes.",
+      error: "Debes iniciar sesión para administrar clientes.",
       role: null,
     };
   }
@@ -277,7 +282,7 @@ async function getActivationActorFromAccess(access: CurrentUserAccess) {
       canManageNutrition: false,
       canManageTraining: false,
       currentUserId: access.userId,
-      error: "Tu cuenta no puede gestionar planes de nutricion ni entrenamiento.",
+      error: "Tu cuenta no puede gestionar planes de nutrición ni entrenamiento.",
       role: access.role,
     };
   }
@@ -345,7 +350,7 @@ export async function activateClientAccount(
 
   if (actor.error || !actor.activationSupabase || !actor.role) {
     return {
-      message: actor.error ?? "No se pudo validar tu sesion.",
+      message: actor.error ?? "No se pudo validar tu sesión.",
       status: "error",
     };
   }
@@ -362,7 +367,7 @@ export async function activateClientAccount(
 
   if (clientError || !clientProfile || clientProfile.role !== "client") {
     return {
-      message: "La cuenta seleccionada no es un cliente valido.",
+      message: "La cuenta seleccionada no es un cliente válido.",
       status: "error",
     };
   }
@@ -376,25 +381,34 @@ export async function activateClientAccount(
 
   if (assignmentError) {
     return {
-      message: "No se pudo consultar la activacion actual del cliente.",
+      message: "No se pudo consultar la activación actual del cliente.",
       status: "error",
     };
   }
 
   const nutritionistId = parsed.data.assignedNutritionistId || "";
   const trainerId = parsed.data.assignedTrainerId || "";
+  const isAdmin = actor.role === "admin";
+  const existingNutritionistId =
+    existingAssignment?.assigned_nutritionist_id ?? null;
+  const existingTrainerId = existingAssignment?.assigned_trainer_id ?? null;
+  const nutritionBelongsToAnotherProfessional =
+    existingNutritionistId !== null &&
+    existingNutritionistId !== actor.currentUserId;
+  const trainingBelongsToAnotherProfessional =
+    existingTrainerId !== null && existingTrainerId !== actor.currentUserId;
 
-  if (actor.canManageNutrition && wantsNutrition && !nutritionistId) {
+  if (isAdmin && wantsNutrition && !nutritionistId) {
     return {
       fieldErrors: {
-        assignedNutritionistId: "Selecciona un profesional en nutricion.",
+        assignedNutritionistId: "Selecciona un profesional en nutrición.",
       },
-      message: "Selecciona un profesional en nutricion para activar el plan.",
+      message: "Selecciona un profesional en nutrición para activar el plan.",
       status: "error",
     };
   }
 
-  if (actor.canManageTraining && wantsTraining && !trainerId) {
+  if (isAdmin && wantsTraining && !trainerId) {
     return {
       fieldErrors: {
         assignedTrainerId: "Selecciona un profesional en entrenamiento.",
@@ -406,26 +420,145 @@ export async function activateClientAccount(
   }
 
   if (
-    actor.canManageNutrition &&
-    wantsNutrition &&
-    actor.role !== "admin" &&
-    nutritionistId !== actor.currentUserId
+    !isAdmin &&
+    !actor.canManageNutrition &&
+    wantsNutrition !== Boolean(existingNutritionistId)
   ) {
     return {
-      fieldErrors: {
-        assignedNutritionistId:
-          "Solo puedes asignarte clientes de nutricion a tu propia cuenta.",
-      },
-      message:
-        "Solo puedes asignar clientes de nutricion a tu propia cuenta.",
+      message: "No tienes permisos para modificar el plan de nutrición.",
       status: "error",
     };
   }
 
   if (
+    !isAdmin &&
+    !actor.canManageTraining &&
+    wantsTraining !== Boolean(existingTrainerId)
+  ) {
+    return {
+      message: "No tienes permisos para modificar el plan de entrenamiento.",
+      status: "error",
+    };
+  }
+
+  if (
+    !isAdmin &&
+    !actor.canManageNutrition &&
+    nutritionistId &&
+    nutritionistId !== existingNutritionistId
+  ) {
+    return {
+      fieldErrors: {
+        assignedNutritionistId:
+          "No puedes enviar otro profesional de nutrición.",
+      },
+      message: "No tienes permisos para modificar el plan de nutrición.",
+      status: "error",
+    };
+  }
+
+  if (
+    !isAdmin &&
+    !actor.canManageTraining &&
+    trainerId &&
+    trainerId !== existingTrainerId
+  ) {
+    return {
+      fieldErrors: {
+        assignedTrainerId: "No puedes enviar otro entrenador.",
+      },
+      message: "No tienes permisos para modificar el plan de entrenamiento.",
+      status: "error",
+    };
+  }
+
+  if (
+    !isAdmin &&
+    actor.canManageNutrition &&
+    nutritionBelongsToAnotherProfessional &&
+    !wantsNutrition
+  ) {
+    return {
+      message:
+        "No puedes quitar nutrición porque este cliente pertenece a otro profesional.",
+      status: "error",
+    };
+  }
+
+  if (
+    !isAdmin &&
     actor.canManageTraining &&
+    trainingBelongsToAnotherProfessional &&
+    !wantsTraining
+  ) {
+    return {
+      message:
+        "No puedes quitar entrenamiento porque este cliente pertenece a otro profesional.",
+      status: "error",
+    };
+  }
+
+  if (
+    !isAdmin &&
+    actor.canManageNutrition &&
+    nutritionBelongsToAnotherProfessional &&
+    nutritionistId &&
+    nutritionistId !== existingNutritionistId
+  ) {
+    return {
+      fieldErrors: {
+        assignedNutritionistId:
+          "Este cliente ya tiene nutrición con otro profesional.",
+      },
+      message:
+        "No puedes cambiar la asignación de nutrición de otro profesional.",
+      status: "error",
+    };
+  }
+
+  if (
+    !isAdmin &&
+    actor.canManageTraining &&
+    trainingBelongsToAnotherProfessional &&
+    trainerId &&
+    trainerId !== existingTrainerId
+  ) {
+    return {
+      fieldErrors: {
+        assignedTrainerId:
+          "Este cliente ya tiene entrenamiento con otro profesional.",
+      },
+      message:
+        "No puedes cambiar la asignación de entrenamiento de otro profesional.",
+      status: "error",
+    };
+  }
+
+  if (
+    !isAdmin &&
+    actor.canManageNutrition &&
+    !nutritionBelongsToAnotherProfessional &&
+    wantsNutrition &&
+    nutritionistId &&
+    nutritionistId !== actor.currentUserId
+  ) {
+    return {
+      fieldErrors: {
+        assignedNutritionistId:
+          "Solo puedes asignarte clientes de nutrición a tu propia cuenta.",
+      },
+      message:
+        "Solo puedes asignar clientes de nutrición a tu propia cuenta.",
+      status: "error",
+    };
+  }
+
+  if (
+    !isAdmin &&
+    actor.canManageTraining &&
+    !trainingBelongsToAnotherProfessional &&
     wantsTraining &&
-    actor.role !== "admin" &&
+    trainerId &&
     trainerId !== actor.currentUserId
   ) {
     return {
@@ -440,7 +573,7 @@ export async function activateClientAccount(
   }
 
   if (
-    actor.canManageNutrition &&
+    isAdmin &&
     wantsNutrition &&
     !(await validateAssignableProfessional({
       activationSupabase: actor.activationSupabase,
@@ -451,15 +584,15 @@ export async function activateClientAccount(
     return {
       fieldErrors: {
         assignedNutritionistId:
-          "El profesional no tiene especialidad de nutricion.",
+          "El profesional no tiene especialidad de nutrición.",
       },
-      message: "El profesional en nutricion seleccionado no es valido.",
+      message: "El profesional en nutrición seleccionado no es válido.",
       status: "error",
     };
   }
 
   if (
-    actor.canManageTraining &&
+    isAdmin &&
     wantsTraining &&
     !(await validateAssignableProfessional({
       activationSupabase: actor.activationSupabase,
@@ -472,21 +605,33 @@ export async function activateClientAccount(
         assignedTrainerId:
           "El profesional no tiene especialidad de entrenamiento.",
       },
-      message: "El profesional en entrenamiento seleccionado no es valido.",
+      message: "El profesional en entrenamiento seleccionado no es válido.",
       status: "error",
     };
   }
 
-  const assignedNutritionistId = actor.canManageNutrition
+  const assignedNutritionistId = isAdmin
     ? wantsNutrition
       ? nutritionistId
       : null
-    : existingAssignment?.assigned_nutritionist_id ?? null;
-  const assignedTrainerId = actor.canManageTraining
+    : actor.canManageNutrition
+      ? nutritionBelongsToAnotherProfessional
+        ? existingNutritionistId
+        : wantsNutrition
+          ? actor.currentUserId
+          : null
+      : existingNutritionistId;
+  const assignedTrainerId = isAdmin
     ? wantsTraining
       ? trainerId
       : null
-    : existingAssignment?.assigned_trainer_id ?? null;
+    : actor.canManageTraining
+      ? trainingBelongsToAnotherProfessional
+        ? existingTrainerId
+        : wantsTraining
+          ? actor.currentUserId
+          : null
+      : existingTrainerId;
 
   let mutation;
 
@@ -549,6 +694,8 @@ function emptyClientActivationData(error: string): ClientActivationData {
     },
     currentUserId: "",
     error,
+    isAdmin: false,
+    isProfessional: false,
     nutritionists: [],
     trainers: [],
   };
@@ -582,12 +729,12 @@ export async function listClientActivationData(
     : await getCurrentActivationActor();
 
   if (actor.error || !actor.activationSupabase) {
-    return emptyClientActivationData(actor.error ?? "No se pudo validar tu sesion.");
+    return emptyClientActivationData(actor.error ?? "No se pudo validar tu sesión.");
   }
 
   if (!actor.canManageNutrition && !actor.canManageTraining) {
     return emptyClientActivationData(
-      "Tu cuenta no puede gestionar planes de nutricion ni entrenamiento.",
+      "Tu cuenta no puede gestionar planes de nutrición ni entrenamiento.",
     );
   }
 
@@ -651,13 +798,23 @@ export async function listClientActivationData(
   }
 
   const professionals = Array.from(professionalById.values());
-  const profileById = new Map(
-    (professionalProfiles ?? []).map((profile) => [profile.id, profile]),
+  const profilesById = await getProfileDirectory(
+    [
+      ...clientProfiles.map((profile) => profile.id),
+      ...professionals.map((professional) => professional.profile_id),
+    ],
+    {
+      includeEmails: true,
+      includeProfessionalProfiles: true,
+    },
   );
   const professionalNameById = new Map(
     professionals.map((item) => {
-      const profile = profileById.get(item.profile_id);
-      return [item.profile_id, profile?.full_name ?? "Profesional sin nombre"];
+      const profile = profilesById.get(item.profile_id);
+      return [
+        item.profile_id,
+        getProfileDisplayName(profile) ?? "Perfil incompleto",
+      ];
     }),
   );
   const assignmentsByClientId = new Map(
@@ -668,7 +825,7 @@ export async function listClientActivationData(
   );
   const assignableProfessionals = professionals
     .map((item) => {
-      const profile = profileById.get(item.profile_id);
+      const profile = profilesById.get(item.profile_id);
 
       if (
         !profile ||
@@ -683,8 +840,8 @@ export async function listClientActivationData(
       }
 
       return {
-        email: "",
-        fullName: profile.full_name ?? "Profesional sin nombre",
+        email: profile.email ?? "",
+        fullName: getProfileDisplayName(profile) ?? "Perfil incompleto",
         id: item.profile_id,
         specialty: item.specialty,
       } satisfies AssignableProfessional;
@@ -692,6 +849,7 @@ export async function listClientActivationData(
     .filter(Boolean) as AssignableProfessional[];
 
   const allClients = (clientProfiles ?? []).map((profile) => {
+    const profileEntry = profilesById.get(profile.id);
     const assignment = assignmentsByClientId.get(profile.id);
     const assignedNutritionistId =
       assignment?.assigned_nutritionist_id ?? null;
@@ -711,8 +869,8 @@ export async function listClientActivationData(
       avatarUrl: profile.avatar_url,
       clientProfileExists: Boolean(assignment),
       createdAt: profile.created_at,
-      email: "",
-      fullName: profile.full_name ?? "Cliente sin nombre",
+      email: profileEntry?.email ?? "",
+      fullName: getProfileDisplayName(profileEntry) ?? "Perfil incompleto",
       hasNutritionService,
       hasTrainingService,
       id: profile.id,
@@ -723,20 +881,8 @@ export async function listClientActivationData(
       }),
     } satisfies ClientAccountListItem;
   });
-  const emailsById = await listAuthEmailsByUserId([
-    ...allClients.map((client) => client.id),
-    ...assignableProfessionals.map((professional) => professional.id),
-  ]);
-  const clientsWithEmails = allClients.map((client) => ({
-    ...client,
-    email: emailsById.get(client.id) ?? "",
-  }));
-  const professionalsWithEmails = assignableProfessionals.map(
-    (professional) => ({
-      ...professional,
-      email: emailsById.get(professional.id) ?? "",
-    }),
-  );
+  const clientsWithEmails = allClients;
+  const professionalsWithEmails = assignableProfessionals;
   const counts = buildCounts(clientsWithEmails);
 
   return {
@@ -747,6 +893,8 @@ export async function listClientActivationData(
     ),
     counts,
     currentUserId: actor.currentUserId,
+    isAdmin: actor.role === "admin",
+    isProfessional: actor.role === "professional",
     nutritionists: professionalsWithEmails.filter((professional) =>
       isProfessionalAllowedForService(professional.specialty, "nutrition"),
     ),

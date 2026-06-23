@@ -37,7 +37,7 @@ function optionalPositiveNumber(label: string, maximum: number) {
     .trim()
     .refine(
       (value) => value === "" || /^\d+([.,]\d{1,2})?$/.test(value),
-      `${label} debe ser un numero valido.`,
+      `${label} debe ser un número válido.`,
     )
     .refine(
       (value) =>
@@ -50,23 +50,47 @@ function optionalPositiveNumber(label: string, maximum: number) {
 
 export const personalDetailsSchema = z
   .object({
+    allergies: z
+      .string()
+      .trim()
+      .max(4000, "Las alergias no pueden superar 4000 caracteres."),
     birthDate: z
       .string()
       .trim()
       .refine(
         (value) => value === "" || isCalendarDate(value),
-        "Selecciona una fecha valida.",
+        "Selecciona una fecha válida.",
       )
       .refine(
         (value) => value === "" || value <= getTodayDateKey(),
         "La fecha de nacimiento no puede estar en el futuro.",
       ),
+    bodyFatPercentage: optionalPositiveNumber("El porcentaje de grasa", 100),
+    bodyMeasurements: z
+      .string()
+      .trim()
+      .max(4000, "Las medidas fisicas no pueden superar 4000 caracteres."),
+    dietaryRestrictions: z
+      .string()
+      .trim()
+      .max(
+        4000,
+        "Las restricciones alimentarias no pueden superar 4000 caracteres.",
+      ),
     gender: z.union([z.literal(""), z.enum(genderOptions)]),
     genderDescription: z
       .string()
       .trim()
-      .max(120, "La autodescripcion no puede superar 120 caracteres."),
+      .max(120, "La autodescripción no puede superar 120 caracteres."),
     heightCm: optionalPositiveNumber("La altura", 300),
+    importantMedications: z
+      .string()
+      .trim()
+      .max(4000, "Los medicamentos no pueden superar 4000 caracteres."),
+    injuries: z
+      .string()
+      .trim()
+      .max(4000, "Las lesiones no pueden superar 4000 caracteres."),
     medicalConditions: z
       .string()
       .trim()
@@ -77,11 +101,15 @@ export const personalDetailsSchema = z
     phone: z
       .string()
       .trim()
-      .max(40, "El telefono no puede superar 40 caracteres.")
+      .max(40, "El teléfono no puede superar 40 caracteres.")
       .refine(
         (value) => value === "" || /^[0-9+() .-]{5,40}$/.test(value),
-        "Usa un formato de telefono valido.",
+        "Usa un formato de teléfono válido.",
       ),
+    professionalNotes: z
+      .string()
+      .trim()
+      .max(4000, "Las notas importantes no pueden superar 4000 caracteres."),
     weightKg: optionalPositiveNumber("El peso", 1000),
   })
   .superRefine((values, context) => {

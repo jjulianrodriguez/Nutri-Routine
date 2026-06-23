@@ -6,7 +6,7 @@ export default function ClientNotFound() {
     <AppScreen>
       <div className="grid min-h-[70dvh] place-items-center">
         <RecoveryState
-          description="El perfil no existe, ya no esta disponible o no tienes permisos para consultarlo."
+          description="El perfil no existe, ya no está disponible o no tienes permisos para consultarlo."
           eyebrow="Perfil no disponible"
           fallbackHref="/app/clientes"
           fallbackLabel="Ir a clientes"

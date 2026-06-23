@@ -27,7 +27,7 @@ export function DeleteRoutineButton({ routineId }: { routineId: string }) {
       router.refresh();
     } catch {
       toast.error(
-        "Ocurrio un error inesperado al eliminar el entrenamiento. Intentalo de nuevo.",
+        "Ocurrió un error inesperado al eliminar el entrenamiento. Inténtalo de nuevo.",
       );
     }
   }

@@ -25,12 +25,19 @@ const fieldClasses =
   "mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
 
 const emptyValues: PersonalDetailsValues = {
+  allergies: "",
   birthDate: "",
+  bodyFatPercentage: "",
+  bodyMeasurements: "",
+  dietaryRestrictions: "",
   gender: "",
   genderDescription: "",
   heightCm: "",
+  importantMedications: "",
+  injuries: "",
   medicalConditions: "",
   phone: "",
+  professionalNotes: "",
   weightKg: "",
 };
 
@@ -97,13 +104,9 @@ export function PersonalDetailsForm({
       return;
     }
 
-    const containsData =
-      values.phone.trim() !== "" ||
-      values.birthDate.trim() !== "" ||
-      values.gender !== "" ||
-      values.weightKg.trim() !== "" ||
-      values.heightCm.trim() !== "" ||
-      values.medicalConditions.trim() !== "";
+    const containsData = Object.values(values).some(
+      (value) => value.trim() !== "",
+    );
     setHasDetails(containsData);
     setSuccessMessage(result.message);
     toast.success(result.message);
@@ -155,7 +158,7 @@ export function PersonalDetailsForm({
       <div className="grid gap-5 md:grid-cols-2">
         <div>
           <Label htmlFor="personalPhone" className="font-extrabold text-charcoal">
-            Telefono
+            Teléfono
           </Label>
           <Input
             id="personalPhone"
@@ -220,7 +223,7 @@ export function PersonalDetailsForm({
             <option value="female">Femenino</option>
             <option value="non_binary">No binario</option>
             <option value="prefer_not_to_say">Prefiero no decir</option>
-            <option value="self_described">Otro / Autodescripcion</option>
+            <option value="self_described">Otro / Autodescripción</option>
           </select>
           <FieldError
             id="personal-gender-error"
@@ -234,7 +237,7 @@ export function PersonalDetailsForm({
               htmlFor="personalGenderDescription"
               className="font-extrabold text-charcoal"
             >
-              Autodescripcion
+              Autodescripción
             </Label>
             <Input
               id="personalGenderDescription"
@@ -322,6 +325,72 @@ export function PersonalDetailsForm({
             message={errors.heightCm?.message}
           />
         </div>
+
+        <div>
+          <Label
+            htmlFor="personalBodyFat"
+            className="font-extrabold text-charcoal"
+          >
+            Porcentaje de grasa
+          </Label>
+          <div className="relative">
+            <Input
+              id="personalBodyFat"
+              type="number"
+              inputMode="decimal"
+              min="0.01"
+              max="100"
+              step="0.01"
+              placeholder="18"
+              className={`${fieldClasses} pr-12`}
+              aria-describedby={
+                errors.bodyFatPercentage ? "personal-body-fat-error" : undefined
+              }
+              aria-invalid={Boolean(errors.bodyFatPercentage)}
+              {...register("bodyFatPercentage")}
+            />
+            <span className="pointer-events-none absolute right-4 top-1/2 translate-y-0.5 text-xs font-bold text-muted">
+              %
+            </span>
+          </div>
+          <FieldError
+            id="personal-body-fat-error"
+            message={errors.bodyFatPercentage?.message}
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label
+          htmlFor="personalBodyMeasurements"
+          className="font-extrabold text-charcoal"
+        >
+          Medidas fisicas por zonas
+        </Label>
+        <textarea
+          id="personalBodyMeasurements"
+          rows={4}
+          maxLength={4000}
+          placeholder="Ejemplo: cintura, cadera, pecho, brazo, pierna u otras zonas relevantes"
+          className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+          aria-describedby={
+            errors.bodyMeasurements
+              ? "personal-body-measurements-error"
+              : "personal-body-measurements-help"
+          }
+          aria-invalid={Boolean(errors.bodyMeasurements)}
+          {...register("bodyMeasurements")}
+        />
+        <p
+          id="personal-body-measurements-help"
+          className="mt-2 text-xs leading-5 text-muted"
+        >
+          Opcional. Usa el formato que tu profesional ya revise contigo.
+        </p>
+        <FieldError
+          id="personal-body-measurements-error"
+          message={errors.bodyMeasurements?.message}
+        />
       </div>
 
       <div>
@@ -335,7 +404,7 @@ export function PersonalDetailsForm({
           id="personalMedicalConditions"
           rows={5}
           maxLength={4000}
-          placeholder="Informacion que deseas conservar en tu perfil"
+          placeholder="Información que deseas conservar en tu perfil"
           className="mt-2 min-h-32 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
           aria-describedby={
             errors.medicalConditions
@@ -355,6 +424,136 @@ export function PersonalDetailsForm({
         <FieldError
           id="personal-medical-conditions-error"
           message={errors.medicalConditions?.message}
+        />
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <div>
+          <Label htmlFor="personalInjuries" className="font-extrabold text-charcoal">
+            Lesiones
+          </Label>
+          <textarea
+            id="personalInjuries"
+            rows={4}
+            maxLength={4000}
+            placeholder="Lesiones actuales o historial relevante"
+            className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+            aria-describedby={errors.injuries ? "personal-injuries-error" : undefined}
+            aria-invalid={Boolean(errors.injuries)}
+            {...register("injuries")}
+          />
+          <FieldError
+            id="personal-injuries-error"
+            message={errors.injuries?.message}
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="personalAllergies" className="font-extrabold text-charcoal">
+            Alergias
+          </Label>
+          <textarea
+            id="personalAllergies"
+            rows={4}
+            maxLength={4000}
+            placeholder="Alergias alimentarias, medicamentos u otras"
+            className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+            aria-describedby={errors.allergies ? "personal-allergies-error" : undefined}
+            aria-invalid={Boolean(errors.allergies)}
+            {...register("allergies")}
+          />
+          <FieldError
+            id="personal-allergies-error"
+            message={errors.allergies?.message}
+          />
+        </div>
+
+        <div>
+          <Label
+            htmlFor="personalImportantMedications"
+            className="font-extrabold text-charcoal"
+          >
+            Medicamentos importantes
+          </Label>
+          <textarea
+            id="personalImportantMedications"
+            rows={4}
+            maxLength={4000}
+            placeholder="Medicamentos o suplementos relevantes para tu seguimiento"
+            className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+            aria-describedby={
+              errors.importantMedications
+                ? "personal-important-medications-error"
+                : undefined
+            }
+            aria-invalid={Boolean(errors.importantMedications)}
+            {...register("importantMedications")}
+          />
+          <FieldError
+            id="personal-important-medications-error"
+            message={errors.importantMedications?.message}
+          />
+        </div>
+
+        <div>
+          <Label
+            htmlFor="personalDietaryRestrictions"
+            className="font-extrabold text-charcoal"
+          >
+            Restricciones alimentarias
+          </Label>
+          <textarea
+            id="personalDietaryRestrictions"
+            rows={4}
+            maxLength={4000}
+            placeholder="Preferencias, restricciones o alimentos a evitar"
+            className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+            aria-describedby={
+              errors.dietaryRestrictions
+                ? "personal-dietary-restrictions-error"
+                : undefined
+            }
+            aria-invalid={Boolean(errors.dietaryRestrictions)}
+            {...register("dietaryRestrictions")}
+          />
+          <FieldError
+            id="personal-dietary-restrictions-error"
+            message={errors.dietaryRestrictions?.message}
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label
+          htmlFor="personalProfessionalNotes"
+          className="font-extrabold text-charcoal"
+        >
+          Notas importantes para el profesional
+        </Label>
+        <textarea
+          id="personalProfessionalNotes"
+          rows={4}
+          maxLength={4000}
+          placeholder="Informacion que tu profesional asignado debe considerar"
+          className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+          aria-describedby={
+            errors.professionalNotes
+              ? "personal-professional-notes-error"
+              : "personal-professional-notes-help"
+          }
+          aria-invalid={Boolean(errors.professionalNotes)}
+          {...register("professionalNotes")}
+        />
+        <p
+          id="personal-professional-notes-help"
+          className="mt-2 text-xs leading-5 text-muted"
+        >
+          Tus datos de salud solo deben ser visibles para profesionales asignados
+          y administradores autorizados.
+        </p>
+        <FieldError
+          id="personal-professional-notes-error"
+          message={errors.professionalNotes?.message}
         />
       </div>
 
@@ -391,7 +590,7 @@ export function PersonalDetailsForm({
           ) : (
             <Save className="size-4" aria-hidden="true" />
           )}
-          {isSubmitting ? "Guardando..." : "Guardar informacion"}
+          {isSubmitting ? "Guardando..." : "Guardar información"}
         </Button>
 
         {hasDetails ? (

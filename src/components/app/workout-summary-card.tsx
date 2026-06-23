@@ -119,7 +119,7 @@ function SummaryContent({
 >) {
   const difficultyLabel = getDifficultyLabel(difficulty);
   const resolvedDescription =
-    description?.trim() || "Sin descripcion adicional.";
+    description?.trim() || "Sin descripción adicional.";
 
   return (
     <div className="min-w-0">

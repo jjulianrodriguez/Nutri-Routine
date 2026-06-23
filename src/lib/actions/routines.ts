@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { getCurrentUserAccess } from "@/lib/auth/current-user-access";
 import { createClient } from "@/lib/supabase/server";
 import {
   routineAssignmentSchema,
@@ -30,60 +31,28 @@ export type RoutineActionResult =
 
 async function getTrainingManagerContext() {
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const access = await getCurrentUserAccess();
 
-  if (userError || !user) {
+  if (!access) {
     return {
-      error: "Debes iniciar sesion para gestionar entrenamientos.",
+      error: "Debes iniciar sesión para gestionar entrenamientos.",
       supabase,
       user: null,
     };
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError || !profile) {
-    return {
-      error: "No se pudo validar tu perfil profesional.",
-      supabase,
-      user,
-    };
-  }
-
-  if (profile.role === "admin") {
+  if (access.canManageTraining) {
     return {
       error: null,
       supabase,
-      user,
+      user: { id: access.userId },
     };
   }
 
-  const { data: professionalProfile, error: professionalProfileError } =
-    await supabase
-      .from("professional_profiles")
-      .select("is_active, specialty")
-      .eq("profile_id", user.id)
-      .maybeSingle();
-  const canManageTraining =
-    !professionalProfileError &&
-    profile.role === "professional" &&
-    professionalProfile?.is_active === true &&
-    (professionalProfile.specialty === "training" ||
-      professionalProfile.specialty === "both");
-
   return {
-    error: canManageTraining
-      ? null
-      : "No tienes permisos para gestionar entrenamientos.",
+    error: "No tienes permisos para gestionar entrenamientos.",
     supabase,
-    user,
+    user: null,
   };
 }
 
@@ -93,7 +62,7 @@ function getRoutineErrorMessage(code?: string, message?: string) {
   }
 
   if (code === "55000") {
-    return "No puedes agregar ejercicios desactivados nuevos. Puedes conservarlos solo si ya pertenecian a este entrenamiento.";
+    return "No puedes agregar ejercicios desactivados nuevos. Puedes conservarlos solo si ya pertenecían a este entrenamiento.";
   }
 
   if (code === "P0002" && message?.includes("ejercicios")) {
@@ -101,14 +70,14 @@ function getRoutineErrorMessage(code?: string, message?: string) {
   }
 
   if (code === "23503") {
-    return "Uno de los ejercicios ya no esta disponible. Retiralo o selecciona otro.";
+    return "Uno de los ejercicios ya no está disponible. Retíralo o selecciona otro.";
   }
 
   if (code === "42501") {
     return "No tienes permisos para gestionar entrenamientos.";
   }
 
-  return "No se pudo guardar el entrenamiento. Revisa los datos e intentalo de nuevo.";
+  return "No se pudo guardar el entrenamiento. Revisa los datos e inténtalo de nuevo.";
 }
 
 function getRoutineAssignmentErrorMessage(code?: string, message?: string) {
@@ -120,7 +89,7 @@ function getRoutineAssignmentErrorMessage(code?: string, message?: string) {
     code === "23505" &&
     message?.includes("workout_plans_one_active_per_client_idx")
   ) {
-    return "El cliente ya tiene una rutina asignada. Actualiza la pagina y confirma el reemplazo.";
+    return "El cliente ya tiene una rutina asignada. Actualiza la página y confirma el reemplazo.";
   }
 
   if (code === "23503") {
@@ -149,7 +118,7 @@ export async function saveRoutine(
 
   if (routineId && !/^[0-9a-f-]{36}$/i.test(routineId)) {
     return {
-      message: "El entrenamiento indicado no es valido.",
+      message: "El entrenamiento indicado no es válido.",
       status: "error",
     };
   }
@@ -213,7 +182,7 @@ export async function deleteRoutine(
 ): Promise<RoutineActionResult> {
   if (!/^[0-9a-f-]{36}$/i.test(routineId)) {
     return {
-      message: "El entrenamiento indicado no es valido.",
+      message: "El entrenamiento indicado no es válido.",
       status: "error",
     };
   }
@@ -247,7 +216,7 @@ export async function deleteRoutine(
       message:
         error?.code === "23503"
           ? "No se puede eliminar el entrenamiento porque forma parte de una plantilla."
-          : "No se pudo eliminar el entrenamiento. Intentalo de nuevo.",
+          : "No se pudo eliminar el entrenamiento. Inténtalo de nuevo.",
       status: "error",
     };
   }
@@ -270,7 +239,7 @@ export async function setRoutineActive(
 ): Promise<RoutineActionResult> {
   if (!/^[0-9a-f-]{36}$/i.test(routineId)) {
     return {
-      message: "El entrenamiento indicado no es valido.",
+      message: "El entrenamiento indicado no es válido.",
       status: "error",
     };
   }
@@ -319,7 +288,7 @@ export async function assignRoutineToClient(
 
   if (!parsed.success) {
     return {
-      message: parsed.error.issues[0]?.message ?? "Revisa la asignacion.",
+      message: parsed.error.issues[0]?.message ?? "Revisa la asignación.",
       status: "error",
     };
   }
@@ -370,7 +339,7 @@ export async function unassignRoutineFromClient(
 ): Promise<RoutineActionResult> {
   if (!/^[0-9a-f-]{36}$/i.test(assignmentId)) {
     return {
-      message: "La asignacion indicada no es valida.",
+      message: "La asignación indicada no es válida.",
       status: "error",
     };
   }

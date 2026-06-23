@@ -4,6 +4,7 @@ import {
   StatTile,
 } from "@/components/app/AppScreen";
 import { ResourceManager } from "@/components/app/resource-manager";
+import { getManageableResourceAreas } from "@/lib/auth/access-rules";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getVisibleResources } from "@/lib/resources/data";
 import type { Enums } from "@/types/database";
@@ -31,14 +32,15 @@ export default async function ResourcesPage({
   searchParams: Promise<{ area?: string }>;
 }) {
   const access = await requireRouteAccess("/app/recursos");
-  const canManage = access.role === "admin";
+  const canManage = access.canManageResources;
+  const manageableResourceAreas = getManageableResourceAreas(access);
   const resources = await getVisibleResources({
     includeCreator: canManage,
   });
   const { area } = await searchParams;
   const requestedFilter = normalizeFilter(area);
   const availableFilters: ResourceFilter[] = canManage
-    ? ["all", "training", "nutrition", "general"]
+    ? ["all", ...manageableResourceAreas]
     : [
         "all",
         access.canViewTraining ? "training" : null,
@@ -62,15 +64,25 @@ export default async function ResourcesPage({
     (resource) => resource.area === "general",
   ).length;
   const clientDescription = access.canViewTraining && !access.canViewNutrition
-    ? "Encuentra materiales compartidos para acompanar tu plan de entrenamiento."
+    ? "Encuentra materiales compartidos para acompañar tu plan de entrenamiento."
     : access.canViewNutrition && !access.canViewTraining
-      ? "Encuentra materiales compartidos para acompanar tu plan de nutricion."
+      ? "Encuentra materiales compartidos para acompañar tu plan de nutrición."
       : "Encuentra materiales compartidos para tus planes activos.";
+  const assignedTrainerLabel =
+    access.assignedTrainerName ?? "Tu profesional de entrenamiento";
+  const assignedNutritionistLabel =
+    access.assignedNutritionistName ?? "Tu profesional de nutrición";
+  const sameAssignedProfessional =
+    access.assignedTrainerId &&
+    access.assignedNutritionistId &&
+    access.assignedTrainerId === access.assignedNutritionistId;
   const emptyHint = access.canViewTraining && !access.canViewNutrition
-    ? "Tu entrenador puede compartir recursos contigo."
+    ? `${assignedTrainerLabel} puede compartir recursos contigo.`
     : access.canViewNutrition && !access.canViewTraining
-      ? "Tu profesional de nutricion puede compartir recursos contigo."
-      : "Tus profesionales pueden compartir recursos contigo.";
+      ? `${assignedNutritionistLabel} puede compartir recursos contigo.`
+      : sameAssignedProfessional && access.assignedTrainerName
+        ? `${access.assignedTrainerName} puede compartir recursos contigo.`
+        : "Tus profesionales asignados pueden compartir recursos contigo.";
 
   return (
     <AppScreen>
@@ -79,7 +91,7 @@ export default async function ResourcesPage({
         title="Recursos multimedia"
         description={
           canManage
-            ? "Crea y administra enlaces externos para entrenamiento, nutricion o ambas areas."
+            ? "Crea y administra enlaces externos para entrenamiento, nutrición o ambas áreas."
             : clientDescription
         }
       />
@@ -102,9 +114,9 @@ export default async function ResourcesPage({
         ) : null}
         {canManage || access.canViewNutrition ? (
           <StatTile
-            label="Nutricion"
+            label="Nutrición"
             value={String(nutritionCount)}
-            detail="Material para tu plan de nutricion"
+            detail="Material para tu plan de nutrición"
           />
         ) : null}
         <StatTile
@@ -120,6 +132,7 @@ export default async function ResourcesPage({
         canManage={canManage}
         emptyHint={emptyHint}
         emptyMessage="Aun no tienes recursos disponibles"
+        manageableAreas={manageableResourceAreas}
         resources={filteredResources}
       />
     </AppScreen>

@@ -114,14 +114,14 @@ function getAdminAuthErrorMessage(message: string, code?: string) {
   }
 
   if (normalized.includes("password")) {
-    return "La contrasena temporal no cumple los requisitos de seguridad.";
+    return "La contraseña temporal no cumple los requisitos de seguridad.";
   }
 
   if (normalized.includes("email")) {
     return "El email no pudo usarse para crear la cuenta.";
   }
 
-  return "No se pudo crear la cuenta profesional. Intentalo de nuevo.";
+  return "No se pudo crear la cuenta profesional. Inténtalo de nuevo.";
 }
 
 function isProfessionalSpecialty(
@@ -143,7 +143,7 @@ async function getCurrentUniversalAdminProfile() {
 
   if (userError || !user) {
     return {
-      error: "Debes iniciar sesion para crear cuentas profesionales.",
+      error: "Debes iniciar sesión para crear cuentas profesionales.",
       profile: null,
       user: null,
     };
@@ -223,7 +223,7 @@ export async function createProfessionalAccount(
   if (!expectedAdminCode) {
     return {
       message:
-        "La creacion de cuentas profesionales no esta disponible en este momento.",
+        "La creación de cuentas profesionales no está disponible en este momento.",
       status: "error",
     };
   }
@@ -231,9 +231,9 @@ export async function createProfessionalAccount(
   if (!isValidAccessCode(parsed.data.adminAccessCode, expectedAdminCode)) {
     return {
       fieldErrors: {
-        adminAccessCode: "Codigo administrativo invalido.",
+        adminAccessCode: "Código administrativo inválido.",
       },
-      message: "Codigo administrativo invalido.",
+      message: "Código administrativo inválido.",
       status: "error",
     };
   }
@@ -241,7 +241,7 @@ export async function createProfessionalAccount(
   if (!hasSupabaseAdminConfig()) {
     return {
       message:
-        "La creacion de cuentas profesionales no esta disponible en este momento.",
+        "La creación de cuentas profesionales no está disponible en este momento.",
       status: "error",
     };
   }
@@ -268,7 +268,7 @@ export async function createProfessionalAccount(
 
   if (!createdUser) {
     return {
-      message: "No se pudo completar la creacion de la cuenta profesional.",
+      message: "No se pudo completar la creación de la cuenta profesional.",
       status: "error",
     };
   }
@@ -288,7 +288,7 @@ export async function createProfessionalAccount(
     await deleteCreatedUser(createdUser.id);
 
     return {
-      message: "No se pudo completar la configuracion de la cuenta profesional.",
+      message: "No se pudo completar la configuración de la cuenta profesional.",
       status: "error",
     };
   }
@@ -310,7 +310,7 @@ export async function createProfessionalAccount(
     await deleteCreatedUser(createdUser.id);
 
     return {
-      message: "No se pudo guardar el area profesional seleccionada.",
+      message: "No se pudo guardar el área profesional seleccionada.",
       status: "error",
     };
   }
@@ -337,7 +337,7 @@ export async function listProfessionalAccounts(): Promise<ProfessionalAccountLis
 
   if (!hasSupabaseAdminConfig()) {
     return {
-      error: "La lista de profesionales no esta disponible en este momento.",
+      error: "La lista de profesionales no está disponible en este momento.",
       items: [],
     };
   }
@@ -400,13 +400,18 @@ export async function listProfessionalAccounts(): Promise<ProfessionalAccountLis
     };
   }
 
+  const emailsById = new Map(
+    (authUsers?.users ?? []).map((user) => [user.id, user.email ?? ""]),
+  );
   const profilesById = new Map(
     profiles
       .filter((profile) => profile.role === "professional")
-      .map((profile) => [profile.id, profile.full_name ?? "Sin nombre"]),
-  );
-  const emailsById = new Map(
-    (authUsers?.users ?? []).map((user) => [user.id, user.email ?? ""]),
+      .map((profile) => [
+        profile.id,
+        profile.full_name?.trim() ||
+          emailsById.get(profile.id) ||
+          "Perfil incompleto",
+      ]),
   );
   const nutritionAssignments = new Map<string, number>();
   const trainingAssignments = new Map<string, number>();
@@ -438,7 +443,7 @@ export async function listProfessionalAccounts(): Promise<ProfessionalAccountLis
         bio: item.bio ?? "",
         createdAt: item.created_at,
         email: emailsById.get(item.profile_id) ?? "",
-        fullName: profilesById.get(item.profile_id) ?? "Sin nombre",
+        fullName: profilesById.get(item.profile_id) ?? "Perfil incompleto",
         id: item.profile_id,
         isActive: item.is_active,
         specialty: item.specialty,
@@ -483,7 +488,7 @@ export async function getProfessionalAccount(
 function getProfessionalUpdateError(code?: string, message?: string) {
   if (code === "23514") {
     if (message?.includes("nutricion")) {
-      return "Reasigna primero los clientes de nutricion antes de cambiar la especialidad.";
+      return "Reasigna primero los clientes de nutrición antes de cambiar la especialidad.";
     }
 
     if (message?.includes("entrenamiento")) {
@@ -518,7 +523,7 @@ export async function updateProfessionalAccount(
 
   if (!hasSupabaseAdminConfig()) {
     return {
-      message: "La gestion de profesionales no esta disponible.",
+      message: "La gestión de profesionales no está disponible.",
       status: "error",
     };
   }
@@ -585,7 +590,7 @@ export async function setProfessionalActive(
 
   if (!parsedId.success) {
     return {
-      message: parsedId.error.issues[0]?.message ?? "Cuenta invalida.",
+      message: parsedId.error.issues[0]?.message ?? "Cuenta inválida.",
       status: "error",
     };
   }
@@ -596,7 +601,7 @@ export async function setProfessionalActive(
     return {
       message:
         privilegedContext.error ??
-        "La gestion de profesionales no esta disponible.",
+        "La gestión de profesionales no está disponible.",
       status: "error",
     };
   }
@@ -722,7 +727,7 @@ export async function deleteProfessionalAccount(
 
   if (!parsedId.success) {
     return {
-      message: parsedId.error.issues[0]?.message ?? "Cuenta invalida.",
+      message: parsedId.error.issues[0]?.message ?? "Cuenta inválida.",
       status: "error",
     };
   }
@@ -733,7 +738,7 @@ export async function deleteProfessionalAccount(
     return {
       message:
         privilegedContext.error ??
-        "La gestion de profesionales no esta disponible.",
+        "La gestión de profesionales no está disponible.",
       status: "error",
     };
   }

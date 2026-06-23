@@ -13,6 +13,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { ClientAvatar } from "@/components/app/client-avatar";
+import {
+  getAssignedRelationBadge,
+  RelationshipBadge,
+} from "@/components/app/relationship-badges";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -138,13 +142,26 @@ export function AssignmentEntitySelector({
 
 export function ClientSearchCard({
   client,
+  currentUserId,
+  isAdmin,
+  isProfessional,
   onSelect,
   selected,
 }: {
   client: AssignableTrainingClient;
+  currentUserId: string;
+  isAdmin: boolean;
+  isProfessional: boolean;
   onSelect: (clientId: string) => void;
   selected: boolean;
 }) {
+  const relationBadge = getAssignedRelationBadge({
+    assignedId: client.assignedTrainerId,
+    currentUserId,
+    isAdmin,
+    isProfessional,
+  });
+
   return (
     <article
       className={cn(
@@ -181,12 +198,16 @@ export function ClientSearchCard({
               />
             </div>
 
-            <p className="mt-3 text-xs font-bold text-warm-brown">
-              Plan de entrenamiento activo
-            </p>
-            <p className="mt-1 truncate text-xs font-semibold text-muted">
-              Profesional:{" "}
-              {client.assignedTrainerName ?? "No asignado"}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <RelationshipBadge tone="primary">
+                Entrenamiento
+              </RelationshipBadge>
+              <RelationshipBadge tone={relationBadge.tone}>
+                {relationBadge.label}
+              </RelationshipBadge>
+            </div>
+            <p className="mt-2 truncate text-xs font-semibold text-muted">
+              {client.assignedTrainerName ?? "Sin profesional asignado"}
             </p>
             <p className="mt-2 text-xs font-bold text-warm-brown">
               {client.currentAssignment

@@ -42,7 +42,7 @@ export async function markNotificationRead(
 ): Promise<NotificationActionResult> {
   if (!UUID_PATTERN.test(notificationId)) {
     return {
-      message: "La notificacion seleccionada no es valida.",
+      message: "La notificación seleccionada no es válida.",
       status: "error",
     };
   }
@@ -51,7 +51,7 @@ export async function markNotificationRead(
 
   if (!user) {
     return {
-      message: "Debes iniciar sesion para gestionar tus notificaciones.",
+      message: "Debes iniciar sesión para gestionar tus notificaciones.",
       status: "error",
     };
   }
@@ -69,7 +69,7 @@ export async function markNotificationRead(
     !destination.startsWith("/app")
   ) {
     return {
-      message: "No se pudo marcar la notificacion como leida.",
+      message: "No se pudo marcar la notificación como leída.",
       status: "error",
     };
   }
@@ -78,7 +78,7 @@ export async function markNotificationRead(
 
   return {
     destination,
-    message: "Notificacion marcada como leida.",
+    message: "Notificación marcada como leída.",
     status: "success",
   };
 }
@@ -88,7 +88,7 @@ export async function markAllNotificationsRead(): Promise<NotificationActionResu
 
   if (!user) {
     return {
-      message: "Debes iniciar sesion para gestionar tus notificaciones.",
+      message: "Debes iniciar sesión para gestionar tus notificaciones.",
       status: "error",
     };
   }
@@ -97,7 +97,7 @@ export async function markAllNotificationsRead(): Promise<NotificationActionResu
 
   if (error) {
     return {
-      message: "No se pudieron marcar todas las notificaciones como leidas.",
+      message: "No se pudieron marcar todas las notificaciones como leídas.",
       status: "error",
     };
   }
@@ -105,7 +105,7 @@ export async function markAllNotificationsRead(): Promise<NotificationActionResu
   revalidateNotificationPaths();
 
   return {
-    message: "Todas las notificaciones quedaron marcadas como leidas.",
+    message: "Todas las notificaciones quedaron marcadas como leídas.",
     status: "success",
   };
 }

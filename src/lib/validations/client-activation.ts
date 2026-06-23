@@ -10,7 +10,7 @@ export const clientActivationServiceSchema = z.enum([
 export const clientActivationSchema = z.object({
   assignedNutritionistId: z.string().uuid().optional().or(z.literal("")),
   assignedTrainerId: z.string().uuid().optional().or(z.literal("")),
-  clientId: z.string().uuid("Selecciona un cliente valido."),
+  clientId: z.string().uuid("Selecciona un cliente válido."),
   serviceType: clientActivationServiceSchema,
 });
 
