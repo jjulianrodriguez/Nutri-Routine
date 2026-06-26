@@ -51,6 +51,8 @@ import {
   calendarEventValuesSchema,
   type CalendarEventValues,
 } from "@/lib/validations/calendar";
+import { formatTimeInputLabel } from "@/lib/user-settings/time";
+import type { TimeFormatPreference } from "@/lib/user-settings/types";
 import { cn } from "@/lib/utils";
 
 type CalendarManagerProps = {
@@ -247,12 +249,16 @@ function EventSummary({
   event,
   onEdit,
   onOpen,
+  timeFormat,
 }: {
   event: CalendarEventItem;
   onEdit?: (event: CalendarEventItem) => void;
   onOpen: (event: CalendarEventItem) => void;
+  timeFormat: TimeFormatPreference;
 }) {
   const isCancelled = event.status === "cancelled";
+  const startTime = formatTimeInputLabel(event.startTime, timeFormat);
+  const endTime = formatTimeInputLabel(event.endTime, timeFormat);
 
   return (
     <article
@@ -268,8 +274,8 @@ function EventSummary({
           onClick={() => onOpen(event)}
         >
           <span className="block truncate text-sm font-extrabold text-warm-brown">
-            {event.startTime}
-            {event.endTime ? ` - ${event.endTime}` : ""}
+            {startTime}
+            {endTime ? ` - ${endTime}` : ""}
           </span>
           <h3 className="mt-1 break-words text-lg font-extrabold text-charcoal">
             {event.title}
@@ -399,6 +405,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
     professionalAllowsArea(professional, selectedArea),
   );
   const canCreate = data.canManageEvents && data.clientOptions.length > 0;
+  const timeFormat = data.timeFormat;
 
   useEffect(() => {
     if (areaOptions.length > 0 && !areaOptions.includes(selectedArea)) {
@@ -740,7 +747,8 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                           }}
                         >
                           <span className="block truncate">
-                            {event.startTime} {event.title}
+                            {formatTimeInputLabel(event.startTime, timeFormat)}{" "}
+                            {event.title}
                           </span>
                         </button>
                       ))}
@@ -1084,6 +1092,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   event={event}
                   onEdit={canEditEvent(event) ? startEditing : undefined}
                   onOpen={(nextEvent) => setSelectedEventId(nextEvent.id)}
+                  timeFormat={timeFormat}
                 />
               ))}
             </div>
@@ -1127,9 +1136,12 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   <dd className="mt-1 text-muted">
                     <Clock className="mr-1 inline size-4" aria-hidden="true" />
                     {formatFullDate(selectedEvent.dateKey)},{" "}
-                    {selectedEvent.startTime}
+                    {formatTimeInputLabel(selectedEvent.startTime, timeFormat)}
                     {selectedEvent.endTime
-                      ? ` - ${selectedEvent.endTime}`
+                      ? ` - ${formatTimeInputLabel(
+                          selectedEvent.endTime,
+                          timeFormat,
+                        )}`
                       : ""}
                   </dd>
                 </div>

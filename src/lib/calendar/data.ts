@@ -23,6 +23,7 @@ import type {
   CalendarStatus,
 } from "@/lib/calendar/types";
 import { createClient } from "@/lib/supabase/server";
+import { getUserSettings } from "@/lib/user-settings/data";
 import type { Enums, Tables } from "@/types/database";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -463,6 +464,7 @@ export async function getCalendarPageData(
   },
 ): Promise<CalendarPageData> {
   const supabase = await createClient();
+  const settings = await getUserSettings(access.userId);
   const filters = normalizeFilters({ access, ...params });
   const monthKey = filters.month;
   const bounds = getMonthBounds(monthKey);
@@ -520,6 +522,7 @@ export async function getCalendarPageData(
       nextMonthKey: addMonths(monthKey, 1),
       previousMonthKey: addMonths(monthKey, -1),
       professionalOptions,
+      timeFormat: settings.timeFormat,
     };
   }
 
@@ -553,6 +556,7 @@ export async function getCalendarPageData(
     nextMonthKey: addMonths(monthKey, 1),
     previousMonthKey: addMonths(monthKey, -1),
     professionalOptions,
+    timeFormat: settings.timeFormat,
   };
 }
 

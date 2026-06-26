@@ -33,7 +33,7 @@ type LoginFormProps = {
 };
 
 const inputClasses =
-  "mt-2 h-14 rounded-full border-charcoal/10 bg-white px-5 text-espresso shadow-none placeholder:text-stone/60 focus-visible:border-terracotta focus-visible:ring-4 focus-visible:ring-terracotta/25";
+  "mt-2 h-[3.25rem] rounded-[16px] border-border bg-surface px-4 text-espresso shadow-none placeholder:text-stone/60 focus-visible:border-terracotta focus-visible:ring-4 focus-visible:ring-terracotta/20";
 
 export function LoginForm({ initialError }: LoginFormProps) {
   const router = useRouter();
@@ -126,7 +126,7 @@ export function LoginForm({ initialError }: LoginFormProps) {
       {serverMessage || errors.root?.message ? (
         <Alert
           variant="destructive"
-          className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
+          className="rounded-[1.1rem] border-danger/20 bg-danger/5 px-4 py-3"
         >
           <AlertDescription className="font-semibold text-danger">
             {serverMessage || errors.root?.message}
@@ -137,8 +137,8 @@ export function LoginForm({ initialError }: LoginFormProps) {
       <motion.button
         type="submit"
         disabled={isSubmitting}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-terracotta py-4 text-sm font-extrabold text-white shadow-soft disabled:opacity-50"
-        whileHover={isSubmitting ? undefined : { scale: 1.018 }}
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-espresso py-4 text-sm font-extrabold text-white shadow-soft transition-colors hover:bg-charcoal disabled:cursor-not-allowed disabled:opacity-50"
+        whileHover={isSubmitting ? undefined : { y: -1 }}
         whileTap={isSubmitting ? undefined : { scale: 0.99 }}
       >
         {isSubmitting ? (
@@ -159,7 +159,7 @@ export function LoginForm({ initialError }: LoginFormProps) {
           ¿No tenés cuenta?{" "}
           <Link
             href="/register"
-            className="font-bold text-espresso underline decoration-terracotta decoration-2 underline-offset-4 transition-none"
+            className="font-bold text-espresso underline decoration-terracotta decoration-2 underline-offset-4 transition-colors hover:text-terracotta"
           >
             Registrate
           </Link>

@@ -311,6 +311,153 @@ export type Database = {
           },
         ];
       };
+      habit_assignments: {
+        Row: {
+          active: boolean;
+          assigned_by: string;
+          client_id: string;
+          created_at: string;
+          days_of_week: number[];
+          end_date: string | null;
+          habit_id: string;
+          id: string;
+          start_date: string;
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          assigned_by: string;
+          client_id: string;
+          created_at?: string;
+          days_of_week?: number[];
+          end_date?: string | null;
+          habit_id: string;
+          id?: string;
+          start_date?: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          assigned_by?: string;
+          client_id?: string;
+          created_at?: string;
+          days_of_week?: number[];
+          end_date?: string | null;
+          habit_id?: string;
+          id?: string;
+          start_date?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "habit_assignments_assigned_by_fkey";
+            columns: ["assigned_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "habit_assignments_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "habit_assignments_habit_id_fkey";
+            columns: ["habit_id"];
+            isOneToOne: false;
+            referencedRelation: "habits";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      habit_progress: {
+        Row: {
+          client_id: string;
+          completed: boolean;
+          completed_at: string | null;
+          created_at: string;
+          date: string;
+          habit_assignment_id: string;
+          id: string;
+          updated_at: string;
+        };
+        Insert: {
+          client_id: string;
+          completed?: boolean;
+          completed_at?: string | null;
+          created_at?: string;
+          date: string;
+          habit_assignment_id: string;
+          id?: string;
+          updated_at?: string;
+        };
+        Update: {
+          client_id?: string;
+          completed?: boolean;
+          completed_at?: string | null;
+          created_at?: string;
+          date?: string;
+          habit_assignment_id?: string;
+          id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "habit_progress_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "habit_progress_habit_assignment_id_fkey";
+            columns: ["habit_assignment_id"];
+            isOneToOne: false;
+            referencedRelation: "habit_assignments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      habits: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          created_by: string;
+          description: string | null;
+          id: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          created_by: string;
+          description?: string | null;
+          id?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          created_by?: string;
+          description?: string | null;
+          id?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "habits_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       notifications: {
         Row: {
           actor_id: string | null;
@@ -357,6 +504,68 @@ export type Database = {
             foreignKeyName: "notifications_recipient_id_fkey";
             columns: ["recipient_id"];
             isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      user_settings: {
+        Row: {
+          allow_assigned_professionals_health_data: boolean;
+          allow_assigned_professionals_personal_info: boolean;
+          allow_assigned_professionals_sensitive_notes: boolean;
+          created_at: string;
+          notifications_enabled: boolean;
+          notify_appointments: boolean;
+          notify_assignments: boolean;
+          notify_messages: boolean;
+          notify_plan_changes: boolean;
+          profile_id: string;
+          reduced_motion: boolean;
+          text_size: string;
+          theme: string;
+          time_format: string;
+          updated_at: string;
+        };
+        Insert: {
+          allow_assigned_professionals_health_data?: boolean;
+          allow_assigned_professionals_personal_info?: boolean;
+          allow_assigned_professionals_sensitive_notes?: boolean;
+          created_at?: string;
+          notifications_enabled?: boolean;
+          notify_appointments?: boolean;
+          notify_assignments?: boolean;
+          notify_messages?: boolean;
+          notify_plan_changes?: boolean;
+          profile_id: string;
+          reduced_motion?: boolean;
+          text_size?: string;
+          theme?: string;
+          time_format?: string;
+          updated_at?: string;
+        };
+        Update: {
+          allow_assigned_professionals_health_data?: boolean;
+          allow_assigned_professionals_personal_info?: boolean;
+          allow_assigned_professionals_sensitive_notes?: boolean;
+          created_at?: string;
+          notifications_enabled?: boolean;
+          notify_appointments?: boolean;
+          notify_assignments?: boolean;
+          notify_messages?: boolean;
+          notify_plan_changes?: boolean;
+          profile_id?: string;
+          reduced_motion?: boolean;
+          text_size?: string;
+          theme?: string;
+          time_format?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_settings_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
@@ -527,6 +736,114 @@ export type Database = {
             columns: ["profile_id"];
             isOneToOne: true;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      nutrition_document_folders: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          created_by: string;
+          id: string;
+          name: string;
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          name: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          name?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "nutrition_document_folders_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      nutrition_documents: {
+        Row: {
+          client_id: string | null;
+          created_at: string;
+          created_by: string;
+          description: string | null;
+          document_type: Database["public"]["Enums"]["nutrition_document_type"];
+          file_name: string;
+          file_size: number;
+          folder_id: string | null;
+          id: string;
+          mime_type: string;
+          status: Database["public"]["Enums"]["nutrition_document_status"];
+          storage_path: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          client_id?: string | null;
+          created_at?: string;
+          created_by: string;
+          description?: string | null;
+          document_type: Database["public"]["Enums"]["nutrition_document_type"];
+          file_name: string;
+          file_size: number;
+          folder_id?: string | null;
+          id?: string;
+          mime_type: string;
+          status?: Database["public"]["Enums"]["nutrition_document_status"];
+          storage_path: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          client_id?: string | null;
+          created_at?: string;
+          created_by?: string;
+          description?: string | null;
+          document_type?: Database["public"]["Enums"]["nutrition_document_type"];
+          file_name?: string;
+          file_size?: number;
+          folder_id?: string | null;
+          id?: string;
+          mime_type?: string;
+          status?: Database["public"]["Enums"]["nutrition_document_status"];
+          storage_path?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "nutrition_documents_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "nutrition_documents_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "nutrition_documents_folder_id_fkey";
+            columns: ["folder_id"];
+            isOneToOne: false;
+            referencedRelation: "nutrition_document_folders";
             referencedColumns: ["id"];
           },
         ];
@@ -1191,6 +1508,8 @@ export type Database = {
         | "consultation"
         | "other";
       appointment_status: "scheduled" | "completed" | "cancelled";
+      nutrition_document_status: "active" | "inactive";
+      nutrition_document_type: "meal_plan" | "educational_library";
       plan_status: "draft" | "active" | "archived";
       professional_specialty: "nutrition" | "training" | "both";
       profile_role: "professional" | "client" | "admin";

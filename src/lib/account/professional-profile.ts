@@ -19,6 +19,10 @@ export const emptyProfessionalProfile: ProfessionalProfileValues = {
   professionalPhone: "",
 };
 
+const baseProfessionalProfileSelect = "specialty, is_active";
+
+const extendedProfessionalProfileSelect = `${baseProfessionalProfileSelect}, bio, professional_phone, professional_links, experience, certifications, focus_areas, availability_schedule, availability_days, availability_note`;
+
 export type OwnProfessionalProfile = {
   isActive: boolean;
   specialty: Enums<"professional_specialty"> | null;
@@ -36,26 +40,21 @@ function normalizeFocusAreas(values: string[] | null) {
   );
 }
 
-export async function getOwnProfessionalProfile(
-  profileId: string,
-): Promise<OwnProfessionalProfile | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("professional_profiles")
-    .select(
-      "specialty, is_active, bio, professional_phone, professional_links, experience, certifications, focus_areas, availability_schedule, availability_days, availability_note",
-    )
-    .eq("profile_id", profileId)
-    .maybeSingle();
+type ProfessionalProfileRow = {
+  availability_days?: string | null;
+  availability_note?: string | null;
+  availability_schedule?: string | null;
+  bio?: string | null;
+  certifications?: string | null;
+  experience?: string | null;
+  focus_areas?: string[] | null;
+  is_active: boolean;
+  professional_links?: string | null;
+  professional_phone?: string | null;
+  specialty: Enums<"professional_specialty"> | null;
+};
 
-  if (error) {
-    throw new Error("No se pudo cargar la informacion profesional.");
-  }
-
-  if (!data) {
-    return null;
-  }
-
+function toProfessionalProfile(data: ProfessionalProfileRow) {
   return {
     isActive: data.is_active,
     specialty: data.specialty,
@@ -66,9 +65,38 @@ export async function getOwnProfessionalProfile(
       bio: data.bio ?? "",
       certifications: data.certifications ?? "",
       experience: data.experience ?? "",
-      focusAreas: normalizeFocusAreas(data.focus_areas),
+      focusAreas: normalizeFocusAreas(data.focus_areas ?? null),
       professionalLinks: data.professional_links ?? "",
       professionalPhone: data.professional_phone ?? "",
     },
-  };
+  } satisfies OwnProfessionalProfile;
+}
+
+export async function getOwnProfessionalProfile(
+  profileId: string,
+): Promise<OwnProfessionalProfile | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("professional_profiles")
+    .select(extendedProfessionalProfileSelect)
+    .eq("profile_id", profileId)
+    .maybeSingle();
+  const fallbackResult = error
+    ? await supabase
+        .from("professional_profiles")
+        .select(baseProfessionalProfileSelect)
+        .eq("profile_id", profileId)
+        .maybeSingle()
+    : null;
+  const resolvedData = data ?? fallbackResult?.data ?? null;
+
+  if (error && fallbackResult?.error) {
+    throw new Error("No se pudo cargar la informacion profesional.");
+  }
+
+  if (!resolvedData) {
+    return null;
+  }
+
+  return toProfessionalProfile(resolvedData);
 }

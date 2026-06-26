@@ -7,6 +7,9 @@ import {
   type ProfileDirectoryEntry,
 } from "@/lib/auth/profile-directory";
 import { createClient } from "@/lib/supabase/server";
+import { getUserSettings } from "@/lib/user-settings/data";
+import { formatAppDateTime } from "@/lib/user-settings/time";
+import type { TimeFormatPreference } from "@/lib/user-settings/types";
 import type { Tables } from "@/types/database";
 
 export type ChatArea = "nutrition" | "training";
@@ -55,6 +58,7 @@ export type ChatConversationPayload = {
   professionalId: string;
   professionalName: string;
   subtitle: string;
+  timeFormat: TimeFormatPreference;
   title: string;
 };
 
@@ -153,12 +157,8 @@ function displayName(
   return getProfileDisplayName(profileById.get(id)) ?? fallback ?? "Perfil incompleto";
 }
 
-function formatMessageDate(value: string) {
-  return new Intl.DateTimeFormat("es-CR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "America/Costa_Rica",
-  }).format(new Date(value));
+function formatMessageDate(value: string, timeFormat: TimeFormatPreference) {
+  return formatAppDateTime(value, timeFormat);
 }
 
 function getConversationKey(conversation: ChatConversationRow) {
@@ -579,7 +579,8 @@ async function buildConversationPayload(
     };
   }
 
-  const [profileById, messagesResult] = await Promise.all([
+  const [settings, profileById, messagesResult] = await Promise.all([
+    getUserSettings(currentUserId),
     getProfiles([
       conversation.client_id,
       conversation.professional_id,
@@ -620,7 +621,7 @@ async function buildConversationPayload(
       return {
         body: isDeleted ? "Mensaje eliminado" : message.body,
         createdAt: message.created_at,
-        createdLabel: formatMessageDate(message.created_at),
+        createdLabel: formatMessageDate(message.created_at, settings.timeFormat),
         deletedAt: message.deleted_at,
         deliveredAt: message.created_at,
         editedAt: message.edited_at,
@@ -649,6 +650,7 @@ async function buildConversationPayload(
       professionalId: conversation.professional_id,
       professionalName,
       subtitle: getAreaLabel(conversation.area),
+      timeFormat: settings.timeFormat,
       title: viewingAsClient ? professionalName : clientName,
     },
     status: "success",

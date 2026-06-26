@@ -12,6 +12,7 @@ import {
   hasSupabaseAdminConfig,
 } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { getUserSettings } from "@/lib/user-settings/data";
 import type { Enums, Tables } from "@/types/database";
 
 type ServerSupabase = Awaited<ReturnType<typeof createClient>>;
@@ -52,23 +53,33 @@ export type ClientAdministrativeProfile = {
   assignedNutritionistName: string | null;
   assignedTrainerId: string | null;
   assignedTrainerName: string | null;
+  allergies: string | null;
   avatarUrl: string | null;
   birthDate: string | null;
+  bodyFatPercentage: number | null;
+  bodyMeasurements: string | null;
   canViewNutritionPlans: boolean;
   canViewTrainingPlans: boolean;
   createdAt: string;
+  dietaryRestrictions: string | null;
   email: string | null;
   fullName: string;
   gender: string | null;
   genderDescription: string | null;
   hasNutritionService: boolean;
   hasTrainingService: boolean;
+  healthDataHidden: boolean;
   heightCm: number | null;
   id: string;
+  importantMedications: string | null;
+  injuries: string | null;
   medicalConditions: string | null;
   nutritionPlans: ClientPlanSummary[];
+  personalInfoHidden: boolean;
   phone: string | null;
+  professionalNotes: string | null;
   role: "client";
+  sensitiveNotesHidden: boolean;
   trainingPlans: ClientPlanSummary[];
   updatedAt: string;
   weightKg: number | null;
@@ -286,6 +297,7 @@ export async function getClientAdministrativeProfile(
   const [
     professionalProfilesById,
     personalDetailsResult,
+    privacySettings,
     nutritionPlans,
     trainingPlans,
     auth,
@@ -297,10 +309,11 @@ export async function getClientAdministrativeProfile(
       supabase
         .from("profile_personal_details")
         .select(
-          "phone, birth_date, gender, gender_description, weight_kg, height_cm, medical_conditions, updated_at",
+          "phone, birth_date, gender, gender_description, weight_kg, height_cm, body_fat_percentage, body_measurements, medical_conditions, injuries, allergies, important_medications, dietary_restrictions, professional_notes, updated_at",
         )
         .eq("profile_id", clientId)
         .maybeSingle(),
+      getUserSettings(clientId),
       canViewNutritionPlans
         ? listDietPlans(supabase, clientId)
         : Promise.resolve([]),
@@ -315,6 +328,12 @@ export async function getClientAdministrativeProfile(
   }
 
   const personalDetails = personalDetailsResult.data;
+  const canViewPersonalInfo =
+    generalAdmin || privacySettings.allowAssignedProfessionalsPersonalInfo;
+  const canViewHealthData =
+    generalAdmin || privacySettings.allowAssignedProfessionalsHealthData;
+  const canViewSensitiveNotes =
+    generalAdmin || privacySettings.allowAssignedProfessionalsSensitiveNotes;
 
   return {
     accountStatus: auth.accountStatus,
@@ -328,28 +347,55 @@ export async function getClientAdministrativeProfile(
     assignedTrainerName: assignedTrainerId
       ? getProfileDisplayName(professionalProfilesById.get(assignedTrainerId))
       : null,
+    allergies: canViewHealthData ? personalDetails?.allergies ?? null : null,
     avatarUrl: profile.avatar_url,
-    birthDate: personalDetails?.birth_date ?? null,
+    birthDate: canViewPersonalInfo ? personalDetails?.birth_date ?? null : null,
+    bodyFatPercentage: canViewHealthData
+      ? personalDetails?.body_fat_percentage ?? null
+      : null,
+    bodyMeasurements: canViewHealthData
+      ? personalDetails?.body_measurements ?? null
+      : null,
     canViewNutritionPlans,
     canViewTrainingPlans,
     createdAt: profile.created_at,
-    email: auth.email,
-    fullName: profile.full_name?.trim() || auth.email || "Perfil incompleto",
-    gender: personalDetails?.gender ?? null,
-    genderDescription: personalDetails?.gender_description ?? null,
+    dietaryRestrictions: canViewHealthData
+      ? personalDetails?.dietary_restrictions ?? null
+      : null,
+    email: canViewPersonalInfo ? auth.email : null,
+    fullName:
+      profile.full_name?.trim() ||
+      (canViewPersonalInfo ? auth.email : null) ||
+      "Perfil incompleto",
+    gender: canViewPersonalInfo ? personalDetails?.gender ?? null : null,
+    genderDescription: canViewPersonalInfo
+      ? personalDetails?.gender_description ?? null
+      : null,
     hasNutritionService: assignedNutritionistId !== null,
     hasTrainingService: assignedTrainerId !== null,
-    heightCm: personalDetails?.height_cm ?? null,
+    healthDataHidden: !canViewHealthData,
+    heightCm: canViewHealthData ? personalDetails?.height_cm ?? null : null,
     id: profile.id,
-    medicalConditions: personalDetails?.medical_conditions ?? null,
+    importantMedications: canViewHealthData
+      ? personalDetails?.important_medications ?? null
+      : null,
+    injuries: canViewHealthData ? personalDetails?.injuries ?? null : null,
+    medicalConditions: canViewHealthData
+      ? personalDetails?.medical_conditions ?? null
+      : null,
     nutritionPlans,
-    phone: personalDetails?.phone ?? null,
+    personalInfoHidden: !canViewPersonalInfo,
+    phone: canViewPersonalInfo ? personalDetails?.phone ?? null : null,
+    professionalNotes: canViewSensitiveNotes
+      ? personalDetails?.professional_notes ?? null
+      : null,
     role: "client",
+    sensitiveNotesHidden: !canViewSensitiveNotes,
     trainingPlans,
     updatedAt:
       personalDetails?.updated_at ??
       clientProfile?.updated_at ??
       profile.updated_at,
-    weightKg: personalDetails?.weight_kg ?? null,
+    weightKg: canViewHealthData ? personalDetails?.weight_kg ?? null : null,
   };
 }

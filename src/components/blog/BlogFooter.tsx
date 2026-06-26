@@ -1,30 +1,54 @@
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+
+const footerLinks = [
+  { href: "/", label: "Inicio" },
+  { href: "/blog", label: "Blog" },
+  { href: "/login", label: "Iniciar sesión" },
+  { href: "/register", label: "Registrarse" },
+];
 
 export function BlogFooter() {
   return (
-    <footer className="border-t border-border bg-surface/82 backdrop-blur-md">
-      <div className="mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-8 md:grid-cols-[1fr_auto] md:items-end lg:px-10">
+    <footer className="relative overflow-hidden border-t border-[var(--blog-night)]/8 bg-[var(--blog-paper)]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_10%,rgb(231_197_138_/_0.28),transparent_26rem),radial-gradient(circle_at_88%_40%,rgb(247_230_212_/_0.78),transparent_30rem)]" />
+      <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end lg:px-10">
         <div>
-          <p className="font-heading text-2xl font-bold text-charcoal">
-            Nutrición Con Enfoque
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-[var(--blog-forest)]">
+            Poner nombre
           </p>
-          <p className="mt-2 max-w-md text-sm leading-6 text-warm-brown">
-            Lecturas sobre nutrición funcional, entrenamiento, salud hormonal y
-            bienestar cotidiano.
+          <p
+            style={{
+              fontFamily: "var(--font-landing-display)",
+              fontWeight: 500,
+            }}
+            className="mt-4 max-w-2xl text-[clamp(3rem,7vw,5.8rem)] leading-[0.86] tracking-[-0.035em] text-[var(--blog-night)]"
+          >
+            lecturas para cuidar tu cuerpo con criterio.
+          </p>
+          <p className="mt-5 max-w-md text-sm font-bold leading-6 text-[var(--blog-muted)]">
+            Nutrición funcional, entrenamiento y bienestar cotidiano con una
+            mirada humana y aplicable.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 text-sm font-semibold text-warm-brown">
-          <Link href="/" className="underline decoration-sage decoration-2 underline-offset-4">
-            Inicio
-          </Link>
-          <Link
-            href="/blog"
-            className="underline decoration-sage decoration-2 underline-offset-4"
-          >
-            Blog
-          </Link>
-          <span>© {new Date().getFullYear()}</span>
+        <div className="grid gap-4">
+          <div className="flex flex-wrap gap-2">
+            {footerLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="group inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.56)] px-4 py-2 text-sm font-black text-[var(--blog-night)] shadow-[0_18px_48px_-40px_rgb(75_53_53_/_0.2)] backdrop-blur-xl transition-colors hover:border-[var(--blog-clay)]/30 hover:bg-[rgb(255_252_248_/_0.78)]"
+              >
+                {link.label}
+                <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            ))}
+          </div>
+          <p className="text-sm font-bold text-[var(--blog-muted)] md:text-right">
+            © {new Date().getFullYear()} · Mariana Rodríguez Méndez + Camila
+            Rodríguez Méndez
+          </p>
         </div>
       </div>
     </footer>

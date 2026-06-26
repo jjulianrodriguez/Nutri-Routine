@@ -1,4 +1,5 @@
 import type { Enums } from "@/types/database";
+import type { TimeFormatPreference } from "@/lib/user-settings/types";
 
 export type CalendarArea = Enums<"service_area">;
 export type CalendarEventType = Enums<"appointment_event_type">;
@@ -62,4 +63,5 @@ export type CalendarPageData = {
   nextMonthKey: string;
   previousMonthKey: string;
   professionalOptions: CalendarProfessionalOption[];
+  timeFormat: TimeFormatPreference;
 };

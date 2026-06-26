@@ -1,27 +1,25 @@
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, BookOpen } from "lucide-react";
 import Link from "next/link";
-
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 function BlogMark() {
   return (
     <Link
       href="/blog"
-      aria-label="Blog · Nutrición Con Enfoque"
-      className="inline-flex items-center gap-3"
+      aria-label="Blog · Poner nombre"
+      className="group inline-flex items-center gap-3"
     >
       <span
         aria-hidden="true"
-        className="flex size-10 items-center justify-center rounded-full border border-border bg-primary-soft text-charcoal shadow-soft"
+        className="grid size-10 place-items-center rounded-full border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.66)] text-[var(--blog-night)] shadow-[0_16px_44px_-34px_rgb(75_53_53_/_0.22)] backdrop-blur-xl transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105"
       >
         <BookOpen className="size-4" />
       </span>
       <span className="leading-none">
-        <span className="block font-heading text-lg font-bold text-charcoal">
+        <span className="block text-base font-black text-[var(--blog-night)]">
           Diario
         </span>
-        <span className="block text-[0.68rem] font-bold uppercase text-warm-brown">
-          Con Enfoque
+        <span className="block text-[0.62rem] font-black uppercase tracking-[0.18em] text-[var(--blog-muted)]">
+          Poner nombre
         </span>
       </span>
     </Link>
@@ -30,19 +28,19 @@ function BlogMark() {
 
 export function BlogNavbar() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/78 shadow-soft backdrop-blur-xl">
-      <div className="mx-auto flex h-20 w-full max-w-6xl items-center justify-between px-5 sm:px-8 lg:px-10">
+    <header className="sticky top-0 z-40 border-b border-[var(--blog-night)]/8 bg-[rgb(255_252_248_/_0.76)] shadow-[0_18px_60px_-50px_rgb(75_53_53_/_0.22)] backdrop-blur-2xl">
+      <div className="mx-auto flex min-h-20 w-full max-w-7xl items-center justify-between gap-4 px-5 sm:px-8 lg:px-10">
         <BlogMark />
 
         <nav className="flex items-center gap-2" aria-label="Blog">
-          <ThemeToggle showLabel={false} />
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/82 px-4 py-2.5 text-sm font-bold text-warm-brown shadow-soft backdrop-blur-md transition-colors hover:bg-primary-soft hover:text-charcoal"
+            className="group inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.62)] px-4 py-2 text-sm font-black text-[var(--blog-night)] shadow-[0_18px_48px_-38px_rgb(75_53_53_/_0.2)] backdrop-blur-xl transition-colors hover:border-[var(--blog-clay)]/30 hover:bg-[rgb(255_252_248_/_0.78)]"
           >
             <ArrowLeft className="size-4" />
             <span className="hidden sm:inline">Volver al inicio</span>
             <span className="sm:hidden">Inicio</span>
+            <ArrowUpRight className="hidden size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 sm:block" />
           </Link>
         </nav>
       </div>

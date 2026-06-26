@@ -3,6 +3,11 @@ import "server-only";
 import { cache } from "react";
 
 import { createClient } from "@/lib/supabase/server";
+import {
+  getUserSettings,
+  notificationMatchesSettings,
+} from "@/lib/user-settings/data";
+import { formatAppDateTime } from "@/lib/user-settings/time";
 import type { Tables } from "@/types/database";
 
 export type AppNotification = Pick<
@@ -23,14 +28,6 @@ export type NotificationListResult = {
   error?: string;
   items: AppNotification[];
 };
-
-function formatNotificationDate(value: string) {
-  return new Intl.DateTimeFormat("es-CR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "America/Costa_Rica",
-  }).format(new Date(value));
-}
 
 function formatRelativeNotificationDate(value: string) {
   const date = new Date(value);
@@ -72,14 +69,18 @@ function formatRelativeNotificationDate(value: string) {
 export const getNotifications = cache(
   async (userId: string): Promise<NotificationListResult> => {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("notifications")
-      .select(
-        "id, event_type, message, destination_path, metadata, read_at, created_at",
-      )
-      .eq("recipient_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(100);
+    const [settings, notificationsResult] = await Promise.all([
+      getUserSettings(userId),
+      supabase
+        .from("notifications")
+        .select(
+          "id, event_type, message, destination_path, metadata, read_at, created_at",
+        )
+        .eq("recipient_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(100),
+    ]);
+    const { data, error } = notificationsResult;
 
     if (error) {
       return {
@@ -89,24 +90,41 @@ export const getNotifications = cache(
     }
 
     return {
-      items: (data ?? []).map((notification) => ({
-        ...notification,
-        createdLabel: formatNotificationDate(notification.created_at),
-        createdRelativeLabel: formatRelativeNotificationDate(
-          notification.created_at,
-        ),
-      })),
+      items: (data ?? [])
+        .filter((notification) =>
+          notificationMatchesSettings(notification.event_type, settings),
+        )
+        .map((notification) => ({
+          ...notification,
+          createdLabel: formatAppDateTime(
+            notification.created_at,
+            settings.timeFormat,
+          ),
+          createdRelativeLabel: formatRelativeNotificationDate(
+            notification.created_at,
+          ),
+        })),
     };
   },
 );
 
 export const getUnreadNotificationCount = cache(async (userId: string) => {
   const supabase = await createClient();
-  const { count, error } = await supabase
-    .from("notifications")
-    .select("id", { count: "exact", head: true })
-    .eq("recipient_id", userId)
-    .is("read_at", null);
+  const [settings, unreadResult] = await Promise.all([
+    getUserSettings(userId),
+    supabase
+      .from("notifications")
+      .select("id, event_type")
+      .eq("recipient_id", userId)
+      .is("read_at", null),
+  ]);
+  const { data, error } = unreadResult;
 
-  return error ? 0 : (count ?? 0);
+  if (error) {
+    return 0;
+  }
+
+  return (data ?? []).filter((notification) =>
+    notificationMatchesSettings(notification.event_type, settings),
+  ).length;
 });

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Sora } from "next/font/google";
+import { Manrope, Newsreader, Plus_Jakarta_Sans, Sora } from "next/font/google";
 import Script from "next/script";
 
 import { Providers } from "./providers";
@@ -18,8 +18,23 @@ const manrope = Manrope({
   display: "swap",
 });
 
+const landingDisplay = Newsreader({
+  subsets: ["latin"],
+  weight: "variable",
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  variable: "--font-landing-display",
+  display: "swap",
+});
+
+const landingSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-landing-sans",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Nutrición Con Enfoque · Mariana y Camila Rodríguez Méndez",
+  title: "Poner nombre · Mariana y Camila Rodríguez Méndez",
   description:
     "Nutrición funcional e integrativa con la Dra. Mariana Rodríguez Méndez + entrenamiento personalizado con Camila Rodríguez Méndez.",
 };
@@ -34,7 +49,7 @@ export default function RootLayout({
       lang="es"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${display.variable} ${manrope.variable}`}
+      className={`${display.variable} ${manrope.variable} ${landingDisplay.variable} ${landingSans.variable}`}
     >
       <head>
         <Script

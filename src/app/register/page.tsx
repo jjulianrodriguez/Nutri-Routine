@@ -12,8 +12,8 @@ export default async function RegisterPage() {
 
   return (
     <AuthCard
-      headline="Comenzá tu camino"
-      subtitle="Creá tu cuenta y empezá a transformar tu bienestar"
+      headline="Empezá con calma"
+      subtitle="Creá tu cuenta y ordená tu bienestar con acompañamiento"
     >
       <RegisterForm />
     </AuthCard>

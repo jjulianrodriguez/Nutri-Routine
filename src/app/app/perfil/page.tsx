@@ -34,6 +34,9 @@ import {
 } from "@/lib/account/profile-summary";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { createClient } from "@/lib/supabase/server";
+import { getUserSettings } from "@/lib/user-settings/data";
+import { formatAppDateTime } from "@/lib/user-settings/time";
+import type { TimeFormatPreference } from "@/lib/user-settings/types";
 
 const specialtyLabels = {
   both: "Entrenamiento y nutricion",
@@ -53,16 +56,12 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
-function formatDateTime(value: string | null) {
+function formatDateTime(value: string | null, timeFormat: TimeFormatPreference) {
   if (!value) {
     return "Sin cita programada";
   }
 
-  return new Intl.DateTimeFormat("es-CR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "America/Costa_Rica",
-  }).format(new Date(value));
+  return formatAppDateTime(value, timeFormat);
 }
 
 function SectionNav({
@@ -127,9 +126,10 @@ async function ClientProfile({
   avatarUrl: string | null;
 }) {
   const access = await requireRouteAccess("/app/perfil");
-  const [personalDetails, planSummary] = await Promise.all([
+  const [personalDetails, planSummary, settings] = await Promise.all([
     getPersonalDetails(access.userId),
     getClientProfileSummary(access),
+    getUserSettings(access.userId),
   ]);
   const planBadge = getPlanBadgeLabel({
     hasNutritionService: access.hasNutritionService,
@@ -162,7 +162,10 @@ async function ClientProfile({
         <StatTile
           label="Proxima cita"
           value={planSummary.nextAppointment ? "Programada" : "Pendiente"}
-          detail={formatDateTime(planSummary.nextAppointment?.starts_at ?? null)}
+          detail={formatDateTime(
+            planSummary.nextAppointment?.starts_at ?? null,
+            settings.timeFormat,
+          )}
         />
       </section>
 
@@ -255,7 +258,10 @@ async function ClientProfile({
                   <span>{planSummary.nextAppointment.title}</span>
                   <span className="mt-1 block text-muted">
                     {getAreaLabel(planSummary.nextAppointment.area)} -{" "}
-                    {formatDateTime(planSummary.nextAppointment.starts_at)}
+                    {formatDateTime(
+                      planSummary.nextAppointment.starts_at,
+                      settings.timeFormat,
+                    )}
                   </span>
                 </>
               ) : (

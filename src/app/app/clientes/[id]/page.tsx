@@ -19,6 +19,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ClientAvatar } from "@/components/app/client-avatar";
+import { HabitTracker } from "@/components/app/habit-tracker";
 import {
   AppPanel,
   AppScreen,
@@ -37,6 +38,7 @@ import {
   type ClientPlanState,
   type ClientPlanSummary,
 } from "@/lib/clients/profile-data";
+import { getNutritionHabitTrackerData } from "@/lib/habits/data";
 import { cn } from "@/lib/utils";
 
 const accountStatusLabels: Record<ClientAccountStatus, string> = {
@@ -339,7 +341,10 @@ export default async function ClientProfilePage({
 }) {
   const access = await requireCurrentUserAccess();
   const { id } = await params;
-  const client = await getClientAdministrativeProfile(id, access);
+  const [client, habitData] = await Promise.all([
+    getClientAdministrativeProfile(id, access),
+    getNutritionHabitTrackerData(access, id),
+  ]);
 
   if (!client) {
     notFound();
@@ -412,52 +417,129 @@ export default async function ClientProfilePage({
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <AppPanel
           title="Información personal"
-          description="Datos opcionales visibles solo para profesionales asignados y administración."
+          description="Datos compartidos por el cliente para su seguimiento."
         >
-          <div className="grid gap-3 sm:grid-cols-2">
-            <DetailItem
-              icon={Mail}
-              label="Email"
-              value={client.email ?? "No disponible"}
-            />
-            <DetailItem
-              icon={Phone}
-              label="Teléfono"
-              value={client.phone ?? "No indicado"}
-            />
-            <DetailItem
-              icon={CalendarDays}
-              label="Fecha de nacimiento"
-              value={
-                client.birthDate
-                  ? formatDate(client.birthDate)
-                  : "No indicado"
-              }
-            />
-            <DetailItem
-              icon={UserRound}
-              label="Genero"
-              value={formatGender(
-                client.gender,
-                client.genderDescription,
+          <div className="space-y-5">
+            <div>
+              <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
+                Contacto
+              </p>
+              {client.personalInfoHidden ? (
+                <EmptyState>
+                  El cliente no comparte su informacion personal con
+                  profesionales por ahora.
+                </EmptyState>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <DetailItem
+                    icon={Mail}
+                    label="Email"
+                    value={client.email ?? "No disponible"}
+                  />
+                  <DetailItem
+                    icon={Phone}
+                    label="Teléfono"
+                    value={client.phone ?? "No indicado"}
+                  />
+                  <DetailItem
+                    icon={CalendarDays}
+                    label="Fecha de nacimiento"
+                    value={
+                      client.birthDate
+                        ? formatDate(client.birthDate)
+                        : "No indicado"
+                    }
+                  />
+                  <DetailItem
+                    icon={UserRound}
+                    label="Genero"
+                    value={formatGender(
+                      client.gender,
+                      client.genderDescription,
+                    )}
+                  />
+                </div>
               )}
-            />
-            <DetailItem
-              icon={Scale}
-              label="Peso"
-              value={formatMeasurement(client.weightKg, "kg")}
-            />
-            <DetailItem
-              icon={Ruler}
-              label="Altura"
-              value={formatMeasurement(client.heightCm, "cm")}
-            />
-            <DetailItem
-              className="sm:col-span-2"
-              icon={HeartPulse}
-              label="Enfermedades o condiciones medicas"
-              value={client.medicalConditions ?? "No indicado"}
-            />
+            </div>
+
+            <div>
+              <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
+                Datos fisicos y salud
+              </p>
+              {client.healthDataHidden ? (
+                <EmptyState>
+                  El cliente no comparte sus datos fisicos y de salud con
+                  profesionales por ahora.
+                </EmptyState>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <DetailItem
+                    icon={Scale}
+                    label="Peso"
+                    value={formatMeasurement(client.weightKg, "kg")}
+                  />
+                  <DetailItem
+                    icon={Ruler}
+                    label="Altura"
+                    value={formatMeasurement(client.heightCm, "cm")}
+                  />
+                  <DetailItem
+                    icon={HeartPulse}
+                    label="Porcentaje de grasa"
+                    value={formatMeasurement(client.bodyFatPercentage, "%")}
+                  />
+                  <DetailItem
+                    icon={Ruler}
+                    label="Medidas fisicas"
+                    value={client.bodyMeasurements ?? "No indicado"}
+                  />
+                  <DetailItem
+                    icon={HeartPulse}
+                    label="Enfermedades o condiciones medicas"
+                    value={client.medicalConditions ?? "No indicado"}
+                  />
+                  <DetailItem
+                    icon={HeartPulse}
+                    label="Lesiones"
+                    value={client.injuries ?? "No indicado"}
+                  />
+                  <DetailItem
+                    icon={HeartPulse}
+                    label="Alergias"
+                    value={client.allergies ?? "No indicado"}
+                  />
+                  <DetailItem
+                    icon={HeartPulse}
+                    label="Medicamentos importantes"
+                    value={client.importantMedications ?? "No indicado"}
+                  />
+                  <DetailItem
+                    className="sm:col-span-2"
+                    icon={Leaf}
+                    label="Restricciones alimentarias"
+                    value={client.dietaryRestrictions ?? "No indicado"}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
+                Notas importantes
+              </p>
+              {client.sensitiveNotesHidden ? (
+                <EmptyState>
+                  El cliente no comparte notas sensibles con profesionales por
+                  ahora.
+                </EmptyState>
+              ) : (
+                <DetailItem
+                  icon={ShieldCheck}
+                  label="Notas para el profesional"
+                  value={client.professionalNotes ?? "No indicado"}
+                />
+              )}
+            </div>
           </div>
         </AppPanel>
 
@@ -503,6 +585,20 @@ export default async function ClientProfilePage({
           title="Entrenamiento"
         />
       </div>
+
+      {client.canViewNutritionPlans ? (
+        <AppPanel
+          title="Habitos de nutricion"
+          description="Cumplimiento semanal visible para la profesional asignada."
+          tone="primary"
+        >
+          <HabitTracker
+            data={habitData}
+            isClient={false}
+            showManagement={false}
+          />
+        </AppPanel>
+      ) : null}
     </AppScreen>
   );
 }

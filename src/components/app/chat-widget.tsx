@@ -44,6 +44,8 @@ import {
   type ChatMessageItem,
   type ChatTarget,
 } from "@/lib/actions/chat";
+import { formatAppTime } from "@/lib/user-settings/time";
+import type { TimeFormatPreference } from "@/lib/user-settings/types";
 import { cn } from "@/lib/utils";
 
 const CHAT_QUERY_KEY = ["chat"] as const;
@@ -62,13 +64,6 @@ const DAY_PARTS_FORMATTER = new Intl.DateTimeFormat("en-US", {
   timeZone: CHAT_TIME_ZONE,
   year: "numeric",
 });
-const MESSAGE_TIME_FORMATTER = new Intl.DateTimeFormat("es-CR", {
-  hour: "2-digit",
-  hour12: false,
-  minute: "2-digit",
-  timeZone: CHAT_TIME_ZONE,
-});
-
 const AREA_META: Record<
   ChatArea,
   {
@@ -140,8 +135,8 @@ function formatDaySeparator(value: string) {
   return DAY_LABEL_FORMATTER.format(new Date(value)).replace(/\./g, "");
 }
 
-function formatMessageTime(value: string) {
-  return MESSAGE_TIME_FORMATTER.format(new Date(value));
+function formatMessageTime(value: string, timeFormat: TimeFormatPreference) {
+  return formatAppTime(value, timeFormat);
 }
 
 function ChatStatus({
@@ -350,7 +345,7 @@ function ChatMessages({
               ) : null}
               <div
                 className={cn(
-                  "min-w-[7.5rem] max-w-[82%] rounded-[18px] border px-3.5 py-2.5 shadow-soft transition",
+                  "min-w-[7.5rem] max-w-[82%] rounded-[18px] border px-3.5 py-2 shadow-soft transition",
                   message.isOwn
                     ? "border-primary/20 bg-primary text-primary-foreground"
                     : "border-border bg-background text-charcoal",
@@ -361,7 +356,7 @@ function ChatMessages({
               >
                 <p
                   className={cn(
-                    "whitespace-pre-wrap break-words text-sm font-semibold leading-6",
+                    "whitespace-pre-wrap break-words text-sm font-semibold leading-5",
                     message.isDeleted && "italic",
                   )}
                 >
@@ -369,14 +364,17 @@ function ChatMessages({
                 </p>
                 <div
                   className={cn(
-                    "mt-1 flex items-center gap-1.5 text-[0.68rem] font-bold",
+                    "mt-0.5 flex items-center gap-1.5 text-[0.68rem] font-bold",
                     message.isOwn
                       ? "justify-end text-primary-foreground/72"
                       : "justify-start text-muted",
                   )}
                 >
                   <span className="min-w-0 truncate">
-                    {formatMessageTime(message.createdAt)}
+                    {formatMessageTime(
+                      message.createdAt,
+                      conversation.timeFormat,
+                    )}
                     {message.isEdited ? " · editado" : ""}
                   </span>
                   {deliveryIndicator ? (

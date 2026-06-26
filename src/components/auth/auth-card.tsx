@@ -1,18 +1,9 @@
 "use client";
 
-import { ArrowLeft, ArrowUpRight, Sparkles } from "lucide-react";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { ArrowLeft } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { useRef, type ReactNode } from "react";
-
-import { SmoothScroll } from "@/components/SmoothScroll";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { type ReactNode } from "react";
 
 type AuthCardProps = {
   children: ReactNode;
@@ -20,57 +11,24 @@ type AuthCardProps = {
   subtitle: string;
 };
 
-function AuthBotanical({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 520 620"
-      className={className}
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M326 28C438 89 484 204 446 322C408 440 293 545 172 560C78 572 24 516 42 434C64 329 163 299 135 194C108 93 211-34 326 28Z"
-        fill="var(--cream)"
-        opacity="0.38"
-      />
-      <path
-        d="M315 123C234 197 183 304 166 466"
-        stroke="var(--warm-brown)"
-        strokeLinecap="round"
-        strokeWidth="4"
-        opacity="0.38"
-      />
-      <path
-        d="M205 276C263 270 315 222 347 160C281 154 225 184 205 276Z"
-        fill="var(--white)"
-        opacity="0.64"
-      />
-      <path
-        d="M178 382C241 377 302 329 336 257C260 251 194 285 178 382Z"
-        fill="var(--blush)"
-        opacity="0.42"
-      />
-    </svg>
-  );
-}
+const motionEase = [0.18, 0.82, 0.22, 1] as const;
 
 function AuthWordmark() {
   return (
     <Link
       href="/"
-      aria-label="Nutrición Con Enfoque · Inicio"
-      className="inline-grid grid-cols-[2.5rem_1fr] items-center gap-3"
+      aria-label="Poner nombre · Inicio"
+      className="inline-flex items-center gap-3"
     >
-      <span className="relative flex size-10 items-center justify-center overflow-hidden rounded-full border border-border bg-surface shadow-soft">
-        <span className="absolute h-8 w-5 rotate-45 rounded-[100%_0_100%_0] bg-terracotta" />
-        <span className="relative size-1.5 rounded-full bg-espresso" />
+      <span className="grid size-10 place-items-center rounded-full border border-border bg-surface text-xs font-extrabold text-espresso shadow-soft">
+        PN
       </span>
       <span className="leading-none">
-        <span className="block font-heading text-lg font-bold text-espresso">
-          Nutrición
+        <span className="block text-base font-extrabold text-espresso">
+          Poner nombre
         </span>
-        <span className="block text-[0.68rem] font-bold uppercase text-stone">
-          Con Enfoque
+        <span className="block text-[0.68rem] font-bold uppercase tracking-[0.14em] text-stone">
+          bienestar privado
         </span>
       </span>
     </Link>
@@ -78,128 +36,51 @@ function AuthWordmark() {
 }
 
 export function AuthCard({ children, headline, subtitle }: AuthCardProps) {
-  const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-  const smoothProgress = useSpring(scrollYProgress, {
-    damping: 34,
-    stiffness: 115,
-    mass: 0.45,
-  });
-  const artY = useTransform(smoothProgress, [0, 1], [0, -48]);
-  const formY = useTransform(smoothProgress, [0, 1], [0, 32]);
 
   return (
-    <SmoothScroll>
-      <main
-        ref={ref}
-        className="nce-grain relative min-h-dvh overflow-hidden bg-background text-charcoal"
-      >
-        <div className="relative z-10 mx-auto grid min-h-dvh max-w-7xl grid-rows-[auto_1fr] px-5 py-6 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:grid-rows-1 lg:px-10">
-          <section className="relative flex items-center justify-between lg:hidden">
-            <AuthWordmark />
-            <div className="flex items-center gap-2">
-              <ThemeToggle showLabel={false} />
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 rounded-full border border-charcoal/10 bg-white/72 px-4 py-2 text-sm font-extrabold text-stone shadow-soft backdrop-blur-xl"
-              >
-                <ArrowLeft className="size-4" />
-                Inicio
-              </Link>
-            </div>
-          </section>
+    <main className="relative min-h-dvh overflow-hidden bg-background px-5 py-6 text-charcoal sm:px-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgb(247_228_219_/_0.72),transparent_28rem),linear-gradient(180deg,rgb(255_250_246_/_0.72),transparent_55%)]" />
 
-          <section className="relative hidden min-h-dvh flex-col justify-between overflow-hidden border-r border-border bg-primary-soft/80 px-10 py-10 backdrop-blur-xl lg:flex xl:px-14">
-            <motion.div
-              style={reduceMotion ? undefined : { y: artY }}
-              className="pointer-events-none absolute -bottom-28 -right-40 w-[38rem]"
-            >
-              <AuthBotanical className="w-full" />
-            </motion.div>
+      <div className="relative mx-auto flex min-h-[calc(100dvh-3rem)] w-full max-w-6xl flex-col">
+        <header className="flex items-center justify-between gap-4">
+          <AuthWordmark />
+          <Link
+            href="/"
+            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-bold text-stone shadow-soft transition-colors hover:border-terracotta/30 hover:text-espresso"
+          >
+            <ArrowLeft className="size-4" />
+            Inicio
+          </Link>
+        </header>
 
-            <div className="relative z-10 flex items-center justify-between gap-4">
-              <AuthWordmark />
-              <ThemeToggle showLabel={false} />
-            </div>
-
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 34 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.82, ease: [0.22, 0.72, 0.18, 1] }}
-              className="relative z-10 max-w-lg"
-            >
-              <p className="text-sm font-extrabold text-espresso/70">
-                Nutrición Con Enfoque
-              </p>
-              <h1 className="mt-5 font-heading text-[clamp(4.5rem,8vw,7.2rem)] font-bold leading-[0.84] text-espresso">
-                Bienestar con
-                <br />
-                <em className="font-heading italic text-terracotta">criterio</em>
-              </h1>
-              <p className="mt-7 max-w-md text-base leading-7 text-espresso/80">
-                Un espacio cálido para acompañar tu nutrición, tu entrenamiento
-                y tus decisiones de salud con ciencia, calma y seguimiento real
-                junto a Mariana y Camila.
-              </p>
-            </motion.div>
-
-            <div className="relative z-10 grid gap-4 text-sm font-bold leading-6 text-espresso/70">
-              <p>
-                Dra. Mariana Rodríguez Méndez
-                <br />
-                Camila Rodríguez Méndez
-              </p>
-              <Link
-                href="/"
-                className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-surface/58 px-4 py-2 text-espresso shadow-soft backdrop-blur-xl transition-colors hover:bg-surface"
-              >
-                Inicio
-                <ArrowUpRight className="size-4" />
-              </Link>
-            </div>
-          </section>
-
-          <section className="flex min-h-[calc(100dvh-5.5rem)] items-center justify-center py-10 lg:min-h-dvh lg:pl-12">
-            <motion.div
-              style={reduceMotion ? undefined : { y: formY }}
-              initial={reduceMotion ? false : { opacity: 0, y: 34 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.88,
-                delay: reduceMotion ? 0 : 0.08,
-                ease: [0.22, 0.72, 0.18, 1],
-              }}
-              className="w-full max-w-[34rem]"
-            >
-              <div className="relative overflow-hidden rounded-[2.1rem] border border-border bg-surface/74 p-5 shadow-premium backdrop-blur-2xl sm:p-7">
-                <div className="absolute inset-x-0 top-0 h-2 bg-terracotta" />
-                <div className="rounded-[1.6rem] bg-surface/82 p-6 shadow-soft backdrop-blur-xl sm:p-8">
-                  <div className="mb-8 flex items-center justify-between gap-4">
-                    <p className="text-sm font-extrabold text-stone">
-                      Nutrición Con Enfoque
-                    </p>
-                    <span className="flex size-10 items-center justify-center rounded-full bg-primary-soft text-espresso">
-                      <Sparkles className="size-4" />
-                    </span>
-                  </div>
-                  <h2 className="font-heading text-[clamp(3.25rem,11vw,5rem)] font-bold leading-[0.9] text-espresso">
+        <section className="flex flex-1 items-center justify-center py-10 sm:py-14">
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.48, ease: motionEase }}
+            className="w-full max-w-[31rem]"
+          >
+            <div className="rounded-[1.75rem] border border-border bg-surface/92 p-5 shadow-premium backdrop-blur-xl sm:p-7">
+              <div className="rounded-[1.25rem] border border-border/80 bg-background/80 p-6 sm:p-8">
+                <div className="mb-8">
+                  <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-terracotta">
+                    Acceso privado
+                  </p>
+                  <h1 className="mt-3 font-heading text-[clamp(2.7rem,8vw,4.25rem)] font-bold leading-[0.92] text-espresso">
                     {headline}
-                  </h2>
-                  <p className="mt-4 font-heading text-2xl italic leading-8 text-terracotta">
+                  </h1>
+                  <p className="mt-4 max-w-sm text-base font-semibold leading-7 text-stone">
                     {subtitle}
                   </p>
-
-                  <div className="mt-9">{children}</div>
                 </div>
+
+                {children}
               </div>
-            </motion.div>
-          </section>
-        </div>
-      </main>
-    </SmoothScroll>
+            </div>
+          </motion.div>
+        </section>
+      </div>
+    </main>
   );
 }

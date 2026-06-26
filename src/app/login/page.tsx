@@ -24,8 +24,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <AuthCard
-      headline="Bienvenida/o de vuelta"
-      subtitle="Tu progreso te está esperando"
+      headline="Bienvenida de vuelta"
+      subtitle="Tu espacio de seguimiento te está esperando"
     >
       <LoginForm initialError={initialError} />
     </AuthCard>

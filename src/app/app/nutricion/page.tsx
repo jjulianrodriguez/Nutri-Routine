@@ -7,13 +7,38 @@ import {
   EmptyState,
   StatTile,
 } from "@/components/app/AppScreen";
+import { HabitTracker } from "@/components/app/habit-tracker";
+import { NutritionDocumentManager } from "@/components/app/nutrition-document-manager";
 import { AssignedProfessionalCards } from "@/components/app/relationship-badges";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getDashboardData } from "@/lib/app/dashboard-data";
+import { getNutritionHabitTrackerData } from "@/lib/habits/data";
+import { getNutritionDocumentsPageData } from "@/lib/nutrition-documents/data";
 
-export default async function NutritionPage() {
+type NutritionPageProps = {
+  searchParams?: Promise<{
+    client?: string;
+  }>;
+};
+
+export const dynamic = "force-dynamic";
+
+export default async function NutritionPage({
+  searchParams,
+}: NutritionPageProps) {
   const access = await requireRouteAccess("/app/nutricion");
-  const data = await getDashboardData(access);
+  const params = await searchParams;
+  const [data, habitData, documentData] = await Promise.all([
+    getDashboardData(access),
+    getNutritionHabitTrackerData(access, params?.client),
+    getNutritionDocumentsPageData(access),
+  ]);
+  const activeMealPlanCount = documentData.mealPlanDocuments.filter(
+    (document) => document.status === "active",
+  ).length;
+  const activeLibraryCount = documentData.libraryDocuments.filter(
+    (document) => document.status === "active",
+  ).length;
 
   return (
     <AppScreen>
@@ -43,15 +68,17 @@ export default async function NutritionPage() {
         )}
         <StatTile
           label="Planes alimenticios"
-          value={String(data.dietPlansCount)}
-          detail="Disponibles para tu cuenta"
+          value={String(activeMealPlanCount)}
+          detail="PDFs activos disponibles"
         />
         <StatTile
-          label="Recursos"
-          value={String(data.resourcesCount)}
-          detail="Biblioteca visible"
+          label="Biblioteca educativa"
+          value={String(activeLibraryCount)}
+          detail="Recursos PDF activos"
         />
       </section>
+
+      <HabitTracker data={habitData} isClient={access.isClient} />
 
       <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
         <AppPanel
@@ -128,6 +155,14 @@ export default async function NutritionPage() {
           </div>
         </AppPanel>
       </div>
+
+      <NutritionDocumentManager
+        canManage={access.canManageNutrition}
+        clients={documentData.clients}
+        folders={documentData.folders}
+        libraryDocuments={documentData.libraryDocuments}
+        mealPlanDocuments={documentData.mealPlanDocuments}
+      />
     </AppScreen>
   );
 }

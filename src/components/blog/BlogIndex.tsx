@@ -30,11 +30,17 @@ export function BlogIndex({ posts }: BlogIndexProps) {
 
   if (posts.length === 0) {
     return (
-      <div className="rounded-[24px] border border-dashed border-charcoal/15 bg-white px-6 py-14 text-center shadow-soft">
-        <h2 className="font-serif text-3xl font-semibold text-charcoal">
-          Pronto habra nuevas lecturas
+      <div className="rounded-[2rem] border border-dashed border-[var(--blog-night)]/16 bg-[rgb(255_252_248_/_0.54)] px-6 py-14 text-center shadow-[0_28px_86px_-66px_rgb(75_53_53_/_0.22)] backdrop-blur-xl">
+        <h2
+          style={{
+            fontFamily: "var(--font-landing-display)",
+            fontWeight: 500,
+          }}
+          className="text-4xl leading-none tracking-[-0.025em] text-[var(--blog-night)]"
+        >
+          Pronto habrá nuevas lecturas
         </h2>
-        <p className="mx-auto mt-3 max-w-xl leading-7 text-warm-brown">
+        <p className="mx-auto mt-4 max-w-xl font-bold leading-7 text-[var(--blog-muted)]">
           Los artículos visibles publicados por el equipo aparecerán aquí.
         </p>
       </div>
@@ -42,8 +48,8 @@ export function BlogIndex({ posts }: BlogIndexProps) {
   }
 
   return (
-    <div>
-      <div className="flex gap-2 overflow-x-auto pb-2">
+    <div className="relative">
+      <div className="flex gap-2 overflow-x-auto rounded-full border border-[var(--blog-night)]/8 bg-[rgb(255_252_248_/_0.4)] p-2 shadow-[0_22px_70px_-56px_rgb(75_53_53_/_0.2)] backdrop-blur-xl">
         {blogCategories.map((category) => {
           const isActive = category === activeCategory;
 
@@ -54,10 +60,10 @@ export function BlogIndex({ posts }: BlogIndexProps) {
               aria-pressed={isActive}
               onClick={() => setActiveCategory(category)}
               className={[
-                "min-h-11 shrink-0 rounded-full border px-4 py-2 text-sm font-bold shadow-soft transition-colors",
+                "min-h-11 shrink-0 rounded-full border px-4 py-2 text-sm font-black transition-all duration-300",
                 isActive
-                  ? "border-sage bg-sage text-charcoal"
-                  : "border-charcoal/10 bg-white text-warm-brown hover:border-sage hover:bg-cream",
+                  ? "border-[var(--blog-night)]/10 bg-[var(--blog-night)] text-[var(--blog-paper)] shadow-[0_18px_46px_-34px_rgb(75_53_53_/_0.4)]"
+                  : "border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.56)] text-[var(--blog-muted)] hover:border-[var(--blog-clay)]/30 hover:text-[var(--blog-night)]",
               ].join(" ")}
             >
               {category}
