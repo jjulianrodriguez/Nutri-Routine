@@ -29,7 +29,7 @@ import {
   Unlink,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, forwardRef } from "react";
 import { toast } from "sonner";
 
 import { BlogContentRenderer } from "@/components/blog/BlogContentRenderer";
@@ -61,53 +61,26 @@ type ToolbarButtonProps = {
 };
 
 const BLOG_TEXT_ALIGNMENTS = ["left", "center", "right"] as const;
-const BLOG_TEXT_SIZES = ["small", "normal", "large"] as const;
-const BLOG_TEXT_COLORS = [
-  {
-    className: "blog-color-charcoal",
-    label: "Azul oscuro",
-    swatchClassName: "bg-charcoal",
-    value: "charcoal",
-  },
-  {
-    className: "blog-color-warm",
-    label: "Azul medio",
-    swatchClassName: "bg-warm-brown",
-    value: "warm",
-  },
-  {
-    className: "blog-color-teal",
-    label: "Teal",
-    swatchClassName: "bg-teal",
-    value: "teal",
-  },
-  {
-    className: "blog-color-accent",
-    label: "Acento",
-    swatchClassName: "bg-accent",
-    value: "accent",
-  },
-] as const;
 
 type BlogTextAlign = (typeof BLOG_TEXT_ALIGNMENTS)[number];
-type BlogTextSize = (typeof BLOG_TEXT_SIZES)[number];
-type BlogTextColor = (typeof BLOG_TEXT_COLORS)[number]["value"];
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     blogHighlight: {
       toggleBlogHighlight: () => ReturnType;
+      setBlogHighlight: (color: string) => ReturnType;
+      unsetBlogHighlight: () => ReturnType;
     };
     blogTextAlign: {
       setBlogTextAlign: (alignment: BlogTextAlign) => ReturnType;
       unsetBlogTextAlign: () => ReturnType;
     };
     blogTextColor: {
-      setBlogTextColor: (color: BlogTextColor) => ReturnType;
+      setBlogTextColor: (color: string) => ReturnType;
       unsetBlogTextColor: () => ReturnType;
     };
     blogTextSize: {
-      setBlogTextSize: (size: BlogTextSize) => ReturnType;
+      setBlogTextSize: (size: string) => ReturnType;
       unsetBlogTextSize: () => ReturnType;
     };
   }
@@ -120,41 +93,20 @@ function isBlogTextAlign(value: unknown): value is BlogTextAlign {
   );
 }
 
-function isBlogTextSize(value: unknown): value is BlogTextSize {
-  return (
-    typeof value === "string" &&
-    BLOG_TEXT_SIZES.includes(value as BlogTextSize)
-  );
-}
-
-function getBlogTextColor(value: unknown): BlogTextColor | null {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  return BLOG_TEXT_COLORS.some((color) => color.value === value)
-    ? (value as BlogTextColor)
-    : null;
-}
-
 function getClassMatch(
   element: HTMLElement,
   prefix: string,
-  values: readonly string[],
 ) {
   const className = Array.from(element.classList).find((item) =>
     item.startsWith(prefix),
   );
-  const value = className?.replace(prefix, "");
-
-  return value && values.includes(value) ? value : null;
+  return className?.replace(prefix, "") || null;
 }
 
 function parseTextAlign(element: HTMLElement) {
   const classValue = getClassMatch(
     element,
     "blog-align-",
-    BLOG_TEXT_ALIGNMENTS,
   );
   const styleValue = element.style.textAlign;
 
@@ -163,25 +115,6 @@ function parseTextAlign(element: HTMLElement) {
   }
 
   return isBlogTextAlign(styleValue) ? styleValue : null;
-}
-
-function parseTextSize(element: HTMLElement) {
-  const classValue = getClassMatch(element, "blog-text-", [
-    "large",
-    "small",
-  ]);
-
-  return isBlogTextSize(classValue) ? classValue : null;
-}
-
-function parseTextColor(element: HTMLElement) {
-  const classValue = getClassMatch(
-    element,
-    "blog-color-",
-    BLOG_TEXT_COLORS.map((color) => color.value),
-  );
-
-  return getBlogTextColor(classValue);
 }
 
 const BlogTextAlignExtension = Extension.create({
@@ -240,13 +173,27 @@ const BlogTextSizeExtension = Mark.create({
     return {
       size: {
         default: null,
-        parseHTML: (element) => parseTextSize(element as HTMLElement),
+        parseHTML: (element) => {
+          const el = element as HTMLElement;
+          const styleSize = el.style.fontSize;
+          if (styleSize) {
+            return styleSize;
+          }
+          if (el.classList.contains("blog-text-large")) {
+            return "20px";
+          }
+          if (el.classList.contains("blog-text-small")) {
+            return "12px";
+          }
+          return null;
+        },
         renderHTML: (attributes) => {
-          const size = attributes.size;
-
-          return size === "small" || size === "large"
-            ? { class: `blog-text-${size}` }
-            : {};
+          if (!attributes.size) {
+            return {};
+          }
+          return {
+            style: `font-size: ${attributes.size}`,
+          };
         },
       },
     };
@@ -255,10 +202,15 @@ const BlogTextSizeExtension = Mark.create({
   parseHTML() {
     return [
       {
-        tag: "span.blog-text-large",
-      },
-      {
-        tag: "span.blog-text-small",
+        tag: "span",
+        getAttrs: (element) => {
+          const el = element as HTMLElement;
+          const hasFontSize =
+            el.style.fontSize ||
+            el.classList.contains("blog-text-large") ||
+            el.classList.contains("blog-text-small");
+          return hasFontSize ? {} : false;
+        },
       },
     ];
   },
@@ -272,13 +224,11 @@ const BlogTextSizeExtension = Mark.create({
       setBlogTextSize:
         (size) =>
         ({ commands }) => {
-          if (size === "normal") {
+          if (!size || size === "16px" || size === "default") {
             return commands.unsetMark(this.name);
           }
 
-          return isBlogTextSize(size)
-            ? commands.setMark(this.name, { size })
-            : false;
+          return commands.setMark(this.name, { size });
         },
       unsetBlogTextSize:
         () =>
@@ -295,20 +245,54 @@ const BlogTextColorExtension = Mark.create({
     return {
       color: {
         default: null,
-        parseHTML: (element) => parseTextColor(element as HTMLElement),
+        parseHTML: (element) => {
+          const el = element as HTMLElement;
+          const styleColor = el.style.color;
+          if (styleColor) {
+            return styleColor;
+          }
+          if (el.classList.contains("blog-color-teal")) {
+            return "#44509F";
+          }
+          if (el.classList.contains("blog-color-accent")) {
+            return "#F87F52";
+          }
+          if (el.classList.contains("blog-color-charcoal")) {
+            return "#071C33";
+          }
+          if (el.classList.contains("blog-color-warm")) {
+            return "#DB3854";
+          }
+          return null;
+        },
         renderHTML: (attributes) => {
-          const color = getBlogTextColor(attributes.color);
-
-          return color ? { class: `blog-color-${color}` } : {};
+          if (!attributes.color) {
+            return {};
+          }
+          return {
+            style: `color: ${attributes.color}`,
+          };
         },
       },
     };
   },
 
   parseHTML() {
-    return BLOG_TEXT_COLORS.map((color) => ({
-      tag: `span.${color.className}`,
-    }));
+    return [
+      {
+        tag: "span",
+        getAttrs: (element) => {
+          const el = element as HTMLElement;
+          const hasColor =
+            el.style.color ||
+            el.classList.contains("blog-color-teal") ||
+            el.classList.contains("blog-color-accent") ||
+            el.classList.contains("blog-color-charcoal") ||
+            el.classList.contains("blog-color-warm");
+          return hasColor ? {} : false;
+        },
+      },
+    ];
   },
 
   renderHTML({ HTMLAttributes }) {
@@ -320,11 +304,11 @@ const BlogTextColorExtension = Mark.create({
       setBlogTextColor:
         (color) =>
         ({ commands }) => {
-          const safeColor = getBlogTextColor(color);
+          if (!color || color === "default") {
+            return commands.unsetMark(this.name);
+          }
 
-          return safeColor
-            ? commands.setMark(this.name, { color: safeColor })
-            : false;
+          return commands.setMark(this.name, { color });
         },
       unsetBlogTextColor:
         () =>
@@ -337,10 +321,41 @@ const BlogTextColorExtension = Mark.create({
 const BlogHighlightExtension = Mark.create({
   name: "blogHighlight",
 
+  addAttributes() {
+    return {
+      color: {
+        default: null,
+        parseHTML: (element) => {
+          const el = element as HTMLElement;
+          const styleBgColor = el.style.backgroundColor;
+          if (styleBgColor) {
+            return styleBgColor;
+          }
+          return null;
+        },
+        renderHTML: (attributes) => {
+          if (!attributes.color) {
+            return {};
+          }
+          return {
+            style: `background-color: ${attributes.color}`,
+          };
+        },
+      },
+    };
+  },
+
   parseHTML() {
     return [
       {
-        tag: "span.blog-highlight",
+        tag: "span",
+        getAttrs: (element) => {
+          const el = element as HTMLElement;
+          const hasHighlight =
+            el.classList.contains("blog-highlight") ||
+            el.style.backgroundColor;
+          return hasHighlight ? {} : false;
+        },
       },
     ];
   },
@@ -355,6 +370,18 @@ const BlogHighlightExtension = Mark.create({
 
   addCommands() {
     return {
+      setBlogHighlight:
+        (color) =>
+        ({ commands }) => {
+          if (!color || color === "default") {
+            return commands.unsetMark(this.name);
+          }
+          return commands.setMark(this.name, { color });
+        },
+      unsetBlogHighlight:
+        () =>
+        ({ commands }) =>
+          commands.unsetMark(this.name),
       toggleBlogHighlight:
         () =>
         ({ commands }) =>
@@ -428,97 +455,341 @@ function ToolbarButton({
   );
 }
 
-function ToolbarSelect({
+function SizeDropdown({
   disabled = false,
-  icon: Icon,
-  label,
-  onChange,
-  options,
   value,
+  onChange,
 }: {
   disabled?: boolean;
-  icon: LucideIcon;
-  label: string;
-  onChange: (value: string) => void;
-  options: Array<{ label: string; value: string }>;
   value: string;
+  onChange: (value: string) => void;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleOutsideClick = () => setIsOpen(false);
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, [isOpen]);
+
+  const sizes = [
+    { label: "10px", value: "10px" },
+    { label: "12px", value: "12px" },
+    { label: "14px", value: "14px" },
+    { label: "16px (Normal)", value: "16px" },
+    { label: "18px", value: "18px" },
+    { label: "20px", value: "20px" },
+    { label: "22px", value: "22px" },
+    { label: "24px", value: "24px" },
+    { label: "28px", value: "28px" },
+    { label: "32px", value: "32px" },
+    { label: "36px", value: "36px" },
+    { label: "40px", value: "40px" },
+    { label: "48px", value: "48px" },
+    { label: "56px", value: "56px" },
+    { label: "64px", value: "64px" },
+  ];
+
+  const currentLabel = sizes.find((s) => s.value === value)?.label || value || "16px (Normal)";
+
   return (
-    <label
-      className={cn(
-        "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-2 text-muted transition-colors focus-within:border-primary/40 focus-within:ring-3 focus-within:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft hover:text-charcoal",
-        disabled && "pointer-events-none opacity-45",
-      )}
-    >
-      <Icon className="size-4" aria-hidden="true" />
-      <span className="sr-only">{label}</span>
-      <select
-        aria-label={label}
+    <div className="relative inline-block text-left">
+      <button
+        type="button"
         disabled={disabled}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="h-full min-h-0 min-w-[6.75rem] bg-transparent text-xs font-extrabold text-charcoal outline-none"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+        className={cn(
+          "inline-flex h-10 items-center justify-between gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-all focus:outline-none focus:ring-3 focus:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
+          disabled && "pointer-events-none opacity-45"
+        )}
       >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
+        <Type className="size-4 text-muted" />
+        <span>{currentLabel}</span>
+      </button>
+
+      {isOpen && (
+        <div className="absolute left-0 mt-1 z-50 max-h-60 w-32 overflow-y-auto rounded-[14px] border border-border bg-surface p-1 shadow-premium">
+          {sizes.map((size) => (
+            <button
+              key={size.value}
+              type="button"
+              onClick={() => {
+                onChange(size.value);
+                setIsOpen(false);
+              }}
+              className={cn(
+                "flex w-full items-center px-3 py-1.5 text-xs font-bold rounded-[8px] transition-colors hover:bg-primary-soft hover:text-charcoal",
+                value === size.value || (size.value === "16px" && !value)
+                  ? "bg-primary-soft text-teal"
+                  : "text-muted"
+              )}
+            >
+              {size.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
-function ColorSwatchButton({
-  active = false,
+function ColorDropdown({
   disabled = false,
-  label,
-  onClick,
-  swatchClassName,
+  value,
+  onChange,
 }: {
-  active?: boolean;
   disabled?: boolean;
-  label: string;
-  onClick: () => void;
-  swatchClassName?: string;
+  value: string;
+  onChange: (value: string) => void;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [hexInput, setHexInput] = useState(value && value !== "default" ? value : "");
+
+  useEffect(() => {
+    setHexInput(value && value !== "default" ? value : "");
+  }, [value]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleOutsideClick = () => setIsOpen(false);
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, [isOpen]);
+
+  const presetColors = [
+    { label: "Auto", value: "default", class: "" },
+    { label: "Amarantha", value: "#DB3854", class: "bg-[#DB3854]" },
+    { label: "Basketball", value: "#F87F52", class: "bg-[#F87F52]" },
+    { label: "Lu Lee", value: "#44509F", class: "bg-[#44509F]" },
+    { label: "Navy", value: "#071C33", class: "bg-[#071C33]" },
+    { label: "Charcoal", value: "#535353", class: "bg-[#535353]" },
+    { label: "Muted", value: "#656B78", class: "bg-[#656B78]" },
+  ];
+
+  const currentSwatchStyle = value && value !== "default" ? { backgroundColor: value } : undefined;
+
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          aria-label={label}
-          aria-pressed={active}
-          disabled={disabled}
-          title={label}
-          onMouseDown={(event) => {
-            event.preventDefault();
-            onClick();
-          }}
-          className={cn(
-            "inline-flex size-8 shrink-0 items-center justify-center rounded-full border bg-surface transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/35 disabled:pointer-events-none disabled:opacity-45",
-            active
-              ? "border-teal bg-primary-soft shadow-soft"
-              : "border-border hover:border-primary/40 hover:bg-primary-soft",
-          )}
-        >
-          {swatchClassName ? (
-            <span
-              className={cn(
-                "size-4 rounded-full border border-charcoal/10",
-                swatchClassName,
-              )}
-              aria-hidden="true"
-            />
-          ) : (
-            <span className="text-[10px] font-extrabold text-charcoal">
-              Auto
-            </span>
-          )}
-        </button>
-      </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
-    </Tooltip>
+    <div className="relative inline-block text-left" onClick={(e) => e.stopPropagation()}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-all focus:outline-none focus:ring-3 focus:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
+          disabled && "pointer-events-none opacity-45"
+        )}
+      >
+        <Palette className="size-4 text-muted" />
+        {currentSwatchStyle ? (
+          <span
+            className="size-3.5 rounded-full border border-charcoal/10"
+            style={currentSwatchStyle}
+          />
+        ) : (
+          <span className="text-[10px] font-extrabold text-muted">Auto</span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute left-0 mt-1 z-50 w-52 rounded-[18px] border border-border bg-surface p-3 shadow-premium">
+          <p className="mb-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">
+            Paleta de colores
+          </p>
+          <div className="grid grid-cols-5 gap-2">
+            {presetColors.map((color) => (
+              <button
+                key={color.value}
+                type="button"
+                title={color.label}
+                onClick={() => {
+                  onChange(color.value);
+                  setIsOpen(false);
+                }}
+                className={cn(
+                  "relative flex size-6 shrink-0 items-center justify-center rounded-full border border-border transition-transform active:scale-95 hover:scale-110",
+                  value === color.value || (color.value === "default" && (!value || value === "default"))
+                    ? "ring-2 ring-teal ring-offset-1"
+                    : ""
+                )}
+              >
+                {color.value === "default" ? (
+                  <span className="text-[9px] font-bold text-charcoal">A</span>
+                ) : (
+                  <span className={cn("size-full rounded-full", color.class)} />
+                )}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-3 border-t border-border pt-3">
+            <p className="mb-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">
+              Color personalizado
+            </p>
+            <div className="flex items-center gap-2">
+              <label className="relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] border border-border bg-background transition-colors hover:bg-surface-hover">
+                <input
+                  type="color"
+                  value={value && value !== "default" && value.startsWith("#") ? value : "#44509F"}
+                  onChange={(e) => {
+                    onChange(e.target.value);
+                  }}
+                  className="sr-only"
+                />
+                <span
+                  className="size-5 rounded-[4px] border border-charcoal/10"
+                  style={{ backgroundColor: value && value !== "default" ? value : "#44509F" }}
+                />
+              </label>
+              <input
+                type="text"
+                placeholder="#HEX"
+                value={hexInput}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setHexInput(val);
+                  if (/^#[0-9A-F]{6}$/i.test(val) || /^#[0-9A-F]{3}$/i.test(val)) {
+                    onChange(val);
+                  }
+                }}
+                className="h-8 w-full rounded-[8px] border border-border bg-background px-2 text-xs font-bold uppercase text-charcoal outline-none focus:border-primary/40 focus:ring-1 focus:ring-ring"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function HighlightDropdown({
+  disabled = false,
+  value,
+  onChange,
+}: {
+  disabled?: boolean;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [hexInput, setHexInput] = useState(value && value !== "default" ? value : "");
+
+  useEffect(() => {
+    setHexInput(value && value !== "default" ? value : "");
+  }, [value]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleOutsideClick = () => setIsOpen(false);
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, [isOpen]);
+
+  const presetColors = [
+    { label: "Sin resaltado", value: "default", class: "" },
+    { label: "Banana Light", value: "#FFE9AD", class: "bg-[#FFE9AD]" },
+    { label: "Almost Dawn", value: "#FFF8E8", class: "bg-[#FFF8E8]" },
+    { label: "Amarantha suave", value: "#F8CAD2", class: "bg-[#F8CAD2]" },
+    { label: "Basketball suave", value: "#FFE0D2", class: "bg-[#FFE0D2]" },
+    { label: "Lu Lee suave", value: "#DDE1FF", class: "bg-[#DDE1FF]" },
+    { label: "Neutro", value: "#E9ECEF", class: "bg-[#E9ECEF]" },
+  ];
+
+  const currentSwatchStyle = value && value !== "default" ? { backgroundColor: value } : undefined;
+
+  return (
+    <div className="relative inline-block text-left" onClick={(e) => e.stopPropagation()}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-all focus:outline-none focus:ring-3 focus:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
+          disabled && "pointer-events-none opacity-45"
+        )}
+      >
+        <Highlighter className="size-4 text-muted" />
+        {currentSwatchStyle ? (
+          <span
+            className="size-3.5 rounded-full border border-charcoal/10"
+            style={currentSwatchStyle}
+          />
+        ) : (
+          <span className="text-[10px] font-extrabold text-muted">Ninguno</span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute left-0 mt-1 z-50 w-52 rounded-[18px] border border-border bg-surface p-3 shadow-premium">
+          <p className="mb-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">
+            Color de resaltado
+          </p>
+          <div className="grid grid-cols-5 gap-2">
+            {presetColors.map((color) => (
+              <button
+                key={color.value}
+                type="button"
+                title={color.label}
+                onClick={() => {
+                  onChange(color.value);
+                  setIsOpen(false);
+                }}
+                className={cn(
+                  "relative flex size-6 shrink-0 items-center justify-center rounded-full border border-border transition-transform active:scale-95 hover:scale-110",
+                  value === color.value || (color.value === "default" && (!value || value === "default"))
+                    ? "ring-2 ring-teal ring-offset-1"
+                    : ""
+                )}
+              >
+                {color.value === "default" ? (
+                  <span className="text-[9px] font-bold text-charcoal">✕</span>
+                ) : (
+                  <span className={cn("size-full rounded-full", color.class)} />
+                )}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-3 border-t border-border pt-3">
+            <p className="mb-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">
+              Resaltado personalizado
+            </p>
+            <div className="flex items-center gap-2">
+              <label className="relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] border border-border bg-background transition-colors hover:bg-surface-hover">
+                <input
+                  type="color"
+                  value={value && value !== "default" && value.startsWith("#") ? value : "#FFE9AD"}
+                  onChange={(e) => {
+                    onChange(e.target.value);
+                  }}
+                  className="sr-only"
+                />
+                <span
+                  className="size-5 rounded-[4px] border border-charcoal/10"
+                  style={{ backgroundColor: value && value !== "default" ? value : "#FFE9AD" }}
+                />
+              </label>
+              <input
+                type="text"
+                placeholder="#HEX"
+                value={hexInput}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setHexInput(val);
+                  if (/^#[0-9A-F]{6}$/i.test(val) || /^#[0-9A-F]{3}$/i.test(val)) {
+                    onChange(val);
+                  }
+                }}
+                className="h-8 w-full rounded-[8px] border border-border bg-background px-2 text-xs font-bold uppercase text-charcoal outline-none focus:border-primary/40 focus:ring-1 focus:ring-ring"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -583,28 +854,25 @@ function getActiveTextAlign(editor: Editor | null): BlogTextAlign {
   return "left";
 }
 
-function getActiveTextSize(editor: Editor | null): BlogTextSize {
-  if (editor?.isActive("blogTextSize", { size: "small" })) {
-    return "small";
+function getActiveTextSize(editor: Editor | null): string {
+  if (!editor) {
+    return "16px";
   }
-
-  if (editor?.isActive("blogTextSize", { size: "large" })) {
-    return "large";
-  }
-
-  return "normal";
+  return editor.getAttributes("blogTextSize").size || "16px";
 }
 
-function getActiveTextColor(editor: Editor | null): BlogTextColor | "default" {
+function getActiveTextColor(editor: Editor | null): string {
   if (!editor) {
     return "default";
   }
+  return editor.getAttributes("blogTextColor").color || "default";
+}
 
-  return (
-    BLOG_TEXT_COLORS.find((color) =>
-      editor.isActive("blogTextColor", { color: color.value }),
-    )?.value ?? "default"
-  );
+function getActiveHighlightColor(editor: Editor | null): string {
+  if (!editor) {
+    return "default";
+  }
+  return editor.getAttributes("blogHighlight").color || "default";
 }
 
 const editorContentClasses = [
@@ -624,144 +892,29 @@ const editorContentClasses = [
   "[&_.ProseMirror>*:first-child]:mt-0 [&_.ProseMirror>*:last-child]:mb-0",
 ].join(" ");
 
-export function BlogRichTextEditor({
-  describedBy,
-  disabled = false,
-  error = false,
-  id,
-  onBlur,
-  onChange,
-  value,
-}: BlogRichTextEditorProps) {
-  const [showPreview, setShowPreview] = useState(false);
-  const [toolbarState, setToolbarState] = useState({
-    textLength: 0,
-    version: 0,
-    wordCount: 0,
-  });
-  const isEmpty = !value.trim();
-  const editor = useEditor({
-    editable: !disabled,
-    editorProps: {
-      attributes: {
-        "aria-describedby": describedBy ?? "",
-        "aria-invalid": error ? "true" : "false",
-        "aria-label": "Contenido del blog",
-        "aria-multiline": "true",
-        class:
-          "min-h-[20rem] px-4 py-4 text-base leading-7 text-foreground outline-none sm:px-5",
-        id,
-        role: "textbox",
-      },
-    },
-    extensions: [
-      BlogTextAlignExtension,
-      BlogTextColorExtension,
-      BlogTextSizeExtension,
-      BlogHighlightExtension,
-      StarterKit.configure({
-        code: false,
-        codeBlock: false,
-        heading: {
-          levels: [1, 2, 3],
-        },
-        link: {
-          HTMLAttributes: {
-            rel: "noopener noreferrer",
-            target: "_blank",
-          },
-          autolink: true,
-          defaultProtocol: "https",
-          isAllowedUri: (url, context) =>
-            !url.trim().startsWith("//") &&
-            (isAllowedEditorUrl(url) || context.defaultValidate(url)),
-          openOnClick: false,
-          protocols: ["http", "https", "mailto", "tel"],
-        },
-        strike: false,
-      }),
-      Placeholder.configure({
-        placeholder: "Escribe el contenido del blog...",
-      }),
-    ],
-    immediatelyRender: false,
-    onBlur: () => {
-      onBlur?.();
-    },
-    onUpdate: ({ editor: currentEditor }) => {
-      const stats = getEditorStats(currentEditor);
+interface BlogEditorToolbarProps {
+  editor: Editor | null;
+  disabled?: boolean;
+  className?: string;
+  error?: boolean;
+}
 
-      setToolbarState((current) => ({
-        ...stats,
-        version: current.version + 1,
-      }));
-      onChange(getEditorHtml(currentEditor));
-    },
-  });
+export const BlogEditorToolbar = forwardRef<HTMLDivElement, BlogEditorToolbarProps>(
+  ({ editor, disabled = false, className, error = false }, ref) => {
+    const toolbarDisabled = disabled || !editor;
+    const activeTextAlign = getActiveTextAlign(editor);
+    const activeTextColor = getActiveTextColor(editor);
+    const activeHighlightColor = getActiveHighlightColor(editor);
+    const activeTextSize = getActiveTextSize(editor);
 
-  useEffect(() => {
-    if (!editor) {
-      return;
-    }
-
-    const refreshToolbarState = () => {
-      const stats = getEditorStats(editor);
-
-      setToolbarState((current) => ({
-        ...stats,
-        version: current.version + 1,
-      }));
-    };
-
-    refreshToolbarState();
-    editor.on("selectionUpdate", refreshToolbarState);
-    editor.on("transaction", refreshToolbarState);
-
-    return () => {
-      editor.off("selectionUpdate", refreshToolbarState);
-      editor.off("transaction", refreshToolbarState);
-    };
-  }, [editor]);
-
-  useEffect(() => {
-    if (!editor) {
-      return;
-    }
-
-    const currentHtml = getEditorHtml(editor);
-
-    if (value !== currentHtml) {
-      editor.commands.setContent(value || "", { emitUpdate: false });
-    }
-
-    const statsTimer = window.setTimeout(() => {
-      setToolbarState((current) => ({
-        ...getEditorStats(editor),
-        version: current.version + 1,
-      }));
-    }, 0);
-
-    return () => window.clearTimeout(statsTimer);
-  }, [editor, value]);
-
-  useEffect(() => {
-    editor?.setEditable(!disabled);
-  }, [disabled, editor]);
-
-  const toolbarDisabled = disabled || !editor;
-  const activeTextAlign = getActiveTextAlign(editor);
-  const activeTextColor = getActiveTextColor(editor);
-  const activeTextSize = getActiveTextSize(editor);
-  const contentLength = value.trim().length;
-  const isNearContentLimit = contentLength >= 45000;
-
-  return (
-    <div>
+    return (
       <TooltipProvider>
         <div
+          ref={ref}
           className={cn(
-            "flex flex-wrap items-center gap-1.5 rounded-t-[22px] border border-input bg-background/90 p-2 shadow-soft",
+            "flex flex-wrap items-center gap-1.5 p-2 bg-background/95 backdrop-blur-md",
             error && "border-danger/40",
+            className
           )}
           aria-label="Herramientas de formato del blog"
           role="toolbar"
@@ -787,57 +940,27 @@ export function BlogRichTextEditor({
             label="Subrayado"
             onClick={() => editor?.chain().focus().toggleUnderline().run()}
           />
-          <ToolbarButton
-            active={editor?.isActive("blogHighlight")}
+          <HighlightDropdown
             disabled={toolbarDisabled}
-            icon={Highlighter}
-            label="Resaltado"
-            onClick={() => editor?.chain().focus().toggleBlogHighlight().run()}
-          />
-          <ToolbarSelect
-            disabled={toolbarDisabled}
-            icon={Type}
-            label="Tamano de texto"
-            value={activeTextSize}
-            options={[
-              { label: "Pequeno", value: "small" },
-              { label: "Normal", value: "normal" },
-              { label: "Grande", value: "large" },
-            ]}
-            onChange={(nextSize) => {
-              if (isBlogTextSize(nextSize)) {
-                editor?.chain().focus().setBlogTextSize(nextSize).run();
-              }
+            value={activeHighlightColor}
+            onChange={(color) => {
+              editor?.chain().focus().setBlogHighlight(color).run();
             }}
           />
-
-          <div
-            className="flex h-10 shrink-0 items-center gap-1 rounded-[14px] border border-border bg-surface px-1.5"
-            aria-label="Color de texto"
-            role="group"
-          >
-            <Palette className="size-4 text-muted" aria-hidden="true" />
-            <ColorSwatchButton
-              active={activeTextColor === "default"}
-              disabled={toolbarDisabled}
-              label="Color por defecto"
-              onClick={() =>
-                editor?.chain().focus().unsetBlogTextColor().run()
-              }
-            />
-            {BLOG_TEXT_COLORS.map((color) => (
-              <ColorSwatchButton
-                key={color.value}
-                active={activeTextColor === color.value}
-                disabled={toolbarDisabled}
-                label={`Color ${color.label}`}
-                swatchClassName={color.swatchClassName}
-                onClick={() =>
-                  editor?.chain().focus().setBlogTextColor(color.value).run()
-                }
-              />
-            ))}
-          </div>
+          <SizeDropdown
+            disabled={toolbarDisabled}
+            value={activeTextSize}
+            onChange={(nextSize) => {
+              editor?.chain().focus().setBlogTextSize(nextSize).run();
+            }}
+          />
+          <ColorDropdown
+            disabled={toolbarDisabled}
+            value={activeTextColor}
+            onChange={(color) => {
+              editor?.chain().focus().setBlogTextColor(color).run();
+            }}
+          />
 
           <ToolbarDivider />
 
@@ -988,6 +1111,229 @@ export function BlogRichTextEditor({
           />
         </div>
       </TooltipProvider>
+    );
+  }
+);
+
+BlogEditorToolbar.displayName = "BlogEditorToolbar";
+
+export function BlogRichTextEditor({
+  describedBy,
+  disabled = false,
+  error = false,
+  id,
+  onBlur,
+  onChange,
+  value,
+}: BlogRichTextEditorProps) {
+  const [showPreview, setShowPreview] = useState(false);
+  const [toolbarState, setToolbarState] = useState({
+    textLength: 0,
+    version: 0,
+    wordCount: 0,
+  });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mainToolbarRef = useRef<HTMLDivElement>(null);
+  const [showFloatingToolbar, setShowFloatingToolbar] = useState(false);
+  const [floatingStyle, setFloatingStyle] = useState<React.CSSProperties>({});
+  const isEmpty = !value.trim();
+  const editor = useEditor({
+    editable: !disabled,
+    editorProps: {
+      attributes: {
+        "aria-describedby": describedBy ?? "",
+        "aria-invalid": error ? "true" : "false",
+        "aria-label": "Contenido del blog",
+        "aria-multiline": "true",
+        class:
+          "min-h-[20rem] px-4 py-4 text-base leading-7 text-foreground outline-none sm:px-5",
+        id,
+        role: "textbox",
+      },
+    },
+    extensions: [
+      BlogTextAlignExtension,
+      BlogTextColorExtension,
+      BlogTextSizeExtension,
+      BlogHighlightExtension,
+      StarterKit.configure({
+        code: false,
+        codeBlock: false,
+        heading: {
+          levels: [1, 2, 3],
+        },
+        link: {
+          HTMLAttributes: {
+            rel: "noopener noreferrer",
+            target: "_blank",
+          },
+          autolink: true,
+          defaultProtocol: "https",
+          isAllowedUri: (url, context) =>
+            !url.trim().startsWith("//") &&
+            (isAllowedEditorUrl(url) || context.defaultValidate(url)),
+          openOnClick: false,
+          protocols: ["http", "https", "mailto", "tel"],
+        },
+        strike: false,
+      }),
+      Placeholder.configure({
+        placeholder: "Escribe el contenido del blog...",
+      }),
+    ],
+    immediatelyRender: false,
+    onBlur: () => {
+      onBlur?.();
+    },
+    onUpdate: ({ editor: currentEditor }) => {
+      const stats = getEditorStats(currentEditor);
+
+      setToolbarState((current) => ({
+        ...stats,
+        version: current.version + 1,
+      }));
+      onChange(getEditorHtml(currentEditor));
+    },
+  });
+
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+
+    const refreshToolbarState = () => {
+      const stats = getEditorStats(editor);
+
+      setToolbarState((current) => ({
+        ...stats,
+        version: current.version + 1,
+      }));
+    };
+
+    refreshToolbarState();
+    editor.on("selectionUpdate", refreshToolbarState);
+    editor.on("transaction", refreshToolbarState);
+
+    return () => {
+      editor.off("selectionUpdate", refreshToolbarState);
+      editor.off("transaction", refreshToolbarState);
+    };
+  }, [editor]);
+
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+
+    const currentHtml = getEditorHtml(editor);
+
+    if (value !== currentHtml) {
+      editor.commands.setContent(value || "", { emitUpdate: false });
+    }
+
+    const statsTimer = window.setTimeout(() => {
+      setToolbarState((current) => ({
+        ...getEditorStats(editor),
+        version: current.version + 1,
+      }));
+    }, 0);
+
+    return () => window.clearTimeout(statsTimer);
+  }, [editor, value]);
+
+  useEffect(() => {
+    editor?.setEditable(!disabled);
+  }, [disabled, editor]);
+
+  useEffect(() => {
+    const mainToolbar = mainToolbarRef.current;
+    const container = containerRef.current;
+    if (!mainToolbar || !container) return;
+
+    let isMainToolbarIntersecting = true;
+    let isContainerIntersecting = false;
+
+    const updateVisibility = () => {
+      setShowFloatingToolbar(isContainerIntersecting && !isMainToolbarIntersecting);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === mainToolbar) {
+            isMainToolbarIntersecting = entry.isIntersecting;
+          }
+          if (entry.target === container) {
+            isContainerIntersecting = entry.isIntersecting;
+          }
+        });
+        updateVisibility();
+      },
+      {
+        threshold: 0,
+        rootMargin: "-64px 0px 0px 0px",
+      }
+    );
+
+    observer.observe(mainToolbar);
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!showFloatingToolbar) return;
+
+    const updatePosition = () => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const rect = container.getBoundingClientRect();
+      setFloatingStyle({
+        width: `${rect.width}px`,
+        left: `${rect.left}px`,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener("scroll", updatePosition, { passive: true });
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      window.removeEventListener("scroll", updatePosition);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [showFloatingToolbar]);
+
+  const toolbarDisabled = disabled || !editor;
+  const activeTextAlign = getActiveTextAlign(editor);
+  const activeTextColor = getActiveTextColor(editor);
+  const activeHighlightColor = getActiveHighlightColor(editor);
+  const activeTextSize = getActiveTextSize(editor);
+  const contentLength = value.trim().length;
+  const isNearContentLimit = contentLength >= 45000;
+
+  return (
+    <div ref={containerRef}>
+      <BlogEditorToolbar
+        ref={mainToolbarRef}
+        editor={editor}
+        disabled={disabled}
+        error={error}
+        className="rounded-t-[22px] border border-input shadow-soft"
+      />
+
+      {showFloatingToolbar && (
+        <div
+          style={floatingStyle}
+          className="fixed top-16 lg:top-0 z-40 rounded-b-[22px] border-x border-b border-input bg-background/95 shadow-premium backdrop-blur-md transition-all overflow-hidden"
+        >
+          <BlogEditorToolbar
+            editor={editor}
+            disabled={disabled}
+            error={error}
+          />
+        </div>
+      )}
 
       <div className={cn(editorContentClasses, error && "border-danger/40")}>
         <EditorContent editor={editor} />

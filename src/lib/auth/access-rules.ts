@@ -211,7 +211,7 @@ export function buildNavigationForUser(
     managementItems.push(item("clients", "clients", "Clientes"));
   }
 
-  if (access.role === "admin") {
+  if (access.role === "admin" || access.isProfessional) {
     managementItems.push(item("progress", "progress", "Progreso"));
   }
 
@@ -338,7 +338,7 @@ export function canAccessRoute(
     case "profile":
       return access.isClient || access.isProfessional || access.isAdmin;
     case "progress":
-      return access.isClient || access.role === "admin";
+      return access.isClient || access.role === "admin" || access.isProfessional;
     case "clients":
       return access.canManageClientPlans;
     case "professionalAccounts":

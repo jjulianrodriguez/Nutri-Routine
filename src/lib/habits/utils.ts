@@ -66,6 +66,8 @@ const WEEKDAY_LABELS = [
   { label: "Miercoles", shortLabel: "Mie" },
   { label: "Jueves", shortLabel: "Jue" },
   { label: "Viernes", shortLabel: "Vie" },
+  { label: "Sabado", shortLabel: "Sab" },
+  { label: "Domingo", shortLabel: "Dom" },
 ];
 
 export function toDateKey(date: Date) {
@@ -105,7 +107,7 @@ export function getCurrentHabitWeek(today = new Date()) {
   return {
     today: todayKey,
     weekDays,
-    weekEnd: weekDays[4].date,
+    weekEnd: weekDays[6].date,
     weekStart: weekDays[0].date,
   };
 }
@@ -139,7 +141,7 @@ export function isAssignmentApplicableOnDate(
 
   return (
     isoDay >= 1 &&
-    isoDay <= 5 &&
+    isoDay <= 7 &&
     assignment.active &&
     assignment.daysOfWeek.includes(isoDay) &&
     isAssignmentInDate(assignment, date)

@@ -6,7 +6,7 @@ export function AppScreen({ children }: { children: ReactNode }) {
   return (
     <div
       className={cn(
-        "relative min-h-dvh overflow-hidden px-4 py-6 sm:px-6 lg:px-8 lg:py-8",
+        "relative min-h-dvh overflow-x-clip px-4 py-6 sm:px-6 lg:px-8 lg:py-8",
         "bg-[radial-gradient(circle_at_top_right,rgb(var(--sage-rgb)/0.2),transparent_30rem)]",
       )}
     >
@@ -48,7 +48,7 @@ export function AppPanel({
   children?: ReactNode;
   description?: string;
   title: string;
-  tone?: "surface" | "accent" | "primary";
+  tone?: "surface" | "accent" | "primary" | "warm";
 }) {
   return (
     <section
@@ -57,6 +57,7 @@ export function AppPanel({
         tone === "surface" && "border-border bg-surface/82",
         tone === "accent" && "border-primary/20 bg-accent-soft/75",
         tone === "primary" && "border-primary/30 bg-primary-soft/70",
+        tone === "warm" && "border-border bg-cream/70",
       )}
     >
       <h2 className="text-2xl font-bold leading-tight text-charcoal">
@@ -92,7 +93,7 @@ export function StatTile({
 
 export function EmptyState({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-[22px] border border-dashed border-border bg-surface/58 p-5 text-sm font-semibold leading-6 text-muted shadow-soft backdrop-blur-md">
+    <div className="rounded-[22px] border border-dashed border-border bg-cream/45 p-5 text-sm font-semibold leading-6 text-muted shadow-soft backdrop-blur-md">
       {children}
     </div>
   );

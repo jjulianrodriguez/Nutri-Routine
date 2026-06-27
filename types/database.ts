@@ -1000,14 +1000,74 @@ export type Database = {
           },
         ];
       };
+      resource_folders: {
+        Row: {
+          active: boolean;
+          area: Database["public"]["Enums"]["service_area"];
+          created_at: string;
+          created_by: string;
+          description: string | null;
+          id: string;
+          legacy_nutrition_folder_id: string | null;
+          name: string;
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          area?: Database["public"]["Enums"]["service_area"];
+          created_at?: string;
+          created_by: string;
+          description?: string | null;
+          id?: string;
+          legacy_nutrition_folder_id?: string | null;
+          name: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          area?: Database["public"]["Enums"]["service_area"];
+          created_at?: string;
+          created_by?: string;
+          description?: string | null;
+          id?: string;
+          legacy_nutrition_folder_id?: string | null;
+          name?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "resource_folders_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "resource_folders_legacy_nutrition_folder_id_fkey";
+            columns: ["legacy_nutrition_folder_id"];
+            isOneToOne: false;
+            referencedRelation: "nutrition_document_folders";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       resources: {
         Row: {
           area: Database["public"]["Enums"]["service_area"];
           client_id: string | null;
           created_at: string;
           description: string | null;
-          file_url: string;
+          file_name: string | null;
+          file_size: number | null;
+          file_url: string | null;
+          folder_id: string | null;
           id: string;
+          kind: Database["public"]["Enums"]["resource_kind"];
+          legacy_nutrition_document_id: string | null;
+          mime_type: string | null;
+          status: Database["public"]["Enums"]["resource_status"];
+          storage_bucket: string | null;
+          storage_path: string | null;
           title: string;
           updated_at: string;
           uploaded_by: string;
@@ -1017,8 +1077,17 @@ export type Database = {
           client_id?: string | null;
           created_at?: string;
           description?: string | null;
-          file_url: string;
+          file_name?: string | null;
+          file_size?: number | null;
+          file_url?: string | null;
+          folder_id?: string | null;
           id?: string;
+          kind?: Database["public"]["Enums"]["resource_kind"];
+          legacy_nutrition_document_id?: string | null;
+          mime_type?: string | null;
+          status?: Database["public"]["Enums"]["resource_status"];
+          storage_bucket?: string | null;
+          storage_path?: string | null;
           title: string;
           updated_at?: string;
           uploaded_by: string;
@@ -1028,13 +1097,36 @@ export type Database = {
           client_id?: string | null;
           created_at?: string;
           description?: string | null;
-          file_url?: string;
+          file_name?: string | null;
+          file_size?: number | null;
+          file_url?: string | null;
+          folder_id?: string | null;
           id?: string;
+          kind?: Database["public"]["Enums"]["resource_kind"];
+          legacy_nutrition_document_id?: string | null;
+          mime_type?: string | null;
+          status?: Database["public"]["Enums"]["resource_status"];
+          storage_bucket?: string | null;
+          storage_path?: string | null;
           title?: string;
           updated_at?: string;
           uploaded_by?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "resources_folder_id_fkey";
+            columns: ["folder_id"];
+            isOneToOne: false;
+            referencedRelation: "resource_folders";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "resources_legacy_nutrition_document_id_fkey";
+            columns: ["legacy_nutrition_document_id"];
+            isOneToOne: false;
+            referencedRelation: "nutrition_documents";
+            referencedColumns: ["id"];
+          },
           {
             foreignKeyName: "resources_client_id_fkey";
             columns: ["client_id"];
@@ -1513,6 +1605,8 @@ export type Database = {
       plan_status: "draft" | "active" | "archived";
       professional_specialty: "nutrition" | "training" | "both";
       profile_role: "professional" | "client" | "admin";
+      resource_kind: "external_link" | "pdf";
+      resource_status: "active" | "inactive";
       service_area: "nutrition" | "training" | "general";
     };
     CompositeTypes: {

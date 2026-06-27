@@ -24,7 +24,7 @@ const badgeToneClasses: Record<RelationshipBadgeTone, string> = {
   accent: "border-accent/30 bg-accent-soft text-charcoal",
   danger: "border-danger/20 bg-danger/10 text-danger",
   muted: "border-border bg-background text-muted",
-  neutral: "border-border bg-surface text-warm-brown",
+  neutral: "border-accent/25 bg-cream/80 text-charcoal",
   primary: "border-primary/30 bg-primary-soft text-charcoal",
   success: "border-success/20 bg-success/10 text-success",
   warning: "border-warning/25 bg-warning/10 text-warning",

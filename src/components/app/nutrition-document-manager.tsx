@@ -9,7 +9,9 @@ import {
   Loader2,
   Pencil,
   Plus,
+  Power,
   RefreshCw,
+  RotateCcw,
   Save,
   Trash2,
   Upload,
@@ -26,10 +28,13 @@ import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  activateNutritionDocument,
   createNutritionDocumentSignedUrl,
   createNutritionFolder,
   deactivateNutritionDocument,
+  deleteNutritionDocument,
   deleteNutritionFolder,
+  toggleNutritionFolderActive,
   updateNutritionDocument,
   updateNutritionFolder,
   uploadEducationalDocument,
@@ -52,6 +57,7 @@ type NutritionDocumentManagerProps = {
   folders: NutritionDocumentFolderRecord[];
   libraryDocuments: NutritionDocumentRecord[];
   mealPlanDocuments: NutritionDocumentRecord[];
+  viewMode?: "plan" | "library";
 };
 
 type FieldErrors = Record<string, string | undefined>;
@@ -59,11 +65,11 @@ type FieldErrors = Record<string, string | undefined>;
 type ConfirmationState =
   | {
       document: NutritionDocumentRecord;
-      type: "deactivate-document";
+      type: "deactivate-document" | "activate-document" | "delete-document";
     }
   | {
       folder: NutritionDocumentFolderRecord;
-      type: "delete-folder";
+      type: "delete-folder" | "toggle-folder-active";
     };
 
 const DOCUMENT_TYPE_LABELS = {
@@ -140,12 +146,16 @@ function PdfOpenButton({ documentId }: { documentId: string }) {
 function DocumentCard({
   canManage,
   document,
+  onActivate,
   onDeactivate,
+  onDelete,
   onEdit,
 }: {
   canManage: boolean;
   document: NutritionDocumentRecord;
+  onActivate?: (document: NutritionDocumentRecord) => void;
   onDeactivate?: (document: NutritionDocumentRecord) => void;
+  onDelete?: (document: NutritionDocumentRecord) => void;
   onEdit?: (document: NutritionDocumentRecord) => void;
 }) {
   const isInactive = document.status === "inactive";
@@ -172,7 +182,7 @@ function DocumentCard({
           </div>
         </div>
 
-        {canManage && onEdit && onDeactivate ? (
+        {canManage && onEdit && onDeactivate && onActivate && onDelete ? (
           <CardActionsMenu
             label={document.title}
             items={[
@@ -181,12 +191,23 @@ function DocumentCard({
                 label: "Editar",
                 onSelect: () => onEdit(document),
               },
+              isInactive
+                ? {
+                    icon: RotateCcw,
+                    label: "Activar",
+                    onSelect: () => onActivate(document),
+                  }
+                : {
+                    destructive: true,
+                    icon: Power,
+                    label: "Desactivar",
+                    onSelect: () => onDeactivate(document),
+                  },
               {
                 destructive: true,
-                disabled: isInactive,
                 icon: Trash2,
-                label: "Desactivar",
-                onSelect: () => onDeactivate(document),
+                label: "Eliminar",
+                onSelect: () => onDelete(document),
                 separatorBefore: true,
               },
             ]}
@@ -224,7 +245,18 @@ function DocumentCard({
         {canManage ? (
           <div>
             <dt className="text-muted">Estado</dt>
-            <dd className="mt-1">{isInactive ? "Inactivo" : "Activo"}</dd>
+            <dd className="mt-1.5">
+              <span
+                className={cn(
+                  "rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider",
+                  isInactive
+                    ? "bg-muted/15 text-muted"
+                    : "bg-primary-soft text-charcoal",
+                )}
+              >
+                {isInactive ? "Inactivo" : "Activo"}
+              </span>
+            </dd>
           </div>
         ) : null}
       </dl>
@@ -261,7 +293,8 @@ function MealPlanUploadForm({
     setMessage("");
     setFieldErrors({});
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const fileError = readFileError(formData, true);
 
     if (fileError) {
@@ -284,7 +317,7 @@ function MealPlanUploadForm({
       }
 
       toast.success(result.message);
-      event.currentTarget.reset();
+      form.reset();
       router.refresh();
     } finally {
       setIsPending(false);
@@ -293,6 +326,14 @@ function MealPlanUploadForm({
 
   return (
     <form className="space-y-4" onSubmit={onSubmit} noValidate>
+      {clients.length === 0 ? (
+        <Alert className="rounded-[18px] border-primary/25 bg-primary-soft">
+          <AlertDescription className="font-semibold text-charcoal">
+            No tienes clientas de nutricion asignadas para subir planes de alimentacion.
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <div>
         <Label htmlFor="meal-plan-client" className="font-extrabold text-charcoal">
           Clienta
@@ -301,7 +342,8 @@ function MealPlanUploadForm({
           id="meal-plan-client"
           name="clientId"
           required
-          className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+          disabled={isPending}
+          className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
         >
           <option value="">Seleccionar clienta</option>
           {clients.map((client) => (
@@ -323,6 +365,7 @@ function MealPlanUploadForm({
           className="mt-2 h-12 rounded-control"
           maxLength={180}
           required
+          disabled={isPending}
         />
         <FieldError id="meal-plan-title-error" message={fieldErrors.title} />
       </div>
@@ -336,7 +379,8 @@ function MealPlanUploadForm({
           name="description"
           rows={4}
           maxLength={2000}
-          className="mt-2 w-full resize-y rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+          disabled={isPending}
+          className="mt-2 w-full resize-y rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
         />
         <FieldError
           id="meal-plan-description-error"
@@ -353,6 +397,7 @@ function MealPlanUploadForm({
           name="file"
           type="file"
           accept="application/pdf,.pdf"
+          disabled={isPending}
           className="mt-2 h-auto rounded-control py-3"
           required
         />
@@ -388,9 +433,11 @@ function MealPlanUploadForm({
 function FolderManager({
   folders,
   onDelete,
+  onToggleActive,
 }: {
   folders: NutritionDocumentFolderRecord[];
   onDelete: (folder: NutritionDocumentFolderRecord) => void;
+  onToggleActive: (folder: NutritionDocumentFolderRecord) => void;
 }) {
   const router = useRouter();
   const [editingFolder, setEditingFolder] =
@@ -403,7 +450,8 @@ function FolderManager({
     setFieldErrors({});
     setIsPending(true);
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const values = {
       id: editingFolder?.id,
       name: String(formData.get("name") ?? ""),
@@ -421,7 +469,7 @@ function FolderManager({
       }
 
       toast.success(result.message);
-      event.currentTarget.reset();
+      form.reset();
       setEditingFolder(null);
       router.refresh();
     } finally {
@@ -474,48 +522,65 @@ function FolderManager({
       </form>
 
       <div className="space-y-2">
-        {folders.map((folder) => (
-          <div
-            key={folder.id}
-            className="flex items-center justify-between gap-3 rounded-[18px] border border-border bg-background px-4 py-3"
-          >
-            <div className="min-w-0">
-              <p className="truncate font-extrabold text-charcoal">
-                {folder.name}
-              </p>
-              <p className="mt-1 text-xs font-bold text-muted">
-                {folder.documentCount} documentos
-              </p>
+        {folders.map((folder) => {
+          const isInactive = !folder.active;
+          return (
+            <div
+              key={folder.id}
+              className={cn(
+                "flex items-center justify-between gap-3 rounded-[18px] border border-border bg-background px-4 py-3",
+                isInactive && "opacity-70",
+              )}
+            >
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="truncate font-extrabold text-charcoal">
+                    {folder.name}
+                  </p>
+                  <span
+                    className={cn(
+                      "rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider",
+                      isInactive
+                        ? "bg-muted/15 text-muted"
+                        : "bg-primary-soft text-charcoal",
+                    )}
+                  >
+                    {isInactive ? "Inactivo" : "Activo"}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs font-bold text-muted">
+                  {folder.documentCount} documentos
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <CardActionsMenu
+                  label={folder.name}
+                  items={[
+                    {
+                      icon: Pencil,
+                      label: "Editar",
+                      onSelect: () => setEditingFolder(folder),
+                    },
+                    {
+                      destructive: !isInactive,
+                      icon: isInactive ? RotateCcw : Power,
+                      label: isInactive ? "Activar" : "Desactivar",
+                      onSelect: () => onToggleActive(folder),
+                    },
+                    {
+                      destructive: true,
+                      disabled: folder.documentCount > 0,
+                      icon: Trash2,
+                      label: "Eliminar",
+                      onSelect: () => onDelete(folder),
+                      separatorBefore: true,
+                    },
+                  ]}
+                />
+              </div>
             </div>
-            <div className="flex shrink-0 gap-2">
-              <Button
-                type="button"
-                size="icon-sm"
-                variant="outline"
-                aria-label={`Editar ${folder.name}`}
-                title={`Editar ${folder.name}`}
-                onClick={() => setEditingFolder(folder)}
-              >
-                <Pencil className="size-4" aria-hidden="true" />
-              </Button>
-              <Button
-                type="button"
-                size="icon-sm"
-                variant="outline"
-                aria-label={`Eliminar ${folder.name}`}
-                title={
-                  folder.documentCount > 0
-                    ? "Solo se eliminan carpetas vacias"
-                    : `Eliminar ${folder.name}`
-                }
-                disabled={folder.documentCount > 0}
-                onClick={() => onDelete(folder)}
-              >
-                <Trash2 className="size-4" aria-hidden="true" />
-              </Button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -537,7 +602,8 @@ function EducationalUploadForm({
     setMessage("");
     setFieldErrors({});
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const fileError = readFileError(formData, true);
 
     if (fileError) {
@@ -560,7 +626,7 @@ function EducationalUploadForm({
       }
 
       toast.success(result.message);
-      event.currentTarget.reset();
+      form.reset();
       router.refresh();
     } finally {
       setIsPending(false);
@@ -569,6 +635,14 @@ function EducationalUploadForm({
 
   return (
     <form className="space-y-4" onSubmit={onSubmit} noValidate>
+      {activeFolders.length === 0 ? (
+        <Alert className="rounded-[18px] border-primary/25 bg-primary-soft">
+          <AlertDescription className="font-semibold text-charcoal">
+            Debes crear al menos una carpeta educativa antes de poder subir recursos.
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <div>
         <Label htmlFor="library-folder" className="font-extrabold text-charcoal">
           Carpeta
@@ -577,7 +651,8 @@ function EducationalUploadForm({
           id="library-folder"
           name="folderId"
           required
-          className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+          disabled={isPending}
+          className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
         >
           <option value="">Seleccionar carpeta</option>
           {activeFolders.map((folder) => (
@@ -599,6 +674,7 @@ function EducationalUploadForm({
           className="mt-2 h-12 rounded-control"
           maxLength={180}
           required
+          disabled={isPending}
         />
         <FieldError id="library-title-error" message={fieldErrors.title} />
       </div>
@@ -612,7 +688,8 @@ function EducationalUploadForm({
           name="description"
           rows={4}
           maxLength={2000}
-          className="mt-2 w-full resize-y rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+          disabled={isPending}
+          className="mt-2 w-full resize-y rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
         />
         <FieldError id="library-description-error" message={fieldErrors.description} />
       </div>
@@ -626,6 +703,7 @@ function EducationalUploadForm({
           name="file"
           type="file"
           accept="application/pdf,.pdf"
+          disabled={isPending}
           className="mt-2 h-auto rounded-control py-3"
           required
         />
@@ -678,7 +756,8 @@ function DocumentEditForm({
     setMessage("");
     setFieldErrors({});
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const fileError = readFileError(formData, false);
 
     if (fileError) {
@@ -897,6 +976,7 @@ export function NutritionDocumentManager({
   folders,
   libraryDocuments,
   mealPlanDocuments,
+  viewMode,
 }: NutritionDocumentManagerProps) {
   const router = useRouter();
   const [editingDocument, setEditingDocument] =
@@ -920,10 +1000,26 @@ export function NutritionDocumentManager({
       return;
     }
 
-    const result =
-      confirmation.type === "delete-folder"
-        ? await deleteNutritionFolder(confirmation.folder.id)
-        : await deactivateNutritionDocument(confirmation.document.id);
+    let result;
+    switch (confirmation.type) {
+      case "delete-folder":
+        result = await deleteNutritionFolder(confirmation.folder.id);
+        break;
+      case "toggle-folder-active":
+        result = await toggleNutritionFolderActive(confirmation.folder.id);
+        break;
+      case "deactivate-document":
+        result = await deactivateNutritionDocument(confirmation.document.id);
+        break;
+      case "activate-document":
+        result = await activateNutritionDocument(confirmation.document.id);
+        break;
+      case "delete-document":
+        result = await deleteNutritionDocument(confirmation.document.id);
+        break;
+    }
+
+    if (!result) return;
 
     if (result.status === "error") {
       toast.error(result.message);
@@ -939,86 +1035,97 @@ export function NutritionDocumentManager({
 
     return (
       <div className="space-y-6">
-        <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
-          <div className="flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
-              <FileText className="size-5" aria-hidden="true" />
+        {(!viewMode || viewMode === "plan") && (
+          <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
+                <FileText className="size-5" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-charcoal">
+                  Plan de alimentacion
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-muted">
+                  Tu documento PDF asignado por nutricion.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-charcoal">
-                Plan de alimentacion
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-muted">
-                Tu documento PDF asignado por nutricion.
-              </p>
-            </div>
-          </div>
 
-          <div className="mt-5">
-            {currentPlan ? (
-              <DocumentCard canManage={false} document={currentPlan} />
+            <div className="mt-5">
+              {currentPlan ? (
+                <DocumentCard canManage={false} document={currentPlan} />
+              ) : (
+                <div className="rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
+                  <p className="font-extrabold text-charcoal">
+                    Aun no tienes un plan PDF asignado.
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted">
+                    Tu nutricionista podra compartirlo contigo desde esta seccion.
+                  </p>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {(!viewMode || viewMode === "library") && (
+          <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="grid size-11 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
+                <BookOpen className="size-5" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-charcoal">
+                  Biblioteca educativa
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-muted">
+                  Recursos PDF organizados por carpeta.
+                </p>
+              </div>
+            </div>
+
+            {groupedLibrary.length > 0 ? (
+              <div className="mt-6 space-y-6">
+                {groupedLibrary.map(({ documents, folder }) => (
+                  <section key={folder.id}>
+                    <h3 className="flex items-center gap-2 text-lg font-extrabold text-charcoal">
+                      <Folder className="size-5 text-warm-brown" aria-hidden="true" />
+                      {folder.name}
+                    </h3>
+                    <div className="mt-3 grid gap-4 md:grid-cols-2">
+                      {documents.map((document) => (
+                        <DocumentCard
+                          key={document.id}
+                          canManage={false}
+                          document={document}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
             ) : (
-              <div className="rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
+              <div className="mt-5 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
                 <p className="font-extrabold text-charcoal">
-                  Aun no tienes un plan PDF asignado.
+                  No hay recursos educativos disponibles.
                 </p>
                 <p className="mt-2 text-sm leading-6 text-muted">
-                  Tu nutricionista podra compartirlo contigo desde esta seccion.
+                  Cuando haya PDFs activos apareceran organizados por carpeta.
                 </p>
               </div>
             )}
-          </div>
-        </section>
-
-        <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
-          <div className="flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
-              <BookOpen className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-charcoal">
-                Biblioteca educativa
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-muted">
-                Recursos PDF organizados por carpeta.
-              </p>
-            </div>
-          </div>
-
-          {groupedLibrary.length > 0 ? (
-            <div className="mt-6 space-y-6">
-              {groupedLibrary.map(({ documents, folder }) => (
-                <section key={folder.id}>
-                  <h3 className="flex items-center gap-2 text-lg font-extrabold text-charcoal">
-                    <Folder className="size-5 text-warm-brown" aria-hidden="true" />
-                    {folder.name}
-                  </h3>
-                  <div className="mt-3 grid gap-4 md:grid-cols-2">
-                    {documents.map((document) => (
-                      <DocumentCard
-                        key={document.id}
-                        canManage={false}
-                        document={document}
-                      />
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          ) : (
-            <div className="mt-5 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
-              <p className="font-extrabold text-charcoal">
-                No hay recursos educativos disponibles.
-              </p>
-              <p className="mt-2 text-sm leading-6 text-muted">
-                Cuando haya PDFs activos apareceran organizados por carpeta.
-              </p>
-            </div>
-          )}
-        </section>
+          </section>
+        )}
       </div>
     );
   }
+
+  const documentsToShow =
+    viewMode === "plan"
+      ? mealPlanDocuments
+      : viewMode === "library"
+        ? libraryDocuments
+        : [...mealPlanDocuments, ...libraryDocuments];
 
   return (
     <div className="space-y-6">
@@ -1030,73 +1137,80 @@ export function NutritionDocumentManager({
         />
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr] xl:items-start">
-        <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
-          <div className="flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
-              <Plus className="size-5" aria-hidden="true" />
+      {(!viewMode || viewMode === "plan") && (
+        <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr] xl:items-start">
+          <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
+                <Plus className="size-5" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-charcoal">
+                  Subir plan de alimentacion
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-muted">
+                  Al subir uno nuevo para una clienta se desactiva el PDF activo anterior.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-charcoal">
-                Subir plan de alimentacion
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-muted">
-                Al subir uno nuevo para una clienta se desactiva el PDF activo anterior.
-              </p>
+            <div className="mt-5">
+              <MealPlanUploadForm clients={clients} />
             </div>
-          </div>
-          <div className="mt-5">
-            <MealPlanUploadForm clients={clients} />
-          </div>
-        </section>
+          </section>
 
-        <ClientMealPlanSummary clients={clients} />
-      </div>
+          <ClientMealPlanSummary clients={clients} />
+        </div>
+      )}
 
-      <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr] xl:items-start">
-        <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
-          <div className="flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
-              <Folder className="size-5" aria-hidden="true" />
+      {(!viewMode || viewMode === "library") && (
+        <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr] xl:items-start">
+          <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="grid size-11 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
+                <Folder className="size-5" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-charcoal">
+                  Carpetas educativas
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-muted">
+                  Organiza la biblioteca por temas.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-charcoal">
-                Carpetas educativas
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-muted">
-                Organiza la biblioteca por temas.
-              </p>
+            <div className="mt-5">
+              <FolderManager
+                folders={folders}
+                onDelete={(folder) =>
+                  setConfirmation({ folder, type: "delete-folder" })
+                }
+                onToggleActive={(folder) =>
+                  setConfirmation({ folder, type: "toggle-folder-active" })
+                }
+              />
             </div>
-          </div>
-          <div className="mt-5">
-            <FolderManager
-              folders={folders}
-              onDelete={(folder) =>
-                setConfirmation({ folder, type: "delete-folder" })
-              }
-            />
-          </div>
-        </section>
+          </section>
 
-        <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
-          <div className="flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
-              <Upload className="size-5" aria-hidden="true" />
+          <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
+                <Upload className="size-5" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-charcoal">
+                  Subir recurso educativo
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-muted">
+                  Guarda PDFs dentro de una carpeta de la biblioteca.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-charcoal">
-                Subir recurso educativo
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-muted">
-                Guarda PDFs dentro de una carpeta de la biblioteca.
-              </p>
+            <div className="mt-5">
+              <EducationalUploadForm folders={folders} />
             </div>
-          </div>
-          <div className="mt-5">
-            <EducationalUploadForm folders={folders} />
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
+      )}
 
       <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
         <div className="flex items-center gap-3">
@@ -1105,17 +1219,17 @@ export function NutritionDocumentManager({
           </div>
           <div>
             <h2 className="text-2xl font-bold text-charcoal">
-              Documentos cargados
+              {viewMode === "plan" ? "Planes cargados" : viewMode === "library" ? "Recursos educativos" : "Documentos cargados"}
             </h2>
             <p className="mt-1 text-sm leading-6 text-muted">
-              Planes y recursos educativos con estado, fecha y asignacion.
+              {viewMode === "plan" ? "Planes alimenticios con estado, fecha y asignacion." : viewMode === "library" ? "Recursos educativos organizados con estado y carpeta." : "Planes y recursos educativos con estado, fecha y asignacion."}
             </p>
           </div>
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
-          {[...mealPlanDocuments, ...libraryDocuments].length > 0 ? (
-            [...mealPlanDocuments, ...libraryDocuments].map((document) => (
+          {documentsToShow.length > 0 ? (
+            documentsToShow.map((document) => (
               <DocumentCard
                 key={document.id}
                 canManage
@@ -1124,6 +1238,18 @@ export function NutritionDocumentManager({
                   setConfirmation({
                     document: selected,
                     type: "deactivate-document",
+                  })
+                }
+                onActivate={(selected) =>
+                  setConfirmation({
+                    document: selected,
+                    type: "activate-document",
+                  })
+                }
+                onDelete={(selected) =>
+                  setConfirmation({
+                    document: selected,
+                    type: "delete-document",
                   })
                 }
                 onEdit={setEditingDocument}
@@ -1135,43 +1261,74 @@ export function NutritionDocumentManager({
                 Aun no hay documentos PDF.
               </p>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Sube un plan de alimentacion o un recurso educativo para comenzar.
+                {viewMode === "plan" ? "Sube un plan de alimentacion para comenzar." : "Sube un recurso educativo para comenzar."}
               </p>
             </div>
           )}
         </div>
       </section>
 
-      <ConfirmationDialog
-        open={Boolean(confirmation)}
-        onOpenChange={(open) => {
-          if (!open) {
-            setConfirmation(null);
+      {(() => {
+        let confirmTitle = "";
+        let confirmDescription = "";
+        let confirmLabel = "";
+        let pendingLabel = "";
+        let confirmTone: "default" | "destructive" = "default";
+
+        if (confirmation) {
+          if (confirmation.type === "delete-folder") {
+            confirmTitle = "Eliminar carpeta";
+            confirmDescription = `Se eliminara la carpeta "${confirmation.folder.name}" porque no tiene documentos.`;
+            confirmLabel = "Eliminar carpeta";
+            pendingLabel = "Eliminando...";
+            confirmTone = "destructive";
+          } else if (confirmation.type === "toggle-folder-active") {
+            const folderActive = confirmation.folder.active;
+            confirmTitle = folderActive ? "Desactivar carpeta" : "Activar carpeta";
+            confirmDescription = folderActive
+              ? `La carpeta "${confirmation.folder.name}" y sus documentos se ocultaran para las clientas.`
+              : `La carpeta "${confirmation.folder.name}" y sus documentos volveran a estar disponibles para las clientas.`;
+            confirmLabel = folderActive ? "Desactivar" : "Activar";
+            pendingLabel = folderActive ? "Desactivando..." : "Activando...";
+            confirmTone = folderActive ? "destructive" : "default";
+          } else if (confirmation.type === "deactivate-document") {
+            confirmTitle = "Desactivar documento";
+            confirmDescription = `El documento "${confirmation.document.title}" dejara de estar disponible para las clientas.`;
+            confirmLabel = "Desactivar";
+            pendingLabel = "Desactivando...";
+            confirmTone = "destructive";
+          } else if (confirmation.type === "activate-document") {
+            confirmTitle = "Activar documento";
+            confirmDescription = `El documento "${confirmation.document.title}" volvera a estar disponible para las clientas.`;
+            confirmLabel = "Activar";
+            pendingLabel = "Activando...";
+            confirmTone = "default";
+          } else if (confirmation.type === "delete-document") {
+            confirmTitle = "Eliminar documento";
+            confirmDescription = `Se eliminara permanentemente el documento "${confirmation.document.title}" y su archivo PDF de storage. Esta accion no se puede deshacer.`;
+            confirmLabel = "Eliminar permanentemente";
+            pendingLabel = "Eliminando...";
+            confirmTone = "destructive";
           }
-        }}
-        title={
-          confirmation?.type === "delete-folder"
-            ? "Eliminar carpeta"
-            : "Desactivar documento"
         }
-        description={
-          confirmation?.type === "delete-folder"
-            ? `Se eliminara la carpeta "${confirmation.folder.name}" porque no tiene documentos.`
-            : confirmation
-              ? `El documento "${confirmation.document.title}" dejara de estar disponible para las clientas.`
-              : ""
-        }
-        confirmLabel={
-          confirmation?.type === "delete-folder"
-            ? "Eliminar carpeta"
-            : "Desactivar"
-        }
-        pendingLabel={
-          confirmation?.type === "delete-folder" ? "Eliminando..." : "Desactivando..."
-        }
-        tone="destructive"
-        onConfirm={confirmAction}
-      />
+
+        return (
+          <ConfirmationDialog
+            open={Boolean(confirmation)}
+            onOpenChange={(open) => {
+              if (!open) {
+                setConfirmation(null);
+              }
+            }}
+            title={confirmTitle}
+            description={confirmDescription}
+            confirmLabel={confirmLabel}
+            pendingLabel={pendingLabel}
+            tone={confirmTone}
+            onConfirm={confirmAction}
+          />
+        );
+      })()}
     </div>
   );
 }

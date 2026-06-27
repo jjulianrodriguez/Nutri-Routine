@@ -28,7 +28,7 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
       }}
       whileHover={reduceMotion ? undefined : { y: -2 }}
       className={[
-        "group relative overflow-hidden border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.54)] shadow-[0_34px_96px_-70px_rgb(75_53_53_/_0.24)] backdrop-blur-2xl transition-colors hover:border-[var(--blog-clay)]/30",
+        "group relative overflow-hidden border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.54)] shadow-[0_34px_96px_-70px_rgb(26_48_56_/_0.24)] backdrop-blur-2xl transition-colors hover:border-[var(--blog-clay)]/30",
         isFeatured
           ? "min-h-full rounded-[2.1rem] p-6 sm:p-8"
           : "rounded-[1.7rem] p-5 sm:p-6",
@@ -45,7 +45,7 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
       <div className="relative z-0 flex h-full flex-col">
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.62)] px-3 py-1.5 text-xs font-black text-[var(--blog-muted)] shadow-[0_14px_38px_-30px_rgb(75_53_53_/_0.2)] backdrop-blur-xl">
+            <span className="rounded-full border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.62)] px-3 py-1.5 text-xs font-black text-[var(--blog-muted)] shadow-[0_14px_38px_-30px_rgb(26_48_56_/_0.2)] backdrop-blur-xl">
               {post.category}
             </span>
             {post.isPinned ? (
@@ -89,7 +89,7 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
             <p className="font-black text-[var(--blog-night)]">{post.author}</p>
             <p className="mt-1">{post.date}</p>
           </div>
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[var(--blog-night)] text-[var(--blog-paper)] shadow-[0_18px_46px_-32px_rgb(75_53_53_/_0.38)] transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[var(--blog-night)] text-[var(--blog-paper)] shadow-[0_18px_46px_-32px_rgb(26_48_56_/_0.38)] transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105">
             <ArrowUpRight className="size-5" />
           </span>
         </div>

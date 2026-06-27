@@ -34,7 +34,7 @@ export function CardActionsMenu({ items, label }: CardActionsMenuProps) {
   }
 
   return (
-    <DropdownMenu.Root>
+    <DropdownMenu.Root modal={false}>
       <DropdownMenu.Trigger asChild>
         <Button
           type="button"

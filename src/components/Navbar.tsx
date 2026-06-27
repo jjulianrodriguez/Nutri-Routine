@@ -80,7 +80,7 @@ export function Navbar() {
               rel="noopener noreferrer"
               whileHover={reduceMotion ? undefined : { y: -2, scale: 1.012 }}
               whileTap={reduceMotion ? undefined : { scale: 0.985 }}
-              className="hidden min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ln-peach)] px-5 py-2.5 text-xs font-black uppercase tracking-[0.13em] text-[var(--ln-night)] shadow-[0_18px_54px_-36px_rgb(75_53_53_/_0.24)] sm:inline-flex"
+              className="hidden min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ln-peach)] px-5 py-2.5 text-xs font-black uppercase tracking-[0.13em] text-[var(--ln-night)] shadow-[0_18px_54px_-36px_rgb(26_48_56_/_0.24)] sm:inline-flex"
             >
               <MessageCircle className="size-4" />
               Agendar
@@ -89,7 +89,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMenuOpen((value) => !value)}
-              className="inline-flex size-12 items-center justify-center rounded-[1.2rem] bg-[var(--ln-peach)] text-[var(--ln-night)] shadow-[0_18px_54px_-36px_rgb(75_53_53_/_0.24)] transition-transform hover:scale-[1.02] md:hidden"
+              className="inline-flex size-12 items-center justify-center rounded-[1.2rem] bg-[var(--ln-peach)] text-[var(--ln-night)] shadow-[0_18px_54px_-36px_rgb(26_48_56_/_0.24)] transition-transform hover:scale-[1.02] md:hidden"
               aria-expanded={menuOpen}
               aria-controls="landing-mobile-menu"
               aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
@@ -111,14 +111,14 @@ export function Navbar() {
             initial={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-[rgb(75_53_53_/_0.22)] px-4 pt-24 backdrop-blur-md md:hidden"
+            className="fixed inset-0 z-40 bg-[rgb(26_48_56_/_0.22)] px-4 pt-24 backdrop-blur-md md:hidden"
           >
             <motion.nav
               initial={reduceMotion ? { y: 0 } : { y: -14 }}
               animate={{ y: 0 }}
               exit={reduceMotion ? { y: 0 } : { y: -14 }}
               transition={{ duration: 0.28, ease: [0.22, 0.72, 0.18, 1] }}
-              className="overflow-hidden rounded-[2rem] border border-[rgb(255_252_248_/_0.8)] bg-[rgb(255_252_248_/_0.96)] p-4 shadow-[0_36px_100px_-64px_rgb(75_53_53_/_0.34)] backdrop-blur-2xl"
+              className="overflow-hidden rounded-[2rem] border border-[rgb(255_252_248_/_0.8)] bg-[rgb(255_252_248_/_0.96)] p-4 shadow-[0_36px_100px_-64px_rgb(26_48_56_/_0.34)] backdrop-blur-2xl"
               aria-label="Navegación móvil"
             >
               {[...navLinks, { href: "/register", label: "Registrarse" }].map(
@@ -141,7 +141,7 @@ export function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
-                className="mt-4 flex min-h-12 items-center justify-center gap-2 rounded-full bg-[var(--ln-peach)] px-5 py-3.5 text-sm font-black text-[var(--ln-night)] shadow-[0_18px_54px_-36px_rgb(75_53_53_/_0.24)]"
+                className="mt-4 flex min-h-12 items-center justify-center gap-2 rounded-full bg-[var(--ln-peach)] px-5 py-3.5 text-sm font-black text-[var(--ln-night)] shadow-[0_18px_54px_-36px_rgb(26_48_56_/_0.24)]"
               >
                 Agendar consulta
                 <ArrowUpRight className="size-4" />

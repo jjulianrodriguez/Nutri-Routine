@@ -76,7 +76,14 @@ const sanitizerOptions: IOptions = {
     h2: ["class"],
     h3: ["class"],
     p: ["class"],
-    span: ["class"],
+    span: ["class", "style"],
+  },
+  allowedStyles: {
+    span: {
+      color: [/.*/],
+      "font-size": [/.*/],
+      "background-color": [/.*/],
+    },
   },
   allowedClasses: {
     h1: [...BLOCK_CLASS_NAMES],
@@ -141,8 +148,23 @@ const sanitizerOptions: IOptions = {
       transformClassedTag(tagName, attributes, BLOCK_CLASS_SET),
     p: (tagName, attributes) =>
       transformClassedTag(tagName, attributes, BLOCK_CLASS_SET),
-    span: (tagName, attributes) =>
-      transformClassedTag(tagName, attributes, INLINE_CLASS_SET),
+    span: (tagName, attributes) => {
+      const className = sanitizeClassAttribute(attributes.class, INLINE_CLASS_SET);
+      const attribs: Record<string, string> = {};
+
+      if (className) {
+        attribs.class = className;
+      }
+
+      if (attributes.style) {
+        attribs.style = attributes.style;
+      }
+
+      return {
+        attribs,
+        tagName,
+      };
+    },
   },
 };
 

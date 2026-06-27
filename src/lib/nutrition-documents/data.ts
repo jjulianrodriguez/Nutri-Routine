@@ -99,11 +99,14 @@ export async function getManageableNutritionClients(
   const supabase = await createClient();
   let query = supabase
     .from("client_profiles")
-    .select("profile_id, assigned_nutritionist_id")
-    .not("assigned_nutritionist_id", "is", null);
+    .select("profile_id, assigned_nutritionist_id");
 
-  if (!isGeneralAdmin(access)) {
-    query = query.eq("assigned_nutritionist_id", access.userId);
+  if (isGeneralAdmin(access)) {
+    // Admin sees all clients
+  } else {
+    query = query
+      .not("assigned_nutritionist_id", "is", null)
+      .eq("assigned_nutritionist_id", access.userId);
   }
 
   const clientProfiles = await resolveRows<ClientProfileRow>(query);

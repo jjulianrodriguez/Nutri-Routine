@@ -253,6 +253,7 @@ function ClientDashboard({
           <AppPanel
             title="Progreso"
             description="Consulta tus avances en un espacio separado de las áreas de nutrición y entrenamiento."
+            tone="warm"
           >
             <Link
               href="/app/progreso"

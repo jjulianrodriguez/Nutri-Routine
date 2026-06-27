@@ -28,13 +28,13 @@ export function BlogContentRenderer({
   return (
     <div
       className={cn(
-        "max-w-none break-words font-bold text-[var(--blog-muted)] [overflow-wrap:anywhere]",
+        "max-w-none break-words font-normal text-[var(--blog-muted)] [overflow-wrap:anywhere]",
         "[&_a[href]]:font-black [&_a[href]]:text-[var(--blog-forest)] [&_a[href]]:underline [&_a[href]]:decoration-[var(--blog-peach)] [&_a[href]]:decoration-2 [&_a[href]]:underline-offset-4 hover:[&_a[href]]:text-[var(--blog-clay)]",
         "[&_.blog-align-center]:text-center [&_.blog-align-left]:text-left [&_.blog-align-right]:text-right",
         "[&_.blog-color-accent]:text-[var(--blog-clay)] [&_.blog-color-charcoal]:text-[var(--blog-night)] [&_.blog-color-teal]:text-[var(--blog-forest)] [&_.blog-color-warm]:text-[var(--blog-muted)]",
         "[&_.blog-highlight]:rounded-[8px] [&_.blog-highlight]:bg-[var(--blog-rose)] [&_.blog-highlight]:px-1.5 [&_.blog-highlight]:py-0.5 [&_.blog-highlight]:font-black [&_.blog-highlight]:text-[var(--blog-night)]",
         "[&_.blog-text-large]:text-xl [&_.blog-text-large]:leading-9 [&_.blog-text-small]:text-sm [&_.blog-text-small]:leading-6",
-        "[&_blockquote]:my-8 [&_blockquote]:rounded-[1.4rem] [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--blog-forest)] [&_blockquote]:bg-[rgb(255_252_248_/_0.62)] [&_blockquote]:px-5 [&_blockquote]:py-5 [&_blockquote]:font-black [&_blockquote]:text-[var(--blog-night)] [&_blockquote]:shadow-[0_22px_70px_-56px_rgb(75_53_53_/_0.2)] [&_blockquote]:backdrop-blur-xl",
+        "[&_blockquote]:my-8 [&_blockquote]:rounded-[1.4rem] [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--blog-forest)] [&_blockquote]:bg-[rgb(255_252_248_/_0.62)] [&_blockquote]:px-5 [&_blockquote]:py-5 [&_blockquote]:font-black [&_blockquote]:text-[var(--blog-night)] [&_blockquote]:shadow-[0_22px_70px_-56px_rgb(26_48_56_/_0.2)] [&_blockquote]:backdrop-blur-xl",
         "[&_em]:text-[var(--blog-night)] [&_h1]:leading-[1.02] [&_h1]:text-[var(--blog-night)]",
         "[&_h2]:leading-[1.08] [&_h2]:text-[var(--blog-night)] [&_h3]:leading-tight [&_h3]:text-[var(--blog-night)]",
         "[&_h1]:[font-family:var(--font-landing-display)] [&_h1]:font-medium [&_h2]:[font-family:var(--font-landing-display)] [&_h2]:font-medium [&_h3]:[font-family:var(--font-landing-display)] [&_h3]:font-medium",

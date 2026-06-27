@@ -189,6 +189,22 @@ function getClientNotificationMessage(
       return "Tu plan de nutrición está activo.";
     case "nutrition_plan_deactivated":
       return "Tu plan de nutrición fue desactivado.";
+    case "nutrition_meal_plan_assigned":
+      return `${nutritionistLabel} compartio un nuevo plan de alimentacion.`;
+    case "nutrition_meal_plan_updated":
+      return "Tu plan de alimentacion fue actualizado.";
+    case "nutrition_meal_plan_deactivated":
+      return "Tu plan de alimentacion fue desactivado.";
+    case "nutrition_educational_resource_created":
+      return "Hay un nuevo recurso educativo en tu biblioteca.";
+    case "nutrition_educational_resource_updated":
+      return "Se actualizo un recurso educativo de tu biblioteca.";
+    case "nutrition_habit_assigned":
+      return `${nutritionistLabel} te asigno un nuevo habito de nutricion.`;
+    case "nutrition_habit_updated":
+      return "Se actualizo un habito de nutricion que tienes asignado.";
+    case "nutrition_habit_removed":
+      return "Un habito de nutricion fue desactivado de tu plan.";
     case "nutrition_professional_changed":
     case "nutrition_professional_assigned":
       return assignedNutritionistName

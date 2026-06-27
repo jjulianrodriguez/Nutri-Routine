@@ -48,7 +48,8 @@ export function notificationMatchesSettings(
   if (
     eventType === "resource_available" ||
     eventType.endsWith("_assigned") ||
-    eventType.includes("professional_")
+    eventType.includes("professional_") ||
+    eventType.endsWith("_created")
   ) {
     return settings.notifyAssignments;
   }
@@ -59,7 +60,8 @@ export function notificationMatchesSettings(
     eventType.endsWith("_unassigned") ||
     eventType.endsWith("_deactivated") ||
     eventType.endsWith("_activated") ||
-    eventType.endsWith("_archived")
+    eventType.endsWith("_archived") ||
+    eventType.endsWith("_removed")
   ) {
     return settings.notifyPlanChanges;
   }

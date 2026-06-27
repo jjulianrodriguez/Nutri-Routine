@@ -229,7 +229,7 @@ function MessageActionsMenu({
   onEdit: () => void;
 }) {
   return (
-    <DropdownMenu.Root>
+    <DropdownMenu.Root modal={false}>
       <DropdownMenu.Trigger asChild>
         <button
           type="button"

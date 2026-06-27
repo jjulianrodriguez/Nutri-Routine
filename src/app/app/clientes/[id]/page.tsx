@@ -595,7 +595,6 @@ export default async function ClientProfilePage({
           <HabitTracker
             data={habitData}
             isClient={false}
-            showManagement={false}
           />
         </AppPanel>
       ) : null}

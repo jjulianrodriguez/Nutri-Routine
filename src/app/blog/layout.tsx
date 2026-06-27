@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function BlogLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-dvh flex-col bg-[var(--blog-cream)] text-[var(--blog-night)] [--blog-clay:#9F5F5B] [--blog-cream:#F7E6D4] [--blog-forest:#4F7836] [--blog-mint:#86B05D] [--blog-muted:#7A6660] [--blog-night:#4B3535] [--blog-paper:#FFFCF8] [--blog-peach:#E7C58A] [--blog-rose:#F1D6D0] [--blog-sage:#FFF4EA] [--blog-sand:#E7C58A] [font-family:var(--font-landing-sans)]">
+    <div className="flex min-h-dvh flex-col bg-[var(--blog-cream)] text-[var(--blog-night)] [--blog-clay:#DB3854] [--blog-cream:#FFF8E8] [--blog-forest:#44509F] [--blog-mint:#FFE9AD] [--blog-muted:#656B78] [--blog-night:#071C33] [--blog-paper:#FFFFFF] [--blog-peach:#F87F52] [--blog-rose:#FFF8E8] [--blog-sage:#FFE9AD] [--blog-sand:#F87F52] [font-family:var(--font-landing-sans)]">
       <BlogNavbar />
       <main className="flex-1">{children}</main>
       <BlogFooter />

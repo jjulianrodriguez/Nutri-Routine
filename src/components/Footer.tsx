@@ -24,7 +24,7 @@ export function Footer() {
 
   return (
     <footer className="relative overflow-hidden border-t border-[var(--ln-night)]/8 bg-[var(--ln-cream)] text-[var(--ln-night)]">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgb(231_197_138_/_0.3),transparent_30rem),radial-gradient(circle_at_82%_6%,rgb(247_230_212_/_0.9),transparent_34rem),linear-gradient(180deg,var(--ln-paper)_0%,var(--ln-sand)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgb(255_233_173_/_0.3),transparent_30rem),radial-gradient(circle_at_82%_6%,rgb(255_248_232_/_0.9),transparent_34rem),linear-gradient(180deg,var(--ln-paper)_0%,var(--ln-sand)_100%)]" />
       <div className="relative mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10 lg:py-20">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1.18fr)_minmax(20rem,0.58fr)]">
           <motion.div
@@ -32,10 +32,10 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.72, ease: [0.18, 0.82, 0.22, 1] }}
-            className="relative overflow-hidden rounded-[2.4rem] border border-[rgb(255_252_248_/_0.72)] bg-[rgb(255_252_248_/_0.74)] p-6 shadow-[0_38px_120px_-84px_rgb(75_53_53_/_0.28)] backdrop-blur-2xl sm:p-8 lg:min-h-[35rem]"
+            className="relative overflow-hidden rounded-[2.4rem] border border-[rgb(255_252_248_/_0.72)] bg-[rgb(255_252_248_/_0.74)] p-6 shadow-[0_38px_120px_-84px_rgb(26_48_56_/_0.28)] backdrop-blur-2xl sm:p-8 lg:min-h-[35rem]"
           >
             <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-[42%_58%_48%_52%] bg-[var(--ln-mint)]/70 blur-2xl" />
-            <div className="pointer-events-none absolute bottom-0 left-0 h-24 w-full bg-[linear-gradient(90deg,rgb(199_121_116_/_0.18),transparent)]" />
+            <div className="pointer-events-none absolute bottom-0 left-0 h-24 w-full bg-[linear-gradient(90deg,rgb(219_56_84_/_0.18),transparent)]" />
 
             <div className="relative flex flex-wrap items-start justify-between gap-6">
               <div className="inline-flex items-center gap-3">
@@ -59,7 +59,7 @@ export function Footer() {
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ln-peach)] px-5 py-2.5 text-sm font-black text-[var(--ln-night)] shadow-[0_20px_58px_-36px_rgb(75_53_53_/_0.24)]"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ln-peach)] px-5 py-2.5 text-sm font-black text-[var(--ln-night)] shadow-[0_20px_58px_-36px_rgb(26_48_56_/_0.24)]"
               >
                 <MessageCircle className="size-4" />
                 WhatsApp
@@ -106,7 +106,7 @@ export function Footer() {
             }}
             className="grid gap-5"
           >
-            <div className="rounded-[2rem] bg-[var(--ln-night)] p-6 text-[var(--ln-paper)] shadow-[0_34px_100px_-70px_rgb(75_53_53_/_0.42)] sm:p-7">
+            <div className="rounded-[2rem] bg-[var(--ln-night)] p-6 text-[var(--ln-paper)] shadow-[0_34px_100px_-70px_rgb(26_48_56_/_0.42)] sm:p-7">
               <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--ln-peach)]">
                 próximas consultas
               </p>
@@ -116,7 +116,7 @@ export function Footer() {
               </p>
             </div>
 
-            <div className="rounded-[2rem] border border-[var(--ln-night)]/8 bg-[rgb(255_252_248_/_0.56)] p-6 shadow-[0_34px_100px_-78px_rgb(75_53_53_/_0.22)] backdrop-blur-xl sm:p-7">
+            <div className="rounded-[2rem] border border-[var(--ln-night)]/8 bg-[rgb(255_252_248_/_0.56)] p-6 shadow-[0_34px_100px_-78px_rgb(26_48_56_/_0.22)] backdrop-blur-xl sm:p-7">
               <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--ln-forest)]">

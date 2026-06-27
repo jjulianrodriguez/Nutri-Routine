@@ -11,7 +11,7 @@ const footerLinks = [
 export function BlogFooter() {
   return (
     <footer className="relative overflow-hidden border-t border-[var(--blog-night)]/8 bg-[var(--blog-paper)]">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_10%,rgb(231_197_138_/_0.28),transparent_26rem),radial-gradient(circle_at_88%_40%,rgb(247_230_212_/_0.78),transparent_30rem)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_10%,rgb(255_233_173_/_0.28),transparent_26rem),radial-gradient(circle_at_88%_40%,rgb(255_248_232_/_0.78),transparent_30rem)]" />
       <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end lg:px-10">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.24em] text-[var(--blog-forest)]">
@@ -38,7 +38,7 @@ export function BlogFooter() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="group inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.56)] px-4 py-2 text-sm font-black text-[var(--blog-night)] shadow-[0_18px_48px_-40px_rgb(75_53_53_/_0.2)] backdrop-blur-xl transition-colors hover:border-[var(--blog-clay)]/30 hover:bg-[rgb(255_252_248_/_0.78)]"
+                className="group inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.56)] px-4 py-2 text-sm font-black text-[var(--blog-night)] shadow-[0_18px_48px_-40px_rgb(26_48_56_/_0.2)] backdrop-blur-xl transition-colors hover:border-[var(--blog-clay)]/30 hover:bg-[rgb(255_252_248_/_0.78)]"
               >
                 {link.label}
                 <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

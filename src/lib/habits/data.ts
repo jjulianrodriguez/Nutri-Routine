@@ -34,29 +34,25 @@ type AssignmentHabitRow = Pick<
   "active" | "created_by" | "description" | "id" | "title"
 >;
 
-function logHabitTrackerQueryError(
-  label: string,
-  error: {
-    code?: string;
-    details?: string;
-    hint?: string;
-    message?: string;
-  },
-) {
-  console.error(label, {
-    code: error.code,
-    details: error.details,
-    hint: error.hint,
-    message: error.message,
+function logHabitTrackerQueryError(label: string, error: unknown) {
+  const e = error as Record<string, unknown> | null;
+  const message = typeof e?.message === "string" ? e.message : "Error desconocido";
+  
+  console.error(`${label}: ${message}`, {
+    code: e?.code,
+    details: e?.details,
+    hint: e?.hint,
+    message: e?.message,
+    name: e?.name,
   });
 }
 
 function normalizeDaysOfWeek(value: number[] | null) {
   const uniqueDays = Array.from(
-    new Set((value ?? []).filter((day) => day >= 1 && day <= 5)),
+    new Set((value ?? []).filter((day) => day >= 1 && day <= 7)),
   );
 
-  return uniqueDays.length > 0 ? uniqueDays.sort((a, b) => a - b) : [1, 2, 3, 4, 5];
+  return uniqueDays.length > 0 ? uniqueDays.sort((a, b) => a - b) : [1, 2, 3, 4, 5, 6, 7];
 }
 
 function mapHabit(row: HabitRow): HabitSummary {
@@ -111,10 +107,14 @@ async function listNutritionClients(
     return [];
   }
 
-  const { data, error } = await supabase
-    .from("client_profiles")
-    .select("profile_id, assigned_nutritionist_id")
-    .not("assigned_nutritionist_id", "is", null);
+  const query = access.isAdmin
+    ? supabase.from("client_profiles").select("profile_id, assigned_nutritionist_id")
+    : supabase
+        .from("client_profiles")
+        .select("profile_id, assigned_nutritionist_id")
+        .not("assigned_nutritionist_id", "is", null);
+
+  const { data, error } = await query;
 
   if (error) {
     logHabitTrackerQueryError(
@@ -217,7 +217,6 @@ async function listAssignmentsForWeek({
       "id, habit_id, client_id, assigned_by, active, days_of_week, start_date, end_date",
     )
     .eq("client_id", clientId)
-    .eq("active", true)
     .lte("start_date", weekEnd)
     .or(`end_date.is.null,end_date.gte.${weekStart}`)
     .order("start_date", { ascending: false });

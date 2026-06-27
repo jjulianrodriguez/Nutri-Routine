@@ -3,12 +3,22 @@
 import { revalidatePath } from "next/cache";
 
 import { getCurrentUserAccess } from "@/lib/auth/current-user-access";
+import type { CurrentUserAccess } from "@/lib/auth/access-rules";
 import {
   getCurrentHabitWeek,
   isAssignmentApplicableOnDate,
   isHabitDateMarkable,
 } from "@/lib/habits/utils";
+import {
+  createNutritionNotification,
+  createNutritionNotifications,
+  getAssignedHabitNotificationRecipients,
+} from "@/lib/actions/nutrition-notifications";
 import { createClient } from "@/lib/supabase/server";
+import {
+  createAdminClient,
+  hasSupabaseAdminConfig,
+} from "@/lib/supabase/admin";
 import {
   habitAssignmentSchema,
   habitProgressSchema,
@@ -30,6 +40,7 @@ type HabitActionResult =
     };
 
 const NUTRITION_PATH = "/app/nutricion";
+const NUTRITION_HABITS_PATH = "/app/nutricion/habitos";
 const DASHBOARD_PATH = "/app/dashboard";
 
 function getFieldErrors(error: {
@@ -41,6 +52,35 @@ function getFieldErrors(error: {
       messages?.[0] ?? "Campo invalido.",
     ]),
   );
+}
+
+function logQueryError(label: string, error: unknown) {
+  const e = error as Record<string, unknown> | null;
+  const message = typeof e?.message === "string" ? e.message : "Error desconocido";
+  
+  console.error(`${label}: ${message}`, {
+    code: e?.code,
+    details: e?.details,
+    hint: e?.hint,
+    message: e?.message,
+    name: e?.name,
+  });
+}
+
+async function logActionFailure(userId: string, message: string) {
+  if (!hasSupabaseAdminConfig()) return;
+  try {
+    const admin = createAdminClient();
+    await admin.from("notifications").insert({
+      actor_id: userId,
+      destination_path: "/app/nutricion",
+      event_type: "nutrition_action_failed",
+      message: message,
+      recipient_id: userId,
+    });
+  } catch (err) {
+    console.error("No se pudo registrar la notificacion de fallo:", err);
+  }
 }
 
 function normalizeDescription(value?: string | null) {
@@ -60,6 +100,58 @@ function revalidateHabits(clientId?: string) {
   if (clientId) {
     revalidatePath(`/app/clientes/${clientId}`);
   }
+}
+
+async function notifyAssignedHabitClients({
+  access,
+  eventType,
+  habitId,
+  message,
+}: {
+  access: CurrentUserAccess;
+  eventType: string;
+  habitId: string;
+  message: string;
+}) {
+  const recipientIds = await getAssignedHabitNotificationRecipients({
+    actorId: access.userId,
+    habitId,
+    isAdmin: access.isAdmin,
+  });
+
+  await createNutritionNotifications({
+    actorId: access.userId,
+    destinationPath: NUTRITION_HABITS_PATH,
+    eventType,
+    message,
+    metadata: { habitId },
+    recipientIds,
+  });
+}
+
+async function notifyHabitAssignmentClient({
+  access,
+  assignmentId,
+  clientId,
+  eventType,
+  habitId,
+  message,
+}: {
+  access: CurrentUserAccess;
+  assignmentId: string;
+  clientId: string;
+  eventType: string;
+  habitId: string;
+  message: string;
+}) {
+  await createNutritionNotification({
+    actorId: access.userId,
+    destinationPath: NUTRITION_HABITS_PATH,
+    eventType,
+    message,
+    metadata: { assignmentId, habitId },
+    recipientId: clientId,
+  });
 }
 
 async function requireNutritionManager() {
@@ -96,14 +188,25 @@ async function validateClientForNutritionManager(clientId: string) {
     .eq("profile_id", clientId)
     .maybeSingle();
 
-  if (error || !data?.assigned_nutritionist_id) {
+  if (error || !data) {
+    return {
+      access: null,
+      error: "La clienta seleccionada no existe.",
+    };
+  }
+
+  if (actor.access.isAdmin) {
+    return actor;
+  }
+
+  if (!data.assigned_nutritionist_id) {
     return {
       access: null,
       error: "La clienta seleccionada no tiene nutricion activa.",
     };
   }
 
-  if (!actor.access.isAdmin && data.assigned_nutritionist_id !== actor.access.userId) {
+  if (data.assigned_nutritionist_id !== actor.access.userId) {
     return {
       access: null,
       error: "Solo puedes gestionar habitos de tus clientas asignadas.",
@@ -136,6 +239,19 @@ export async function saveHabit(values: HabitValues): Promise<HabitActionResult>
     description: normalizeDescription(parsed.data.description),
     title: parsed.data.title.trim(),
   };
+
+  const { data: previousHabit, error: previousHabitError } = parsed.data.habitId
+    ? await supabase
+        .from("habits")
+        .select("id, active")
+        .eq("id", parsed.data.habitId)
+        .maybeSingle()
+    : { data: null, error: null };
+
+  if (previousHabitError) {
+    logQueryError("Error revisando habito actual", previousHabitError);
+  }
+
   const mutation = parsed.data.habitId
     ? supabase
         .from("habits")
@@ -148,6 +264,8 @@ export async function saveHabit(values: HabitValues): Promise<HabitActionResult>
   const { error } = await mutation;
 
   if (error) {
+    logQueryError("Error en saveHabit", error);
+    await logActionFailure(actor.access.userId, "Fallo al guardar el habito de nutricion.");
     return {
       message: "No se pudo guardar el habito. Verifica tus permisos.",
       status: "error",
@@ -155,6 +273,21 @@ export async function saveHabit(values: HabitValues): Promise<HabitActionResult>
   }
 
   revalidateHabits();
+
+  if (parsed.data.habitId) {
+    const wasDeactivated = previousHabit?.active === true && !payload.active;
+
+    await notifyAssignedHabitClients({
+      access: actor.access,
+      eventType: wasDeactivated
+        ? "nutrition_habit_removed"
+        : "nutrition_habit_updated",
+      habitId: parsed.data.habitId,
+      message: wasDeactivated
+        ? "Un habito de nutricion asignado fue desactivado de tu plan."
+        : "Se actualizo un habito de nutricion que tienes asignado.",
+    });
+  }
 
   return {
     message: parsed.data.habitId
@@ -189,11 +322,19 @@ export async function deactivateHabit(habitId: string): Promise<HabitActionResul
     .eq("id", habitId);
 
   if (error) {
+    logQueryError("Error en deactivateHabit", error);
     return {
       message: "No se pudo desactivar el habito.",
       status: "error",
     };
   }
+
+  await notifyAssignedHabitClients({
+    access: actor.access,
+    eventType: "nutrition_habit_removed",
+    habitId,
+    message: "Un habito de nutricion asignado fue desactivado de tu plan.",
+  });
 
   revalidateHabits();
 
@@ -253,28 +394,49 @@ export async function saveHabitAssignment(
     assignmentId = existing?.id ?? null;
   }
 
+  const isNewAssignment = !assignmentId;
   const mutation = assignmentId
-    ? supabase.from("habit_assignments").update(payload).eq("id", assignmentId)
+    ? supabase
+        .from("habit_assignments")
+        .update(payload)
+        .eq("id", assignmentId)
+        .select("id")
+        .maybeSingle()
     : supabase.from("habit_assignments").insert({
         ...payload,
         assigned_by: actor.access.userId,
         client_id: parsed.data.clientId,
-      });
-  const { error } = await mutation;
+      }).select("id").single();
+  const { data, error } = await mutation;
 
-  if (error) {
+  if (error || !data) {
+    logQueryError("Error en saveHabitAssignment", error);
+    await logActionFailure(actor.access.userId, "Fallo al asignar el habito de nutricion.");
     return {
       message: "No se pudo asignar el habito. Verifica permisos y duplicados.",
       status: "error",
     };
   }
 
+  await notifyHabitAssignmentClient({
+    access: actor.access,
+    assignmentId: data.id,
+    clientId: parsed.data.clientId,
+    eventType: isNewAssignment
+      ? "nutrition_habit_assigned"
+      : "nutrition_habit_updated",
+    habitId: parsed.data.habitId,
+    message: isNewAssignment
+      ? "Se te asigno un nuevo habito de nutricion."
+      : "Se actualizo un habito de nutricion que tienes asignado.",
+  });
+
   revalidateHabits(parsed.data.clientId);
 
   return {
-    message: assignmentId
-      ? "Asignacion actualizada correctamente."
-      : "Habito asignado correctamente.",
+    message: isNewAssignment
+      ? "Habito asignado correctamente."
+      : "Asignacion actualizada correctamente.",
     status: "success",
   };
 }
@@ -290,21 +452,33 @@ export async function deactivateHabitAssignment(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("habit_assignments")
     .update({
       active: false,
       end_date: getCurrentHabitWeek().today,
     })
     .eq("id", assignmentId)
-    .eq("client_id", clientId);
+    .eq("client_id", clientId)
+    .select("id, habit_id")
+    .maybeSingle();
 
-  if (error) {
+  if (error || !data) {
+    logQueryError("Error en deactivateHabitAssignment", error);
     return {
       message: "No se pudo desactivar la asignacion.",
       status: "error",
     };
   }
+
+  await notifyHabitAssignmentClient({
+    access: actor.access,
+    assignmentId: data.id,
+    clientId,
+    eventType: "nutrition_habit_removed",
+    habitId: data.habit_id,
+    message: "Un habito de nutricion fue desactivado de tu plan.",
+  });
 
   revalidateHabits(clientId);
 
@@ -417,6 +591,7 @@ export async function updateHabitProgress(
   const { error } = await mutation;
 
   if (error) {
+    logQueryError("Error en updateHabitProgress", error);
     return {
       message: "No se pudo guardar tu avance. Intentalo de nuevo.",
       status: "error",
@@ -429,6 +604,214 @@ export async function updateHabitProgress(
     message: parsed.data.completed
       ? "Habito marcado como completado."
       : "Habito desmarcado.",
+    status: "success",
+  };
+}
+
+export async function activateHabit(habitId: string): Promise<HabitActionResult> {
+  if (!habitId) {
+    return {
+      message: "El habito no es valido.",
+      status: "error",
+    };
+  }
+
+  const actor = await requireNutritionManager();
+
+  if (actor.error || !actor.access) {
+    return { message: actor.error, status: "error" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("habits")
+    .update({ active: true })
+    .eq("id", habitId);
+
+  if (error) {
+    logQueryError("Error en activateHabit", error);
+    return {
+      message: "No se pudo activar el habito.",
+      status: "error",
+    };
+  }
+
+  revalidateHabits();
+
+  return {
+    message: "Habito activado correctamente.",
+    status: "success",
+  };
+}
+
+export async function deleteHabit(habitId: string): Promise<HabitActionResult> {
+  if (!habitId) {
+    return {
+      message: "El habito no es valido.",
+      status: "error",
+    };
+  }
+
+  const actor = await requireNutritionManager();
+
+  if (actor.error || !actor.access) {
+    return { message: actor.error, status: "error" };
+  }
+
+  const supabase = await createClient();
+
+  // First check if it has assignments
+  const { count, error: countError } = await supabase
+    .from("habit_assignments")
+    .select("id", { count: "exact", head: true })
+    .eq("habit_id", habitId);
+
+  if (countError) {
+    logQueryError("Error contando asignaciones en deleteHabit", countError);
+    return {
+      message: "No se pudo verificar el historial del habito.",
+      status: "error",
+    };
+  }
+
+  if ((count ?? 0) > 0) {
+    return {
+      message: "Este habito tiene asignaciones activas o pasadas. Desactivalo en su lugar para conservar el historial.",
+      status: "error",
+    };
+  }
+
+  const { error } = await supabase
+    .from("habits")
+    .delete()
+    .eq("id", habitId);
+
+  if (error) {
+    logQueryError("Error en deleteHabit", error);
+    return {
+      message: "No se pudo eliminar el habito.",
+      status: "error",
+    };
+  }
+
+  revalidateHabits();
+
+  return {
+    message: "Habito eliminado correctamente.",
+    status: "success",
+  };
+}
+
+export async function reactivateHabitAssignment(
+  assignmentId: string,
+  clientId: string,
+): Promise<HabitActionResult> {
+  const actor = await validateClientForNutritionManager(clientId);
+
+  if (actor.error || !actor.access) {
+    return { message: actor.error, status: "error" };
+  }
+
+  const supabase = await createClient();
+
+  // Get the assignment details to check habit_id
+  const { data: assignment, error: assignmentError } = await supabase
+    .from("habit_assignments")
+    .select("id, habit_id, active")
+    .eq("id", assignmentId)
+    .eq("client_id", clientId)
+    .maybeSingle();
+
+  if (assignmentError || !assignment) {
+    return {
+      message: "La asignacion no existe o no pertenece a la clienta.",
+      status: "error",
+    };
+  }
+
+  if (assignment.active) {
+    return {
+      message: "La asignacion ya esta activa.",
+      status: "error",
+    };
+  }
+
+  // Check if parent habit is active
+  const { data: habit, error: habitError } = await supabase
+    .from("habits")
+    .select("id, active")
+    .eq("id", assignment.habit_id)
+    .maybeSingle();
+
+  if (habitError || !habit) {
+    return {
+      message: "El habito asignado no existe.",
+      status: "error",
+    };
+  }
+
+  if (!habit.active) {
+    return {
+      message: "El habito debe estar activo para reactivar la asignacion.",
+      status: "error",
+    };
+  }
+
+  // Check if there is already an active assignment for this habit and client
+  const { data: existingActive, error: existingError } = await supabase
+    .from("habit_assignments")
+    .select("id")
+    .eq("client_id", clientId)
+    .eq("habit_id", assignment.habit_id)
+    .eq("active", true)
+    .maybeSingle();
+
+  if (existingError) {
+    return {
+      message: "No se pudo verificar si ya existe una asignacion activa.",
+      status: "error",
+    };
+  }
+
+  if (existingActive) {
+    return {
+      message: "Ya existe una asignacion activa de este habito para esta clienta.",
+      status: "error",
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("habit_assignments")
+    .update({
+      active: true,
+      end_date: null,
+    })
+    .eq("id", assignmentId)
+    .eq("client_id", clientId)
+    .select("id, habit_id")
+    .maybeSingle();
+
+  if (error || !data) {
+    logQueryError("Error en reactivateHabitAssignment", error);
+    return {
+      message: "No se pudo reactivar la asignacion.",
+      status: "error",
+    };
+  }
+
+  await notifyHabitAssignmentClient({
+    access: actor.access,
+    assignmentId: data.id,
+    clientId,
+    eventType: "nutrition_habit_assigned",
+    habitId: data.habit_id,
+    message: "Se te asigno un nuevo habito de nutricion.",
+  });
+
+  revalidateHabits(clientId);
+
+  return {
+    message: "Asignacion reactivada correctamente.",
     status: "success",
   };
 }

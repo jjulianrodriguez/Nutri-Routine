@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   ArrowUpRight,
@@ -164,12 +164,12 @@ function PremiumLink({
     "group relative inline-flex min-h-12 items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-full px-5 py-3 text-sm font-black transition-none sm:px-6";
   const variants = {
     primary:
-      "bg-[var(--ln-peach)] !text-[var(--ln-night)] shadow-[0_24px_70px_-38px_rgb(75_53_53_/_0.24)]",
+      "bg-[var(--ln-peach)] !text-[var(--ln-night)] shadow-[0_24px_70px_-38px_rgb(26_48_56_/_0.24)]",
     secondary:
-      "border border-[var(--ln-night)]/10 bg-[rgb(255_255_255_/_0.62)] !text-[var(--ln-night)] shadow-[0_18px_54px_-42px_rgb(75_53_53_/_0.18)] backdrop-blur-xl",
+      "border border-[var(--ln-night)]/10 bg-[rgb(255_255_255_/_0.62)] !text-[var(--ln-night)] shadow-[0_18px_54px_-42px_rgb(26_48_56_/_0.18)] backdrop-blur-xl",
     ghost:
-      "border border-[var(--ln-night)]/10 bg-[rgb(255_255_255_/_0.42)] !text-[var(--ln-night)] shadow-[0_18px_54px_-46px_rgb(75_53_53_/_0.16)] backdrop-blur-xl",
-    ink: "bg-[var(--ln-night)] !text-[var(--ln-paper)] shadow-[0_24px_70px_-42px_rgb(75_53_53_/_0.42)]",
+      "border border-[var(--ln-night)]/10 bg-[rgb(255_255_255_/_0.42)] !text-[var(--ln-night)] shadow-[0_18px_54px_-46px_rgb(26_48_56_/_0.16)] backdrop-blur-xl",
+    ink: "bg-[var(--ln-night)] !text-[var(--ln-paper)] shadow-[0_24px_70px_-42px_rgb(26_48_56_/_0.42)]",
   };
   const classes = `${base} ${variants[variant]} ${className}`;
   const content = (
@@ -219,7 +219,7 @@ function SectionEyebrow({
       className={[
         "inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.68rem] font-black uppercase tracking-[0.18em] backdrop-blur-xl",
         light
-          ? "border border-white/[0.8] bg-[rgb(255_255_255_/_0.48)] text-[var(--ln-forest)] shadow-[0_16px_40px_-34px_rgb(75_53_53_/_0.2)]"
+          ? "border border-white/[0.8] bg-[rgb(255_255_255_/_0.48)] text-[var(--ln-forest)] shadow-[0_16px_40px_-34px_rgb(26_48_56_/_0.2)]"
           : "border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.74] text-[var(--ln-forest)]",
       ].join(" ")}
     >
@@ -261,11 +261,11 @@ function HeroProductVisual() {
           delay: reduceMotion ? 0 : 0.16,
           ease: motionEase,
         }}
-        className="absolute -right-14 bottom-12 top-4 w-[88%] rounded-[999px] bg-[radial-gradient(circle_at_56%_34%,rgb(255_252_248_/_0.92),rgb(247_230_212_/_0.68)_46%,rgb(231_197_138_/_0.24)_72%,transparent_78%)] blur-[1px] sm:-right-20 sm:bottom-16 lg:-right-28"
+        className="absolute -right-14 bottom-12 top-4 w-[88%] rounded-[999px] bg-[radial-gradient(circle_at_56%_34%,rgb(255_248_232_/_0.92),rgb(255_248_232_/_0.68)_46%,rgb(255_233_173_/_0.24)_72%,transparent_78%)] blur-[1px] sm:-right-20 sm:bottom-16 lg:-right-28"
       />
       <motion.div
         style={reduceMotion ? undefined : { scale: shadowScale }}
-        className="absolute bottom-10 right-0 h-20 w-[58%] rounded-full bg-[radial-gradient(ellipse,rgb(75_53_53_/_0.18),transparent_68%)] blur-xl"
+        className="absolute bottom-10 right-0 h-20 w-[58%] rounded-full bg-[radial-gradient(ellipse,rgb(26_48_56_/_0.18),transparent_68%)] blur-xl"
       />
 
       <motion.div
@@ -322,7 +322,7 @@ function HeroProductVisual() {
             height={1536}
             priority
             sizes="(min-width: 1024px) 48vw, 110vw"
-            className="h-auto w-full select-none drop-shadow-[0_38px_64px_rgb(75_53_53_/_0.18)]"
+            className="h-auto w-full select-none drop-shadow-[0_38px_64px_rgb(26_48_56_/_0.18)]"
           />
         </motion.div>
       </motion.div>
@@ -359,7 +359,7 @@ function HeroProductVisual() {
             width={1600}
             height={900}
             sizes="(min-width: 1024px) 13vw, 30vw"
-            className="h-auto w-full select-none drop-shadow-[0_18px_28px_rgb(75_53_53_/_0.18)]"
+            className="h-auto w-full select-none drop-shadow-[0_18px_28px_rgb(26_48_56_/_0.18)]"
           />
         </motion.div>
       </div>
@@ -386,8 +386,8 @@ function Hero() {
       ref={ref}
       className="relative min-h-dvh overflow-hidden bg-[var(--ln-cream)] px-5 pb-16 pt-28 text-[var(--ln-night)] sm:px-8 sm:pb-24 sm:pt-32 lg:px-10"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgb(231_197_138_/_0.34),transparent_28rem),radial-gradient(circle_at_88%_20%,rgb(247_230_212_/_0.88),transparent_34rem),linear-gradient(135deg,var(--ln-cream)_0%,var(--ln-paper)_46%,var(--ln-sage)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 opacity-[0.28] [background-image:linear-gradient(rgb(75_53_53_/_0.08)_1px,transparent_1px),linear-gradient(90deg,rgb(75_53_53_/_0.07)_1px,transparent_1px)] [background-size:78px_78px]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgb(255_233_173_/_0.34),transparent_28rem),radial-gradient(circle_at_88%_20%,rgb(255_248_232_/_0.88),transparent_34rem),linear-gradient(135deg,var(--ln-cream)_0%,var(--ln-paper)_46%,var(--ln-sage)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.28] [background-image:linear-gradient(rgb(26_48_56_/_0.08)_1px,transparent_1px),linear-gradient(90deg,rgb(26_48_56_/_0.07)_1px,transparent_1px)] [background-size:78px_78px]" />
 
       <div className="relative mx-auto grid min-h-[calc(100dvh-8rem)] max-w-7xl items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(26rem,0.82fr)]">
         <motion.div
@@ -433,7 +433,7 @@ function BenefitChips({ benefits }: { benefits: string[] }) {
     <ul className="mt-8 flex flex-wrap gap-2.5">
       {benefits.map((benefit, index) => (
         <Reveal key={benefit} delay={index * 0.035}>
-          <li className="inline-flex items-center gap-2 rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.72] px-3.5 py-2 text-sm font-extrabold text-[var(--ln-night)] shadow-[0_16px_42px_-34px_rgb(75_53_53_/_0.28)] backdrop-blur-xl">
+          <li className="inline-flex items-center gap-2 rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.72] px-3.5 py-2 text-sm font-extrabold text-[var(--ln-night)] shadow-[0_16px_42px_-34px_rgb(26_48_56_/_0.28)] backdrop-blur-xl">
             <Check className="size-4 text-[var(--ln-clay)]" />
             {benefit}
           </li>
@@ -474,7 +474,7 @@ function ProfessionalVisual({
       ref={ref}
       style={reduceMotion ? undefined : { y }}
       className={[
-        "relative min-h-[28rem] overflow-hidden rounded-[2rem] border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.78] p-4 shadow-[0_42px_110px_-76px_rgb(75_53_53_/_0.34)] backdrop-blur-2xl sm:rounded-[2.5rem]",
+        "relative min-h-[28rem] overflow-hidden rounded-[2rem] border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.78] p-4 shadow-[0_42px_110px_-76px_rgb(26_48_56_/_0.34)] backdrop-blur-2xl sm:rounded-[2.5rem]",
         reverse ? "lg:col-start-2" : "",
       ].join(" ")}
     >
@@ -482,7 +482,7 @@ function ProfessionalVisual({
         className="absolute inset-0 opacity-95"
         style={{
           background:
-            "radial-gradient(circle at 20% 18%, rgb(247 230 212 / 0.86), transparent 18rem), linear-gradient(145deg, rgb(255 252 248 / 0.94), rgb(231 197 138 / 0.38))",
+            "radial-gradient(circle at 20% 18%, rgb(255 248 232 / 0.86), transparent 18rem), linear-gradient(145deg, rgb(255 248 232 / 0.94), rgb(255 233 173 / 0.38))",
         }}
       />
       <div className="relative flex min-h-[25rem] flex-col justify-between overflow-hidden rounded-[1.5rem] border border-[var(--ln-night)]/10 bg-[var(--ln-cream)] p-6 sm:rounded-[2rem] sm:p-7 lg:min-h-[32rem]">
@@ -510,7 +510,7 @@ function ProfessionalVisual({
           </span>
         </div>
 
-        <div className="relative mx-auto grid size-48 place-items-center rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.82] shadow-[0_28px_72px_-50px_rgb(75_53_53_/_0.34)] sm:size-56">
+        <div className="relative mx-auto grid size-48 place-items-center rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.82] shadow-[0_28px_72px_-50px_rgb(26_48_56_/_0.34)] sm:size-56">
           <span
             style={displayFontStyle}
             className="text-8xl leading-none text-[var(--ln-night)]"
@@ -564,7 +564,7 @@ function ProfessionalChapter({
       id={id}
       className="relative overflow-hidden border-t border-[var(--ln-night)]/10 bg-[var(--ln-paper)] px-5 py-20 sm:px-8 sm:py-28 lg:px-10"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_10%,rgb(134_176_93_/_0.16),transparent_26rem)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_10%,rgb(68_80_159_/_0.16),transparent_26rem)]" />
       <div
         className={[
           "relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.86fr_1.14fr]",
@@ -619,7 +619,7 @@ function WhySection() {
       id="enfoque"
       className="relative overflow-hidden border-y border-[var(--ln-night)]/8 bg-[var(--ln-sage)] px-5 py-20 text-[var(--ln-night)] sm:px-8 sm:py-28 lg:px-10"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_18%,rgb(231_197_138_/_0.22),transparent_30rem),radial-gradient(circle_at_92%_12%,rgb(247_230_212_/_0.86),transparent_34rem),linear-gradient(180deg,var(--ln-sage)_0%,var(--ln-paper)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_18%,rgb(255_233_173_/_0.22),transparent_30rem),radial-gradient(circle_at_92%_12%,rgb(255_248_232_/_0.86),transparent_34rem),linear-gradient(180deg,var(--ln-sage)_0%,var(--ln-paper)_100%)]" />
       <div className="relative mx-auto max-w-7xl">
         <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
           <Reveal>
@@ -656,7 +656,7 @@ function WhySection() {
                 <motion.article
                   whileHover={{ y: -8, scale: 1.012 }}
                   transition={{ duration: 0.28, ease: motionEase }}
-                  className="group flex h-full min-h-[13rem] flex-col justify-between overflow-hidden rounded-[1.4rem] border border-[var(--ln-night)]/8 bg-[rgb(255_252_248_/_0.62)] p-5 shadow-[0_34px_90px_-66px_rgb(75_53_53_/_0.22)] backdrop-blur-xl sm:p-6"
+                  className="group flex h-full min-h-[13rem] flex-col justify-between overflow-hidden rounded-[1.4rem] border border-[var(--ln-night)]/8 bg-[rgb(255_252_248_/_0.62)] p-5 shadow-[0_34px_90px_-66px_rgb(26_48_56_/_0.22)] backdrop-blur-xl sm:p-6"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <span
@@ -705,7 +705,7 @@ function ClosingCta() {
 
   return (
     <section className="relative overflow-hidden bg-[var(--ln-paper)] px-5 py-20 text-[var(--ln-night)] sm:px-8 sm:py-28 lg:px-10">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_12%,rgb(199_121_116_/_0.18),transparent_30rem),radial-gradient(circle_at_86%_22%,rgb(247_230_212_/_0.86),transparent_34rem),linear-gradient(180deg,var(--ln-paper)_0%,var(--ln-cream)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_12%,rgb(219_56_84_/_0.18),transparent_30rem),radial-gradient(circle_at_86%_22%,rgb(255_248_232_/_0.86),transparent_34rem),linear-gradient(180deg,var(--ln-paper)_0%,var(--ln-cream)_100%)]" />
       <motion.div
         aria-hidden="true"
         animate={reduceMotion ? undefined : { x: ["0%", "-7%", "0%"] }}
@@ -720,9 +720,9 @@ function ClosingCta() {
       <div className="relative mx-auto max-w-7xl">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(28rem,0.72fr)] lg:items-center">
           <Reveal>
-            <div className="relative overflow-hidden rounded-[2.4rem] border border-[var(--ln-night)]/10 bg-[rgb(255_252_248_/_0.48)] p-5 shadow-[0_44px_130px_-86px_rgb(75_53_53_/_0.28)] backdrop-blur-2xl sm:rounded-[3rem] sm:p-7">
+            <div className="relative overflow-hidden rounded-[2.4rem] border border-[var(--ln-night)]/10 bg-[rgb(255_252_248_/_0.48)] p-5 shadow-[0_44px_130px_-86px_rgb(26_48_56_/_0.28)] backdrop-blur-2xl sm:rounded-[3rem] sm:p-7">
               <div className="relative min-h-[34rem] overflow-hidden rounded-[1.9rem] border border-[var(--ln-night)]/8 bg-[var(--ln-cream)] p-6 sm:min-h-[39rem] sm:p-8 lg:p-10">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgb(231_197_138_/_0.22),transparent_20rem),radial-gradient(circle_at_88%_10%,rgb(247_230_212_/_0.86),transparent_24rem)]" />
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgb(255_233_173_/_0.22),transparent_20rem),radial-gradient(circle_at_88%_10%,rgb(255_248_232_/_0.86),transparent_24rem)]" />
                 <motion.p
                   aria-hidden="true"
                   animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
@@ -760,7 +760,7 @@ function ClosingCta() {
                         ease: motionEase,
                       }}
                       whileHover={reduceMotion ? undefined : { y: -5 }}
-                      className="rounded-[1.25rem] border border-[var(--ln-night)]/8 bg-[rgb(255_252_248_/_0.62)] p-4 shadow-[0_20px_62px_-48px_rgb(75_53_53_/_0.2)] backdrop-blur-xl"
+                      className="rounded-[1.25rem] border border-[var(--ln-night)]/8 bg-[rgb(255_252_248_/_0.62)] p-4 shadow-[0_20px_62px_-48px_rgb(26_48_56_/_0.2)] backdrop-blur-xl"
                     >
                       <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-[var(--ln-cacao)]/74">
                         {kicker}
@@ -803,7 +803,7 @@ function ClosingCta() {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="absolute left-0 top-8 w-[82%] rounded-[2.2rem] border border-[var(--ln-night)]/10 bg-[var(--ln-mint)] p-6 shadow-[0_34px_96px_-68px_rgb(75_53_53_/_0.24)] sm:p-7"
+                className="absolute left-0 top-8 w-[82%] rounded-[2.2rem] border border-[var(--ln-night)]/10 bg-[var(--ln-mint)] p-6 shadow-[0_34px_96px_-68px_rgb(26_48_56_/_0.24)] sm:p-7"
               >
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--ln-forest)]">
                   mesa de inicio
@@ -834,7 +834,7 @@ function ClosingCta() {
                 whileInView={{ opacity: 1, x: 0, y: 0 }}
                 viewport={{ once: true, margin: "-90px" }}
                 transition={{ duration: 0.72, ease: motionEase }}
-                className="absolute right-0 top-0 w-[58%] rounded-[1.8rem] border border-[var(--ln-night)]/10 bg-[var(--ln-rose)] p-5 shadow-[0_28px_76px_-58px_rgb(75_53_53_/_0.22)]"
+                className="absolute right-0 top-0 w-[58%] rounded-[1.8rem] border border-[var(--ln-night)]/10 bg-[var(--ln-rose)] p-5 shadow-[0_28px_76px_-58px_rgb(26_48_56_/_0.22)]"
               >
                 <p className="text-[0.66rem] font-black uppercase tracking-[0.18em] text-[var(--ln-cacao)]">
                   mensaje
@@ -853,7 +853,7 @@ function ClosingCta() {
                   delay: reduceMotion ? 0 : 0.12,
                   ease: motionEase,
                 }}
-                className="absolute bottom-24 left-5 w-[58%] rounded-[1.8rem] border border-[var(--ln-night)]/10 bg-[var(--ln-sand)] p-5 shadow-[0_28px_76px_-58px_rgb(75_53_53_/_0.2)]"
+                className="absolute bottom-24 left-5 w-[58%] rounded-[1.8rem] border border-[var(--ln-night)]/10 bg-[var(--ln-sand)] p-5 shadow-[0_28px_76px_-58px_rgb(26_48_56_/_0.2)]"
               >
                 <p className="text-[0.66rem] font-black uppercase tracking-[0.18em] text-[var(--ln-cacao)]">
                   respuesta
@@ -871,7 +871,7 @@ function ClosingCta() {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="absolute bottom-0 right-3 w-[72%] rounded-[2rem] border border-[rgb(255_252_248_/_0.7)] bg-[var(--ln-night)] p-6 text-[var(--ln-paper)] shadow-[0_34px_90px_-58px_rgb(75_53_53_/_0.42)]"
+                className="absolute bottom-0 right-3 w-[72%] rounded-[2rem] border border-[rgb(255_252_248_/_0.7)] bg-[var(--ln-night)] p-6 text-[var(--ln-paper)] shadow-[0_34px_90px_-58px_rgb(26_48_56_/_0.42)]"
               >
                 <p className="text-[0.66rem] font-black uppercase tracking-[0.2em] text-[var(--ln-peach)]">
                   confianza
@@ -899,7 +899,7 @@ function ClosingCta() {
 export default function Home() {
   return (
     <SmoothScroll>
-      <div className="landing-public min-h-dvh max-w-[100vw] overflow-hidden bg-[var(--ln-cream)] text-[var(--ln-night)] [--ln-brass:#E7C58A] [--ln-cacao:#604846] [--ln-clay:#9F5F5B] [--ln-cream:#F7E6D4] [--ln-forest:#4F7836] [--ln-ink:#604846] [--ln-mint:#86B05D] [--ln-mist:#FCF1E7] [--ln-muted:#7A6660] [--ln-night:#4B3535] [--ln-olive:#86B05D] [--ln-paper:#FFFCF8] [--ln-peach:#E7C58A] [--ln-rose:#F1D6D0] [--ln-sage:#FFF4EA] [--ln-sand:#E7C58A] [font-family:var(--font-landing-sans)] [&_:is(h1,h2,h3,h4,h5,h6)]:!text-inherit">
+      <div className="landing-public min-h-dvh max-w-[100vw] overflow-hidden bg-[var(--ln-cream)] text-[var(--ln-night)] [--ln-brass:#F87F52] [--ln-cacao:#071C33] [--ln-clay:#DB3854] [--ln-cream:#FFF8E8] [--ln-forest:#44509F] [--ln-ink:#071C33] [--ln-mint:#FFE9AD] [--ln-mist:#F1F3F5] [--ln-muted:#656B78] [--ln-night:#071C33] [--ln-olive:#F87F52] [--ln-paper:#FFFFFF] [--ln-peach:#F87F52] [--ln-rose:#FFF8E8] [--ln-sage:#FFE9AD] [--ln-sand:#FFE9AD] [font-family:var(--font-landing-sans)] [&_:is(h1,h2,h3,h4,h5,h6)]:!text-inherit">
         <Navbar />
         <main>
           <Hero />
@@ -912,7 +912,7 @@ export default function Home() {
             description="Un enfoque personalizado basado en tu bioquímica, historia clínica y estilo de vida. Sin dietas de moda, con ciencia real, escucha y ajustes que respetan tu contexto."
             benefits={marianaBenefits}
             cta="Agendar con Mariana"
-            accent="#E7C58A"
+            accent="#F87F52"
             monogram="MR"
           />
           <ProfessionalChapter
@@ -923,7 +923,7 @@ export default function Home() {
             description="Rutinas diseñadas para tu cuerpo, tu ritmo y tus metas. Desde casa o en el gimnasio, con progresión clara, seguimiento real y motivación constante."
             benefits={camilaBenefits}
             cta="Agendar con Camila"
-            accent="#86B05D"
+            accent="#44509F"
             monogram="CR"
             reverse
           />

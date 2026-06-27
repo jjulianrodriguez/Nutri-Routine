@@ -28,9 +28,9 @@ export const habitAssignmentSchema = z
     assignmentId: z.string().uuid("La asignacion no es valida.").optional(),
     clientId: z.string().uuid("Selecciona una clienta valida."),
     daysOfWeek: z
-      .array(z.number().int().min(1).max(5))
+      .array(z.number().int().min(1).max(7))
       .min(1, "Selecciona al menos un dia.")
-      .max(5, "Selecciona solo dias de lunes a viernes."),
+      .max(7, "Selecciona solo dias de la semana."),
     endDate: optionalDateSchema,
     habitId: z.string().uuid("Selecciona un habito valido."),
     startDate: z

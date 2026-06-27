@@ -106,6 +106,7 @@ export function Sidebar({
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isPageAnimated, setIsPageAnimated] = useState(false);
   const { displayName, email, initials, roleLabel } = access;
 
   useEffect(() => {
@@ -180,7 +181,7 @@ export function Sidebar({
 
           <div
             className={cn(
-              "border-t border-border py-4",
+              "mt-auto border-t border-border py-4",
               isCollapsed ? "flex flex-col items-center gap-3 px-3" : "space-y-3 px-4",
             )}
           >
@@ -253,7 +254,7 @@ export function Sidebar({
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 hidden overflow-x-visible border-r border-border bg-surface/76 shadow-card backdrop-blur-2xl transition-[width] duration-300 ease-[var(--ease-premium)] lg:block",
+          "fixed inset-y-0 left-0 h-screen h-dvh z-40 hidden overflow-x-visible border-r border-border bg-surface/76 shadow-card backdrop-blur-2xl transition-[width] duration-300 ease-[var(--ease-premium)] lg:block",
           collapsed ? "w-20" : "w-72",
         )}
       >
@@ -273,7 +274,7 @@ export function Sidebar({
               type="button"
             />
             <motion.aside
-              className="fixed inset-y-0 left-0 z-50 w-[min(21rem,calc(100vw-2rem))] overflow-x-hidden border-r border-border bg-surface/88 shadow-premium backdrop-blur-2xl lg:hidden"
+              className="fixed inset-y-0 left-0 h-screen h-dvh z-50 w-[min(21rem,calc(100vw-2rem))] overflow-x-hidden border-r border-border bg-surface/88 shadow-premium backdrop-blur-2xl lg:hidden"
               initial={reduceMotion ? false : { x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -295,6 +296,8 @@ export function Sidebar({
           initial={reduceMotion ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: [0.22, 0.72, 0.18, 1] }}
+          onAnimationComplete={() => setIsPageAnimated(true)}
+          style={isPageAnimated ? { transform: "none" } : undefined}
         >
           {children}
         </motion.div>
