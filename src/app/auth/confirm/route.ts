@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 const DEFAULT_REDIRECT = "/app";
 
 function getSafeRedirect(value: string | null) {
-  if (value?.startsWith("/app")) {
+  if (value?.startsWith("/app") || value === "/reset-password") {
     return value;
   }
 

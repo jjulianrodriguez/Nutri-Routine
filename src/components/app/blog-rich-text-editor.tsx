@@ -550,7 +550,11 @@ function ColorDropdown({
   const [hexInput, setHexInput] = useState(value && value !== "default" ? value : "");
 
   useEffect(() => {
-    setHexInput(value && value !== "default" ? value : "");
+    const frame = window.requestAnimationFrame(() => {
+      setHexInput(value && value !== "default" ? value : "");
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, [value]);
 
   useEffect(() => {
@@ -678,7 +682,11 @@ function HighlightDropdown({
   const [hexInput, setHexInput] = useState(value && value !== "default" ? value : "");
 
   useEffect(() => {
-    setHexInput(value && value !== "default" ? value : "");
+    const frame = window.requestAnimationFrame(() => {
+      setHexInput(value && value !== "default" ? value : "");
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, [value]);
 
   useEffect(() => {
@@ -1304,11 +1312,6 @@ export function BlogRichTextEditor({
     };
   }, [showFloatingToolbar]);
 
-  const toolbarDisabled = disabled || !editor;
-  const activeTextAlign = getActiveTextAlign(editor);
-  const activeTextColor = getActiveTextColor(editor);
-  const activeHighlightColor = getActiveHighlightColor(editor);
-  const activeTextSize = getActiveTextSize(editor);
   const contentLength = value.trim().length;
   const isNearContentLimit = contentLength >= 45000;
 

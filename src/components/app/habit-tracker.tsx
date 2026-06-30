@@ -2,10 +2,11 @@
 
 import {
   Check,
+  CalendarCheck2,
   CheckCircle2,
   Circle,
+  Info,
   Loader2,
-  MoreHorizontal,
   Pencil,
   Plus,
   Power,
@@ -48,14 +49,28 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 type CompletionOverrides = Record<string, boolean>;
 
 const weekdayOptions = [
-  { label: "L", value: 1 },
-  { label: "M", value: 2 },
-  { label: "X", value: 3 },
-  { label: "J", value: 4 },
-  { label: "V", value: 5 },
-  { label: "S", value: 6 },
-  { label: "D", value: 7 },
+  { label: "L", fullLabel: "lunes", value: 1 },
+  { label: "M", fullLabel: "martes", value: 2 },
+  { label: "X", fullLabel: "miércoles", value: 3 },
+  { label: "J", fullLabel: "jueves", value: 4 },
+  { label: "V", fullLabel: "viernes", value: 5 },
+  { label: "S", fullLabel: "sábado", value: 6 },
+  { label: "D", fullLabel: "domingo", value: 7 },
 ];
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("es-CR", {
+    dateStyle: "medium",
+    timeZone: "America/Costa_Rica",
+  }).format(new Date(`${value}T12:00:00`));
+}
+
+function formatAssignmentDays(daysOfWeek: number[]) {
+  return daysOfWeek
+    .map((day) => weekdayOptions.find((item) => item.value === day)?.fullLabel)
+    .filter(Boolean)
+    .join(", ");
+}
 
 function completionKey(assignmentId: string, date: string) {
   return `${assignmentId}:${date}`;
@@ -125,10 +140,14 @@ function ProgressSummary({
             Progreso semanal
           </p>
           <h2 className="mt-2 text-2xl font-bold text-charcoal">
-            Completaste {stats.completed} de {stats.total} habitos esta semana
+            {stats.total > 0
+              ? `Completaste ${stats.completed} de ${stats.total} hábitos esta semana`
+              : "Sin hábitos aplicables esta semana"}
           </h2>
           <p className="mt-2 text-sm font-semibold text-warm-brown">
-            {stats.pending} pendientes · {stats.markedDays} dias marcados
+            {stats.total > 0
+              ? `${stats.pending} pendientes · ${stats.markedDays} días marcados`
+              : "Cuando haya asignaciones activas, el progreso aparecerá aquí."}
           </p>
         </div>
         <div className="text-left sm:text-right">
@@ -146,6 +165,83 @@ function ProgressSummary({
           style={{ width: `${stats.percentage}%` }}
         />
       </div>
+    </div>
+  );
+}
+
+function TodayFocus({
+  assignments,
+  overrides,
+  today,
+}: {
+  assignments: HabitAssignmentSummary[];
+  overrides: CompletionOverrides;
+  today: string;
+}) {
+  const todayAssignments = assignments.filter((assignment) =>
+    isAssignmentApplicableOnDate(assignment, today),
+  );
+  const pendingToday = todayAssignments.filter(
+    (assignment) => !getCompletion(assignment, today, overrides),
+  );
+
+  if (assignments.length === 0) {
+    return null;
+  }
+
+  if (todayAssignments.length === 0) {
+    return (
+      <div className="rounded-[22px] border border-border bg-surface p-5 text-sm font-semibold text-muted shadow-soft">
+        <p className="font-extrabold text-charcoal">Hoy no tienes hábitos programados.</p>
+        <p className="mt-1">Tu tracker semanal queda disponible para revisar otros días.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-[22px] border border-border bg-surface p-5 shadow-soft">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="grid size-10 shrink-0 place-items-center rounded-[14px] bg-primary-soft text-warm-brown">
+            <CalendarCheck2 className="size-5" aria-hidden="true" />
+          </span>
+          <div>
+            <p className="font-extrabold text-charcoal">
+              {pendingToday.length === 0
+                ? "Hoy está completo."
+                : `Faltan ${pendingToday.length} de ${todayAssignments.length} hábitos de hoy.`}
+            </p>
+            <p className="mt-1 text-sm leading-6 text-muted">
+              {pendingToday.length === 0
+                ? "Puedes revisar la semana o ajustar una marca si lo necesitas."
+                : "Marca cada hábito cuando lo completes."}
+            </p>
+          </div>
+        </div>
+        <span className="rounded-full bg-background px-3 py-1 text-xs font-extrabold text-warm-brown">
+          Hoy
+        </span>
+      </div>
+
+      {pendingToday.length > 0 ? (
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {pendingToday.map((assignment) => (
+            <div
+              key={assignment.id}
+              className="rounded-[16px] border border-border bg-background px-4 py-3"
+            >
+              <p className="font-extrabold text-charcoal">
+                {assignment.habit.title}
+              </p>
+              {assignment.habit.description ? (
+                <p className="mt-1 line-clamp-2 text-sm leading-5 text-muted">
+                  {assignment.habit.description}
+                </p>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -178,6 +274,11 @@ function HabitDayToggle({
   }
 
   const buttonDisabled = disabled || !canToggle;
+  const disabledTitle = disabled
+    ? "Guardando tu cambio."
+    : canToggle
+      ? undefined
+      : "Solo la clienta puede marcar hoy o días anteriores de esta semana.";
 
   return (
     <button
@@ -185,6 +286,7 @@ function HabitDayToggle({
       disabled={buttonDisabled}
       aria-pressed={completed}
       onClick={() => onToggle(assignment.id, date, !completed)}
+      title={disabledTitle}
       className={cn(
         "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[14px] border px-3 py-2 text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:cursor-not-allowed",
         completed
@@ -257,7 +359,13 @@ function HabitWeekGrid({
   if (assignments.length === 0) {
     return (
       <div className="rounded-[22px] border border-dashed border-border bg-surface/58 p-5 text-sm font-semibold leading-6 text-muted shadow-soft">
-        No hay habitos asignados para esta semana.
+        <p className="font-extrabold text-charcoal">
+          Todavía no hay hábitos para esta semana.
+        </p>
+        <p className="mt-1">
+          Cuando tu nutricionista active hábitos, podrás marcarlos de lunes a
+          domingo desde aquí.
+        </p>
       </div>
     );
   }
@@ -269,7 +377,7 @@ function HabitWeekGrid({
           <thead>
             <tr className="border-b border-border bg-background/70">
               <th className="w-[32%] px-4 py-3 text-left text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
-                Habito
+                Hábito
               </th>
               {weekDays.map((day) => (
                 <th
@@ -460,20 +568,20 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
 
   if (confirmation) {
     if (confirmation.type === "activate") {
-      confirmTitle = "Activar habito";
-      confirmDescription = `¿Estas segura de que deseas activar el habito "${confirmation.habit.title}"? Volvera a estar disponible para asignaciones.`;
+      confirmTitle = "Activar hábito";
+      confirmDescription = `¿Estás segura de que deseas activar el hábito "${confirmation.habit.title}"? Volverá a estar disponible para asignaciones.`;
       confirmLabel = "Activar";
       pendingLabel = "Activando...";
       confirmTone = "default";
     } else if (confirmation.type === "deactivate") {
-      confirmTitle = "Desactivar habito";
-      confirmDescription = `¿Estas segura de que deseas desactivar el habito "${confirmation.habit.title}"? No se perdera el progreso historico, pero no se podra usar en nuevas asignaciones.`;
+      confirmTitle = "Desactivar hábito";
+      confirmDescription = `¿Estás segura de que deseas desactivar el hábito "${confirmation.habit.title}"? No se perderá el progreso histórico, pero no se podrá usar en nuevas asignaciones.`;
       confirmLabel = "Desactivar";
       pendingLabel = "Desactivando...";
       confirmTone = "destructive";
     } else if (confirmation.type === "delete") {
-      confirmTitle = "Eliminar habito";
-      confirmDescription = `¿Estas segura de que deseas eliminar permanentemente el habito "${confirmation.habit.title}"? Esta accion solo es posible si nunca ha sido asignado.`;
+      confirmTitle = "Eliminar hábito";
+      confirmDescription = `¿Estás segura de que deseas eliminar permanentemente el hábito "${confirmation.habit.title}"? Esta acción solo es posible si nunca ha sido asignado.`;
       confirmLabel = "Eliminar";
       pendingLabel = "Eliminando...";
       confirmTone = "destructive";
@@ -484,7 +592,7 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
     <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
       <div className="rounded-[22px] border border-border bg-background p-4">
         <h3 className="font-extrabold text-charcoal">
-          {editing ? "Editar habito" : "Crear habito"}
+          {editing ? "Editar hábito" : "Crear hábito"}
         </h3>
         <div className="mt-4 space-y-4">
           <div>
@@ -498,7 +606,7 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
             />
           </div>
           <div>
-            <Label htmlFor="habit-description">Descripcion opcional</Label>
+            <Label htmlFor="habit-description">Descripción opcional</Label>
             <textarea
               id="habit-description"
               value={description}
@@ -514,7 +622,7 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
               onChange={(event) => setActive(event.target.checked)}
               className="size-4 accent-primary"
             />
-            Habito activo
+            Hábito activo
           </label>
           <div className="flex flex-wrap gap-2">
             <Button type="button" onClick={submit} disabled={isPending || !title.trim()}>
@@ -525,7 +633,7 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
               ) : (
                 <Plus className="size-4" aria-hidden="true" />
               )}
-              {editing ? "Guardar cambios" : "Crear habito"}
+              {editing ? "Guardar cambios" : "Crear hábito"}
             </Button>
             {editing ? (
               <Button type="button" variant="outline" onClick={resetForm}>
@@ -541,7 +649,7 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
         {habits.length === 0 ? (
           <Alert className="rounded-[18px] border-primary/25 bg-primary-soft">
             <AlertDescription className="font-semibold text-charcoal">
-              Crea el primer habito para poder asignarlo a una clienta.
+              Crea el primer hábito para poder asignarlo a una clienta.
             </AlertDescription>
           </Alert>
         ) : (
@@ -654,6 +762,13 @@ function AssignmentManager({
   const [endDate, setEndDate] = useState("");
   const [isPending, startTransition] = useTransition();
   const activeHabits = habits.filter((habit) => habit.active);
+  const assignDisabledReason = !habitId
+    ? "Crea o activa un hábito antes de asignarlo."
+    : daysOfWeek.length === 0
+      ? "Selecciona al menos un día aplicable."
+      : isPending
+        ? "Guardando la asignación."
+        : undefined;
 
   const [confirmation, setConfirmation] = useState<{
     assignment: HabitAssignmentSummary;
@@ -728,13 +843,13 @@ function AssignmentManager({
   if (confirmation) {
     if (confirmation.type === "activate") {
       confirmTitle = "Activar asignación";
-      confirmDescription = `¿Estas segura de que deseas activar la asignación de "${confirmation.assignment.habit.title}" para esta clienta?`;
+      confirmDescription = `¿Estás segura de que deseas activar la asignación de "${confirmation.assignment.habit.title}" para esta clienta?`;
       confirmLabel = "Activar";
       pendingLabel = "Activando...";
       confirmTone = "default";
     } else {
       confirmTitle = "Desactivar asignación";
-      confirmDescription = `¿Estas segura de que deseas desactivar la asignación de "${confirmation.assignment.habit.title}"? El progreso histórico se conservará, pero ya no aparecerá en la semana activa de la clienta.`;
+      confirmDescription = `¿Estás segura de que deseas desactivar la asignación de "${confirmation.assignment.habit.title}"? El progreso histórico se conservará, pero ya no aparecerá en la semana activa de la clienta.`;
       confirmLabel = "Desactivar";
       pendingLabel = "Desactivando...";
       confirmTone = "destructive";
@@ -745,7 +860,8 @@ function AssignmentManager({
     return (
       <Alert className="rounded-[18px] border-primary/25 bg-primary-soft">
         <AlertDescription className="font-semibold text-charcoal">
-          No hay clientas de nutricion asignadas para gestionar habitos.
+          No hay clientas de nutrición disponibles para gestionar hábitos.
+          Revisa las asignaciones activas antes de crear un seguimiento.
         </AlertDescription>
       </Alert>
     );
@@ -754,7 +870,10 @@ function AssignmentManager({
   return (
     <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
       <div className="rounded-[22px] border border-border bg-background p-4">
-        <h3 className="font-extrabold text-charcoal">Asignar habito</h3>
+        <h3 className="font-extrabold text-charcoal">Asignar hábito</h3>
+        <p className="mt-1 text-sm leading-6 text-muted">
+          La clienta verá este hábito solo durante la vigencia y en los días que selecciones.
+        </p>
         <div className="mt-4 space-y-4">
           <div>
             <Label htmlFor="habit-client">Clienta</Label>
@@ -776,7 +895,7 @@ function AssignmentManager({
           </div>
 
           <div>
-            <Label htmlFor="habit-select">Habito</Label>
+            <Label htmlFor="habit-select">Hábito</Label>
             <select
               id="habit-select"
               value={habitId}
@@ -784,7 +903,7 @@ function AssignmentManager({
               className="mt-2 h-12 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
             >
               {activeHabits.length === 0 ? (
-                <option value="">Crea un habito activo primero</option>
+                <option value="">Crea un hábito activo primero</option>
               ) : null}
               {activeHabits.map((habit) => (
                 <option key={habit.id} value={habit.id}>
@@ -795,7 +914,7 @@ function AssignmentManager({
           </div>
 
           <div>
-            <p className="text-sm font-bold text-charcoal">Dias</p>
+            <p className="text-sm font-bold text-charcoal">Días aplicables</p>
             <div className="mt-2 grid grid-cols-7 gap-1">
               {weekdayOptions.map((day) => (
                 <button
@@ -814,6 +933,9 @@ function AssignmentManager({
                 </button>
               ))}
             </div>
+            <p className="mt-2 text-xs font-semibold leading-5 text-muted">
+              Estos son los días en que la clienta podrá marcar el hábito.
+            </p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -843,13 +965,14 @@ function AssignmentManager({
             type="button"
             onClick={submit}
             disabled={isPending || !habitId || daysOfWeek.length === 0}
+            title={assignDisabledReason ?? "Asignar hábito a la clienta"}
           >
             {isPending ? (
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />
             ) : (
               <Check className="size-4" aria-hidden="true" />
             )}
-            Asignar habito
+            Asignar hábito
           </Button>
         </div>
       </div>
@@ -858,7 +981,7 @@ function AssignmentManager({
         {assignments.length === 0 ? (
           <Alert className="rounded-[18px] border-primary/25 bg-primary-soft">
             <AlertDescription className="font-semibold text-charcoal">
-              Esta clienta no tiene habitos asignados esta semana.
+              Esta clienta no tiene hábitos asignados esta semana. Crea una asignación para que pueda marcar progreso.
             </AlertDescription>
           </Alert>
         ) : (
@@ -890,15 +1013,17 @@ function AssignmentManager({
                       </span>
                     </div>
                     <p className="mt-2 text-sm font-semibold text-muted">
-                      Dias:{" "}
-                      {assignment.daysOfWeek
-                        .map((day) => weekdayOptions.find((item) => item.value === day)?.label)
-                        .filter(Boolean)
-                        .join(", ")}
+                      Días aplicables: {formatAssignmentDays(assignment.daysOfWeek)}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-warm-brown">
-                      Desde {assignment.startDate}
-                      {assignment.endDate ? ` hasta ${assignment.endDate}` : ""}
+                      Vigencia: desde {formatDate(assignment.startDate)}
+                      {assignment.endDate ? ` hasta ${formatDate(assignment.endDate)}` : " sin fecha final"}
+                    </p>
+                    <p className="mt-2 flex items-start gap-2 text-sm leading-5 text-muted">
+                      <Info className="mt-0.5 size-4 shrink-0 text-warm-brown" aria-hidden="true" />
+                      <span>
+                        Impacto: aparecerá en el tracker de la clienta solo en esos días.
+                      </span>
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center">
@@ -983,6 +1108,14 @@ export function HabitTracker({
         weekDays={data.weekDays}
       />
 
+      {isClient ? (
+        <TodayFocus
+          assignments={data.assignments.filter((a) => a.active)}
+          overrides={overrides}
+          today={data.today}
+        />
+      ) : null}
+
       {!isClient && data.selectedClient ? (
         <div className="flex flex-wrap items-center gap-2 rounded-[20px] border border-border bg-surface px-4 py-3 text-sm font-extrabold text-charcoal shadow-soft">
           <UserRound className="size-4 text-warm-brown" aria-hidden="true" />
@@ -1002,10 +1135,10 @@ export function HabitTracker({
       {!isClient && showCatalog && (
         <section className="rounded-[28px] border border-border bg-surface/82 p-5 shadow-soft backdrop-blur-lg sm:p-6">
           <h2 className="text-2xl font-bold leading-tight text-charcoal">
-            Habitos personalizados
+            Hábitos personalizados
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted">
-            Crea y mantiene los habitos que luego asignas a clientas.
+            Crea y mantiene los hábitos que luego asignas a clientas.
           </p>
           <div className="mt-5">
             <HabitManager habits={data.habits} />
@@ -1019,7 +1152,7 @@ export function HabitTracker({
             Asignaciones
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted">
-            Define que habitos aplican para cada clienta y en que dias.
+            Define qué hábitos aplican para cada clienta y en qué días.
           </p>
           <div className="mt-5">
             {data.selectedClient ? (
@@ -1033,7 +1166,7 @@ export function HabitTracker({
             ) : (
               <Alert className="rounded-[18px] border-primary/25 bg-surface">
                 <AlertDescription className="font-semibold text-charcoal">
-                  Selecciona o asigna una clienta de nutricion para empezar.
+                  Selecciona o asigna una clienta de nutrición para empezar.
                 </AlertDescription>
               </Alert>
             )}

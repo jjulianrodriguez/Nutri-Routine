@@ -134,13 +134,22 @@ export function RegisterForm() {
           type="text"
           autoComplete="off"
           aria-describedby={
-            errors.accessCode ? "register-access-code-error" : undefined
+            errors.accessCode
+              ? "register-access-code-error register-access-code-help"
+              : "register-access-code-help"
           }
           aria-invalid={Boolean(errors.accessCode)}
           className={inputClasses}
           placeholder="Código privado"
           {...register("accessCode")}
         />
+        <p
+          id="register-access-code-help"
+          className="mt-2 text-sm font-semibold leading-6 text-stone"
+        >
+          Usa el código privado que te entregó tu profesional o el equipo de
+          administración.
+        </p>
         <FieldError
           id="register-access-code-error"
           message={errors.accessCode?.message}

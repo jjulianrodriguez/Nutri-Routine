@@ -22,12 +22,12 @@ export async function generateMetadata({
 
   if (!post) {
     return {
-      title: "Artículo no encontrado · Poner nombre",
+      title: "Artículo no encontrado · Nutrición Con Enfoque",
     };
   }
 
   return {
-    title: `${post.title} · Poner nombre`,
+    title: `${post.title} · Nutrición Con Enfoque`,
     description: post.excerpt,
   };
 }

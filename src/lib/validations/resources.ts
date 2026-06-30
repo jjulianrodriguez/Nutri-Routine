@@ -37,6 +37,7 @@ export const resourceValuesSchema = z.object({
     .string()
     .trim()
     .max(2000, "La descripcion no puede superar 2000 caracteres."),
+  folderId: optionalFolderIdSchema,
   title: z
     .string()
     .trim()

@@ -13,7 +13,7 @@ import {
 } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getUserSettings } from "@/lib/user-settings/data";
-import type { Enums, Tables } from "@/types/database";
+import type { Enums } from "@/types/database";
 
 type ServerSupabase = Awaited<ReturnType<typeof createClient>>;
 type PlanStatus = Enums<"plan_status">;

@@ -55,7 +55,7 @@ export default async function NotificationsPage() {
               detail="Eventos que requieren tu atencion"
             />
             <StatTile
-              label="Leidas"
+              label="Leídas"
               value={String(result.items.length - unreadCount)}
               detail="Eventos que ya revisaste"
             />

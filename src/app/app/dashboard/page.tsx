@@ -384,7 +384,11 @@ function AdminDashboard({
         <AppHeader
           eyebrow={access.roleLabel}
           title={`Hola, ${access.displayName}. Tu gestión está organizada por área.`}
-          description="Esta vista reúne clientes, planes y accesos según tu área profesional."
+          description={
+            access.isAdmin
+              ? "Esta vista reúne clientes, planes y accesos de toda la operación."
+              : "Esta vista reúne clientes, planes y accesos según tu área profesional."
+          }
         />
       </FadeIn>
 
@@ -394,9 +398,13 @@ function AdminDashboard({
           aria-label="Metricas administrativas"
         >
           <StatTile
-            label="Clientes asignados"
+            label={access.isAdmin ? "Clientes gestionables" : "Clientes asignados"}
             value={String(data.assignedClientsCount)}
-            detail="Segun tus clientes asignados"
+            detail={
+              access.isAdmin
+                ? "Acceso universal de administración"
+                : "Según tus clientes asignados"
+            }
           />
           {access.canManageNutrition ? (
             <StatTile

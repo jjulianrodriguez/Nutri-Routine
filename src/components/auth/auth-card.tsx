@@ -17,15 +17,15 @@ function AuthWordmark() {
   return (
     <Link
       href="/"
-      aria-label="Poner nombre · Inicio"
+      aria-label="Nutrición Con Enfoque · Inicio"
       className="inline-flex items-center gap-3"
     >
       <span className="grid size-10 place-items-center rounded-full border border-border bg-surface text-xs font-extrabold text-espresso shadow-soft">
-        PN
+        NCE
       </span>
       <span className="leading-none">
         <span className="block text-base font-extrabold text-espresso">
-          Poner nombre
+          Nutrición Con Enfoque
         </span>
         <span className="block text-[0.68rem] font-bold uppercase tracking-[0.14em] text-stone">
           bienestar privado

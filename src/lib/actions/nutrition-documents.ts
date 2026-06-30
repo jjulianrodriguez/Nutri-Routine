@@ -31,7 +31,7 @@ import {
 import type { Enums, Tables } from "@/types/database";
 
 const NUTRITION_PATH = "/app/nutricion";
-const NUTRITION_LIBRARY_PATH = "/app/nutricion/biblioteca";
+const NUTRITION_LIBRARY_PATH = "/app/recursos?area=nutrition";
 const DASHBOARD_PATH = "/app/dashboard";
 
 type NutritionDocumentActionResult =

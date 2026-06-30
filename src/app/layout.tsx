@@ -34,7 +34,7 @@ const landingSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Poner nombre · Mariana y Camila Rodríguez Méndez",
+  title: "Nutrición Con Enfoque · Mariana y Camila Rodríguez Méndez",
   description:
     "Nutrición funcional e integrativa con la Dra. Mariana Rodríguez Méndez + entrenamiento personalizado con Camila Rodríguez Méndez.",
 };

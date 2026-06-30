@@ -9,6 +9,14 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Ingresa tu contraseña."),
 });
 
+export const passwordRecoverySchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .min(1, "Ingresa tu email.")
+    .email("Ingresa un email válido."),
+});
+
 export const profileRoleSchema = z.enum(["client"]);
 
 export const passwordSchema = z
@@ -42,5 +50,17 @@ export const registerSchema = z
     path: ["confirmPassword"],
   });
 
+export const resetPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, "Confirma la contraseña."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden.",
+    path: ["confirmPassword"],
+  });
+
 export type LoginValues = z.infer<typeof loginSchema>;
+export type PasswordRecoveryValues = z.infer<typeof passwordRecoverySchema>;
 export type RegisterValues = z.infer<typeof registerSchema>;
+export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;

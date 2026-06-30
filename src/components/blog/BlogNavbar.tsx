@@ -5,7 +5,7 @@ function BlogMark() {
   return (
     <Link
       href="/blog"
-      aria-label="Blog · Poner nombre"
+      aria-label="Blog · Nutrición Con Enfoque"
       className="group inline-flex items-center gap-3"
     >
       <span
@@ -19,7 +19,7 @@ function BlogMark() {
           Diario
         </span>
         <span className="block text-[0.62rem] font-black uppercase tracking-[0.18em] text-[var(--blog-muted)]">
-          Poner nombre
+          Nutrición Con Enfoque
         </span>
       </span>
     </Link>

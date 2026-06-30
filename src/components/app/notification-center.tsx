@@ -190,21 +190,21 @@ function getClientNotificationMessage(
     case "nutrition_plan_deactivated":
       return "Tu plan de nutrición fue desactivado.";
     case "nutrition_meal_plan_assigned":
-      return `${nutritionistLabel} compartio un nuevo plan de alimentacion.`;
+      return `${nutritionistLabel} compartió un nuevo plan de alimentación.`;
     case "nutrition_meal_plan_updated":
-      return "Tu plan de alimentacion fue actualizado.";
+      return "Tu plan de alimentación fue actualizado.";
     case "nutrition_meal_plan_deactivated":
-      return "Tu plan de alimentacion fue desactivado.";
+      return "Tu plan de alimentación fue desactivado.";
     case "nutrition_educational_resource_created":
-      return "Hay un nuevo recurso educativo en tu biblioteca.";
+      return "Hay un nuevo recurso educativo en Recursos.";
     case "nutrition_educational_resource_updated":
-      return "Se actualizo un recurso educativo de tu biblioteca.";
+      return "Se actualizo un recurso educativo en Recursos.";
     case "nutrition_habit_assigned":
-      return `${nutritionistLabel} te asigno un nuevo habito de nutricion.`;
+      return `${nutritionistLabel} te asignó un nuevo hábito de nutrición.`;
     case "nutrition_habit_updated":
-      return "Se actualizo un habito de nutricion que tienes asignado.";
+      return "Se actualizó un hábito de nutrición que tienes asignado.";
     case "nutrition_habit_removed":
-      return "Un habito de nutricion fue desactivado de tu plan.";
+      return "Un hábito de nutrición fue desactivado de tu plan.";
     case "nutrition_professional_changed":
     case "nutrition_professional_assigned":
       return assignedNutritionistName
@@ -350,7 +350,7 @@ export function NotificationCenter({
             ) : (
               <CheckCheck className="size-4" aria-hidden="true" />
             )}
-            Marcar todas como leidas
+            Marcar todas como leídas
           </Button>
         ) : null}
       </div>
@@ -447,11 +447,11 @@ export function NotificationCenter({
                   className="self-end sm:self-center"
                 >
                   <Check className="size-4" aria-hidden="true" />
-                  Marcar como leida
+                  Marcar como leída
                 </Button>
               ) : (
                 <span className="self-end text-xs font-bold text-muted sm:self-center">
-                  Leida
+                  Leída
                 </span>
               )}
             </article>

@@ -15,7 +15,7 @@ export function BlogFooter() {
       <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end lg:px-10">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.24em] text-[var(--blog-forest)]">
-            Poner nombre
+            Nutrición Con Enfoque
           </p>
           <p
             style={{

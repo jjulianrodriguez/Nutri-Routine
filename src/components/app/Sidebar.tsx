@@ -309,7 +309,12 @@ export function Sidebar({
 
       <button
         type="button"
-        className="fixed bottom-5 right-5 z-30 hidden size-11 place-items-center rounded-full border border-border bg-surface/82 text-warm-brown shadow-pop backdrop-blur-lg transition-[background-color,color,box-shadow,transform] hover:bg-primary hover:text-charcoal hover:shadow-glow focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 lg:grid"
+        className={cn(
+          "fixed bottom-5 z-50 hidden size-11 place-items-center rounded-full border border-border bg-surface/82 text-warm-brown shadow-pop backdrop-blur-lg transition-[left,background-color,color,box-shadow,transform] hover:bg-primary hover:text-charcoal hover:shadow-glow focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 lg:grid",
+          collapsed
+            ? "left-[calc(5rem-1.375rem)]"
+            : "left-[calc(18rem-1.375rem)]",
+        )}
         onClick={() => setCollapsed((current) => !current)}
         aria-label={collapsed ? "Expandir navegación" : "Contraer navegación"}
       >

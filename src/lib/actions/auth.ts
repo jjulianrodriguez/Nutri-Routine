@@ -6,8 +6,10 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import {
   loginSchema,
+  passwordRecoverySchema,
   registerSchema,
   type LoginValues,
+  type PasswordRecoveryValues,
   type RegisterValues,
 } from "@/lib/validations/auth";
 import type { Enums } from "@/types/database";
@@ -15,7 +17,9 @@ import type { Enums } from "@/types/database";
 const APP_PATH = "/app";
 const DEFAULT_PROFILE_ROLE = "client" satisfies ProfileRole;
 
-type AuthFieldErrors = Partial<Record<keyof RegisterValues, string>>;
+type AuthFieldErrors = Partial<
+  Record<keyof RegisterValues | keyof LoginValues | keyof PasswordRecoveryValues, string>
+>;
 type ProfileRole = Enums<"profile_role">;
 
 export type AuthActionResult =
@@ -117,6 +121,27 @@ async function getEmailRedirectTo() {
     (host.startsWith("localhost") ? "http" : "https");
 
   return `${protocol}://${host}/auth/confirm`;
+}
+
+async function getPasswordRecoveryRedirectTo() {
+  const headerStore = await headers();
+  const origin = headerStore.get("origin");
+
+  if (origin) {
+    return `${origin}/auth/confirm?next=/reset-password`;
+  }
+
+  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+
+  if (!host) {
+    return undefined;
+  }
+
+  const protocol =
+    headerStore.get("x-forwarded-proto") ??
+    (host.startsWith("localhost") ? "http" : "https");
+
+  return `${protocol}://${host}/auth/confirm?next=/reset-password`;
 }
 
 async function ensureProfile(
@@ -334,6 +359,51 @@ export async function registerProfessional(
 
     return {
       message,
+      status: "error",
+    };
+  }
+}
+
+export async function requestPasswordRecovery(
+  values: PasswordRecoveryValues,
+): Promise<AuthActionResult> {
+  const parsed = passwordRecoverySchema.safeParse(values);
+
+  if (!parsed.success) {
+    return {
+      fieldErrors: getFieldErrors(parsed.error),
+      message: "Revisa los campos marcados.",
+      status: "error",
+    };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      parsed.data.email,
+      {
+        redirectTo: await getPasswordRecoveryRedirectTo(),
+      },
+    );
+
+    if (error) {
+      return {
+        message:
+          "No pudimos enviar el enlace de recuperación. Inténtalo de nuevo.",
+        status: "error",
+      };
+    }
+
+    return {
+      message:
+        "Si el email está registrado, recibirás un enlace seguro para crear una nueva contraseña.",
+      redirectTo: "/login",
+      status: "success",
+    };
+  } catch {
+    return {
+      message:
+        "No pudimos enviar el enlace de recuperación. Inténtalo de nuevo.",
       status: "error",
     };
   }

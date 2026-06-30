@@ -1,18 +1,20 @@
 import {
-  FileText,
-  BookOpen,
   CalendarDays,
   ClipboardCheck,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
+
 import { cn } from "@/lib/utils";
 
+type NutritionSectionKey = "plan" | "habits" | "assignments";
+
 type NavItem = {
+  adminOnly?: boolean;
   href: string;
   icon: React.ElementType;
-  key: "plan" | "library" | "habits" | "assignments";
+  key: NutritionSectionKey;
   label: string;
-  adminOnly?: boolean;
 };
 
 const items: NavItem[] = [
@@ -21,12 +23,6 @@ const items: NavItem[] = [
     icon: FileText,
     key: "plan",
     label: "Plan de alimentación",
-  },
-  {
-    href: "/app/nutricion/biblioteca",
-    icon: BookOpen,
-    key: "library",
-    label: "Biblioteca educativa",
   },
   {
     href: "/app/nutricion/habitos",
@@ -47,7 +43,7 @@ export function NutritionSectionNav({
   active,
   canManage,
 }: {
-  active: "plan" | "library" | "habits" | "assignments";
+  active: NutritionSectionKey;
   canManage: boolean;
 }) {
   return (

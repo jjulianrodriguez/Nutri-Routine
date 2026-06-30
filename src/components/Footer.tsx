@@ -40,14 +40,14 @@ export function Footer() {
             <div className="relative flex flex-wrap items-start justify-between gap-6">
               <div className="inline-flex items-center gap-3">
                 <span className="grid size-12 place-items-center rounded-[1.25rem] bg-[var(--ln-mint)] text-xs font-black uppercase tracking-[0.14em]">
-                  pn
+                  nce
                 </span>
                 <div>
                   <p
                     style={displayFontStyle}
                     className="text-3xl leading-none tracking-[-0.025em]"
                   >
-                    Poner nombre
+                    Nutrición Con Enfoque
                   </p>
                   <p className="mt-1 text-[0.62rem] font-black uppercase tracking-[0.22em] text-[var(--ln-muted)]">
                     nutrición + entrenamiento
@@ -171,7 +171,7 @@ export function Footer() {
 
         <div className="mt-10 grid gap-4 border-t border-[var(--ln-night)]/10 pt-6 text-xs font-bold text-[var(--ln-muted)] sm:grid-cols-[1fr_auto]">
           <p>
-            © {new Date().getFullYear()} Poner nombre · Dra. Mariana Rodríguez
+            © {new Date().getFullYear()} Nutrición Con Enfoque · Dra. Mariana Rodríguez
             Méndez y Camila Rodríguez Méndez.
           </p>
           <p>Nutrición funcional · Entrenamiento · Bienestar integral</p>

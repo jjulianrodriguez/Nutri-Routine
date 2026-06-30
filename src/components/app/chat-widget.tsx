@@ -718,7 +718,7 @@ export function ChatWidget() {
     conversation?.subtitle ??
     (bootstrap?.viewer === "client"
       ? "Acompañamiento profesional"
-      : "Clientes asignados");
+      : "Conversaciones disponibles");
   const isComposerPending =
     sendMessageMutation.isPending || updateMessageMutation.isPending;
   const composerActionLabel = editingMessage

@@ -121,6 +121,14 @@ export function LoginForm({ initialError }: LoginFormProps) {
           id="login-password-error"
           message={errors.password?.message}
         />
+        <div className="mt-3 flex justify-end">
+          <Link
+            href="/forgot-password"
+            className="text-sm font-bold text-espresso underline decoration-terracotta decoration-2 underline-offset-4 transition-colors hover:text-terracotta"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
       </div>
 
       {serverMessage || errors.root?.message ? (

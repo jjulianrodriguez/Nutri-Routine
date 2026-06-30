@@ -172,7 +172,7 @@ begin
         v_actor_id,
         v_event_type,
         v_message,
-        '/app/nutricion/biblioteca',
+        '/app/recursos?area=nutrition',
         v_metadata
       );
     end if;

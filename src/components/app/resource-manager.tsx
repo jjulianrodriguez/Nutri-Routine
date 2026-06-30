@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowLeft,
+  ChevronRight,
   Download,
   Dumbbell,
   ExternalLink,
@@ -22,6 +23,8 @@ import {
   RefreshCw,
   RotateCcw,
   Save,
+  Search,
+  SlidersHorizontal,
   Trash2,
   Upload,
   X,
@@ -29,7 +32,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useMemo, useRef, useState } from "react";
+import {
+  type FormEvent,
+  type RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -69,6 +78,8 @@ import type { Enums } from "@/types/database";
 
 type ResourceArea = Enums<"service_area">;
 type ResourceFilter = ResourceArea | "all";
+type ResourceContentFilter = "all" | "folders" | "links" | "pdf";
+type ResourceStatusFilter = "active" | "all" | "inactive";
 type FieldErrors = Record<string, string | undefined>;
 
 type ResourceManagerProps = {
@@ -78,6 +89,9 @@ type ResourceManagerProps = {
   emptyHint?: string;
   emptyMessage?: string;
   folders: ResourceFolder[];
+  initialContentFilter?: ResourceContentFilter;
+  initialSearchQuery?: string;
+  initialStatusFilter?: ResourceStatusFilter;
   manageableAreas?: ResourceArea[];
   resources: MultimediaResource[];
   selectedFolderId?: string | null;
@@ -104,8 +118,8 @@ const AREA_DETAILS: Record<
 > = {
   general: {
     icon: Layers3,
-    label: "Ambos",
-    summary: "Entrenamiento y nutricion",
+    label: "Compartido",
+    summary: "Disponible para nutricion y entrenamiento",
   },
   nutrition: {
     icon: Leaf,
@@ -123,7 +137,20 @@ const FILTERS: Array<{ label: string; value: ResourceFilter }> = [
   { label: "Todos", value: "all" },
   { label: "Entrenamiento", value: "training" },
   { label: "Nutricion", value: "nutrition" },
-  { label: "Ambos", value: "general" },
+  { label: "Compartido", value: "general" },
+];
+
+const CONTENT_FILTERS: Array<{ label: string; value: ResourceContentFilter }> = [
+  { label: "Todos", value: "all" },
+  { label: "PDFs", value: "pdf" },
+  { label: "Enlaces", value: "links" },
+  { label: "Carpetas", value: "folders" },
+];
+
+const STATUS_FILTERS: Array<{ label: string; value: ResourceStatusFilter }> = [
+  { label: "Todos", value: "all" },
+  { label: "Activos", value: "active" },
+  { label: "Inactivos", value: "inactive" },
 ];
 
 function formatDate(value: string) {
@@ -162,12 +189,99 @@ function getUrlPresentation(value: string) {
   };
 }
 
-function getAreaLabel(area: ResourceArea, canManage: boolean) {
-  if (!canManage && area === "general") {
-    return "General";
+function getAreaLabel(area: ResourceArea) {
+  return AREA_DETAILS[area].label;
+}
+
+function normalizeSearchText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function getResourceKindLabel(resource: MultimediaResource) {
+  return resource.kind === "pdf" ? "PDF" : "Enlace";
+}
+
+function getResourceSearchText(resource: MultimediaResource) {
+  return normalizeSearchText(
+    [
+      resource.title,
+      resource.description,
+      resource.folderName,
+      getResourceKindLabel(resource),
+      getAreaLabel(resource.area),
+      AREA_DETAILS[resource.area].summary,
+      resource.kind === "pdf" ? resource.file_name : resource.file_url,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+}
+
+function getFolderSearchText(folder: ResourceFolder) {
+  return normalizeSearchText(
+    [
+      folder.name,
+      folder.description,
+      "Carpeta",
+      getAreaLabel(folder.area),
+      AREA_DETAILS[folder.area].summary,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+}
+
+function matchesSearch(haystack: string, query: string) {
+  return !query || haystack.includes(query);
+}
+
+function matchesResourceContent(
+  resource: MultimediaResource,
+  filter: ResourceContentFilter,
+) {
+  if (filter === "all") {
+    return true;
   }
 
-  return AREA_DETAILS[area].label;
+  if (filter === "pdf") {
+    return resource.kind === "pdf";
+  }
+
+  if (filter === "links") {
+    return resource.kind === "external_link";
+  }
+
+  return false;
+}
+
+function matchesFolderContent(filter: ResourceContentFilter) {
+  return filter === "all" || filter === "folders";
+}
+
+function matchesResourceStatus(
+  resource: MultimediaResource,
+  filter: ResourceStatusFilter,
+) {
+  if (filter === "all") {
+    return true;
+  }
+
+  return resource.status === filter;
+}
+
+function matchesFolderStatus(
+  folder: ResourceFolder,
+  filter: ResourceStatusFilter,
+) {
+  if (filter === "all") {
+    return true;
+  }
+
+  return filter === "active" ? folder.active : !folder.active;
 }
 
 function FieldError({ id, message }: { id: string; message?: string }) {
@@ -194,15 +308,35 @@ function readFileError(formData: FormData, required: boolean) {
 
 function buildResourcesHref({
   area,
+  content,
   folderId,
+  q,
+  status,
 }: {
   area?: ResourceFilter;
+  content?: ResourceContentFilter;
   folderId?: string | null;
+  q?: string;
+  status?: ResourceStatusFilter;
 }) {
   const params = new URLSearchParams();
 
   if (area && area !== "all") {
     params.set("area", area);
+  }
+
+  if (content && content !== "all") {
+    params.set("type", content);
+  }
+
+  if (status && status !== "all") {
+    params.set("status", status);
+  }
+
+  const search = q?.trim();
+
+  if (search) {
+    params.set("q", search);
   }
 
   if (folderId) {
@@ -240,6 +374,8 @@ function PdfActionButton({
     }
   }
 
+  const Icon = download ? Download : ExternalLink;
+
   return (
     <Button
       type="button"
@@ -251,9 +387,9 @@ function PdfActionButton({
       {isPending ? (
         <Loader2 className="size-4 animate-spin" aria-hidden="true" />
       ) : (
-        <Download className="size-4" aria-hidden="true" />
+        <Icon className="size-4" aria-hidden="true" />
       )}
-      {download ? "Descargar PDF" : "Abrir PDF"}
+      {download ? "Descargar" : "Abrir PDF"}
     </Button>
   );
 }
@@ -280,209 +416,147 @@ function ResourceCard({
   const presentation =
     !isPdf && resource.file_url ? getUrlPresentation(resource.file_url) : null;
   const PreviewIcon = isPdf ? FileText : presentation?.icon ?? Link2;
-  const kindLabel = isPdf ? "PDF" : presentation?.kind ?? "Enlace";
+  const kindLabel = getResourceKindLabel(resource);
   const sourceLabel = isPdf
     ? resource.file_name ?? "Documento PDF"
     : presentation?.domain ?? "Enlace externo";
+  const actionItems = canManage
+    ? [
+        {
+          icon: Pencil,
+          label: resource.folder_id
+            ? "Editar o quitar carpeta"
+            : "Editar o mover",
+          onSelect: () =>
+            isPdf ? onEditPdf(resource) : onEditExternal(resource),
+        },
+        isInactive
+          ? {
+              icon: RotateCcw,
+              label: "Activar",
+              onSelect: () => onToggleStatus(resource),
+            }
+          : {
+              destructive: true,
+              icon: Power,
+              label: "Desactivar",
+              onSelect: () => onToggleStatus(resource),
+            },
+        {
+          destructive: true,
+          icon: Trash2,
+          label: "Eliminar",
+          onSelect: () => onDelete(resource),
+          separatorBefore: true,
+        },
+      ]
+    : [];
 
   return (
     <article
       className={cn(
-        "flex min-w-0 flex-col overflow-hidden rounded-[24px] border border-border bg-background shadow-soft",
+        "flex min-w-0 flex-col rounded-[20px] border border-border bg-background p-4 shadow-soft",
         isInactive && "opacity-70",
       )}
     >
-      <div
-        className={cn(
-          "relative grid min-h-40 place-items-center overflow-hidden border-b border-border px-5 py-8",
-          resource.area === "training" &&
-            "bg-[radial-gradient(circle_at_top_left,var(--primary),transparent_68%)]",
-          resource.area === "nutrition" &&
-            "bg-[radial-gradient(circle_at_top_left,var(--accent),transparent_68%)]",
-          resource.area === "general" &&
-            "bg-[linear-gradient(135deg,var(--primary-soft),var(--accent-soft))]",
-        )}
-      >
-        <div className="absolute inset-x-5 top-4 flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-charcoal/10 bg-surface/90 px-3 py-1 text-xs font-extrabold text-charcoal shadow-soft">
-            <AreaIcon className="size-3.5" aria-hidden="true" />
-            {getAreaLabel(resource.area, canManage)}
-          </span>
-          <span className="rounded-full bg-charcoal/80 px-3 py-1 text-xs font-bold text-white">
-            {kindLabel}
-          </span>
-        </div>
-        <PreviewIcon
-          className="mt-8 size-12 text-warm-brown"
-          aria-hidden="true"
-        />
-        <p
-          className="mt-3 max-w-full truncate text-sm font-extrabold text-charcoal"
-          translate="no"
+      <div className="flex items-start gap-3">
+        <div
+          className={cn(
+            "grid size-12 shrink-0 place-items-center rounded-[16px] border border-border",
+            isPdf ? "bg-primary-soft text-primary-hover" : "bg-accent-soft text-warm-brown",
+          )}
         >
-          {sourceLabel}
-        </p>
-      </div>
+          <PreviewIcon className="size-5" aria-hidden="true" />
+        </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="min-w-0 break-words text-2xl font-semibold leading-tight text-charcoal">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-charcoal px-2.5 py-1 text-xs font-extrabold text-white">
+              {kindLabel}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-charcoal">
+              <AreaIcon className="size-3.5" aria-hidden="true" />
+              {getAreaLabel(resource.area)}
+            </span>
+            {canManage ? (
+              <span
+                className={cn(
+                  "rounded-full px-2.5 py-1 text-xs font-extrabold",
+                  isInactive
+                    ? "bg-muted/15 text-muted"
+                    : "bg-primary-soft text-charcoal",
+                )}
+              >
+                {isInactive ? "Inactivo" : "Activo"}
+              </span>
+            ) : null}
+          </div>
+
+          <h3 className="mt-2 min-w-0 break-words text-lg font-bold leading-tight text-charcoal">
             {resource.title}
           </h3>
+          <p className="mt-1 truncate text-xs font-bold text-muted" translate="no">
+            {sourceLabel}
+          </p>
+        </div>
+
+        {canManage ? (
           <CardActionsMenu
             label={resource.title}
-            items={[
-              ...(isPdf
-                ? [
-                    {
-                      icon: Download,
-                      label: "Abrir PDF",
-                      onSelect: () => {
-                        void createResourceSignedUrl(resource.id).then(
-                          (result) => {
-                            if (result.status === "error" || !result.signedUrl) {
-                              toast.error(result.message);
-                              return;
-                            }
-
-                            window.open(
-                              result.signedUrl,
-                              "_blank",
-                              "noopener,noreferrer",
-                            );
-                          },
-                        );
-                      },
-                    },
-                    {
-                      icon: Download,
-                      label: "Descargar PDF",
-                      onSelect: () => {
-                        void createResourceSignedUrl(resource.id, {
-                          download: true,
-                        }).then((result) => {
-                          if (result.status === "error" || !result.signedUrl) {
-                            toast.error(result.message);
-                            return;
-                          }
-
-                          window.open(
-                            result.signedUrl,
-                            "_blank",
-                            "noopener,noreferrer",
-                          );
-                        });
-                      },
-                    },
-                  ]
-                : resource.file_url
-                  ? [
-                      {
-                        external: true,
-                        href: resource.file_url,
-                        icon: ExternalLink,
-                        label: "Abrir recurso",
-                      },
-                    ]
-                  : []),
-              ...(canManage
-                ? [
-                    {
-                      icon: Pencil,
-                      label: "Editar",
-                      onSelect: () =>
-                        isPdf ? onEditPdf(resource) : onEditExternal(resource),
-                    },
-                    isInactive
-                      ? {
-                          icon: RotateCcw,
-                          label: "Activar",
-                          onSelect: () => onToggleStatus(resource),
-                        }
-                      : {
-                          destructive: true,
-                          icon: Power,
-                          label: "Desactivar",
-                          onSelect: () => onToggleStatus(resource),
-                        },
-                    {
-                      destructive: true,
-                      icon: Trash2,
-                      label: "Eliminar",
-                      onSelect: () => onDelete(resource),
-                      separatorBefore: true,
-                    },
-                  ]
-                : []),
-            ]}
+            items={actionItems}
           />
-        </div>
-        <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted">
-          {resource.description || area.summary}
-        </p>
+        ) : null}
+      </div>
 
-        <dl className="mt-5 grid gap-3 border-t border-border pt-4 text-xs font-bold text-warm-brown sm:grid-cols-2">
-          {resource.folderName ? (
-            <div>
-              <dt className="text-muted">Carpeta</dt>
-              <dd className="mt-1 break-words">{resource.folderName}</dd>
-            </div>
-          ) : null}
-          {resource.creatorName ? (
-            <div>
-              <dt className="text-muted">Creador</dt>
-              <dd className="mt-1 break-words">{resource.creatorName}</dd>
-            </div>
-          ) : null}
-          {isPdf ? (
-            <div>
-              <dt className="text-muted">Archivo</dt>
-              <dd className="mt-1 break-words">
-                {formatFileSize(resource.file_size)}
-              </dd>
-            </div>
-          ) : null}
+      <p className="mt-4 line-clamp-2 text-sm leading-6 text-muted">
+        {resource.description || area.summary}
+      </p>
+
+      <dl className="mt-4 grid gap-3 border-t border-border pt-4 text-xs font-bold text-warm-brown sm:grid-cols-2">
+        {resource.folderName ? (
           <div>
-            <dt className="text-muted">Actualizado</dt>
-            <dd className="mt-1 tabular-nums">
-              {formatDate(resource.updated_at)}
+            <dt className="text-muted">Carpeta</dt>
+            <dd className="mt-1 break-words">{resource.folderName}</dd>
+          </div>
+        ) : null}
+        {resource.creatorName ? (
+          <div>
+            <dt className="text-muted">Creador</dt>
+            <dd className="mt-1 break-words">{resource.creatorName}</dd>
+          </div>
+        ) : null}
+        {isPdf ? (
+          <div>
+            <dt className="text-muted">Archivo</dt>
+            <dd className="mt-1 break-words">
+              {formatFileSize(resource.file_size)}
             </dd>
           </div>
-          {canManage ? (
-            <div>
-              <dt className="text-muted">Estado</dt>
-              <dd className="mt-1.5">
-                <span
-                  className={cn(
-                    "rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider",
-                    isInactive
-                      ? "bg-muted/15 text-muted"
-                      : "bg-primary-soft text-charcoal",
-                  )}
-                >
-                  {isInactive ? "Inactivo" : "Activo"}
-                </span>
-              </dd>
-            </div>
-          ) : null}
-        </dl>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          {isPdf ? (
-            <PdfActionButton resourceId={resource.id} />
-          ) : resource.file_url ? (
-            <Button asChild variant="outline" size="sm">
-              <a
-                href={resource.file_url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <ExternalLink className="size-4" aria-hidden="true" />
-                Abrir recurso
-              </a>
-            </Button>
-          ) : null}
+        ) : null}
+        <div>
+          <dt className="text-muted">Actualizado</dt>
+          <dd className="mt-1 tabular-nums">{formatDate(resource.updated_at)}</dd>
         </div>
+      </dl>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {isPdf ? (
+          <>
+            <PdfActionButton resourceId={resource.id} />
+            <PdfActionButton resourceId={resource.id} download />
+          </>
+        ) : resource.file_url ? (
+          <Button asChild variant="outline" size="sm">
+            <a
+              href={resource.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ExternalLink className="size-4" aria-hidden="true" />
+              Abrir enlace
+            </a>
+          </Button>
+        ) : null}
       </div>
     </article>
   );
@@ -491,50 +565,75 @@ function ResourceCard({
 function FolderCard({
   activeFilter,
   canManage,
+  contentFilter,
   folder,
   onDelete,
   onEdit,
   onToggleActive,
+  searchQuery,
+  statusFilter,
 }: {
   activeFilter: ResourceFilter;
   canManage: boolean;
+  contentFilter: ResourceContentFilter;
   folder: ResourceFolder;
   onDelete: (folder: ResourceFolder) => void;
   onEdit: (folder: ResourceFolder) => void;
   onToggleActive: (folder: ResourceFolder) => void;
+  searchQuery: string;
+  statusFilter: ResourceStatusFilter;
 }) {
   const details = AREA_DETAILS[folder.area];
   const AreaIcon = details.icon;
   const isInactive = !folder.active;
   const href = buildResourcesHref({
     area: activeFilter,
+    content: contentFilter === "folders" ? "all" : contentFilter,
     folderId: folder.id,
+    q: searchQuery,
+    status: statusFilter,
   });
 
   return (
     <article
       className={cn(
-        "group flex min-w-0 flex-col rounded-[24px] border border-border bg-background p-5 shadow-soft transition-colors hover:border-primary/35",
+        "relative flex min-w-0 flex-col rounded-[20px] border border-border bg-background p-4 pt-6 shadow-soft",
         isInactive && "opacity-70",
       )}
     >
+      <div className="absolute left-5 top-0 h-3 w-24 -translate-y-px rounded-t-[14px] border border-b-0 border-border bg-accent-soft" />
       <div className="flex items-start justify-between gap-3">
-        <Link href={href} className="min-w-0 flex-1">
-          <div className="flex items-start gap-3">
-            <div className="grid size-12 shrink-0 place-items-center rounded-[18px] bg-primary-soft text-warm-brown">
-              <FolderOpen className="size-6" aria-hidden="true" />
-            </div>
-            <div className="min-w-0">
-              <p className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
-                <AreaIcon className="size-3.5" aria-hidden="true" />
-                {getAreaLabel(folder.area, canManage)}
-              </p>
-              <h3 className="mt-1 break-words text-2xl font-semibold leading-tight text-charcoal">
-                {folder.name}
-              </h3>
-            </div>
+        <div className="min-w-0 flex flex-1 items-start gap-3">
+          <div className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
+            <FolderOpen className="size-6" aria-hidden="true" />
           </div>
-        </Link>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-charcoal px-2.5 py-1 text-xs font-extrabold text-white">
+                Carpeta
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-charcoal">
+                <AreaIcon className="size-3.5" aria-hidden="true" />
+                {getAreaLabel(folder.area)}
+              </span>
+              {canManage ? (
+                <span
+                  className={cn(
+                    "rounded-full px-2.5 py-1 text-xs font-extrabold",
+                    isInactive
+                      ? "bg-muted/15 text-muted"
+                      : "bg-primary-soft text-charcoal",
+                  )}
+                >
+                  {isInactive ? "Inactiva" : "Activa"}
+                </span>
+              ) : null}
+            </div>
+            <h3 className="mt-2 break-words text-lg font-bold leading-tight text-charcoal">
+              {folder.name}
+            </h3>
+          </div>
+        </div>
 
         {canManage ? (
           <CardActionsMenu
@@ -564,31 +663,24 @@ function FolderCard({
         ) : null}
       </div>
 
-      <p className="mt-4 line-clamp-3 text-sm leading-6 text-muted">
-        {folder.description || "Carpeta de recursos PDF."}
+      <p className="mt-4 line-clamp-2 text-sm leading-6 text-muted">
+        {folder.description || "Carpeta de recursos."}
       </p>
 
-      <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
         <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
           {folder.documentCount} documentos
         </span>
-        {canManage ? (
-          <span
-            className={cn(
-              "rounded-full px-3 py-1 text-xs font-extrabold",
-              isInactive
-                ? "bg-muted/15 text-muted"
-                : "bg-primary-soft text-charcoal",
-            )}
-          >
-            {isInactive ? "Inactiva" : "Activa"}
-          </span>
-        ) : null}
+        <Button asChild size="sm" variant="outline">
+          <Link href={href}>
+            <FolderOpen className="size-4" aria-hidden="true" />
+            Abrir carpeta
+          </Link>
+        </Button>
       </div>
     </article>
   );
 }
-
 function AreaSelector({
   disabled,
   id,
@@ -623,20 +715,22 @@ function AreaSelector({
 }
 
 function FolderManager({
+  editingFolder,
   folders,
   manageableAreas,
   onDelete,
+  onEditingFolderChange,
   onToggleActive,
 }: {
+  editingFolder: ResourceFolder | null;
   folders: ResourceFolder[];
   manageableAreas: ResourceArea[];
   onDelete: (folder: ResourceFolder) => void;
+  onEditingFolderChange: (folder: ResourceFolder | null) => void;
   onToggleActive: (folder: ResourceFolder) => void;
 }) {
   const router = useRouter();
-  const [editingFolder, setEditingFolder] = useState<ResourceFolder | null>(
-    null,
-  );
+  const sectionRef = useRef<HTMLElement>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [selectedArea, setSelectedArea] = useState<ResourceArea>(
     manageableAreas[0] ?? "general",
@@ -644,16 +738,17 @@ function FolderManager({
   const [isPending, setIsPending] = useState(false);
 
   function clearFolderForm(form?: HTMLFormElement) {
-    setEditingFolder(null);
+    onEditingFolderChange(null);
     setFieldErrors({});
     setSelectedArea(manageableAreas[0] ?? "general");
     form?.reset();
   }
 
   function startEditing(folder: ResourceFolder) {
-    setEditingFolder(folder);
+    onEditingFolderChange(folder);
     setSelectedArea(folder.area);
     setFieldErrors({});
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -664,7 +759,7 @@ function FolderManager({
     const form = event.currentTarget;
     const formData = new FormData(form);
     const values = {
-      area: editingFolder?.area ?? String(formData.get("area") ?? ""),
+      area: editingFolder?.area ?? selectedArea,
       description: String(formData.get("description") ?? ""),
       id: editingFolder?.id,
       name: String(formData.get("name") ?? ""),
@@ -672,7 +767,7 @@ function FolderManager({
 
     try {
       const result = editingFolder
-        ? await updateResourceFolder(values)
+        ? await updateResourceFolder({ ...values, id: editingFolder.id })
         : await createResourceFolder(values);
 
       if (result.status === "error") {
@@ -690,7 +785,10 @@ function FolderManager({
   }
 
   return (
-    <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+    <section
+      ref={sectionRef}
+      className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6"
+    >
       <div className="flex items-center gap-3">
         <div className="grid size-11 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
           <Folder className="size-5" aria-hidden="true" />
@@ -700,7 +798,7 @@ function FolderManager({
             Carpetas
           </h2>
           <p className="mt-1 text-sm leading-6 text-muted">
-            Organiza PDFs por tema y area.
+            Organiza PDFs y enlaces por tema y area.
           </p>
         </div>
       </div>
@@ -750,7 +848,7 @@ function FolderManager({
           </Label>
           <AreaSelector
             id="resource-folder-area"
-            value={selectedArea}
+            value={editingFolder?.area ?? selectedArea}
             manageableAreas={
               editingFolder ? [editingFolder.area] : manageableAreas
             }
@@ -806,7 +904,7 @@ function FolderManager({
                     {folder.name}
                   </p>
                   <p className="mt-1 text-xs font-bold text-muted">
-                    {getAreaLabel(folder.area, true)} · {folder.documentCount} documentos
+                    {getAreaLabel(folder.area)} · {folder.documentCount} documentos
                   </p>
                 </button>
                 <CardActionsMenu
@@ -838,7 +936,7 @@ function FolderManager({
           })
         ) : (
           <div className="rounded-[18px] border border-dashed border-border bg-background p-4 text-sm font-semibold text-muted">
-            Aun no hay carpetas.
+            Todavia no hay carpetas.
           </div>
         )}
       </div>
@@ -849,15 +947,17 @@ function FolderManager({
 function PdfUploadForm({
   folders,
   manageableAreas,
+  selectedFolder,
 }: {
   folders: ResourceFolder[];
   manageableAreas: ResourceArea[];
+  selectedFolder?: ResourceFolder | null;
 }) {
   const router = useRouter();
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [message, setMessage] = useState("");
   const [selectedArea, setSelectedArea] = useState<ResourceArea>(
-    manageableAreas[0] ?? "general",
+    selectedFolder?.area ?? manageableAreas[0] ?? "general",
   );
   const [isPending, setIsPending] = useState(false);
   const availableFolders = folders.filter(
@@ -894,7 +994,7 @@ function PdfUploadForm({
 
       toast.success(result.message);
       form.reset();
-      setSelectedArea(manageableAreas[0] ?? "general");
+      setSelectedArea(selectedFolder?.area ?? manageableAreas[0] ?? "general");
       router.refresh();
     } finally {
       setIsPending(false);
@@ -910,7 +1010,7 @@ function PdfUploadForm({
         <div>
           <h2 className="text-2xl font-bold text-charcoal">Subir PDF</h2>
           <p className="mt-1 text-sm leading-6 text-muted">
-            Puede quedar en raiz o dentro de una carpeta.
+            Puede quedar sin carpeta o dentro de una carpeta.
           </p>
         </div>
       </div>
@@ -935,12 +1035,16 @@ function PdfUploadForm({
             Carpeta opcional
           </Label>
           <select
+            key={selectedArea}
             id="pdf-folder"
             name="folderId"
             disabled={isPending}
+            defaultValue={
+              selectedFolder?.area === selectedArea ? selectedFolder.id : ""
+            }
             className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
           >
-            <option value="">Sin carpeta (raiz)</option>
+            <option value="">Sin carpeta</option>
             {availableFolders.map((folder) => (
               <option key={folder.id} value={folder.id}>
                 {folder.name}
@@ -1134,13 +1238,14 @@ function PdfEditForm({
             Carpeta opcional
           </Label>
           <select
+            key={selectedArea}
             id="pdf-edit-folder"
             name="folderId"
             disabled={isPending}
-            defaultValue={resource.folder_id ?? ""}
+            defaultValue={selectedArea === resource.area ? resource.folder_id ?? "" : ""}
             className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
           >
-            <option value="">Sin carpeta (raiz)</option>
+            <option value="">Sin carpeta</option>
             {availableFolders.map((folder) => (
               <option key={folder.id} value={folder.id}>
                 {folder.name}
@@ -1211,20 +1316,41 @@ function PdfEditForm({
 function ExternalResourceForm({
   editingResource,
   formRef,
+  folders,
   manageableAreas,
   onCancel,
   onSave,
+  selectedFolder,
 }: {
   editingResource: MultimediaResource | null;
-  formRef: React.RefObject<HTMLDivElement | null>;
+  formRef: RefObject<HTMLDivElement | null>;
+  folders: ResourceFolder[];
   manageableAreas: ResourceArea[];
   onCancel: () => void;
   onSave: (
     values: ResourceValues,
     resource: MultimediaResource | null,
   ) => Promise<void>;
+  selectedFolder?: ResourceFolder | null;
 }) {
   const [serverMessage, setServerMessage] = useState("");
+  const defaultArea = selectedFolder?.area ?? manageableAreas[0] ?? "general";
+  const defaultValues: ResourceValues =
+    editingResource?.kind === "external_link"
+      ? {
+          area: editingResource.area,
+          description: editingResource.description ?? "",
+          folderId: editingResource.folder_id ?? "",
+          title: editingResource.title,
+          url: editingResource.file_url ?? "",
+        }
+      : {
+          area: defaultArea,
+          description: "",
+          folderId: selectedFolder?.id ?? "",
+          title: "",
+          url: "",
+        };
   const {
     clearErrors,
     control,
@@ -1233,44 +1359,43 @@ function ExternalResourceForm({
     register,
     reset,
     setError,
+    setValue,
   } = useForm<ResourceValues>({
-    defaultValues: {
-      area: "general",
-      description: "",
-      title: "",
-      url: "",
-    },
+    defaultValues,
     resolver: zodResolver(resourceValuesSchema),
   });
-  const selectedArea = useWatch({ control, name: "area" });
+  const selectedArea = useWatch({ control, name: "area" }) ?? defaultArea;
+  const selectedFolderId = useWatch({ control, name: "folderId" });
+  const availableFolders = folders.filter(
+    (folder) => folder.active && folder.area === selectedArea,
+  );
+
+  useEffect(() => {
+    if (
+      selectedFolderId &&
+      !folders.some(
+        (folder) =>
+          folder.active &&
+          folder.area === selectedArea &&
+          folder.id === selectedFolderId,
+      )
+    ) {
+      setValue("folderId", "");
+    }
+  }, [folders, selectedArea, selectedFolderId, setValue]);
 
   function resetForm() {
     setServerMessage("");
     clearErrors();
     reset({
-      area: "general",
+      area: defaultArea,
       description: "",
+      folderId: selectedFolder?.id ?? "",
       title: "",
       url: "",
     });
     onCancel();
   }
-
-  useMemo(() => {
-    if (!editingResource || editingResource.kind !== "external_link") {
-      return;
-    }
-
-    setServerMessage("");
-    clearErrors();
-    reset({
-      area: editingResource.area,
-      description: editingResource.description ?? "",
-      title: editingResource.title,
-      url: editingResource.file_url ?? "",
-    });
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [clearErrors, editingResource, formRef, reset]);
 
   async function submit(values: ResourceValues) {
     setServerMessage("");
@@ -1278,6 +1403,15 @@ function ExternalResourceForm({
 
     try {
       await onSave(values, editingResource);
+      if (!editingResource) {
+        reset({
+          area: defaultArea,
+          description: "",
+          folderId: selectedFolder?.id ?? "",
+          title: "",
+          url: "",
+        });
+      }
     } catch (error) {
       const result = error as {
         fieldErrors?: FieldErrors;
@@ -1426,6 +1560,32 @@ function ExternalResourceForm({
           <FieldError id="resource-area-error" message={errors.area?.message} />
         </fieldset>
 
+        <div>
+          <Label htmlFor="resource-folder" className="font-extrabold text-charcoal">
+            Carpeta opcional
+          </Label>
+          <select
+            id="resource-folder"
+            className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+            aria-describedby={
+              errors.folderId ? "resource-folder-error" : undefined
+            }
+            aria-invalid={Boolean(errors.folderId)}
+            {...register("folderId")}
+          >
+            <option value="">Sin carpeta</option>
+            {availableFolders.map((folder) => (
+              <option key={folder.id} value={folder.id}>
+                {folder.name}
+              </option>
+            ))}
+          </select>
+          <FieldError
+            id="resource-folder-error"
+            message={errors.folderId?.message}
+          />
+        </div>
+
         {serverMessage ? (
           <Alert
             variant="destructive"
@@ -1467,31 +1627,88 @@ export function ResourceManager({
   emptyHint,
   emptyMessage,
   folders,
+  initialContentFilter = "all",
+  initialSearchQuery = "",
+  initialStatusFilter = "all",
   manageableAreas = ["training", "nutrition", "general"],
   resources,
   selectedFolderId,
 }: ResourceManagerProps) {
   const router = useRouter();
   const formRef = useRef<HTMLDivElement>(null);
+  const initialSafeContentFilter =
+    selectedFolderId && initialContentFilter === "folders"
+      ? "all"
+      : initialContentFilter;
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+  const [contentFilter, setContentFilter] = useState<ResourceContentFilter>(
+    initialSafeContentFilter,
+  );
+  const [statusFilter, setStatusFilter] = useState<ResourceStatusFilter>(
+    canManage ? initialStatusFilter : "all",
+  );
   const [editingExternalResource, setEditingExternalResource] =
     useState<MultimediaResource | null>(null);
   const [editingPdfResource, setEditingPdfResource] =
     useState<MultimediaResource | null>(null);
+  const [editingFolder, setEditingFolder] = useState<ResourceFolder | null>(
+    null,
+  );
   const [confirmation, setConfirmation] =
     useState<ResourceConfirmation | null>(null);
-  const visibleFilters = FILTERS.filter((filter) =>
+  const visibleAreaFilters = FILTERS.filter((filter) =>
     availableFilters.includes(filter.value),
   );
   const selectedFolder =
     selectedFolderId
       ? folders.find((folder) => folder.id === selectedFolderId) ?? null
       : null;
+  const effectiveContentFilter =
+    selectedFolder && contentFilter === "folders" ? "all" : contentFilter;
+  const effectiveStatusFilter = canManage ? statusFilter : "all";
+  const normalizedSearchQuery = normalizeSearchText(searchQuery);
+  const visibleContentFilters = selectedFolder
+    ? CONTENT_FILTERS.filter((filter) => filter.value !== "folders")
+    : CONTENT_FILTERS;
   const rootFolders = selectedFolder ? [] : folders;
-  const visibleResources = selectedFolder
+  const resourcesInScope = selectedFolder
     ? resources.filter((resource) => resource.folder_id === selectedFolder.id)
     : resources.filter((resource) => !resource.folder_id);
-  const hasRootContent = rootFolders.length > 0 || visibleResources.length > 0;
-  const backHref = buildResourcesHref({ area: activeFilter });
+  const filteredFolders = rootFolders.filter(
+    (folder) =>
+      matchesFolderContent(effectiveContentFilter) &&
+      matchesFolderStatus(folder, effectiveStatusFilter) &&
+      matchesSearch(getFolderSearchText(folder), normalizedSearchQuery),
+  );
+  const filteredResources = resourcesInScope.filter(
+    (resource) =>
+      matchesResourceContent(resource, effectiveContentFilter) &&
+      matchesResourceStatus(resource, effectiveStatusFilter) &&
+      matchesSearch(getResourceSearchText(resource), normalizedSearchQuery),
+  );
+  const hasAnyContentInScope =
+    rootFolders.length > 0 || resourcesInScope.length > 0;
+  const hasVisibleContent =
+    filteredFolders.length > 0 || filteredResources.length > 0;
+  const hasActiveLocalFilters =
+    Boolean(normalizedSearchQuery) ||
+    effectiveContentFilter !== "all" ||
+    effectiveStatusFilter !== "all";
+  const hasActiveFilters =
+    hasActiveLocalFilters || (!selectedFolder && activeFilter !== "all");
+  const visibleResultCount = filteredFolders.length + filteredResources.length;
+  const backHref = buildResourcesHref({
+    area: activeFilter,
+    content: effectiveContentFilter,
+    q: searchQuery,
+    status: effectiveStatusFilter,
+  });
+
+  function clearLocalFilters() {
+    setSearchQuery("");
+    setContentFilter("all");
+    setStatusFilter("all");
+  }
 
   async function saveExternalResource(
     values: ResourceValues,
@@ -1609,150 +1826,377 @@ export function ResourceManager({
 
   const library = (
     <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
-            Biblioteca
-          </p>
-          <h2 className="mt-2 text-3xl font-semibold text-charcoal">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          {selectedFolder ? (
+            <nav
+              className="flex flex-wrap items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-muted"
+              aria-label="Ruta de recursos"
+            >
+              <Link href={backHref} className="hover:text-primary-hover">
+                Recursos
+              </Link>
+              <ChevronRight className="size-3.5" aria-hidden="true" />
+              <span className="min-w-0 truncate">{selectedFolder.name}</span>
+            </nav>
+          ) : (
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
+              Biblioteca de materiales
+            </p>
+          )}
+          <h2 className="mt-2 break-words text-3xl font-semibold text-charcoal">
             {selectedFolder ? selectedFolder.name : "Recursos disponibles"}
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
             {selectedFolder
               ? selectedFolder.description ||
-                "Documentos dentro de esta carpeta."
+                "Documentos y enlaces dentro de esta carpeta."
               : canManage
-                ? "Carpetas, PDFs y enlaces visibles segun area y estado."
+                ? "Carpetas, PDFs y enlaces visibles segun area, tipo y estado."
                 : "Abre los materiales compartidos para acompanar tu plan."}
           </p>
         </div>
 
         {selectedFolder ? (
-          <Button asChild variant="outline">
-            <Link href={backHref}>
-              <ArrowLeft className="size-4" aria-hidden="true" />
-              Volver a Recursos
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline">
+              <Link href={backHref}>
+                <ArrowLeft className="size-4" aria-hidden="true" />
+                Volver a Recursos
+              </Link>
+            </Button>
+            {canManage ? (
+              <Button
+                type="button"
+                onClick={() =>
+                  formRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  })
+                }
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                Agregar recurso
+              </Button>
+            ) : null}
+          </div>
         ) : null}
       </div>
 
-      {!selectedFolder ? (
-        <nav
-          className="mt-5 flex flex-wrap gap-2"
-          aria-label="Filtrar recursos por acceso"
-        >
-          {visibleFilters.map((filter) => {
-            const href = buildResourcesHref({ area: filter.value });
-            const label =
-              !canManage && filter.value === "general"
-                ? "General"
-                : filter.label;
+      <div className="mt-5 rounded-[22px] border border-border bg-background p-4">
+        <div>
+          <Label htmlFor="resource-library-search" className="sr-only">
+            Buscar recursos
+          </Label>
+          <div className="relative">
+            <Search
+              className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted"
+              aria-hidden="true"
+            />
+            <Input
+              id="resource-library-search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Buscar por titulo, carpeta, tipo o area"
+              className="h-12 rounded-control border-border bg-surface pl-11 pr-4 text-charcoal shadow-soft"
+              autoComplete="off"
+            />
+          </div>
+        </div>
 
-            return (
-              <Button
-                key={filter.value}
-                asChild
-                size="sm"
-                variant={activeFilter === filter.value ? "default" : "outline"}
-              >
-                <Link
-                  href={href}
-                  aria-current={
-                    activeFilter === filter.value ? "page" : undefined
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {!selectedFolder ? (
+            <div>
+              <p className="mb-2 flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
+                <SlidersHorizontal className="size-3.5" aria-hidden="true" />
+                Area
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {visibleAreaFilters.map((filter) => {
+                  const href = buildResourcesHref({
+                    area: filter.value,
+                    content: effectiveContentFilter,
+                    q: searchQuery,
+                    status: effectiveStatusFilter,
+                  });
+
+                  return (
+                    <Button
+                      key={filter.value}
+                      asChild
+                      size="sm"
+                      variant={
+                        activeFilter === filter.value ? "default" : "outline"
+                      }
+                    >
+                      <Link
+                        href={href}
+                        aria-current={
+                          activeFilter === filter.value ? "page" : undefined
+                        }
+                      >
+                        {filter.label}
+                      </Link>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
+                Area
+              </p>
+              <span className="inline-flex min-h-9 items-center gap-1.5 rounded-control border border-border bg-surface px-3 text-sm font-bold text-charcoal shadow-soft">
+                {getAreaLabel(selectedFolder.area)}
+              </span>
+            </div>
+          )}
+
+          <div>
+            <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
+              Tipo
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {visibleContentFilters.map((filter) => (
+                <Button
+                  key={filter.value}
+                  type="button"
+                  size="sm"
+                  variant={
+                    effectiveContentFilter === filter.value
+                      ? "default"
+                      : "outline"
                   }
+                  onClick={() => setContentFilter(filter.value)}
                 >
-                  {label}
-                </Link>
-              </Button>
-            );
-          })}
-        </nav>
-      ) : null}
+                  {filter.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {canManage ? (
+            <div>
+              <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
+                Estado
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {STATUS_FILTERS.map((filter) => (
+                  <Button
+                    key={filter.value}
+                    type="button"
+                    size="sm"
+                    variant={
+                      effectiveStatusFilter === filter.value
+                        ? "default"
+                        : "outline"
+                    }
+                    onClick={() => setStatusFilter(filter.value)}
+                  >
+                    {filter.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+          <p className="text-sm font-semibold text-muted">
+            {hasVisibleContent
+              ? `${visibleResultCount} resultado${visibleResultCount === 1 ? "" : "s"}`
+              : hasActiveFilters
+                ? "Sin resultados con los filtros actuales"
+                : "Biblioteca sin materiales visibles"}
+          </p>
+          {hasActiveLocalFilters ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={clearLocalFilters}
+            >
+              <X className="size-4" aria-hidden="true" />
+              Limpiar filtros
+            </Button>
+          ) : null}
+        </div>
+      </div>
 
       {selectedFolder ? (
-        visibleResources.length > 0 ? (
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {visibleResources.map((resource) => (
-              <ResourceCard
-                key={resource.id}
-                canManage={canManage}
-                onDelete={(selected) =>
-                  setConfirmation({
-                    resource: selected,
-                    type: "delete-resource",
-                  })
-                }
-                onEditExternal={startEditingExternal}
-                onEditPdf={startEditingPdf}
-                onToggleStatus={(selected) =>
-                  setConfirmation({
-                    resource: selected,
-                    type: "toggle-resource",
-                  })
-                }
-                resource={resource}
-              />
-            ))}
+        filteredResources.length > 0 ? (
+          <section className="mt-6" aria-labelledby="folder-resources-title">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3
+                  id="folder-resources-title"
+                  className="text-lg font-extrabold text-charcoal"
+                >
+                  Documentos de la carpeta
+                </h3>
+                <p className="mt-1 text-sm text-muted">
+                  Solo se muestran recursos dentro de esta carpeta.
+                </p>
+              </div>
+              <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                {filteredResources.length} recurso
+                {filteredResources.length === 1 ? "" : "s"}
+              </span>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              {filteredResources.map((resource) => (
+                <ResourceCard
+                  key={resource.id}
+                  canManage={
+                    canManage && manageableAreas.includes(resource.area)
+                  }
+                  onDelete={(selected) =>
+                    setConfirmation({
+                      resource: selected,
+                      type: "delete-resource",
+                    })
+                  }
+                  onEditExternal={startEditingExternal}
+                  onEditPdf={startEditingPdf}
+                  onToggleStatus={(selected) =>
+                    setConfirmation({
+                      resource: selected,
+                      type: "toggle-resource",
+                    })
+                  }
+                  resource={resource}
+                />
+              ))}
+            </div>
+          </section>
+        ) : hasActiveLocalFilters ? (
+          <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
+            <p className="font-extrabold text-charcoal">
+              No encontramos recursos con esos filtros.
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted">
+              Prueba con otra busqueda o limpia los filtros.
+            </p>
           </div>
         ) : (
           <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
             <p className="font-extrabold text-charcoal">
-              Esta carpeta no tiene documentos visibles.
+              Esta carpeta todavia no tiene documentos.
             </p>
             <p className="mt-2 text-sm leading-6 text-muted">
               {canManage
-                ? "Sube un PDF y asignalo a esta carpeta."
-                : "Cuando haya PDFs activos apareceran aqui."}
+                ? "Agrega un PDF o enlace para empezar."
+                : "Cuando haya recursos activos apareceran aqui."}
             </p>
           </div>
         )
-      ) : hasRootContent ? (
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {rootFolders.map((folder) => (
-            <FolderCard
-              key={folder.id}
-              activeFilter={activeFilter}
-              canManage={canManage}
-              folder={folder}
-              onDelete={(selected) =>
-                setConfirmation({ folder: selected, type: "delete-folder" })
-              }
-              onEdit={() => {
-                const target = document.getElementById("resource-folder-name");
-                target?.scrollIntoView({ behavior: "smooth", block: "center" });
-              }}
-              onToggleActive={(selected) =>
-                setConfirmation({ folder: selected, type: "toggle-folder" })
-              }
-            />
-          ))}
-          {visibleResources.map((resource) => (
-            <ResourceCard
-              key={resource.id}
-              canManage={canManage}
-              onDelete={(selected) =>
-                setConfirmation({
-                  resource: selected,
-                  type: "delete-resource",
-                })
-              }
-              onEditExternal={startEditingExternal}
-              onEditPdf={startEditingPdf}
-              onToggleStatus={(selected) =>
-                setConfirmation({
-                  resource: selected,
-                  type: "toggle-resource",
-                })
-              }
-              resource={resource}
-            />
-          ))}
+      ) : hasVisibleContent ? (
+        <div className="mt-6 space-y-7">
+          {filteredFolders.length > 0 ? (
+            <section aria-labelledby="resource-folders-title">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3
+                    id="resource-folders-title"
+                    className="text-lg font-extrabold text-charcoal"
+                  >
+                    Carpetas
+                  </h3>
+                  <p className="mt-1 text-sm text-muted">
+                    Organizacion principal de la biblioteca.
+                  </p>
+                </div>
+                <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                  {filteredFolders.length} carpeta
+                  {filteredFolders.length === 1 ? "" : "s"}
+                </span>
+              </div>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {filteredFolders.map((folder) => (
+                  <FolderCard
+                    key={folder.id}
+                    activeFilter={activeFilter}
+                    canManage={
+                      canManage && manageableAreas.includes(folder.area)
+                    }
+                    contentFilter={effectiveContentFilter}
+                    folder={folder}
+                    onDelete={(selected) =>
+                      setConfirmation({ folder: selected, type: "delete-folder" })
+                    }
+                    onEdit={setEditingFolder}
+                    onToggleActive={(selected) =>
+                      setConfirmation({ folder: selected, type: "toggle-folder" })
+                    }
+                    searchQuery={searchQuery}
+                    statusFilter={effectiveStatusFilter}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {filteredResources.length > 0 ? (
+            <section aria-labelledby="root-resources-title">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3
+                    id="root-resources-title"
+                    className="text-lg font-extrabold text-charcoal"
+                  >
+                    Recursos sin carpeta
+                  </h3>
+                  <p className="mt-1 text-sm text-muted">
+                    PDFs y enlaces disponibles en el nivel principal.
+                  </p>
+                </div>
+                <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                  {filteredResources.length} recurso
+                  {filteredResources.length === 1 ? "" : "s"}
+                </span>
+              </div>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {filteredResources.map((resource) => (
+                  <ResourceCard
+                    key={resource.id}
+                    canManage={
+                      canManage && manageableAreas.includes(resource.area)
+                    }
+                    onDelete={(selected) =>
+                      setConfirmation({
+                        resource: selected,
+                        type: "delete-resource",
+                      })
+                    }
+                    onEditExternal={startEditingExternal}
+                    onEditPdf={startEditingPdf}
+                    onToggleStatus={(selected) =>
+                      setConfirmation({
+                        resource: selected,
+                        type: "toggle-resource",
+                      })
+                    }
+                    resource={resource}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </div>
+      ) : hasAnyContentInScope || hasActiveFilters ? (
+        <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
+          <p className="font-extrabold text-charcoal">
+            No encontramos recursos con esos filtros.
+          </p>
+          <p className="mt-2 text-sm leading-6 text-muted">
+            Prueba con otra busqueda, cambia el tipo o vuelve a Todos.
+          </p>
         </div>
       ) : (
         <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
           <p className="font-extrabold text-charcoal">
-            {emptyMessage ?? "Aun no hay recursos disponibles."}
+            {emptyMessage ?? "Todavia no hay recursos disponibles."}
           </p>
           <p className="mt-2 text-sm leading-6 text-muted">
             {emptyHint ??
@@ -1760,11 +2204,27 @@ export function ResourceManager({
                 ? "Crea una carpeta, sube un PDF o agrega un enlace."
                 : "Tu profesional asignado puede compartir recursos contigo.")}
           </p>
+          {canManage ? (
+            <div className="mt-5 flex justify-center">
+              <Button
+                type="button"
+                size="sm"
+                onClick={() =>
+                  formRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  })
+                }
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                Crear recurso
+              </Button>
+            </div>
+          ) : null}
         </div>
       )}
     </section>
   );
-
   let confirmTitle = "";
   let confirmDescription = "";
   let confirmLabel = "";
@@ -1828,8 +2288,13 @@ export function ResourceManager({
           </div>
         ) : (
           <ExternalResourceForm
+            key={
+              editingExternalResource?.id ??
+              `new-external-${selectedFolder?.id ?? "root"}`
+            }
             editingResource={editingExternalResource}
             formRef={formRef}
+            folders={folders}
             manageableAreas={manageableAreas}
             onCancel={() => setEditingExternalResource(null)}
             onSave={async (values, resource) => {
@@ -1844,16 +2309,24 @@ export function ResourceManager({
 
               await saveExternalResource(values, null);
             }}
+            selectedFolder={selectedFolder}
           />
         )}
 
-        <PdfUploadForm folders={folders} manageableAreas={manageableAreas} />
+        <PdfUploadForm
+          key={`pdf-upload-${selectedFolder?.id ?? "root"}`}
+          folders={folders}
+          manageableAreas={manageableAreas}
+          selectedFolder={selectedFolder}
+        />
         <FolderManager
+          editingFolder={editingFolder}
           folders={folders}
           manageableAreas={manageableAreas}
           onDelete={(folder) =>
             setConfirmation({ folder, type: "delete-folder" })
           }
+          onEditingFolderChange={setEditingFolder}
           onToggleActive={(folder) =>
             setConfirmation({ folder, type: "toggle-folder" })
           }

@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ClientActivationForm } from "@/components/app/client-activation-form";
 import { ClientAvatar } from "@/components/app/client-avatar";
 import { HabitTracker } from "@/components/app/habit-tracker";
 import {
@@ -25,12 +26,14 @@ import {
   AppScreen,
   EmptyState,
 } from "@/components/app/AppScreen";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   getAssignedRelationBadge,
   getPlanBadgeLabel,
   RelationshipBadge,
 } from "@/components/app/relationship-badges";
+import { listClientActivationData } from "@/lib/actions/client-activation";
 import { requireCurrentUserAccess } from "@/lib/auth/current-user-access";
 import {
   getClientAdministrativeProfile,
@@ -341,14 +344,20 @@ export default async function ClientProfilePage({
 }) {
   const access = await requireCurrentUserAccess();
   const { id } = await params;
-  const [client, habitData] = await Promise.all([
+  const [client, habitData, activationData] = await Promise.all([
     getClientAdministrativeProfile(id, access),
     getNutritionHabitTrackerData(access, id),
+    listClientActivationData("all", access),
   ]);
 
   if (!client) {
     notFound();
   }
+
+  const activationClient = activationData.clients.find(
+    (item) => item.id === client.id,
+  );
+  const canManagePlans = access.canManageNutrition || access.canManageTraining;
 
   return (
     <AppScreen>
@@ -413,6 +422,43 @@ export default async function ClientProfilePage({
           professional={client.assignedTrainerName}
         />
       </section>
+
+      {canManagePlans ? (
+        <div id="gestion-planes" className="scroll-mt-6">
+          <AppPanel
+            title="Gestionar planes"
+            description="Actualiza el estado de nutrición, entrenamiento y profesionales asignados desde este detalle."
+            tone="primary"
+          >
+            {activationData.error ? (
+              <Alert
+                variant="destructive"
+                className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
+              >
+                <AlertDescription className="font-semibold text-danger">
+                  {activationData.error}
+                </AlertDescription>
+              </Alert>
+            ) : activationClient ? (
+              <ClientActivationForm
+                canManageNutrition={activationData.canManageNutrition}
+                canManageTraining={activationData.canManageTraining}
+                client={activationClient}
+                currentUserId={activationData.currentUserId}
+                currentUserName={access.displayName}
+                isAdmin={activationData.isAdmin}
+                nutritionists={activationData.nutritionists}
+                trainers={activationData.trainers}
+              />
+            ) : (
+              <EmptyState>
+                No se pudo abrir la gestión de planes para este cliente con tus
+                permisos actuales.
+              </EmptyState>
+            )}
+          </AppPanel>
+        </div>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <AppPanel

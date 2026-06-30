@@ -272,12 +272,27 @@ export async function createResource(
     };
   }
 
+  const folderContext = await validateFolderForResource({
+    area: parsed.data.area,
+    folderId: parsed.data.folderId,
+    supabase: context.supabase,
+  });
+
+  if (!folderContext.ok) {
+    return {
+      fieldErrors: { folderId: folderContext.error },
+      message: folderContext.error ?? "Carpeta invalida.",
+      status: "error",
+    };
+  }
+
   const { data, error } = await context.supabase
     .from("resources")
     .insert({
       area: parsed.data.area,
       description: parsed.data.description || null,
       file_url: parsed.data.url,
+      folder_id: parsed.data.folderId ?? null,
       kind: "external_link",
       status: "active",
       title: parsed.data.title,
@@ -334,9 +349,9 @@ export async function updateResource(
 
   const { data: currentResource, error: currentError } = await context.supabase
     .from("resources")
-    .select("id, kind")
+    .select("id, kind, area")
     .eq("id", parsed.data.id)
-    .maybeSingle<Pick<ResourceRow, "id" | "kind">>();
+    .maybeSingle<Pick<ResourceRow, "area" | "id" | "kind">>();
 
   if (currentError || !currentResource) {
     return {
@@ -352,12 +367,37 @@ export async function updateResource(
     };
   }
 
+  if (
+    !canManageResourceArea(context.access, currentResource.area) ||
+    !canManageResourceArea(context.access, parsed.data.area)
+  ) {
+    return {
+      message: "No tienes permisos para mover este enlace a esa area.",
+      status: "error",
+    };
+  }
+
+  const folderContext = await validateFolderForResource({
+    area: parsed.data.area,
+    folderId: parsed.data.folderId,
+    supabase: context.supabase,
+  });
+
+  if (!folderContext.ok) {
+    return {
+      fieldErrors: { folderId: folderContext.error },
+      message: folderContext.error ?? "Carpeta invalida.",
+      status: "error",
+    };
+  }
+
   const { data, error } = await context.supabase
     .from("resources")
     .update({
       area: parsed.data.area,
       description: parsed.data.description || null,
       file_url: parsed.data.url,
+      folder_id: parsed.data.folderId ?? null,
       title: parsed.data.title,
     })
     .eq("id", parsed.data.id)
@@ -593,6 +633,26 @@ export async function deleteResourceFolder(
   if (context.error || !context.access) {
     return {
       message: context.error ?? "No se pudo validar tu cuenta.",
+      status: "error",
+    };
+  }
+
+  const { data: folder, error: folderError } = await context.supabase
+    .from("resource_folders")
+    .select("id, area")
+    .eq("id", parsed.data.id)
+    .maybeSingle<Pick<ResourceFolderRow, "area" | "id">>();
+
+  if (folderError || !folder) {
+    return {
+      message: "La carpeta seleccionada no existe o no esta disponible.",
+      status: "error",
+    };
+  }
+
+  if (!canManageResourceArea(context.access, folder.area)) {
+    return {
+      message: "No tienes permisos para eliminar esta carpeta.",
       status: "error",
     };
   }

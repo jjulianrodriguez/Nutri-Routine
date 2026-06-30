@@ -562,10 +562,6 @@ textarea::placeholder {
   color: var(--text-muted);
 }
 
-textarea {
-  resize: none !important;
-}
-
 button,
 input,
 textarea,
@@ -873,19 +869,18 @@ label[class*="bg-background"] {
   box-shadow: var(--shadow-card);
   border-color: var(--border-subtle);
   transition:
-    transform var(--duration-base) var(--ease-premium),
     box-shadow var(--duration-base) var(--ease-premium),
     border-color var(--duration-base) var(--ease-premium);
 }
 
 /* Hover lift ONLY for interactive child cards */
 @media (prefers-reduced-motion: no-preference) {
-  a div[class*="rounded-"][class*="bg-background"]:hover,
-  a article[class*="bg-background"]:hover,
-  a label[class*="bg-background"]:hover,
-  button div[class*="rounded-"][class*="bg-background"]:hover,
-  button article[class*="bg-background"]:hover,
-  button label[class*="bg-background"]:hover,
+  a > div[class*="rounded-"][class*="bg-background"]:hover,
+  a > article[class*="bg-background"]:hover,
+  a > label[class*="bg-background"]:hover,
+  button > div[class*="rounded-"][class*="bg-background"]:hover,
+  button > article[class*="bg-background"]:hover,
+  button > label[class*="bg-background"]:hover,
   div[class*="rounded-"][class*="bg-background"].cursor-pointer:hover,
   article[class*="bg-background"].cursor-pointer:hover,
   label[class*="bg-background"].cursor-pointer:hover,
@@ -894,10 +889,7 @@ label[class*="bg-background"] {
   label[class*="bg-background"][role="button"]:hover,
   div[class*="rounded-"][class*="bg-background"][role="tab"]:hover,
   article[class*="bg-background"][role="tab"]:hover,
-  label[class*="bg-background"][role="tab"]:hover,
-  [class*="group"]:hover div[class*="rounded-"][class*="bg-background"],
-  [class*="group"]:hover article[class*="bg-background"],
-  [class*="group"]:hover label[class*="bg-background"] {
+  label[class*="bg-background"][role="tab"]:hover {
     transform: translateY(-2.5px);
     box-shadow: var(--shadow-pop);
     border-color: rgb(var(--teal-rgb) / 0.28);
@@ -926,6 +918,16 @@ label[class*="bg-background"] {
 }
 
 [data-slot="card"] {
+  transition:
+    border-color var(--duration-base) var(--ease-premium),
+    box-shadow var(--duration-base) var(--ease-premium),
+    background-color var(--duration-base) var(--ease-premium);
+}
+
+a[data-slot="card"],
+button[data-slot="card"],
+[data-slot="card"].cursor-pointer,
+[data-slot="card"][role="button"] {
   transition:
     border-color var(--duration-base) var(--ease-premium),
     box-shadow var(--duration-base) var(--ease-premium),
@@ -1115,12 +1117,7 @@ label,
   a[data-slot="card"]:hover,
   button[data-slot="card"]:hover,
   [data-slot="card"].cursor-pointer:hover,
-  [data-slot="card"][role="button"]:hover,
-  a [data-slot="card"]:hover,
-  button [data-slot="card"]:hover,
-  [class*="group"]:hover [data-slot="card"],
-  [data-slot="card"]:has(a:hover),
-  [data-slot="card"]:has(button:hover) {
+  [data-slot="card"][role="button"]:hover {
     border-color: rgb(var(--teal-rgb) / 0.28);
     box-shadow: 0 8px 24px rgba(var(--espresso-rgb), 0.06), 0 28px 64px -14px rgba(var(--espresso-rgb), 0.14), var(--inner-highlight);
     transform: translateY(-3px) scale(1.006);
@@ -1130,15 +1127,11 @@ label,
   tbody tr {
     transition:
       background-color var(--duration-fast) var(--ease-premium),
-      border-color var(--duration-fast) var(--ease-premium),
-      transform var(--duration-fast) var(--ease-premium),
-      box-shadow var(--duration-fast) var(--ease-premium);
+      border-color var(--duration-fast) var(--ease-premium);
   }
 
   tbody tr:hover {
     background-color: var(--surface-hover);
-    transform: scale(1.002) translateX(2px);
-    box-shadow: 0 4px 12px -8px rgba(var(--espresso-rgb), 0.12);
   }
 
   /* Active Tab Indicator line animation */
