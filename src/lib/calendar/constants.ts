@@ -40,7 +40,13 @@ export const AREA_LABELS: Record<Enums<"service_area">, string> = {
 export const STATUS_LABELS: Record<Enums<"appointment_status">, string> = {
   cancelled: "Cancelado",
   completed: "Completado",
-  scheduled: "Pendiente",
+  scheduled: "Programado",
+};
+
+export const STATUS_DESCRIPTIONS: Record<Enums<"appointment_status">, string> = {
+  cancelled: "La cita fue anulada y queda guardada como referencia.",
+  completed: "La consulta o seguimiento ya fue atendido.",
+  scheduled: "La cita, consulta o recordatorio sigue activo.",
 };
 
 export const TIME_ZONE = "America/Costa_Rica";

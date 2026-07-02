@@ -64,4 +64,5 @@ export type CalendarPageData = {
   previousMonthKey: string;
   professionalOptions: CalendarProfessionalOption[];
   timeFormat: TimeFormatPreference;
+  upcomingEvents: CalendarEventItem[];
 };

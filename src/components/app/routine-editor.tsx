@@ -72,6 +72,9 @@ const routineTargetAudienceOptions = [
 
 const inputClasses =
   "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+const formSectionClasses =
+  "rounded-[22px] border border-border bg-background p-4 sm:p-5";
+const legendClasses = "px-1 text-sm font-extrabold text-charcoal";
 
 function normalizeSearch(value: string) {
   return value
@@ -387,8 +390,11 @@ export function RoutineEditor({
           </Button>
         </div>
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-2">
-          <div>
+        <fieldset className={cn(formSectionClasses, "mt-6")}>
+          <legend className={legendClasses}>Información general</legend>
+
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div>
             <Label htmlFor="routine-name" className="font-extrabold text-charcoal">
               Nombre
             </Label>
@@ -486,8 +492,9 @@ export function RoutineEditor({
               ))}
             </select>
             <FieldError message={errors.targetAudience?.message} />
+            </div>
           </div>
-        </div>
+        </fieldset>
 
         {inactiveSelectedCount > 0 ? (
           <Alert className="mt-5 rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-charcoal">
@@ -505,7 +512,8 @@ export function RoutineEditor({
           </Alert>
         ) : null}
 
-        <div className="mt-5">
+        <fieldset className={cn(formSectionClasses, "mt-5")}>
+          <legend className={legendClasses}>Notas del entrenamiento</legend>
           <Label
             htmlFor="routine-description"
             className="font-extrabold text-charcoal"
@@ -517,14 +525,14 @@ export function RoutineEditor({
             rows={4}
             className={cn(
               inputClasses,
-              "w-full resize-y py-3 text-sm outline-none",
+              "min-h-32 w-full resize-y py-3 text-sm outline-none",
             )}
             placeholder="Objetivo, recomendaciones y contexto del entrenamiento."
             aria-invalid={Boolean(errors.description)}
             {...register("description")}
           />
           <FieldError message={errors.description?.message} />
-        </div>
+        </fieldset>
 
         <label className="mt-5 flex min-h-11 w-fit items-center gap-3 rounded-control border border-border bg-background px-4 text-sm font-extrabold text-charcoal">
           <input
@@ -839,7 +847,7 @@ export function RoutineEditor({
                       rows={2}
                       className={cn(
                         inputClasses,
-                        "w-full resize-y py-3 text-sm outline-none",
+                        "min-h-28 w-full resize-y py-3 text-sm outline-none",
                       )}
                       placeholder="Opcional"
                       {...register(`exercises.${index}.notes`)}

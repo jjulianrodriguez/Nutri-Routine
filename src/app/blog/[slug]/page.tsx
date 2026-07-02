@@ -42,26 +42,26 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <article className="relative overflow-hidden px-5 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-16 lg:px-10">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_6%,rgb(255_233_173_/_0.26),transparent_28rem),radial-gradient(circle_at_86%_16%,rgb(255_248_232_/_0.82),transparent_34rem)]" />
+      <div className="hidden" />
       <div className="relative mx-auto max-w-5xl">
         <Link
           href="/blog"
-          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.62)] px-4 py-2.5 text-sm font-black text-[var(--blog-night)] shadow-[0_18px_48px_-38px_rgb(26_48_56_/_0.2)] backdrop-blur-xl transition-colors hover:border-[var(--blog-clay)]/30 hover:bg-[rgb(255_252_248_/_0.78)]"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--blog-night)]/10 bg-[var(--blog-paper)] px-4 py-2.5 text-sm font-black text-[var(--blog-night)] shadow-[0_18px_48px_-38px_rgb(var(--raspberry-rgb)_/_0.2)] transition-colors hover:border-[var(--blog-clay)]/30 hover:bg-[var(--blog-rose)]"
         >
           <ArrowLeft className="size-4" />
           Todos los artículos
         </Link>
 
-        <header className="mt-10 overflow-hidden rounded-[2.4rem] border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.48)] p-5 shadow-[0_40px_120px_-86px_rgb(26_48_56_/_0.28)] backdrop-blur-2xl sm:mt-14 sm:p-7">
+        <header className="mt-10 overflow-hidden rounded-[2.4rem] border border-[var(--blog-night)]/10 bg-[var(--blog-paper)] p-5 shadow-[0_40px_120px_-86px_rgb(var(--raspberry-rgb)_/_0.28)] sm:mt-14 sm:p-7">
           <div className="relative overflow-hidden rounded-[1.8rem] border border-[var(--blog-night)]/8 bg-[var(--blog-paper)] p-6 sm:p-10">
-            <div className="pointer-events-none absolute -right-24 -top-24 size-64 rounded-full bg-[var(--blog-mint)] blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-28 left-10 size-64 rounded-full bg-[var(--blog-rose)] blur-3xl" />
+            <div className="hidden" />
+            <div className="hidden" />
             <div className="relative">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full bg-[var(--blog-sage)] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[var(--blog-night)]">
                   {post.category}
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.62)] px-4 py-2 text-xs font-black text-[var(--blog-muted)] shadow-[0_14px_38px_-30px_rgb(26_48_56_/_0.2)] backdrop-blur-xl">
+                <span className="inline-flex items-center gap-2 rounded-full border border-[var(--blog-night)]/10 bg-[var(--blog-paper)] px-4 py-2 text-xs font-black text-[var(--blog-muted)] shadow-[0_14px_38px_-30px_rgb(var(--raspberry-rgb)_/_0.2)]">
                   <Clock className="size-3.5" />
                   {post.readTime} de lectura
                 </span>
@@ -94,7 +94,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
         </header>
 
-        <div className="mx-auto mt-12 max-w-[68ch] rounded-[2rem] border border-[var(--blog-night)]/8 bg-[rgb(255_252_248_/_0.6)] p-6 shadow-[0_34px_96px_-78px_rgb(26_48_56_/_0.2)] backdrop-blur-xl sm:p-10">
+        <div className="mx-auto mt-12 max-w-[68ch] rounded-[2rem] border border-[var(--blog-night)]/8 bg-[var(--blog-paper)] p-6 shadow-[0_34px_96px_-78px_rgb(var(--raspberry-rgb)_/_0.2)] sm:p-10">
           <BlogContentRenderer content={post.content} />
         </div>
       </div>

@@ -39,11 +39,19 @@ export type ProgressBlock<T> =
   | {
       data: T;
       error: null;
+      errorCode?: null;
     }
   | {
       data: null;
       error: string;
+      errorCode?: ProgressBlockErrorCode;
     };
+
+export type ProgressBlockErrorCode =
+  | "client_not_found"
+  | "permission_denied"
+  | "selection_required"
+  | "supabase_error";
 
 export type NutritionPlanSummary = {
   createdAt: string;
@@ -76,6 +84,8 @@ export type ProgressEntrySummary = Pick<
 export type PhysicalProfileSummary = {
   bodyFatPercentage: number | null;
   bodyMeasurements: string | null;
+  configured: boolean;
+  exists: boolean;
   heightCm: number | null;
   updatedAt: string | null;
   weightKg: number | null;
@@ -112,9 +122,22 @@ const EMPTY_PERMISSIONS: ProgressPermissions = {
   canViewNutrition: false,
   canViewTraining: false,
 };
+const MEASUREMENT_HISTORY_LIMIT = 200;
 
-function emptyBlock<T>(error: string): ProgressBlock<T> {
-  return { data: null, error };
+class ProgressDataError extends Error {
+  code: ProgressBlockErrorCode;
+
+  constructor(code: ProgressBlockErrorCode, message: string) {
+    super(message);
+    this.code = code;
+  }
+}
+
+function emptyBlock<T>(
+  error: string,
+  errorCode?: ProgressBlockErrorCode,
+): ProgressBlock<T> {
+  return { data: null, error, errorCode };
 }
 
 async function toBlock<T>(
@@ -123,9 +146,71 @@ async function toBlock<T>(
 ): Promise<ProgressBlock<T>> {
   try {
     return { data: await callback(), error: null };
-  } catch {
-    return { data: null, error: fallbackMessage };
+  } catch (error) {
+    if (error instanceof ProgressDataError) {
+      return { data: null, error: error.message, errorCode: error.code };
+    }
+
+    return {
+      data: null,
+      error: fallbackMessage,
+      errorCode: "supabase_error",
+    };
   }
+}
+
+function isSupabasePermissionError(error: { code?: unknown; message?: unknown }) {
+  const code = typeof error.code === "string" ? error.code : "";
+  const message =
+    typeof error.message === "string" ? error.message.toLowerCase() : "";
+
+  return (
+    code === "42501" ||
+    code === "401" ||
+    code === "403" ||
+    message.includes("permission denied") ||
+    message.includes("row-level security") ||
+    message.includes("not authorized")
+  );
+}
+
+function toSupabaseProgressError(error: unknown, fallbackMessage: string) {
+  const supabaseError = error as { code?: unknown; message?: unknown } | null;
+
+  if (supabaseError && isSupabasePermissionError(supabaseError)) {
+    return new ProgressDataError(
+      "permission_denied",
+      "No tienes permisos para consultar estas medidas.",
+    );
+  }
+
+  return new ProgressDataError("supabase_error", fallbackMessage);
+}
+
+function hasPhysicalProfileValues(profile: {
+  body_fat_percentage: number | null;
+  body_measurements: string | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+}) {
+  return (
+    profile.weight_kg !== null ||
+    profile.height_cm !== null ||
+    profile.body_fat_percentage !== null ||
+    Boolean(profile.body_measurements?.trim())
+  );
+}
+
+function emptyPhysicalProfile(): PhysicalProfileSummary {
+  return {
+    bodyFatPercentage: null,
+    bodyMeasurements: null,
+    configured: false,
+    exists: false,
+    heightCm: null,
+    updatedAt: null,
+    weightKg: null,
+  };
 }
 
 function addDays(date: Date, days: number) {
@@ -413,15 +498,21 @@ async function loadOwnPhysicalProfile(clientId: string): Promise<PhysicalProfile
     .maybeSingle();
 
   if (error) {
-    throw new Error("No se pudo cargar el perfil fisico.");
+    throw toSupabaseProgressError(error, "No se pudo cargar el perfil fisico.");
+  }
+
+  if (!data) {
+    return emptyPhysicalProfile();
   }
 
   return {
-    bodyFatPercentage: data?.body_fat_percentage ?? null,
-    bodyMeasurements: data?.body_measurements ?? null,
-    heightCm: data?.height_cm ?? null,
-    updatedAt: data?.updated_at ?? null,
-    weightKg: data?.weight_kg ?? null,
+    bodyFatPercentage: data.body_fat_percentage,
+    bodyMeasurements: data.body_measurements,
+    configured: hasPhysicalProfileValues(data),
+    exists: true,
+    heightCm: data.height_cm,
+    updatedAt: data.updated_at,
+    weightKg: data.weight_kg,
   };
 }
 
@@ -431,12 +522,32 @@ async function loadProfessionalPhysicalProfile(
 ): Promise<PhysicalProfileSummary> {
   const profile = await getClientAdministrativeProfile(clientId, access);
 
+  if (!profile) {
+    throw new ProgressDataError(
+      "client_not_found",
+      "No encontramos el cliente seleccionado.",
+    );
+  }
+
+  if (profile.healthDataHidden) {
+    throw new ProgressDataError(
+      "permission_denied",
+      "El cliente no comparte su perfil fisico con profesionales.",
+    );
+  }
+
   return {
-    bodyFatPercentage: profile?.bodyFatPercentage ?? null,
-    bodyMeasurements: profile?.bodyMeasurements ?? null,
-    heightCm: profile?.heightCm ?? null,
-    updatedAt: profile?.updatedAt ?? null,
-    weightKg: profile?.weightKg ?? null,
+    bodyFatPercentage: profile.bodyFatPercentage,
+    bodyMeasurements: profile.bodyMeasurements,
+    configured:
+      profile.weightKg !== null ||
+      profile.heightCm !== null ||
+      profile.bodyFatPercentage !== null ||
+      Boolean(profile.bodyMeasurements?.trim()),
+    exists: profile.physicalProfileExists,
+    heightCm: profile.heightCm,
+    updatedAt: profile.updatedAt,
+    weightKg: profile.weightKg,
   };
 }
 
@@ -450,7 +561,8 @@ async function loadMeasurements(
     .from("progress_entries")
     .select("id, area, metric_type, metric_value, metric_unit, note, recorded_at")
     .eq("client_id", clientId)
-    .order("recorded_at", { ascending: false });
+    .order("recorded_at", { ascending: false })
+    .limit(MEASUREMENT_HISTORY_LIMIT);
   const visibleAreas = getVisibleAreas(access, permissions);
 
   if (visibleAreas) {
@@ -465,7 +577,10 @@ async function loadMeasurements(
   ]);
 
   if (entriesResult.error) {
-    throw new Error("No se pudieron cargar las medidas.");
+    throw toSupabaseProgressError(
+      entriesResult.error,
+      "Supabase no pudo cargar las medidas.",
+    );
   }
 
   return {
@@ -483,7 +598,12 @@ function emptyProgressPageData(
     appointments: emptyBlock("Selecciona un cliente para ver su progreso."),
     clientOptions,
     invalidClientSelection,
-    measurements: emptyBlock("Selecciona un cliente para ver sus medidas."),
+    measurements: emptyBlock(
+      invalidClientSelection
+        ? "No encontramos el cliente seleccionado."
+        : "Selecciona un cliente para ver sus medidas.",
+      invalidClientSelection ? "client_not_found" : "selection_required",
+    ),
     nutrition: emptyBlock("Selecciona un cliente para ver su nutricion."),
     permissions: EMPTY_PERMISSIONS,
     selectedClient,
@@ -583,7 +703,10 @@ export async function getProgressPageData(
           () => loadMeasurements(selectedClient.id, access, permissions),
           "No pudimos cargar las medidas de este cliente.",
         )
-      : emptyBlock("No tienes acceso a las medidas de este cliente."),
+      : emptyBlock(
+          "No tienes acceso a las medidas de este cliente.",
+          "permission_denied",
+        ),
     nutrition:
       permissions.canViewNutrition && selectedClient.hasNutritionService
         ? await toBlock(

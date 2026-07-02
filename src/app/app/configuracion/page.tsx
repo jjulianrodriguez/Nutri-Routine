@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  BadgeInfo,
   Mail,
   ShieldCheck,
   UserCog,
@@ -53,7 +54,7 @@ function SettingRow({
   label: string;
 }) {
   return (
-    <div className="rounded-[18px] border border-border bg-background p-4">
+    <div className="h-fit self-start rounded-[18px] border border-border bg-background p-4">
       <div className="flex min-w-0 items-start gap-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
           {icon}
@@ -72,13 +73,18 @@ function SettingRow({
 export default async function SettingsPage() {
   const access = await requireRouteAccess("/app/configuracion");
   const settings = await getUserSettings(access.userId);
+  const profileEditHref = access.isProfessional
+    ? "/app/perfil#informacion-profesional"
+    : access.isClient
+      ? "/app/perfil#informacion-personal"
+      : "/app/perfil";
 
   return (
     <AppScreen>
       <AppHeader
         eyebrow="Cuenta"
         title="Configuracion"
-        description="Gestiona tu cuenta, privacidad, notificaciones y seguridad."
+        description="Ajustes tecnicos de la app: acceso, seguridad, apariencia, notificaciones, privacidad y preferencias."
       />
 
       <SectionNav
@@ -92,9 +98,12 @@ export default async function SettingsPage() {
         ]}
       />
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid items-start gap-6 xl:grid-cols-2">
         <section id="cuenta" className="scroll-mt-24">
-          <AppPanel title="Cuenta" description="Datos principales de tu acceso.">
+          <AppPanel
+            title="Cuenta tecnica"
+            description="Resumen de acceso. Los datos personales editables viven en Mi perfil para evitar duplicar formularios."
+          >
             <div className="mb-5 flex items-center gap-4 rounded-[20px] border border-border bg-background p-4">
               <div className="grid size-12 place-items-center rounded-full bg-accent text-sm font-extrabold text-charcoal">
                 {access.initials}
@@ -110,12 +119,20 @@ export default async function SettingsPage() {
                 </div>
               </div>
             </div>
-            <div className="grid gap-3 lg:grid-cols-2">
+            <div className="grid items-start gap-3 lg:grid-cols-2">
+              <SettingRow
+                icon={<BadgeInfo className="size-4" aria-hidden="true" />}
+                label="Nombre visible"
+              >
+                {access.displayName}. Se edita desde Mi perfil, no desde
+                Configuracion.
+              </SettingRow>
               <SettingRow
                 icon={<Mail className="size-4" aria-hidden="true" />}
                 label="Correo electronico"
               >
-                {access.email || "Correo no disponible"}
+                {access.email || "Correo no disponible"}. Es tu identificador de
+                acceso y aqui se muestra solo como referencia.
               </SettingRow>
               <SettingRow
                 icon={<UserCog className="size-4" aria-hidden="true" />}
@@ -128,7 +145,13 @@ export default async function SettingsPage() {
                     : "Administrador"}
               </SettingRow>
             </div>
-            <div className="mt-5">
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <Button asChild variant="outline">
+                <Link href={profileEditHref}>
+                  Editar datos de perfil
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </Button>
               <LogoutButton />
             </div>
           </AppPanel>
@@ -152,7 +175,7 @@ export default async function SettingsPage() {
             description="Herramientas de gestion disponibles para tu cuenta."
             tone="primary"
           >
-            <div className="grid gap-3">
+            <div className="grid items-start gap-3">
               {access.canManageClientPlans ? (
                 <Button asChild size="lg">
                   <Link href="/app/clientes">

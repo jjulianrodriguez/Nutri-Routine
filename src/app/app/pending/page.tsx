@@ -15,14 +15,14 @@ export default async function PendingAccountPage() {
         description="Un administrador debe activar tus servicios antes de que puedas acceder a la app."
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
+      <div className="grid items-start gap-6 xl:grid-cols-[1fr_0.9fr]">
         <AppPanel
           title="Estado de activacion"
           description="Tu rol sigue siendo cliente, pero todavía no hay profesionales de nutrición o entrenamiento asignados."
           tone="primary"
         >
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[20px] border border-primary/30 bg-surface p-4">
+          <div className="grid items-start gap-3 sm:grid-cols-2">
+            <div className="h-fit self-start rounded-[20px] border border-primary/30 bg-surface p-4">
               <Clock className="size-5 text-warm-brown" aria-hidden="true" />
               <h2 className="mt-4 font-extrabold text-charcoal">
                 Servicios pendientes
@@ -32,7 +32,7 @@ export default async function PendingAccountPage() {
                 mostrará solo esas secciones.
               </p>
             </div>
-            <div className="rounded-[20px] border border-primary/30 bg-surface p-4">
+            <div className="h-fit self-start rounded-[20px] border border-primary/30 bg-surface p-4">
               <ShieldCheck
                 className="size-5 text-warm-brown"
                 aria-hidden="true"

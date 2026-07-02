@@ -214,7 +214,7 @@ function ClientDashboard({
 
       <FadeIn delay={0.06}>
         <section
-          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4"
           aria-label="Metricas personales"
         >
           <StatTile
@@ -244,7 +244,7 @@ function ClientDashboard({
         </section>
       </FadeIn>
 
-      <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+      <div className="grid items-start gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <FadeIn delay={0.1}>
           <ServicesSummary access={access} />
         </FadeIn>
@@ -265,7 +265,7 @@ function ClientDashboard({
         </FadeIn>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid items-start gap-6 xl:grid-cols-2">
         {access.canViewNutrition ? (
           <FadeIn delay={0.18}>
             <AppPanel
@@ -298,7 +298,7 @@ function ClientDashboard({
         ) : null}
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <div className="grid items-start gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <FadeIn delay={0.26}>
           <AppPanel
             title="Recursos recientes"
@@ -394,7 +394,7 @@ function AdminDashboard({
 
       <FadeIn delay={0.06}>
         <section
-          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4"
           aria-label="Metricas administrativas"
         >
           <StatTile
@@ -428,13 +428,13 @@ function AdminDashboard({
         </section>
       </FadeIn>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
+      <div className="grid items-start gap-6 xl:grid-cols-[1fr_0.9fr]">
         <FadeIn delay={0.1}>
           <AppPanel
             title="Accesos rapidos"
             description="Solo aparecen las secciones disponibles para tu área profesional."
           >
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid items-start gap-3 sm:grid-cols-2">
               {quickLinks.map((link) => (
                 <QuickLink key={link.href} {...link} />
               ))}
@@ -456,7 +456,7 @@ function AdminDashboard({
         </FadeIn>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid items-start gap-6 xl:grid-cols-2">
         <FadeIn delay={0.18}>
           <AppPanel
             title="Calendario"

@@ -60,14 +60,14 @@ export function ConfirmationDialog({
       <AlertDialogPrimitive.Portal>
         <AlertDialogPrimitive.Overlay
           className={cn(
-            "fixed inset-0 z-[100] bg-charcoal/45 backdrop-blur-[2px]",
+            "fixed inset-0 z-[140] bg-charcoal/55",
             "data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
             "data-[state=open]:animate-in data-[state=open]:fade-in-0",
           )}
         />
         <AlertDialogPrimitive.Content
           className={cn(
-            "fixed left-1/2 top-1/2 z-[110] max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto overscroll-contain rounded-[28px] border border-border bg-surface/88 p-5 shadow-premium backdrop-blur-xl focus-visible:outline-none sm:p-6",
+            "fixed left-1/2 top-1/2 z-[150] max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto overscroll-contain rounded-card border border-border bg-surface-elevated p-5 shadow-premium focus-visible:outline-none sm:p-6",
             "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
             "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
           )}
@@ -78,7 +78,7 @@ export function ConfirmationDialog({
               "grid size-12 place-items-center rounded-full",
               isDestructive
                 ? "bg-danger/10 text-danger"
-                : "bg-primary-soft text-charcoal",
+                : "bg-primary-soft text-primary-hover",
             )}
           >
             <Icon className="size-5" aria-hidden="true" />

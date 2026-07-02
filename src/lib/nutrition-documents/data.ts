@@ -19,6 +19,8 @@ type ClientProfileRow = {
   profile_id: string;
 };
 
+const NUTRITION_DOCUMENT_PAGE_SIZE = 100;
+
 async function resolveRows<Row>(
   query: PromiseLike<{ data: Row[] | null; error: unknown }>,
 ) {
@@ -110,11 +112,17 @@ export async function getManageableNutritionClients(
   }
 
   const clientProfiles = await resolveRows<ClientProfileRow>(query);
+
+  if (clientProfiles.length === 0) {
+    return [];
+  }
+
   const clientNamesById = await getProfilesById(
     clientProfiles.map((client) => client.profile_id),
   );
 
   const activeMealPlans = await getNutritionDocuments(access, {
+    clientIds: clientProfiles.map((client) => client.profile_id),
     documentType: "meal_plan",
     status: "active",
   });
@@ -177,7 +185,9 @@ export async function getNutritionDocumentFolders(
 export async function getNutritionDocuments(
   access: CurrentUserAccess,
   filters: {
+    clientIds?: string[];
     documentType?: Enums<"nutrition_document_type">;
+    limit?: number;
     status?: Enums<"nutrition_document_status">;
   } = {},
 ): Promise<NutritionDocumentRecord[]> {
@@ -193,13 +203,24 @@ export async function getNutritionDocuments(
     query = query.eq("document_type", filters.documentType);
   }
 
+  if (filters.clientIds?.length) {
+    query = query.in("client_id", Array.from(new Set(filters.clientIds)));
+  }
+
   if (filters.status) {
     query = query.eq("status", filters.status);
   }
 
+  if (filters.limit) {
+    query = query.limit(filters.limit);
+  }
+
   const rows = await resolveRows<DocumentRow>(query);
+  const hasFolderReferences = rows.some((row) => row.folder_id);
   const [folders, profileNamesById] = await Promise.all([
-    getNutritionDocumentFolders(access),
+    hasFolderReferences
+      ? getNutritionDocumentFolders(access)
+      : Promise.resolve([]),
     getProfilesById(
       rows.flatMap((row) => [row.client_id ?? "", row.created_by]),
     ),
@@ -221,10 +242,11 @@ export async function getNutritionDocuments(
 export async function getNutritionDocumentsPageData(
   access: CurrentUserAccess,
 ): Promise<NutritionDocumentsPageData> {
-  const [folders, documents] = await Promise.all([
-    getNutritionDocumentFolders(access),
-    getNutritionDocuments(access),
-  ]);
+  const documents = await getNutritionDocuments(access, {
+    documentType: "meal_plan",
+    limit: NUTRITION_DOCUMENT_PAGE_SIZE,
+    status: canManageDocuments(access) ? undefined : "active",
+  });
   const clients = canManageDocuments(access)
     ? await getManageableNutritionClients(access)
     : [];
@@ -232,12 +254,8 @@ export async function getNutritionDocumentsPageData(
   return {
     clients,
     documents,
-    folders,
-    libraryDocuments: documents.filter(
-      (document) => document.documentType === "educational_library",
-    ),
-    mealPlanDocuments: documents.filter(
-      (document) => document.documentType === "meal_plan",
-    ),
+    folders: [],
+    libraryDocuments: [],
+    mealPlanDocuments: documents,
   };
 }

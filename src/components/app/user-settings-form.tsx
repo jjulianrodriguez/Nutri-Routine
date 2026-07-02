@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  AlertCircle,
   Bell,
+  CheckCircle2,
   Clock3,
   Eye,
   EyeOff,
@@ -157,7 +159,13 @@ export function UserSettingsForm({
   const router = useRouter();
   const { setTheme } = useTheme();
   const [values, setValues] = useState<UserSettingsValues>(initialValues);
+  const [savedValues, setSavedValues] = useState<UserSettingsValues>(initialValues);
   const [isSaving, setIsSaving] = useState(false);
+  const hasPendingChanges = Object.keys(values).some((key) => {
+    const typedKey = key as keyof UserSettingsValues;
+
+    return values[typedKey] !== savedValues[typedKey];
+  });
 
   useEffect(() => {
     setTheme(values.theme);
@@ -184,6 +192,7 @@ export function UserSettingsForm({
       return;
     }
 
+    setSavedValues(values);
     toast.success(result.message);
     router.refresh();
   }
@@ -233,12 +242,24 @@ export function UserSettingsForm({
       <section id="privacidad" className="scroll-mt-24">
         <AppPanel
           title="Privacidad"
-          description="Controla que pueden ver tus profesionales asignados."
+          description="Controla que pueden ver tus profesionales asignados antes de atenderte."
         >
           <div className="space-y-3">
+            <div className="rounded-[20px] border border-primary/25 bg-primary-soft/60 p-4 text-sm leading-6 text-muted">
+              <p className="font-extrabold text-charcoal">
+                Que significa compartir estos datos
+              </p>
+              <p className="mt-1">
+                Si activas una opcion, tus profesionales asignados pueden ver
+                ese grupo de datos para preparar tu seguimiento. Si la
+                desactivas, la app oculta esa informacion en sus vistas de
+                cliente. Admin autorizado conserva acceso operativo cuando sea
+                necesario.
+              </p>
+            </div>
             <SwitchRow
               checked={values.allowAssignedProfessionalsPersonalInfo}
-              description="Permite ver datos de contacto y datos personales utiles para tu seguimiento."
+              description="Tu telefono, fecha de nacimiento y datos de contacto utiles para coordinar citas o seguimiento."
               icon={<ShieldCheck className="size-4" aria-hidden="true" />}
               label="Informacion personal"
               onChange={(checked) =>
@@ -247,7 +268,7 @@ export function UserSettingsForm({
             />
             <SwitchRow
               checked={values.allowAssignedProfessionalsHealthData}
-              description="Permite ver peso, altura, medidas, condiciones, lesiones, alergias y restricciones."
+              description="Peso, altura, medidas, condiciones, lesiones, alergias y restricciones que ayudan a adaptar tu plan."
               icon={<Eye className="size-4" aria-hidden="true" />}
               label="Datos fisicos y salud"
               onChange={(checked) =>
@@ -256,7 +277,7 @@ export function UserSettingsForm({
             />
             <SwitchRow
               checked={values.allowAssignedProfessionalsSensitiveNotes}
-              description="Permite ver notas importantes que hayas registrado para tu atencion."
+              description="Notas que vos escribiste para que tu profesional tome en cuenta detalles sensibles de tu atencion."
               icon={<EyeOff className="size-4" aria-hidden="true" />}
               label="Notas sensibles"
               onChange={(checked) =>
@@ -334,12 +355,31 @@ export function UserSettingsForm({
       </section>
 
       <div className="xl:col-span-2">
-        <div className="flex justify-end rounded-[24px] border border-border bg-surface/72 p-4 shadow-soft">
+        <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[24px] border border-border bg-surface/90 p-4 shadow-card backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3 text-sm leading-6">
+            <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
+              {hasPendingChanges ? (
+                <AlertCircle className="size-4" aria-hidden="true" />
+              ) : (
+                <CheckCircle2 className="size-4" aria-hidden="true" />
+              )}
+            </span>
+            <div>
+              <p className="font-extrabold text-charcoal">
+                {hasPendingChanges ? "Cambios pendientes" : "Configuracion al dia"}
+              </p>
+              <p className="text-muted" aria-live="polite">
+                {hasPendingChanges
+                  ? "Revisa y guarda para aplicar estas preferencias en tu cuenta."
+                  : "No hay cambios sin guardar."}
+              </p>
+            </div>
+          </div>
           <Button
             type="button"
             size="lg"
             onClick={saveSettings}
-            disabled={isSaving}
+            disabled={isSaving || !hasPendingChanges}
           >
             {isSaving ? (
               <>

@@ -2,6 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  ArrowRight,
+  CalendarClock,
   Link2,
   Loader2,
   Pencil,
@@ -11,6 +13,7 @@ import {
   RotateCcw,
   Search,
   Trash2,
+  UserRound,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -56,6 +59,9 @@ const difficultyLabels = {
 
 const inputClasses =
   "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+const formSectionClasses =
+  "rounded-[22px] border border-border bg-background p-4 sm:p-5";
+const legendClasses = "px-1 text-sm font-extrabold text-charcoal";
 const libraryPath = "/app/entrenamiento/ejercicios";
 
 const defaultValues: ExerciseFormValues = {
@@ -441,10 +447,10 @@ export function ExerciseManager({
           : "Activar";
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] xl:items-start">
       <section
         id="exercise-form"
-        className="scroll-mt-6 rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6"
+        className="scroll-mt-6 rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6 xl:self-start"
       >
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -470,7 +476,11 @@ export function ExerciseManager({
         >
           <input type="hidden" {...register("id")} />
 
-          <div>
+          <fieldset className={formSectionClasses}>
+            <legend className={legendClasses}>Información principal</legend>
+
+            <div className="grid gap-5">
+              <div>
             <Label htmlFor="exercise-name" className="font-extrabold text-charcoal">
               Nombre
             </Label>
@@ -497,7 +507,7 @@ export function ExerciseManager({
               rows={5}
               className={cn(
                 inputClasses,
-                "w-full resize-y py-3 text-sm outline-none",
+                "min-h-32 w-full resize-y py-3 text-sm outline-none",
               )}
               placeholder="Explica la tecnica, postura y puntos de control."
               aria-invalid={Boolean(errors.description)}
@@ -512,7 +522,13 @@ export function ExerciseManager({
             />
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+            </div>
+          </fieldset>
+
+          <fieldset className={formSectionClasses}>
+            <legend className={legendClasses}>Clasificación</legend>
+
+            <div className="grid gap-5 sm:grid-cols-2">
             <div>
               <Label
                 htmlFor="exercise-difficulty"
@@ -653,8 +669,10 @@ export function ExerciseManager({
             </div>
           </div>
 
-          <fieldset className="rounded-[22px] border border-border bg-background p-4">
-            <legend className="px-1 font-extrabold text-charcoal">
+          </fieldset>
+
+          <fieldset className={formSectionClasses}>
+            <legend className={legendClasses}>
               Recursos multimedia externos
             </legend>
             <p className="text-sm leading-6 text-muted">
@@ -937,15 +955,15 @@ export function ExerciseManager({
               <article
                 key={exercise.id}
                 className={cn(
-                  "group relative overflow-hidden rounded-[24px] border bg-background p-4 shadow-[0_16px_40px_-34px_rgb(var(--espresso-rgb)/0.32)] transition-[background-color,border-color,box-shadow] hover:border-primary/45 hover:bg-surface-hover hover:shadow-soft sm:p-5",
+                  "group relative overflow-hidden rounded-[26px] border bg-surface p-5 shadow-soft transition-[background-color,border-color,box-shadow] hover:border-primary/45 hover:bg-surface-hover sm:p-6",
                   exercise.isActive
                     ? "border-border"
-                    : "border-dashed border-border bg-stone-soft/40 opacity-90",
+                    : "border-border opacity-90",
                 )}
               >
                 <Link
                   href={`/app/entrenamiento/ejercicios/${exercise.id}`}
-                  className="absolute inset-0 z-0 rounded-[24px] outline-none focus-visible:ring-3 focus-visible:ring-ring/35"
+                  className="absolute inset-0 z-0 rounded-[26px] outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-ring/35"
                   aria-label={`Ver información completa de ${exercise.name}`}
                 >
                   <span className="sr-only">
@@ -957,10 +975,10 @@ export function ExerciseManager({
                   <div className="min-w-0 flex-1">
                     <span
                       className={cn(
-                        "inline-flex rounded-full border px-2.5 py-1 text-[0.68rem] font-extrabold uppercase tracking-[0.12em]",
+                        "inline-flex rounded-full px-3 py-1 text-xs font-extrabold",
                         exercise.isActive
-                          ? "border-primary/35 bg-primary-soft text-charcoal"
-                          : "border-border bg-stone-soft text-muted",
+                          ? "bg-primary text-charcoal"
+                          : "bg-stone-soft text-stone-hover",
                       )}
                     >
                       {exercise.isActive ? "Activo" : "Inactivo"}
@@ -973,6 +991,10 @@ export function ExerciseManager({
                         {exercise.description}
                       </p>
                     ) : null}
+                    <span className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-warm-brown transition group-hover:text-charcoal">
+                      Ver información completa
+                      <ArrowRight className="size-4 transition group-hover:translate-x-1" />
+                    </span>
                   </div>
                   <div className="pointer-events-auto relative z-20 shrink-0">
                     <CardActionsMenu
@@ -1002,34 +1024,34 @@ export function ExerciseManager({
                   </div>
                 </div>
 
-                <div className="pointer-events-none relative z-10 mt-4 flex flex-wrap items-center gap-2 text-xs font-bold text-charcoal">
-                  <span className="rounded-full border border-border bg-surface px-2.5 py-1">
+                <div className="pointer-events-none relative z-10 mt-4 flex flex-wrap items-center gap-2 text-xs font-extrabold text-warm-brown">
+                  <span className="rounded-full bg-accent-soft px-3 py-1 text-charcoal">
                     {difficultyLabels[exercise.difficulty ?? "beginner"]}
                   </span>
                   <span
-                    className="rounded-full border border-border bg-surface px-2.5 py-1"
+                    className="rounded-full border border-border bg-background px-3 py-1"
                     title="Grupo muscular"
                   >
                     {exercise.muscleGroup}
                   </span>
                   <span
-                    className="rounded-full border border-border bg-surface px-2.5 py-1"
+                    className="rounded-full border border-border bg-background px-3 py-1"
                     title="Categoría"
                   >
                     {exercise.category}
                   </span>
                   <span
-                    className="rounded-full border border-border bg-surface px-2.5 py-1"
+                    className="rounded-full border border-border bg-background px-3 py-1"
                     title="Tipo de ejercicio"
                   >
                     {exercise.exerciseType}
                   </span>
                   <span
                     className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1",
+                      "inline-flex items-center gap-1.5 rounded-full border px-3 py-1",
                       exercise.multimediaUrls.length > 0
                         ? "border-primary/30 bg-primary-soft text-charcoal"
-                        : "border-border bg-surface text-muted",
+                        : "border-border bg-background text-muted",
                     )}
                   >
                     <Link2 className="size-3.5" aria-hidden="true" />
@@ -1040,12 +1062,19 @@ export function ExerciseManager({
                   </span>
                 </div>
 
-                <div className="pointer-events-none relative z-10 mt-4 rounded-[16px] border border-border-subtle bg-surface/70 px-3 py-2 text-[0.72rem] font-semibold leading-5 text-muted">
-                  <div className="flex flex-wrap gap-x-4 gap-y-1">
-                    <span>Creado por {exercise.creatorName}</span>
-                    <span>Creado: {formatDate(exercise.createdAt)}</span>
-                    <span>Actualizado: {formatDate(exercise.updatedAt)}</span>
-                  </div>
+                <div className="pointer-events-none relative z-10 -mx-5 mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-border px-5 pt-4 text-sm text-muted sm:-mx-6 sm:px-6">
+                  <span className="inline-flex items-center gap-2">
+                    <UserRound className="size-4" aria-hidden="true" />
+                    {exercise.creatorName}
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <CalendarClock className="size-4" aria-hidden="true" />
+                    Creado {formatDate(exercise.createdAt)}
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <CalendarClock className="size-4" aria-hidden="true" />
+                    Actualizado {formatDate(exercise.updatedAt)}
+                  </span>
                 </div>
               </article>
             ))

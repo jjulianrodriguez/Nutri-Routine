@@ -13,9 +13,14 @@ export const dynamic = "force-dynamic";
 export default async function NotificationsPage() {
   const access = await requireRouteAccess("/app/notificaciones");
   const result = await getNotifications(access.userId);
-  const unreadCount = result.items.filter(
-    (notification) => notification.read_at === null,
-  ).length;
+  const totalCount = result.items.reduce(
+    (total, notification) => total + notification.groupCount,
+    0,
+  );
+  const unreadCount = result.items.reduce(
+    (total, notification) => total + notification.groupUnreadCount,
+    0,
+  );
   const pageDescription = access.isClient
     ? access.canViewTraining && !access.canViewNutrition
       ? "Consulta avisos sobre tu entrenamiento, calendario y recursos."
@@ -41,22 +46,22 @@ export default async function NotificationsPage() {
       ) : (
         <>
           <section
-            className="grid gap-4 sm:grid-cols-3"
+            className="grid items-start gap-4 sm:grid-cols-3"
             aria-label="Resumen de notificaciones"
           >
             <StatTile
               label="Total"
-              value={String(result.items.length)}
+              value={String(totalCount)}
               detail="Actividad reciente disponible"
             />
             <StatTile
               label="Sin leer"
               value={String(unreadCount)}
-              detail="Eventos que requieren tu atencion"
+              detail="Eventos que requieren tu atención"
             />
             <StatTile
               label="Leídas"
-              value={String(result.items.length - unreadCount)}
+              value={String(totalCount - unreadCount)}
               detail="Eventos que ya revisaste"
             />
           </section>

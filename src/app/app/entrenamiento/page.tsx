@@ -259,7 +259,7 @@ async function ClientTrainingPage({
         </AppPanel>
       )}
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatTile
           label="Estado actual"
           value={current ? assignmentStateLabels[current.state] : "Sin plantilla"}
@@ -298,7 +298,7 @@ async function ClientTrainingPage({
         tone="accent"
       >
         {overview.history.length > 0 ? (
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid items-start gap-4 lg:grid-cols-2">
             {overview.history.map((assignment) => {
               const relativeCreatedLabel = formatRelativeDate(
                 assignment.createdAt,
@@ -370,7 +370,7 @@ async function ClientTrainingPage({
                 <Link
                   key={assignment.id}
                   href={`/app/entrenamiento/historial/${assignment.id}`}
-                  className="group rounded-[20px] border border-charcoal/10 bg-surface p-4 outline-none transition hover:border-primary/50 hover:shadow-soft focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/35"
+                  className="group h-fit self-start rounded-[20px] border border-charcoal/10 bg-surface p-4 outline-none transition hover:border-primary/50 hover:shadow-soft focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/35"
                   aria-label={`Ver detalle de ${assignment.title}`}
                 >
                   {content}
@@ -378,7 +378,7 @@ async function ClientTrainingPage({
               ) : (
                 <article
                   key={assignment.id}
-                  className="rounded-[20px] border border-charcoal/10 bg-background/70 p-4"
+                  className="h-fit self-start rounded-[20px] border border-charcoal/10 bg-background/70 p-4"
                 >
                   {content}
                 </article>
@@ -420,7 +420,7 @@ export default async function TrainingPage() {
 
       <TrainingSectionNav active="overview" />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           label="Ejercicios activos"
           value={String(overview.exerciseCount)}
@@ -443,10 +443,10 @@ export default async function TrainingPage() {
         />
       </section>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-4">
         <Link
           href="/app/entrenamiento/ejercicios"
-          className="group rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
+          className="group h-fit self-start rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
         >
           <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-charcoal">
             <Dumbbell className="size-5" aria-hidden="true" />
@@ -466,7 +466,7 @@ export default async function TrainingPage() {
 
         <Link
           href="/app/entrenamiento/rutinas"
-          className="group rounded-[28px] border border-charcoal/10 bg-accent-soft p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/40"
+          className="group h-fit self-start rounded-[28px] border border-charcoal/10 bg-accent-soft p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/40"
         >
           <div className="grid size-12 place-items-center rounded-full bg-surface text-charcoal">
             <ListChecks className="size-5" aria-hidden="true" />
@@ -486,7 +486,7 @@ export default async function TrainingPage() {
 
         <Link
           href="/app/entrenamiento/plantillas"
-          className="group rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
+          className="group h-fit self-start rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
         >
           <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-charcoal">
             <Layers3 className="size-5" aria-hidden="true" />
@@ -506,7 +506,7 @@ export default async function TrainingPage() {
 
         <Link
           href="/app/entrenamiento/asignaciones"
-          className="group rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
+          className="group h-fit self-start rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
         >
           <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-charcoal">
             <ClipboardCheck className="size-5" aria-hidden="true" />

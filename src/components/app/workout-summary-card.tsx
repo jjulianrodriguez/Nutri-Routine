@@ -271,7 +271,7 @@ export function WorkoutSummaryCard({
     <article
       id={id}
       className={cn(
-        "overflow-hidden rounded-[26px] border bg-surface shadow-soft",
+        "h-fit self-start overflow-hidden rounded-[26px] border bg-surface shadow-soft",
         isCurrent ? "border-primary/45" : "border-border",
         className,
       )}

@@ -72,10 +72,7 @@ export function RecoveryState({
       aria-describedby="recovery-state-description"
       role={kind === "unexpected" ? "alert" : "region"}
     >
-      <div
-        className="h-2 bg-[linear-gradient(90deg,var(--sage-green),var(--blush),var(--terracotta-soft))]"
-        aria-hidden="true"
-      />
+      <div className="h-2 bg-[var(--color-papaya)]" aria-hidden="true" />
       <CardHeader className="gap-4 px-6 pt-7 sm:px-9 sm:pt-9">
         <div className="grid size-14 place-items-center rounded-full border border-charcoal/10 bg-primary-soft text-warm-brown">
           <Icon className="size-6" aria-hidden="true" />

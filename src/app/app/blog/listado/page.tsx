@@ -22,7 +22,7 @@ export default async function AdminBlogListPage() {
       <AppHeader
         eyebrow="Contenido"
         title="Blogs creados"
-        description="Revisa, edita, oculta, ancla o elimina las publicaciones visibles en el blog público."
+        description="Revisa, edita, oculta, ancla o elimina las publicaciones del blog."
       />
 
       <section className="flex flex-wrap items-center justify-between gap-4 rounded-[24px] border border-border bg-surface p-5 shadow-soft">
@@ -31,7 +31,7 @@ export default async function AdminBlogListPage() {
             Gestión de publicaciones
           </p>
           <p className="mt-1 text-sm leading-6 text-muted">
-            Desde aquí puedes editar cualquier blog existente o volver al editor
+            Desde aqui puedes editar cualquier blog existente o volver al editor
             para crear uno nuevo.
           </p>
         </div>
@@ -52,7 +52,7 @@ export default async function AdminBlogListPage() {
       </section>
 
       <section
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4"
         aria-label="Resumen de blogs"
       >
         <StatTile
@@ -70,14 +70,14 @@ export default async function AdminBlogListPage() {
           value={String(hiddenPosts)}
           detail="Fuera del blog público"
         />
-        <div className="rounded-[24px] border border-primary/30 bg-primary-soft p-5 shadow-soft">
+        <div className="h-fit self-start rounded-[24px] border border-primary/30 bg-primary-soft p-5 shadow-soft">
           <div className="flex items-center gap-2 text-sm font-bold text-muted">
             {pinnedPost ? (
               <Pin className="size-4" aria-hidden="true" />
             ) : (
               <BookOpenText className="size-4" aria-hidden="true" />
             )}
-            Principal
+            Anclado
           </div>
           <p className="mt-3 line-clamp-2 font-serif text-2xl font-semibold leading-tight text-charcoal">
             {pinnedPost?.title ?? "Sin blog anclado"}
@@ -88,7 +88,7 @@ export default async function AdminBlogListPage() {
             ) : (
               <EyeOff className="size-4" aria-hidden="true" />
             )}
-            {pinnedPost ? "Visible y destacado" : "Puedes anclar uno"}
+            {pinnedPost ? "Publicado y anclado" : "Puedes anclar uno"}
           </p>
         </div>
       </section>

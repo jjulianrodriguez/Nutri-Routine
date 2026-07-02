@@ -79,7 +79,7 @@ export default async function WorkoutTemplatesPage() {
         </Button>
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           label="Plantillas"
           value={String(templates.length)}
@@ -112,11 +112,11 @@ export default async function WorkoutTemplatesPage() {
             organízalos en el primer ciclo.
           </EmptyState>
         ) : (
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid items-start gap-4 lg:grid-cols-2">
             {templates.map((template) => (
               <article
                 key={template.id}
-                className="rounded-[24px] border border-border bg-background p-5 shadow-soft"
+                className="h-fit self-start rounded-[24px] border border-border bg-background p-5 shadow-soft"
               >
                 <div className="flex items-start justify-between gap-4">
                   <Link

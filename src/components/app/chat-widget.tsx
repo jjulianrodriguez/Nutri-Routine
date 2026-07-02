@@ -243,6 +243,7 @@ function MessageActionsMenu({
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
+          data-slot="card-actions-menu"
           align="end"
           sideOffset={6}
           collisionPadding={12}
@@ -729,7 +730,7 @@ export function ChatWidget() {
     <>
       <button
         type="button"
-        className="fixed bottom-20 right-5 z-30 grid size-11 place-items-center rounded-full border border-border bg-surface/82 text-warm-brown shadow-pop backdrop-blur-lg transition-[background-color,color,box-shadow,transform] hover:bg-primary hover:text-charcoal hover:shadow-glow focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+        className="fixed bottom-20 right-5 z-30 grid size-11 place-items-center rounded-full border border-border bg-surface/82 text-warm-brown shadow-card backdrop-blur-lg transition-[background-color,color,box-shadow,transform] hover:bg-primary hover:text-charcoal hover:shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
         onClick={togglePanel}
         aria-expanded={open}
         aria-label={open ? "Cerrar chat" : "Abrir chat"}
@@ -752,7 +753,7 @@ export function ChatWidget() {
             role="dialog"
             aria-label="Panel de mensajes"
             aria-modal="false"
-            className="fixed bottom-4 left-3 right-3 top-20 z-50 flex min-h-0 flex-col overflow-hidden rounded-[28px] border border-border bg-surface/92 shadow-premium backdrop-blur-2xl sm:left-auto sm:bottom-20 sm:right-5 sm:top-auto sm:h-[min(38rem,calc(100dvh-7rem))] sm:w-[25rem]"
+            className="fixed bottom-4 left-3 right-3 top-20 z-50 flex min-h-0 flex-col overflow-hidden rounded-[28px] border border-border bg-surface shadow-premium sm:left-auto sm:bottom-20 sm:right-5 sm:top-auto sm:h-[min(38rem,calc(100dvh-7rem))] sm:w-[25rem]"
             initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -796,7 +797,7 @@ export function ChatWidget() {
               </button>
             </header>
 
-            <div className="min-h-0 flex-1 overflow-hidden">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               {bootstrapQuery.isLoading ? (
                 <ChatLoadingState />
               ) : bootstrapQuery.data?.status === "error" ? (
@@ -810,7 +811,7 @@ export function ChatWidget() {
                   <ChatStatus>{bootstrap.emptyMessage}</ChatStatus>
                 </div>
               ) : shouldShowSelector ? (
-                <div className="min-h-0 space-y-3 overflow-y-auto px-4 py-4">
+                <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
                   {bootstrap?.targets.map((target) => (
                     <ChatTargetButton
                       key={target.key}

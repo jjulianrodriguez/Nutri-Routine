@@ -38,6 +38,9 @@ import type { WorkoutTemplateDetail } from "@/types/workout-template";
 
 const inputClasses =
   "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+const formSectionClasses =
+  "rounded-[22px] border border-border bg-background p-4 sm:p-5";
+const legendClasses = "px-1 text-sm font-extrabold text-charcoal";
 
 function normalizeSearch(value: string) {
   return value
@@ -269,8 +272,11 @@ export function WorkoutTemplateEditor({
           </Button>
         </div>
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)_minmax(10rem,0.35fr)]">
-          <div>
+        <fieldset className={cn(formSectionClasses, "mt-6")}>
+          <legend className={legendClasses}>Información general</legend>
+
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)_minmax(10rem,0.35fr)]">
+            <div>
             <Label
               htmlFor="template-name"
               className="font-extrabold text-charcoal"
@@ -324,10 +330,12 @@ export function WorkoutTemplateEditor({
               {...register("cycleDays")}
             />
             <FieldError message={errors.cycleDays?.message} />
+            </div>
           </div>
-        </div>
+        </fieldset>
 
-        <div className="mt-5">
+        <fieldset className={cn(formSectionClasses, "mt-5")}>
+          <legend className={legendClasses}>Notas de la plantilla</legend>
           <Label
             htmlFor="template-description"
             className="font-extrabold text-charcoal"
@@ -339,14 +347,14 @@ export function WorkoutTemplateEditor({
             rows={4}
             className={cn(
               inputClasses,
-              "w-full resize-y py-3 text-sm outline-none",
+              "min-h-28 w-full resize-y py-3 text-sm outline-none",
             )}
             placeholder="Objetivo general o indicaciones del ciclo."
             aria-invalid={Boolean(errors.description)}
             {...register("description")}
           />
           <FieldError message={errors.description?.message} />
-        </div>
+        </fieldset>
 
         <label className="mt-5 flex min-h-11 w-fit items-center gap-3 rounded-control border border-border bg-background px-4 text-sm font-extrabold text-charcoal">
           <input

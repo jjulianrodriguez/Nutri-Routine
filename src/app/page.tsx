@@ -2,28 +2,35 @@
 
 import {
   ArrowUpRight,
+  CalendarCheck,
   Check,
   CircleDot,
+  ClipboardCheck,
   Clock3,
   HeartPulse,
+  LockKeyhole,
+  MapPin,
   MessageCircle,
   MoveRight,
+  RefreshCw,
   ShieldCheck,
   Sparkles,
+  UserRoundCheck,
   Waves,
   Zap,
   type LucideIcon,
 } from "lucide-react";
 import {
   motion,
+  useMotionValue,
   useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
+  type MotionValue,
 } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
-import { useRef, type ReactNode } from "react";
+import { useRef, type PointerEvent, type ReactNode } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
@@ -119,6 +126,73 @@ const benefitCards: Array<{
   },
 ];
 
+const processSteps: Array<{
+  title: string;
+  copy: string;
+  icon: LucideIcon;
+}> = [
+  {
+    title: "Consulta",
+    copy: "Escuchamos tu historia, objetivos, síntomas, rutina y punto de partida sin juicio.",
+    icon: UserRoundCheck,
+  },
+  {
+    title: "Plan",
+    copy: "Definimos prioridades de nutrición, entrenamiento y hábitos con una ruta clara.",
+    icon: ClipboardCheck,
+  },
+  {
+    title: "Seguimiento",
+    copy: "Revisamos avances, energía, adherencia y dudas para sostener el proceso.",
+    icon: CalendarCheck,
+  },
+  {
+    title: "Ajustes",
+    copy: "Adaptamos el plan cuando cambian tus horarios, señales del cuerpo o metas.",
+    icon: RefreshCw,
+  },
+];
+
+const trustItems: Array<{
+  title: string;
+  copy: string;
+  icon: LucideIcon;
+}> = [
+  {
+    title: "Modalidad flexible",
+    copy: "Consultas presenciales y virtuales desde Costa Rica, según disponibilidad profesional.",
+    icon: MapPin,
+  },
+  {
+    title: "Privacidad",
+    copy: "Tu información se trata como parte de un acompañamiento privado y profesional.",
+    icon: LockKeyhole,
+  },
+  {
+    title: "Acompañamiento humano",
+    copy: "La plataforma organiza el seguimiento, pero las decisiones se conversan contigo.",
+    icon: MessageCircle,
+  },
+];
+
+const faqs = [
+  {
+    question: "¿Necesito un código para crear cuenta?",
+    answer:
+      "Sí. El registro usa un código privado entregado por tu profesional para proteger el acceso al espacio de seguimiento.",
+  },
+  {
+    question: "¿Puedo iniciar aunque no tenga todo claro?",
+    answer:
+      "Sí. La primera consulta existe para ordenar tus señales, metas y prioridades antes de definir el plan.",
+  },
+  {
+    question: "¿El plan cambia con el tiempo?",
+    answer:
+      "Sí. El seguimiento permite ajustar nutrición, entrenamiento y hábitos según tu avance real.",
+  },
+];
+
 function Reveal({
   children,
   className,
@@ -164,17 +238,17 @@ function PremiumLink({
     "group relative inline-flex min-h-12 items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-full px-5 py-3 text-sm font-black transition-none sm:px-6";
   const variants = {
     primary:
-      "bg-[var(--ln-peach)] !text-[var(--ln-night)] shadow-[0_24px_70px_-38px_rgb(26_48_56_/_0.24)]",
+      "bg-[var(--ln-clay)] !text-[var(--ln-paper)] shadow-[0_18px_48px_-34px_rgb(var(--raspberry-rgb)_/_0.34)]",
     secondary:
-      "border border-[var(--ln-night)]/10 bg-[rgb(255_255_255_/_0.62)] !text-[var(--ln-night)] shadow-[0_18px_54px_-42px_rgb(26_48_56_/_0.18)] backdrop-blur-xl",
+      "border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] !text-[var(--ln-night)] shadow-[0_12px_34px_-28px_rgb(var(--foreground-rgb)_/_0.18)]",
     ghost:
-      "border border-[var(--ln-night)]/10 bg-[rgb(255_255_255_/_0.42)] !text-[var(--ln-night)] shadow-[0_18px_54px_-46px_rgb(26_48_56_/_0.16)] backdrop-blur-xl",
-    ink: "bg-[var(--ln-night)] !text-[var(--ln-paper)] shadow-[0_24px_70px_-42px_rgb(26_48_56_/_0.42)]",
+      "border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] !text-[var(--ln-night)] shadow-[0_12px_34px_-30px_rgb(var(--foreground-rgb)_/_0.16)]",
+    ink: "bg-[var(--ln-night)] !text-[var(--ln-paper)] shadow-[0_24px_70px_-42px_rgb(var(--raspberry-rgb)_/_0.42)]",
   };
   const classes = `${base} ${variants[variant]} ${className}`;
   const content = (
     <>
-      <span className="absolute inset-0 translate-y-full rounded-full bg-[rgb(255_255_255_/_0.22)] transition-transform duration-500 ease-[var(--ease-premium)] group-hover:translate-y-0" />
+      <span className="absolute inset-0 translate-y-full rounded-full bg-[var(--ln-clay-hover)] transition-transform duration-500 ease-[var(--ease-premium)] group-hover:translate-y-0" />
       <span className="relative z-10">{children}</span>
       <ArrowUpRight className="relative z-10 size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
     </>
@@ -217,15 +291,433 @@ function SectionEyebrow({
   return (
     <span
       className={[
-        "inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.68rem] font-black uppercase tracking-[0.18em] backdrop-blur-xl",
+        "inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.68rem] font-black uppercase tracking-[0.18em]",
         light
-          ? "border border-white/[0.8] bg-[rgb(255_255_255_/_0.48)] text-[var(--ln-forest)] shadow-[0_16px_40px_-34px_rgb(26_48_56_/_0.2)]"
-          : "border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.74] text-[var(--ln-forest)]",
+          ? "border border-[var(--color-bone)] bg-[var(--ln-paper)] text-[var(--ln-forest)] shadow-[0_16px_40px_-34px_rgb(var(--raspberry-rgb)_/_0.2)]"
+          : "border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] text-[var(--ln-forest)]",
       ].join(" ")}
     >
       <span className="size-1.5 rounded-full bg-[var(--ln-peach)]" />
       {children}
     </span>
+  );
+}
+
+const plantLeaves = [
+  {
+    cx: 210,
+    cy: 154,
+    rotate: -26,
+    scale: 0.86,
+    fill: "var(--ln-mint)",
+    radius: 190,
+    strength: 28,
+    twist: -8,
+  },
+  {
+    cx: 342,
+    cy: 96,
+    rotate: 16,
+    scale: 0.74,
+    fill: "var(--ln-peach)",
+    radius: 172,
+    strength: 24,
+    twist: 7,
+  },
+  {
+    cx: 492,
+    cy: 158,
+    rotate: 42,
+    scale: 0.9,
+    fill: "var(--ln-olive)",
+    radius: 190,
+    strength: 30,
+    twist: 9,
+  },
+  {
+    cx: 286,
+    cy: 278,
+    rotate: -48,
+    scale: 1.04,
+    fill: "var(--ln-sage)",
+    radius: 210,
+    strength: 34,
+    twist: -10,
+  },
+  {
+    cx: 544,
+    cy: 300,
+    rotate: 20,
+    scale: 0.98,
+    fill: "var(--ln-forest)",
+    radius: 208,
+    strength: 32,
+    twist: 9,
+  },
+  {
+    cx: 372,
+    cy: 432,
+    rotate: -18,
+    scale: 1.1,
+    fill: "var(--ln-rose)",
+    radius: 228,
+    strength: 38,
+    twist: -8,
+  },
+  {
+    cx: 608,
+    cy: 448,
+    rotate: 48,
+    scale: 0.96,
+    fill: "var(--ln-peach)",
+    radius: 208,
+    strength: 32,
+    twist: 11,
+  },
+  {
+    cx: 440,
+    cy: 610,
+    rotate: -42,
+    scale: 1.02,
+    fill: "var(--ln-olive)",
+    radius: 214,
+    strength: 34,
+    twist: -9,
+  },
+  {
+    cx: 626,
+    cy: 642,
+    rotate: 26,
+    scale: 0.82,
+    fill: "var(--ln-mint)",
+    radius: 190,
+    strength: 26,
+    twist: 8,
+  },
+] as const;
+
+type PlantLeafShape = (typeof plantLeaves)[number];
+
+function PlantLeaf({
+  leaf,
+  pointerX,
+  pointerY,
+  reduceMotion,
+}: {
+  leaf: PlantLeafShape;
+  pointerX: MotionValue<number>;
+  pointerY: MotionValue<number>;
+  reduceMotion: boolean;
+}) {
+  const repelX = useTransform([pointerX, pointerY], ([latestX, latestY]) => {
+    const x = Number(latestX);
+    const y = Number(latestY);
+    const dx = leaf.cx - x;
+    const dy = leaf.cy - y;
+    const distance = Math.max(Math.hypot(dx, dy), 1);
+    const intensity = Math.max(0, 1 - distance / leaf.radius) ** 1.75;
+
+    return (dx / distance) * leaf.strength * intensity;
+  });
+  const repelY = useTransform([pointerX, pointerY], ([latestX, latestY]) => {
+    const x = Number(latestX);
+    const y = Number(latestY);
+    const dx = leaf.cx - x;
+    const dy = leaf.cy - y;
+    const distance = Math.max(Math.hypot(dx, dy), 1);
+    const intensity = Math.max(0, 1 - distance / leaf.radius) ** 1.75;
+
+    return (dy / distance) * leaf.strength * intensity;
+  });
+  const repelRotate = useTransform(
+    [pointerX, pointerY],
+    ([latestX, latestY]) => {
+      const x = Number(latestX);
+      const y = Number(latestY);
+      const dx = leaf.cx - x;
+      const dy = leaf.cy - y;
+      const distance = Math.max(Math.hypot(dx, dy), 1);
+      const intensity = Math.max(0, 1 - distance / leaf.radius) ** 1.7;
+
+      return Math.sign(dx || 1) * leaf.twist * intensity;
+    },
+  );
+  const x = useSpring(repelX, { damping: 22, stiffness: 170, mass: 0.42 });
+  const y = useSpring(repelY, { damping: 22, stiffness: 170, mass: 0.42 });
+  const rotate = useSpring(repelRotate, {
+    damping: 24,
+    stiffness: 155,
+    mass: 0.44,
+  });
+
+  return (
+    <motion.g
+      style={
+        reduceMotion
+          ? undefined
+          : {
+              x,
+              y,
+              rotate,
+              transformBox: "fill-box",
+              transformOrigin: "center",
+            }
+      }
+    >
+      <g
+        transform={`translate(${leaf.cx} ${leaf.cy}) rotate(${leaf.rotate}) scale(${leaf.scale})`}
+      >
+        <path
+          d="M0 0C-44-29-88-26-122 8C-92 53-34 55 0 0Z"
+          fill={leaf.fill}
+          stroke="rgb(var(--bone-rgb) / 0.72)"
+          strokeWidth="2"
+        />
+        <path
+          d="M-9 1C-42 4-78 15-111 34"
+          fill="none"
+          stroke="rgb(var(--spring-sky-rgb) / 0.38)"
+          strokeLinecap="round"
+          strokeWidth="2"
+        />
+      </g>
+    </motion.g>
+  );
+}
+
+function InteractivePlantSvg({ reduceMotion }: { reduceMotion: boolean }) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const pointerX = useMotionValue(9999);
+  const pointerY = useMotionValue(9999);
+
+  function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
+    if (reduceMotion) {
+      return;
+    }
+
+    const rect = svgRef.current?.getBoundingClientRect();
+
+    if (!rect) {
+      return;
+    }
+
+    pointerX.set(((event.clientX - rect.left) / rect.width) * 760);
+    pointerY.set(((event.clientY - rect.top) / rect.height) * 820);
+  }
+
+  function handlePointerLeave() {
+    pointerX.set(9999);
+    pointerY.set(9999);
+  }
+
+  return (
+    <svg
+      ref={svgRef}
+      viewBox="0 0 760 820"
+      role="img"
+      aria-label="Planta SVG animada con hojas organicas"
+      className="h-auto w-full overflow-visible"
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+    >
+      <defs>
+        <filter
+          id="heroPlantShadow"
+          x="-20%"
+          y="-16%"
+          width="140%"
+          height="140%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feDropShadow
+            dx="0"
+            dy="28"
+            stdDeviation="24"
+            floodColor="var(--primary)"
+            floodOpacity="0.17"
+          />
+        </filter>
+      </defs>
+
+      <motion.g
+        filter="url(#heroPlantShadow)"
+        animate={
+          reduceMotion
+            ? undefined
+            : { y: [0, -8, 0], rotate: [0, 0.45, -0.25, 0] }
+        }
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "68% 52%" }}
+      >
+        <path
+          d="M716 776C604 684 604 575 654 454C692 363 684 252 608 154"
+          fill="none"
+          stroke="var(--ln-forest)"
+          strokeLinecap="round"
+          strokeWidth="13"
+        />
+        <path
+          d="M694 710C604 636 494 624 422 602"
+          fill="none"
+          stroke="var(--ln-forest)"
+          strokeLinecap="round"
+          strokeWidth="8"
+        />
+        <path
+          d="M664 528C584 462 504 430 388 410"
+          fill="none"
+          stroke="var(--ln-forest)"
+          strokeLinecap="round"
+          strokeWidth="8"
+        />
+        <path
+          d="M646 382C556 318 452 290 292 280"
+          fill="none"
+          stroke="var(--ln-forest)"
+          strokeLinecap="round"
+          strokeWidth="7"
+        />
+        <path
+          d="M624 212C514 160 410 128 294 116"
+          fill="none"
+          stroke="var(--ln-forest)"
+          strokeLinecap="round"
+          strokeWidth="7"
+        />
+        <path
+          d="M670 486C686 412 654 330 536 286"
+          fill="none"
+          stroke="var(--ln-forest)"
+          strokeLinecap="round"
+          strokeWidth="7"
+        />
+        <path
+          d="M690 650C710 586 684 520 604 444"
+          fill="none"
+          stroke="var(--ln-forest)"
+          strokeLinecap="round"
+          strokeWidth="7"
+        />
+
+        {plantLeaves.map((leaf) => (
+          <PlantLeaf
+            key={`${leaf.cx}-${leaf.cy}`}
+            leaf={leaf}
+            pointerX={pointerX}
+            pointerY={pointerY}
+            reduceMotion={reduceMotion}
+          />
+        ))}
+      </motion.g>
+    </svg>
+  );
+}
+
+function HeroDumbbellSvg({ reduceMotion }: { reduceMotion: boolean }) {
+  return (
+    <motion.svg
+      viewBox="0 0 420 190"
+      role="img"
+      aria-label="Pesa SVG animada"
+      className="h-auto w-full overflow-visible"
+      initial={reduceMotion ? false : { opacity: 0, y: 18, rotate: -10 }}
+      animate={
+        reduceMotion
+          ? { opacity: 1 }
+          : { opacity: 1, y: [0, -7, 0], rotate: [-9, -6.5, -9] }
+      }
+      whileHover={
+        reduceMotion
+          ? undefined
+          : { y: -12, rotate: -3, scale: 1.025 }
+      }
+      transition={{
+        opacity: { duration: 0.5, ease: motionEase },
+        y: { duration: 5.8, repeat: Infinity, ease: "easeInOut" },
+        rotate: { duration: 5.8, repeat: Infinity, ease: "easeInOut" },
+        scale: { duration: 0.28, ease: motionEase },
+      }}
+    >
+      <defs>
+        <filter
+          id="heroDumbbellShadow"
+          x="-18%"
+          y="-30%"
+          width="136%"
+          height="160%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feDropShadow
+            dx="0"
+            dy="24"
+            stdDeviation="16"
+            floodColor="var(--primary)"
+            floodOpacity="0.2"
+          />
+        </filter>
+      </defs>
+      <g filter="url(#heroDumbbellShadow)">
+        <rect
+          x="116"
+          y="80"
+          width="188"
+          height="30"
+          rx="15"
+          fill="var(--ln-clay)"
+        />
+        <path
+          d="M146 82H274"
+          stroke="rgb(var(--bone-rgb) / 0.28)"
+          strokeLinecap="round"
+          strokeWidth="4"
+        />
+        <rect
+          x="42"
+          y="48"
+          width="48"
+          height="94"
+          rx="18"
+          fill="var(--ln-forest)"
+        />
+        <rect
+          x="86"
+          y="34"
+          width="54"
+          height="122"
+          rx="20"
+          fill="var(--ln-forest)"
+        />
+        <rect
+          x="280"
+          y="34"
+          width="54"
+          height="122"
+          rx="20"
+          fill="var(--ln-forest)"
+        />
+        <rect
+          x="330"
+          y="48"
+          width="48"
+          height="94"
+          rx="18"
+          fill="var(--ln-forest)"
+        />
+        <path
+          d="M62 61V129M106 49V141M314 49V141M358 61V129"
+          stroke="rgb(var(--raspberry-rgb) / 0.18)"
+          strokeLinecap="round"
+          strokeWidth="5"
+        />
+        <path
+          d="M48 63C58 54 71 51 85 54M287 48C300 40 317 40 328 49"
+          fill="none"
+          stroke="rgb(var(--bone-rgb) / 0.55)"
+          strokeLinecap="round"
+          strokeWidth="5"
+        />
+      </g>
+    </motion.svg>
   );
 }
 
@@ -241,16 +733,16 @@ function HeroProductVisual() {
     stiffness: 105,
     mass: 0.55,
   });
-  const plantY = useTransform(progress, [0, 1], [34, -78]);
-  const plantX = useTransform(progress, [0, 1], [34, -36]);
-  const plantRotate = useTransform(progress, [0, 1], [2.4, -1.8]);
+  const plantY = useTransform(progress, [0, 1], [24, -64]);
+  const plantX = useTransform(progress, [0, 1], [28, -26]);
+  const plantRotate = useTransform(progress, [0, 1], [1.4, -1.2]);
   const haloY = useTransform(progress, [0, 1], [12, -34]);
   const shadowScale = useTransform(progress, [0, 1], [1, 0.78]);
 
   return (
     <div
       ref={ref}
-      className="pointer-events-none relative mx-auto min-h-[26rem] w-full max-w-[36rem] overflow-visible sm:min-h-[35rem] lg:min-h-[46rem]"
+      className="pointer-events-none relative mx-auto min-h-[22rem] w-full max-w-[33rem] overflow-visible sm:min-h-[32rem] lg:min-h-[43rem] lg:max-w-[38rem]"
     >
       <motion.div
         style={reduceMotion ? undefined : { y: haloY }}
@@ -261,11 +753,11 @@ function HeroProductVisual() {
           delay: reduceMotion ? 0 : 0.16,
           ease: motionEase,
         }}
-        className="absolute -right-14 bottom-12 top-4 w-[88%] rounded-[999px] bg-[radial-gradient(circle_at_56%_34%,rgb(255_248_232_/_0.92),rgb(255_248_232_/_0.68)_46%,rgb(255_233_173_/_0.24)_72%,transparent_78%)] blur-[1px] sm:-right-20 sm:bottom-16 lg:-right-28"
+        className="hidden"
       />
       <motion.div
         style={reduceMotion ? undefined : { scale: shadowScale }}
-        className="absolute bottom-10 right-0 h-20 w-[58%] rounded-full bg-[radial-gradient(ellipse,rgb(26_48_56_/_0.18),transparent_68%)] blur-xl"
+        className="hidden"
       />
 
       <motion.div
@@ -305,63 +797,13 @@ function HeroProductVisual() {
             ease: motionEase,
           },
         }}
-        className="pointer-events-auto absolute -right-28 top-4 w-[34rem] max-w-none cursor-pointer will-change-transform sm:-right-36 sm:top-0 sm:w-[44rem] lg:-right-44 lg:-top-6 lg:w-[53rem]"
+        className="pointer-events-auto absolute -right-20 top-0 w-[28rem] max-w-none cursor-default will-change-transform sm:-right-28 sm:-top-4 sm:w-[39rem] lg:-right-36 lg:-top-8 lg:w-[48rem]"
       >
-        <motion.div
-          animate={
-            reduceMotion
-              ? undefined
-              : { y: [0, -8, 0], rotate: [0, 0.7, -0.45, 0] }
-          }
-          transition={{ duration: 8.5, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Image
-            src="/images/landing/hero-plant-vine.png"
-            alt="Planta verde sin maceta entrando desde el lado derecho"
-            width={1024}
-            height={1536}
-            priority
-            sizes="(min-width: 1024px) 48vw, 110vw"
-            className="h-auto w-full select-none drop-shadow-[0_38px_64px_rgb(26_48_56_/_0.18)]"
-          />
-        </motion.div>
+        <InteractivePlantSvg reduceMotion={Boolean(reduceMotion)} />
       </motion.div>
 
-      <div className="pointer-events-none absolute inset-x-[-6rem] bottom-0 z-10 h-28 overflow-hidden sm:bottom-4 sm:h-36 lg:bottom-10">
-        <motion.div
-          initial={reduceMotion ? false : { opacity: 0, x: "-20vw", rotate: 0 }}
-          animate={
-            reduceMotion
-              ? { opacity: 0.44, x: "68vw", rotate: 0 }
-              : {
-                  opacity: [0, 0.72, 0.72, 0],
-                  x: ["-24vw", "18vw", "72vw", "112vw"],
-                  rotate: [0, 160, 520, 880],
-                }
-          }
-          transition={
-            reduceMotion
-              ? { duration: 0 }
-              : {
-                  duration: 14,
-                  repeat: Infinity,
-                  repeatDelay: 3.2,
-                  ease: "linear",
-                  times: [0, 0.28, 0.72, 1],
-                }
-          }
-          className="absolute bottom-3 left-0 w-32 will-change-transform sm:bottom-4 sm:w-44 lg:w-52"
-          aria-hidden="true"
-        >
-          <Image
-            src="/images/landing/hero-dumbbell.png"
-            alt=""
-            width={1600}
-            height={900}
-            sizes="(min-width: 1024px) 13vw, 30vw"
-            className="h-auto w-full select-none drop-shadow-[0_18px_28px_rgb(26_48_56_/_0.18)]"
-          />
-        </motion.div>
+      <div className="pointer-events-auto absolute bottom-4 left-2 z-10 w-32 origin-center sm:bottom-10 sm:left-4 sm:w-44 lg:bottom-16 lg:w-52">
+        <HeroDumbbellSvg reduceMotion={Boolean(reduceMotion)} />
       </div>
     </div>
   );
@@ -386,8 +828,8 @@ function Hero() {
       ref={ref}
       className="relative min-h-dvh overflow-hidden bg-[var(--ln-cream)] px-5 pb-16 pt-28 text-[var(--ln-night)] sm:px-8 sm:pb-24 sm:pt-32 lg:px-10"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgb(255_233_173_/_0.34),transparent_28rem),radial-gradient(circle_at_88%_20%,rgb(255_248_232_/_0.88),transparent_34rem),linear-gradient(135deg,var(--ln-cream)_0%,var(--ln-paper)_46%,var(--ln-sage)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 opacity-[0.28] [background-image:linear-gradient(rgb(26_48_56_/_0.08)_1px,transparent_1px),linear-gradient(90deg,rgb(26_48_56_/_0.07)_1px,transparent_1px)] [background-size:78px_78px]" />
+      <div className="hidden" />
+      <div className="hidden" />
 
       <div className="relative mx-auto grid min-h-[calc(100dvh-8rem)] max-w-7xl items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(26rem,0.82fr)]">
         <motion.div
@@ -397,6 +839,10 @@ function Hero() {
           transition={{ duration: 0.9, ease: motionEase }}
           className="min-w-0"
         >
+          <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-[var(--ln-forest)]">
+            <span className="size-2 rounded-full bg-[var(--ln-peach)]" />
+            Nutrición Con Enfoque
+          </p>
           <h1
             style={displayFontStyle}
             className="max-w-[14ch] text-balance text-[clamp(4.1rem,10.2vw,10rem)] leading-[0.78] tracking-[-0.035em] text-[var(--ln-night)]"
@@ -415,8 +861,8 @@ function Hero() {
             </p>
             <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
               <PremiumLink>Agendar consulta</PremiumLink>
-              <PremiumLink href="#servicios" variant="ghost">
-                Ver método
+              <PremiumLink href="/login" variant="ghost">
+                Iniciar sesión
               </PremiumLink>
             </div>
           </div>
@@ -428,12 +874,75 @@ function Hero() {
   );
 }
 
+function ProcessSection() {
+  return (
+    <section
+      id="proceso"
+      className="relative overflow-hidden border-t border-[var(--ln-night)]/10 bg-[var(--ln-paper)] px-5 py-20 text-[var(--ln-night)] sm:px-8 sm:py-28 lg:px-10"
+    >
+      <div className="hidden" />
+      <div className="relative mx-auto max-w-7xl">
+        <div className="grid gap-8 lg:grid-cols-[0.72fr_1fr] lg:items-end">
+          <Reveal>
+            <SectionEyebrow>Cómo funciona</SectionEyebrow>
+            <h2
+              style={displayFontStyle}
+              className="mt-7 max-w-3xl text-balance text-[clamp(3.2rem,7vw,7.2rem)] leading-[0.86] tracking-[-0.025em]"
+            >
+              Un proceso simple, personalizado y medible.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <p className="max-w-2xl text-lg leading-8 text-[var(--ln-muted)]">
+              La experiencia combina consulta profesional, plan de acción,
+              seguimiento y ajustes para que nutrición y entrenamiento se
+              sostengan en tu vida real.
+            </p>
+          </Reveal>
+        </div>
+
+        <div className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {processSteps.map((step, index) => {
+            const Icon = step.icon;
+
+            return (
+              <Reveal key={step.title} delay={index * 0.055}>
+                <article className="flex h-full min-h-[18rem] flex-col justify-between rounded-[1.6rem] border border-[var(--ln-night)]/8 p-6 shadow-[0_34px_96px_-72px_rgb(var(--raspberry-rgb)_/_0.24)]">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="grid size-12 place-items-center rounded-full bg-[var(--ln-mint)] text-[var(--ln-night)]">
+                      <Icon className="size-5" strokeWidth={1.8} />
+                    </span>
+                    <span
+                      style={displayFontStyle}
+                      className="text-5xl leading-none text-[var(--ln-night)]/14"
+                    >
+                      0{index + 1}
+                    </span>
+                  </div>
+                  <div className="mt-10">
+                    <h3 className="text-2xl font-black text-[var(--ln-night)]">
+                      {step.title}
+                    </h3>
+                    <p className="mt-3 text-sm font-bold leading-6 text-[var(--ln-muted)]">
+                      {step.copy}
+                    </p>
+                  </div>
+                </article>
+              </Reveal>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function BenefitChips({ benefits }: { benefits: string[] }) {
   return (
     <ul className="mt-8 flex flex-wrap gap-2.5">
       {benefits.map((benefit, index) => (
         <Reveal key={benefit} delay={index * 0.035}>
-          <li className="inline-flex items-center gap-2 rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.72] px-3.5 py-2 text-sm font-extrabold text-[var(--ln-night)] shadow-[0_16px_42px_-34px_rgb(26_48_56_/_0.28)] backdrop-blur-xl">
+          <li className="inline-flex items-center gap-2 rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] px-3.5 py-2 text-sm font-extrabold text-[var(--ln-night)] shadow-[0_16px_42px_-34px_rgb(var(--raspberry-rgb)_/_0.28)]">
             <Check className="size-4 text-[var(--ln-clay)]" />
             {benefit}
           </li>
@@ -474,20 +983,14 @@ function ProfessionalVisual({
       ref={ref}
       style={reduceMotion ? undefined : { y }}
       className={[
-        "relative min-h-[28rem] overflow-hidden rounded-[2rem] border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.78] p-4 shadow-[0_42px_110px_-76px_rgb(26_48_56_/_0.34)] backdrop-blur-2xl sm:rounded-[2.5rem]",
+        "relative min-h-[28rem] overflow-hidden rounded-[2rem] border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] p-4 shadow-[0_42px_110px_-76px_rgb(var(--raspberry-rgb)_/_0.34)] sm:rounded-[2.5rem]",
         reverse ? "lg:col-start-2" : "",
       ].join(" ")}
     >
-      <div
-        className="absolute inset-0 opacity-95"
-        style={{
-          background:
-            "radial-gradient(circle at 20% 18%, rgb(255 248 232 / 0.86), transparent 18rem), linear-gradient(145deg, rgb(255 248 232 / 0.94), rgb(255 233 173 / 0.38))",
-        }}
-      />
+      <div className="hidden" />
       <div className="relative flex min-h-[25rem] flex-col justify-between overflow-hidden rounded-[1.5rem] border border-[var(--ln-night)]/10 bg-[var(--ln-cream)] p-6 sm:rounded-[2rem] sm:p-7 lg:min-h-[32rem]">
         <div
-          className="absolute -right-24 -top-24 size-64 rounded-full opacity-70 blur-2xl"
+          className="hidden"
           style={{ backgroundColor: accent }}
         />
         <div className="absolute left-8 top-1/2 h-px w-[78%] bg-[var(--ln-night)]/12" />
@@ -510,7 +1013,7 @@ function ProfessionalVisual({
           </span>
         </div>
 
-        <div className="relative mx-auto grid size-48 place-items-center rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.82] shadow-[0_28px_72px_-50px_rgb(26_48_56_/_0.34)] sm:size-56">
+        <div className="relative mx-auto grid size-48 place-items-center rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] shadow-[0_28px_72px_-50px_rgb(var(--raspberry-rgb)_/_0.34)] sm:size-56">
           <span
             style={displayFontStyle}
             className="text-8xl leading-none text-[var(--ln-night)]"
@@ -523,7 +1026,7 @@ function ProfessionalVisual({
           {["acompañamiento", "estrategia"].map((item) => (
             <span
               key={item}
-              className="rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)]/[0.78] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.12em] text-[var(--ln-forest)]"
+              className="rounded-full border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.12em] text-[var(--ln-forest)]"
             >
               {item}
             </span>
@@ -564,7 +1067,7 @@ function ProfessionalChapter({
       id={id}
       className="relative overflow-hidden border-t border-[var(--ln-night)]/10 bg-[var(--ln-paper)] px-5 py-20 sm:px-8 sm:py-28 lg:px-10"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_10%,rgb(68_80_159_/_0.16),transparent_26rem)]" />
+      <div className="hidden" />
       <div
         className={[
           "relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.86fr_1.14fr]",
@@ -619,7 +1122,7 @@ function WhySection() {
       id="enfoque"
       className="relative overflow-hidden border-y border-[var(--ln-night)]/8 bg-[var(--ln-sage)] px-5 py-20 text-[var(--ln-night)] sm:px-8 sm:py-28 lg:px-10"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_18%,rgb(255_233_173_/_0.22),transparent_30rem),radial-gradient(circle_at_92%_12%,rgb(255_248_232_/_0.86),transparent_34rem),linear-gradient(180deg,var(--ln-sage)_0%,var(--ln-paper)_100%)]" />
+      <div className="hidden" />
       <div className="relative mx-auto max-w-7xl">
         <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
           <Reveal>
@@ -656,11 +1159,11 @@ function WhySection() {
                 <motion.article
                   whileHover={{ y: -8, scale: 1.012 }}
                   transition={{ duration: 0.28, ease: motionEase }}
-                  className="group flex h-full min-h-[13rem] flex-col justify-between overflow-hidden rounded-[1.4rem] border border-[var(--ln-night)]/8 bg-[rgb(255_252_248_/_0.62)] p-5 shadow-[0_34px_90px_-66px_rgb(26_48_56_/_0.22)] backdrop-blur-xl sm:p-6"
+                  className="group flex h-full min-h-[13rem] flex-col justify-between overflow-hidden rounded-[1.4rem] border border-[var(--ln-night)]/8 p-5 shadow-[0_34px_90px_-66px_rgb(var(--raspberry-rgb)_/_0.22)] sm:p-6"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <span
-                      className={`grid size-11 place-items-center rounded-full ${benefit.accent} shadow-[0_18px_50px_-34px_rgb(0_0_0_/_0.74)]`}
+                      className={`grid size-11 place-items-center rounded-full ${benefit.accent} shadow-[0_18px_50px_-34px_rgb(var(--raspberry-rgb)_/_0.74)]`}
                     >
                       <Icon className="size-5" strokeWidth={1.8} />
                     </span>
@@ -690,6 +1193,75 @@ function WhySection() {
   );
 }
 
+function TrustSection() {
+  return (
+    <section
+      id="confianza"
+      className="relative overflow-hidden border-y border-[var(--ln-night)]/8 bg-[var(--ln-night)] px-5 py-20 text-[var(--ln-paper)] sm:px-8 sm:py-28 lg:px-10"
+    >
+      <div className="hidden" />
+      <div className="relative mx-auto max-w-7xl">
+        <div className="grid gap-8 lg:grid-cols-[0.72fr_1fr] lg:items-end">
+          <Reveal>
+            <SectionEyebrow light>Confianza</SectionEyebrow>
+            <h2
+              style={displayFontStyle}
+              className="mt-7 max-w-3xl text-balance text-[clamp(3.2rem,7vw,7.2rem)] leading-[0.86] tracking-[-0.025em]"
+            >
+              Un espacio privado para avanzar con claridad.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <p className="max-w-2xl text-lg leading-8 text-[rgb(var(--bone-rgb)_/_0.74)]">
+              La experiencia pública explica lo esencial antes de pedir datos:
+              modalidad, privacidad, acceso con código y una ruta de
+              acompañamiento profesional.
+            </p>
+          </Reveal>
+        </div>
+
+        <div className="mt-14 grid gap-4 lg:grid-cols-3">
+          {trustItems.map((item, index) => {
+            const Icon = item.icon;
+
+            return (
+              <Reveal key={item.title} delay={index * 0.06}>
+                <article className="h-full rounded-[1.6rem] border border-[var(--color-bone)]/10 p-6 shadow-[0_34px_96px_-72px_rgb(var(--raspberry-rgb)_/_0.7)]">
+                  <span className="grid size-12 place-items-center rounded-full bg-[var(--ln-peach)] text-[var(--ln-night)]">
+                    <Icon className="size-5" strokeWidth={1.8} />
+                  </span>
+                  <h3 className="mt-8 text-2xl font-black">{item.title}</h3>
+                  <p className="mt-3 text-sm font-bold leading-6 text-[rgb(var(--bone-rgb)_/_0.68)]">
+                    {item.copy}
+                  </p>
+                </article>
+              </Reveal>
+            );
+          })}
+        </div>
+
+        <div className="mt-14 grid gap-4 lg:grid-cols-3">
+          {faqs.map((item, index) => (
+            <Reveal key={item.question} delay={index * 0.055}>
+              <article className="h-full rounded-[1.4rem] border border-[var(--color-bone)]/10 p-5">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--ln-peach)]">
+                  FAQ
+                </p>
+                <h3 className="mt-4 text-lg font-black leading-7">
+                  {item.question}
+                </h3>
+                <p className="mt-3 text-sm font-bold leading-6 text-[rgb(var(--bone-rgb)_/_0.68)]">
+                  {item.answer}
+                </p>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ClosingCta() {
   const reduceMotion = useReducedMotion();
   const startCards = [
@@ -705,12 +1277,12 @@ function ClosingCta() {
 
   return (
     <section className="relative overflow-hidden bg-[var(--ln-paper)] px-5 py-20 text-[var(--ln-night)] sm:px-8 sm:py-28 lg:px-10">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_12%,rgb(219_56_84_/_0.18),transparent_30rem),radial-gradient(circle_at_86%_22%,rgb(255_248_232_/_0.86),transparent_34rem),linear-gradient(180deg,var(--ln-paper)_0%,var(--ln-cream)_100%)]" />
+      <div className="hidden" />
       <motion.div
         aria-hidden="true"
         animate={reduceMotion ? undefined : { x: ["0%", "-7%", "0%"] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        className="pointer-events-none absolute left-[-12%] top-20 hidden w-[124%] -rotate-3 border-y border-[var(--ln-night)]/8 bg-[rgb(255_255_255_/_0.24)] py-4 text-[0.72rem] font-black uppercase tracking-[0.36em] text-[var(--ln-muted)]/60 backdrop-blur-sm lg:block"
+        className="pointer-events-none absolute left-[-12%] top-20 hidden w-[124%] -rotate-3 border-y border-[var(--ln-night)]/8 bg-[var(--ln-paper)] py-4 text-[0.72rem] font-black uppercase tracking-[0.36em] text-[var(--ln-muted)]/60 lg:block"
       >
         <span className="mx-8">empezar sin tener todo claro</span>
         <span className="mx-8">escucha profesional</span>
@@ -720,9 +1292,9 @@ function ClosingCta() {
       <div className="relative mx-auto max-w-7xl">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(28rem,0.72fr)] lg:items-center">
           <Reveal>
-            <div className="relative overflow-hidden rounded-[2.4rem] border border-[var(--ln-night)]/10 bg-[rgb(255_252_248_/_0.48)] p-5 shadow-[0_44px_130px_-86px_rgb(26_48_56_/_0.28)] backdrop-blur-2xl sm:rounded-[3rem] sm:p-7">
+            <div className="relative overflow-hidden rounded-[2.4rem] border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] p-5 shadow-[0_44px_130px_-86px_rgb(var(--raspberry-rgb)_/_0.28)] sm:rounded-[3rem] sm:p-7">
               <div className="relative min-h-[34rem] overflow-hidden rounded-[1.9rem] border border-[var(--ln-night)]/8 bg-[var(--ln-cream)] p-6 sm:min-h-[39rem] sm:p-8 lg:p-10">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgb(255_233_173_/_0.22),transparent_20rem),radial-gradient(circle_at_88%_10%,rgb(255_248_232_/_0.86),transparent_24rem)]" />
+                <div className="hidden" />
                 <motion.p
                   aria-hidden="true"
                   animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
@@ -760,7 +1332,7 @@ function ClosingCta() {
                         ease: motionEase,
                       }}
                       whileHover={reduceMotion ? undefined : { y: -5 }}
-                      className="rounded-[1.25rem] border border-[var(--ln-night)]/8 bg-[rgb(255_252_248_/_0.62)] p-4 shadow-[0_20px_62px_-48px_rgb(26_48_56_/_0.2)] backdrop-blur-xl"
+                      className="rounded-[1.25rem] border border-[var(--ln-night)]/8 bg-[var(--ln-paper)] p-4 shadow-[0_20px_62px_-48px_rgb(var(--raspberry-rgb)_/_0.2)]"
                     >
                       <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-[var(--ln-cacao)]/74">
                         {kicker}
@@ -803,7 +1375,7 @@ function ClosingCta() {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="absolute left-0 top-8 w-[82%] rounded-[2.2rem] border border-[var(--ln-night)]/10 bg-[var(--ln-mint)] p-6 shadow-[0_34px_96px_-68px_rgb(26_48_56_/_0.24)] sm:p-7"
+                className="absolute left-0 top-8 w-[82%] rounded-[2.2rem] border border-[var(--ln-night)]/10 bg-[var(--ln-mint)] p-6 shadow-[0_34px_96px_-68px_rgb(var(--raspberry-rgb)_/_0.24)] sm:p-7"
               >
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--ln-forest)]">
                   mesa de inicio
@@ -816,7 +1388,7 @@ function ClosingCta() {
                   ].map(([title, copy]) => (
                     <div
                       key={title}
-                      className="rounded-[1.35rem] border border-[var(--ln-night)]/8 bg-[rgb(255_255_255_/_0.56)] p-4 backdrop-blur-xl"
+                      className="rounded-[1.35rem] border border-[var(--ln-night)]/8 bg-[var(--ln-paper)] p-4"
                     >
                       <p className="text-sm font-black uppercase tracking-[0.14em] text-[var(--ln-cacao)]">
                         {title}
@@ -834,7 +1406,7 @@ function ClosingCta() {
                 whileInView={{ opacity: 1, x: 0, y: 0 }}
                 viewport={{ once: true, margin: "-90px" }}
                 transition={{ duration: 0.72, ease: motionEase }}
-                className="absolute right-0 top-0 w-[58%] rounded-[1.8rem] border border-[var(--ln-night)]/10 bg-[var(--ln-rose)] p-5 shadow-[0_28px_76px_-58px_rgb(26_48_56_/_0.22)]"
+                className="absolute right-0 top-0 w-[58%] rounded-[1.8rem] border border-[var(--ln-night)]/10 bg-[var(--ln-rose)] p-5 shadow-[0_28px_76px_-58px_rgb(var(--raspberry-rgb)_/_0.22)]"
               >
                 <p className="text-[0.66rem] font-black uppercase tracking-[0.18em] text-[var(--ln-cacao)]">
                   mensaje
@@ -853,7 +1425,7 @@ function ClosingCta() {
                   delay: reduceMotion ? 0 : 0.12,
                   ease: motionEase,
                 }}
-                className="absolute bottom-24 left-5 w-[58%] rounded-[1.8rem] border border-[var(--ln-night)]/10 bg-[var(--ln-sand)] p-5 shadow-[0_28px_76px_-58px_rgb(26_48_56_/_0.2)]"
+                className="absolute bottom-24 left-5 w-[58%] rounded-[1.8rem] border border-[var(--ln-night)]/10 bg-[var(--ln-sand)] p-5 shadow-[0_28px_76px_-58px_rgb(var(--raspberry-rgb)_/_0.2)]"
               >
                 <p className="text-[0.66rem] font-black uppercase tracking-[0.18em] text-[var(--ln-cacao)]">
                   respuesta
@@ -871,7 +1443,7 @@ function ClosingCta() {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="absolute bottom-0 right-3 w-[72%] rounded-[2rem] border border-[rgb(255_252_248_/_0.7)] bg-[var(--ln-night)] p-6 text-[var(--ln-paper)] shadow-[0_34px_90px_-58px_rgb(26_48_56_/_0.42)]"
+                className="absolute bottom-0 right-3 w-[72%] rounded-[2rem] border border-[rgb(var(--bone-rgb)_/_0.7)] bg-[var(--ln-night)] p-6 text-[var(--ln-paper)] shadow-[0_34px_90px_-58px_rgb(var(--raspberry-rgb)_/_0.42)]"
               >
                 <p className="text-[0.66rem] font-black uppercase tracking-[0.2em] text-[var(--ln-peach)]">
                   confianza
@@ -880,7 +1452,7 @@ function ClosingCta() {
                   {notes.map((note) => (
                     <div
                       key={note}
-                      className="flex items-center gap-3 rounded-full bg-[rgb(255_255_255_/_0.1)] px-4 py-3 text-sm font-black"
+                      className="flex items-center gap-3 rounded-full bg-[var(--ln-paper)] px-4 py-3 text-sm font-black text-[var(--ln-night)]"
                     >
                       <span className="size-2 rounded-full bg-[var(--ln-peach)]" />
                       {note}
@@ -899,10 +1471,11 @@ function ClosingCta() {
 export default function Home() {
   return (
     <SmoothScroll>
-      <div className="landing-public min-h-dvh max-w-[100vw] overflow-hidden bg-[var(--ln-cream)] text-[var(--ln-night)] [--ln-brass:#F87F52] [--ln-cacao:#071C33] [--ln-clay:#DB3854] [--ln-cream:#FFF8E8] [--ln-forest:#44509F] [--ln-ink:#071C33] [--ln-mint:#FFE9AD] [--ln-mist:#F1F3F5] [--ln-muted:#656B78] [--ln-night:#071C33] [--ln-olive:#F87F52] [--ln-paper:#FFFFFF] [--ln-peach:#F87F52] [--ln-rose:#FFF8E8] [--ln-sage:#FFE9AD] [--ln-sand:#FFE9AD] [font-family:var(--font-landing-sans)] [&_:is(h1,h2,h3,h4,h5,h6)]:!text-inherit">
+      <div className="landing-public min-h-dvh max-w-[100vw] overflow-hidden bg-[var(--ln-cream)] text-[var(--ln-night)] [--ln-brass:var(--primary)] [--ln-cacao:var(--text-secondary)] [--ln-clay:var(--primary)] [--ln-clay-hover:var(--primary-hover)] [--ln-cream:var(--background)] [--ln-forest:var(--secondary)] [--ln-ink:var(--text-primary)] [--ln-mint:var(--secondary-soft)] [--ln-mist:var(--surface-elevated)] [--ln-muted:var(--muted-foreground)] [--ln-night:var(--foreground)] [--ln-olive:var(--secondary-hover)] [--ln-paper:var(--surface)] [--ln-peach:var(--primary-soft)] [--ln-rose:var(--primary-soft)] [--ln-sage:var(--surface-muted)] [--ln-sand:var(--secondary-soft)] [font-family:var(--font-landing-sans)] [&_:is(h1,h2,h3,h4,h5,h6)]:!text-inherit">
         <Navbar />
-        <main>
+        <main id="main-content">
           <Hero />
+          <ProcessSection />
           <ProfessionalChapter
             id="servicios"
             number="01"
@@ -912,7 +1485,7 @@ export default function Home() {
             description="Un enfoque personalizado basado en tu bioquímica, historia clínica y estilo de vida. Sin dietas de moda, con ciencia real, escucha y ajustes que respetan tu contexto."
             benefits={marianaBenefits}
             cta="Agendar con Mariana"
-            accent="#F87F52"
+            accent="var(--primary-soft)"
             monogram="MR"
           />
           <ProfessionalChapter
@@ -923,11 +1496,12 @@ export default function Home() {
             description="Rutinas diseñadas para tu cuerpo, tu ritmo y tus metas. Desde casa o en el gimnasio, con progresión clara, seguimiento real y motivación constante."
             benefits={camilaBenefits}
             cta="Agendar con Camila"
-            accent="#44509F"
+            accent="var(--secondary-soft)"
             monogram="CR"
             reverse
           />
           <WhySection />
+          <TrustSection />
           <ClosingCta />
         </main>
         <Footer />

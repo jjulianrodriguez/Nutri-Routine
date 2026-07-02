@@ -87,6 +87,19 @@ function getMonthBounds(monthKey: string) {
   };
 }
 
+function getUpcomingBounds() {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + 90);
+
+  return {
+    end,
+    start,
+  };
+}
+
 function getDatePart(value: string, part: Intl.DateTimeFormatPartTypes) {
   return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
@@ -468,9 +481,14 @@ export async function getCalendarPageData(
   const filters = normalizeFilters({ access, ...params });
   const monthKey = filters.month;
   const bounds = getMonthBounds(monthKey);
+  const upcomingBounds = getUpcomingBounds();
   const rangeBounds = {
     end: getMonthBounds(addMonths(monthKey, 7)).start,
     start: getMonthBounds(addMonths(monthKey, -6)).start,
+  };
+  const scheduledFilters = {
+    ...filters,
+    status: "scheduled" as const,
   };
 
   const [clientOptions, professionalOptions] = await Promise.all([
@@ -499,10 +517,27 @@ export async function getCalendarPageData(
     filters,
     rangeBounds,
   );
+  const upcomingQuery = await applyAppointmentFilters(
+    supabase
+      .from("appointments")
+      .select(
+        "id, title, description, event_type, area, client_id, professional_id, created_by, starts_at, ends_at, status",
+      )
+      .order("starts_at", { ascending: true })
+      .limit(6),
+    access,
+    scheduledFilters,
+    upcomingBounds,
+  );
 
-  const [{ data: rows, error }, { data: monthRows }] = await Promise.all([
+  const [
+    { data: rows, error },
+    { data: monthRows },
+    { data: upcomingRows },
+  ] = await Promise.all([
     rowsQuery,
     monthsQuery,
+    upcomingQuery,
   ]);
 
   if (error || !rows) {
@@ -523,13 +558,20 @@ export async function getCalendarPageData(
       previousMonthKey: addMonths(monthKey, -1),
       professionalOptions,
       timeFormat: settings.timeFormat,
+      upcomingEvents: [],
     };
   }
 
   const profileNames = await getProfiles(
-    rows.flatMap((row) => [row.client_id, row.professional_id]),
+    [...rows, ...(upcomingRows ?? [])].flatMap((row) => [
+      row.client_id,
+      row.professional_id,
+    ]),
   );
   const events = rows.map((row) => toEventItem(row, profileNames));
+  const upcomingEvents = (upcomingRows ?? []).map((row) =>
+    toEventItem(row, profileNames),
+  );
   const eventMonthKeys = Array.from(
     new Set(
       (monthRows ?? []).map((row) => formatDateKey(row.starts_at).slice(0, 7)),
@@ -557,6 +599,7 @@ export async function getCalendarPageData(
     previousMonthKey: addMonths(monthKey, -1),
     professionalOptions,
     timeFormat: settings.timeFormat,
+    upcomingEvents,
   };
 }
 

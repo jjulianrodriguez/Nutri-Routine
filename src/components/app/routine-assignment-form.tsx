@@ -38,6 +38,8 @@ import type { AssignableWorkoutTemplate } from "@/types/workout-template";
 
 const inputClasses =
   "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft focus-visible:ring-primary/20";
+const assignmentSectionClasses =
+  "rounded-[24px] border border-border bg-surface p-5 shadow-soft";
 
 function normalizeSearch(value: string) {
   return value
@@ -261,7 +263,7 @@ export function WorkoutTemplateAssignmentForm({
       <input type="hidden" {...register("clientId")} />
       <input type="hidden" {...register("templateId")} />
 
-      <div className="grid min-w-0 gap-5 xl:grid-cols-2">
+      <div className="grid min-w-0 gap-5 xl:grid-cols-2 xl:items-start">
         <AssignmentEntitySelector
           id="assignment-client-search"
           label="1. Selecciona un cliente"
@@ -316,7 +318,7 @@ export function WorkoutTemplateAssignmentForm({
         </AssignmentEntitySelector>
       </div>
 
-      <section className="rounded-[24px] border border-charcoal/10 bg-surface p-5">
+      <section className={assignmentSectionClasses}>
         <div className="flex items-center gap-2">
           <CheckCircle2 className="size-5 text-warm-brown" aria-hidden="true" />
           <h2 className="font-extrabold text-charcoal">
@@ -362,7 +364,15 @@ export function WorkoutTemplateAssignmentForm({
         </div>
       </section>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(8rem,0.55fr)_minmax(10rem,0.65fr)_auto] xl:items-end">
+      <section className={assignmentSectionClasses}>
+        <div className="flex items-center gap-2">
+          <CalendarPlus className="size-5 text-warm-brown" aria-hidden="true" />
+          <h2 className="font-extrabold text-charcoal">
+            Fechas de asignación
+          </h2>
+        </div>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(8rem,0.55fr)_minmax(10rem,0.65fr)_auto] xl:items-end">
         <div>
           <Label
             htmlFor="assignment-duration"
@@ -416,6 +426,7 @@ export function WorkoutTemplateAssignmentForm({
         <Button
           type="submit"
           size="lg"
+          className="w-full md:col-span-2 xl:col-span-1 xl:w-auto"
           disabled={isSubmitting || missingAssignmentReasons.length > 0}
         >
           {isSubmitting ? (
@@ -425,7 +436,8 @@ export function WorkoutTemplateAssignmentForm({
           )}
           {isSubmitting ? "Asignando..." : "Confirmar asignación"}
         </Button>
-      </div>
+        </div>
+      </section>
 
       {missingAssignmentReasons.length > 0 ? (
         <Alert className="rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3">

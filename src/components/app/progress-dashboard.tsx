@@ -181,7 +181,7 @@ function StatusPill({ children, tone = "neutral" }: { children: ReactNode; tone?
         "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-extrabold",
         tone === "good" && "bg-primary-soft text-charcoal",
         tone === "neutral" && "bg-muted/10 text-muted",
-        tone === "warn" && "bg-amber-50 text-amber-700",
+        tone === "warn" && "bg-warning-soft text-warning",
       )}
     >
       {children}
@@ -201,7 +201,7 @@ function MetricCard({
   value: string;
 }) {
   return (
-    <article className="rounded-[22px] border border-border bg-surface/85 p-4 shadow-soft">
+    <article className="h-fit self-start rounded-[22px] border border-border bg-surface/85 p-4 shadow-soft">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
@@ -224,7 +224,7 @@ function MetricCard({
 
 function BlockError({ message }: { message: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-[18px] border border-amber-200 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">
+    <div className="flex items-start gap-3 rounded-[18px] border border-warning/30 bg-warning-soft p-4 text-sm font-semibold leading-6 text-warning">
       <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
       <span>{message}</span>
     </div>
@@ -241,7 +241,7 @@ function EmptyProgressState({
   title: string;
 }) {
   return (
-    <div className="rounded-[22px] border border-dashed border-border bg-cream/45 p-5">
+    <div className="h-fit self-start rounded-[22px] border border-dashed border-border bg-cream/45 p-5">
       <p className="font-extrabold text-charcoal">{title}</p>
       <p className="mt-2 text-sm leading-6 text-muted">{description}</p>
       {action ? <div className="mt-4">{action}</div> : null}
@@ -259,7 +259,7 @@ function ClientSelectorPanel({
   selectedClient: ProgressClientOption | null;
 }) {
   return (
-    <section className="rounded-[24px] border border-border bg-surface/85 p-4 shadow-soft">
+    <section className="h-fit self-start rounded-[24px] border border-border bg-surface/85 p-4 shadow-soft">
       <form
         action="/app/progreso"
         className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
@@ -288,7 +288,7 @@ function ClientSelectorPanel({
         </Button>
       </form>
       {invalidClientSelection ? (
-        <p className="mt-3 text-sm font-semibold text-amber-700">
+        <p className="mt-3 text-sm font-semibold text-warning">
           Ese cliente no esta disponible para tu cuenta.
         </p>
       ) : null}
@@ -420,7 +420,7 @@ function LineTrendChart({
 
   if (points.length === 1) {
     return (
-      <div className="rounded-[20px] border border-border bg-background p-4">
+      <div className="h-fit self-start rounded-[20px] border border-border bg-background p-4">
         <p className="text-sm font-extrabold text-charcoal">{label}</p>
         <p className="mt-4 font-heading text-3xl font-bold text-charcoal">
           {formatValue(points[0].value, unit)}
@@ -443,7 +443,7 @@ function LineTrendChart({
   });
 
   return (
-    <div className="rounded-[20px] border border-border bg-background p-4">
+    <div className="h-fit self-start rounded-[20px] border border-border bg-background p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-extrabold text-charcoal">{label}</p>
@@ -496,7 +496,7 @@ function BarHistoryChart({
   const max = Math.max(1, ...items.map((item) => item.value));
 
   return (
-    <div className="rounded-[20px] border border-border bg-background p-4">
+    <div className="h-fit self-start rounded-[20px] border border-border bg-background p-4">
       <p className="text-sm font-extrabold text-charcoal">{label}</p>
       <div className="mt-5 grid h-40 grid-cols-[repeat(var(--bar-count),minmax(0,1fr))] items-end gap-2 [--bar-count:6] sm:[--bar-count:8]">
         {items.map((item) => (
@@ -536,7 +536,7 @@ function DeltaBadge({
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold",
-        delta <= 0 ? "bg-primary-soft text-charcoal" : "bg-amber-50 text-amber-700",
+        delta <= 0 ? "bg-primary-soft text-charcoal" : "bg-warning-soft text-warning",
       )}
     >
       <Icon className="size-3.5" aria-hidden="true" />
@@ -563,7 +563,7 @@ function WeekdayHabitGrid({ nutrition }: { nutrition: NutritionProgressSummary }
           <div
             key={day.date}
             className={cn(
-              "rounded-[16px] border p-3 text-center",
+              "h-fit self-start rounded-[16px] border p-3 text-center",
               day.isToday
                 ? "border-primary bg-primary-soft"
                 : "border-border bg-background",
@@ -593,7 +593,7 @@ function PlanMeta({
   title: string;
 }) {
   return (
-    <div className="rounded-[20px] border border-border bg-background p-4">
+    <div className="h-fit self-start rounded-[20px] border border-border bg-background p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
@@ -664,7 +664,7 @@ function NutritionTab({
 
   return (
     <div className="space-y-5">
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           detail="Habitos completados esta semana"
           icon={CheckCircle2}
@@ -691,7 +691,7 @@ function NutritionTab({
         />
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="grid items-start gap-5 lg:grid-cols-[1.15fr_0.85fr]">
         <AppPanel title="Semana actual">
           {nutrition.habits.assignments.length > 0 ? (
             <WeekdayHabitGrid nutrition={nutrition} />
@@ -738,7 +738,7 @@ function NutritionTab({
         </AppPanel>
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-2">
+      <section className="grid items-start gap-5 lg:grid-cols-2">
         <BarHistoryChart
           items={nutrition.habitHistory.map((item) => ({
             label: formatShortDate(item.end),
@@ -801,6 +801,24 @@ function TrainingTab({
   }
 
   if (block.error) {
+    if (block.errorCode === "permission_denied") {
+      return (
+        <EmptyProgressState
+          description={block.error}
+          title="Entrenamiento no disponible"
+        />
+      );
+    }
+
+    if (block.errorCode === "client_not_found") {
+      return (
+        <EmptyProgressState
+          description="Revisa la seleccion o vuelve a elegir un cliente disponible."
+          title="Cliente no encontrado"
+        />
+      );
+    }
+
     return <BlockError message={block.error} />;
   }
 
@@ -814,7 +832,7 @@ function TrainingTab({
 
   return (
     <div className="space-y-5">
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           detail="Entrenamientos completados en total"
           icon={CheckCircle2}
@@ -841,7 +859,7 @@ function TrainingTab({
         />
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+      <section className="grid items-start gap-5 lg:grid-cols-[0.9fr_1.1fr]">
         <AppPanel title="Entrenamiento actual" tone="accent">
           {current ? (
             <PlanMeta
@@ -873,11 +891,11 @@ function TrainingTab({
 
       <AppPanel title="Historial de entrenamientos">
         {workoutStats.completed.length > 0 ? (
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {workoutStats.completed.slice(0, 6).map((item) => (
               <article
                 key={item.id}
-                className="rounded-[18px] border border-border bg-background p-4"
+                className="h-fit self-start rounded-[18px] border border-border bg-background p-4"
               >
                 <p className="font-extrabold text-charcoal">Dia del ciclo {item.cycleDay}</p>
                 <p className="mt-2 text-sm font-semibold text-muted">
@@ -915,6 +933,23 @@ function MeasurementsTab({
   }
 
   if (block.error) {
+    if (
+      block.errorCode === "client_not_found" ||
+      block.errorCode === "permission_denied" ||
+      block.errorCode === "selection_required"
+    ) {
+      return (
+        <EmptyProgressState
+          description={block.error}
+          title={
+            block.errorCode === "client_not_found"
+              ? "Cliente no encontrado"
+              : "Medidas no disponibles"
+          }
+        />
+      );
+    }
+
     return <BlockError message={block.error} />;
   }
 
@@ -931,14 +966,12 @@ function MeasurementsTab({
   const bodyFatValue =
     bodyFatEntry?.metric_value ?? measurements.profile.bodyFatPercentage;
   const latestRecord = measurements.entries[0]?.recorded_at ?? measurements.profile.updatedAt;
-  const hasAnyData =
-    measurements.entries.length > 0 ||
-    measurements.profile.weightKg !== null ||
-    measurements.profile.heightCm !== null ||
-    measurements.profile.bodyFatPercentage !== null ||
-    Boolean(measurements.profile.bodyMeasurements);
+  const weightSeries = getMetricSeries(measurements.entries, "weight");
+  const bodyFatSeries = getMetricSeries(measurements.entries, "bodyFat");
+  const hasMeasurementEntries = measurements.entries.length > 0;
+  const hasEnoughHistory = weightSeries.length >= 2 || bodyFatSeries.length >= 2;
 
-  if (!hasAnyData) {
+  if (!measurements.profile.exists && !hasMeasurementEntries) {
     return (
       <EmptyProgressState
         action={
@@ -948,15 +981,47 @@ function MeasurementsTab({
             </Button>
           ) : null
         }
-        description="Todavia no hay medidas registradas."
-        title="Todavia no hay medidas registradas"
+        description="El cliente todavia no tiene un perfil fisico guardado."
+        title="Sin perfil fisico"
+      />
+    );
+  }
+
+  if (!measurements.profile.configured && !hasMeasurementEntries) {
+    return (
+      <EmptyProgressState
+        action={
+          !access.isClient ? (
+            <Button asChild size="sm">
+              <Link href={`/app/clientes/${selectedClient.id}`}>Ver cliente</Link>
+            </Button>
+          ) : null
+        }
+        description="El cliente todavia no tiene peso, altura, grasa corporal ni medidas fisicas configuradas en su perfil."
+        title="Perfil fisico sin configurar"
+      />
+    );
+  }
+
+  if (!hasMeasurementEntries) {
+    return (
+      <EmptyProgressState
+        action={
+          !access.isClient ? (
+            <Button asChild size="sm">
+              <Link href={`/app/clientes/${selectedClient.id}`}>Ver cliente</Link>
+            </Button>
+          ) : null
+        }
+        description="El perfil fisico tiene datos base, pero todavia no hay registros historicos de medidas."
+        title="Sin medidas registradas"
       />
     );
   }
 
   return (
     <div className="space-y-5">
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           detail="Ultimo peso disponible"
           icon={Scale}
@@ -983,12 +1048,12 @@ function MeasurementsTab({
         />
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-2">
+      <section className="grid items-start gap-5 lg:grid-cols-2">
         <div className="space-y-3">
           <LineTrendChart
             emptyLabel="No hay historial de peso para graficar."
             label="Peso por fecha"
-            points={getMetricSeries(measurements.entries, "weight")}
+            points={weightSeries}
             unit={weightEntry?.metric_unit ?? "kg"}
           />
           <DeltaBadge
@@ -1001,7 +1066,7 @@ function MeasurementsTab({
           <LineTrendChart
             emptyLabel="No hay historial de grasa corporal para graficar."
             label="Grasa corporal por fecha"
-            points={getMetricSeries(measurements.entries, "bodyFat")}
+            points={bodyFatSeries}
             unit={bodyFatEntry?.metric_unit ?? "%"}
           />
           <DeltaBadge
@@ -1011,6 +1076,13 @@ function MeasurementsTab({
           />
         </div>
       </section>
+
+      {!hasEnoughHistory ? (
+        <EmptyProgressState
+          description="Hace falta al menos dos registros comparables de peso o grasa corporal para mostrar una tendencia."
+          title="Historial insuficiente"
+        />
+      ) : null}
 
       <AppPanel title="Medidas fisicas">
         {measurements.profile.bodyMeasurements ? (
@@ -1094,7 +1166,7 @@ function SummaryTab({
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           detail="Cumplimiento semanal de habitos"
           icon={BarChart3}
@@ -1121,7 +1193,7 @@ function SummaryTab({
         />
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-2">
+      <section className="grid items-start gap-5 lg:grid-cols-2">
         <AppPanel title="Planes activos">
           <div className="space-y-3">
             {selectedClient.hasNutritionService ? (
@@ -1156,7 +1228,7 @@ function SummaryTab({
         </AppPanel>
 
         <AppPanel title="Ultimas medidas" tone="primary">
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid items-start gap-3 sm:grid-cols-2">
             <MetricCard
               detail="Ultimo peso registrado"
               icon={Scale}
@@ -1231,10 +1303,17 @@ export function ProgressDashboard({
       ) : null}
 
       {!data.selectedClient ? (
-        <EmptyProgressState
-          description="Selecciona un cliente para ver su progreso de nutricion, entrenamiento, habitos y medidas."
-          title="Selecciona un cliente para ver su progreso"
-        />
+        data.invalidClientSelection ? (
+          <EmptyProgressState
+            description="No encontramos ese cliente entre los clientes disponibles para tu cuenta."
+            title="Cliente no encontrado"
+          />
+        ) : (
+          <EmptyProgressState
+            description="Selecciona un cliente para ver su progreso de nutricion, entrenamiento, habitos y medidas."
+            title="Selecciona un cliente para ver su progreso"
+          />
+        )
       ) : (
         <>
           <ProgressTabs activeTab={activeTab} selectedClientId={selectedClientId} />

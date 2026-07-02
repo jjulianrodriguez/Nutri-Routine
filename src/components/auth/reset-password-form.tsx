@@ -137,7 +137,7 @@ export function ResetPasswordForm() {
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="h-[3.25rem] w-full rounded-full bg-espresso text-sm font-extrabold text-white hover:bg-charcoal"
+        className="h-[3.25rem] w-full rounded-full bg-primary text-sm font-extrabold text-primary-foreground hover:bg-primary-hover"
       >
         {isSubmitting ? (
           <>

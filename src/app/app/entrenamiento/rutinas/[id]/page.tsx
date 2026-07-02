@@ -112,26 +112,26 @@ export default async function RoutineDetailPage({
         </div>
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-[24px] border border-border bg-surface p-5 shadow-soft">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="h-fit self-start rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Dificultad</p>
           <p className="mt-3 text-xl font-extrabold text-charcoal">
             {difficultyLabels[routine.difficulty]}
           </p>
         </div>
-        <div className="rounded-[24px] border border-border bg-surface p-5 shadow-soft">
+        <div className="h-fit self-start rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Categoría</p>
           <p className="mt-3 text-xl font-extrabold text-charcoal">
             {routine.category}
           </p>
         </div>
-        <div className="rounded-[24px] border border-border bg-surface p-5 shadow-soft">
+        <div className="h-fit self-start rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Publico objetivo</p>
           <p className="mt-3 text-xl font-extrabold text-charcoal">
             {routine.targetAudience}
           </p>
         </div>
-        <div className="rounded-[24px] border border-border bg-surface p-5 shadow-soft">
+        <div className="h-fit self-start rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Estado</p>
           <p className="mt-3 text-xl font-extrabold text-charcoal">
             {routine.isActive ? "Activo" : "Inactivo"}
@@ -168,7 +168,7 @@ export default async function RoutineDetailPage({
         description="Información de autoría y mantenimiento del entrenamiento."
         tone="accent"
       >
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid items-start gap-3 sm:grid-cols-3">
           <MetaValue
             icon={UserRound}
             label="Creador"
@@ -200,7 +200,7 @@ function MetaValue({
   value: string;
 }) {
   return (
-    <div className="rounded-[18px] border border-charcoal/10 bg-surface p-4">
+    <div className="h-fit self-start rounded-[18px] border border-charcoal/10 bg-surface p-4">
       <Icon className="size-4 text-warm-brown" aria-hidden="true" />
       <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
         {label}

@@ -50,7 +50,7 @@ function ProfileBlock({
   const profile = (
     <div
       className={cn(
-        "flex min-w-0 items-center gap-3 rounded-[22px] border border-primary/20 bg-surface/72 p-3 shadow-soft backdrop-blur-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
+        "flex min-w-0 items-center gap-3 rounded-card border border-[var(--sidebar-border)] bg-[var(--sidebar-accent)] p-3 text-[var(--sidebar-foreground)] shadow-none focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--sidebar-primary)]/25",
         !collapsed && "pr-14 lg:pr-3",
         collapsed && "mx-auto size-12 justify-center rounded-full p-0",
       )}
@@ -59,20 +59,20 @@ function ProfileBlock({
         collapsed ? `Perfil activo: ${displayName}, ${roleLabel}` : undefined
       }
     >
-      <div className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-sm font-extrabold text-charcoal">
+      <div className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--sidebar-primary)] text-sm font-extrabold text-[var(--sidebar-primary-foreground)]">
         {initials}
       </div>
       {!collapsed ? (
         <div className="min-w-0">
-          <p className="text-[0.68rem] font-extrabold uppercase tracking-[0.16em] text-muted">
+          <p className="text-[0.68rem] font-extrabold uppercase tracking-[0.16em] text-[var(--sidebar-foreground)]">
             Perfil activo
           </p>
-          <p className="mt-1 truncate text-sm font-extrabold text-charcoal">
+          <p className="mt-1 truncate text-sm font-extrabold text-[var(--sidebar-foreground)]">
             {displayName}
           </p>
-          <p className="truncate text-xs text-muted">{email || roleLabel}</p>
+          <p className="truncate text-xs font-semibold text-[var(--sidebar-foreground)]">{email || roleLabel}</p>
           {email ? (
-            <p className="truncate text-xs font-bold text-warm-brown">
+            <p className="truncate text-xs font-bold text-[var(--sidebar-foreground)]">
               {roleLabel}
             </p>
           ) : null}
@@ -144,7 +144,7 @@ export function Sidebar({
         <div className="flex h-full min-w-0 flex-col overflow-x-hidden">
           <div
             className={cn(
-              "relative border-b border-border py-4",
+              "relative border-b border-white/12 py-4",
               isCollapsed ? "px-3" : "px-4",
             )}
           >
@@ -157,7 +157,7 @@ export function Sidebar({
             />
             <button
               type="button"
-              className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-border bg-surface/82 text-warm-brown shadow-soft backdrop-blur-md transition-colors hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 lg:hidden"
+              className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-white/12 bg-white/8 text-white/72 shadow-none transition-colors hover:bg-white/14 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30 lg:hidden"
               onClick={() => setMobileOpen(false)}
               aria-label="Cerrar navegación"
             >
@@ -181,7 +181,7 @@ export function Sidebar({
 
           <div
             className={cn(
-              "mt-auto border-t border-border py-4",
+              "mt-auto border-t border-white/12 py-4",
               isCollapsed ? "flex flex-col items-center gap-3 px-3" : "space-y-3 px-4",
             )}
           >
@@ -204,7 +204,7 @@ export function Sidebar({
                   onClick={handleLogout}
                   disabled={isLoggingOut}
                   className={cn(
-                    "flex h-11 min-w-0 items-center justify-center gap-3 rounded-control border border-border bg-surface/78 text-sm font-extrabold text-warm-brown shadow-soft backdrop-blur-md transition-[background-color,border-color,color,box-shadow,transform] hover:border-primary/30 hover:bg-primary hover:text-charcoal hover:shadow-glow focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:opacity-60",
+                    "flex h-11 min-w-0 items-center justify-center gap-3 rounded-control border border-white/12 bg-white/8 text-sm font-extrabold text-white/72 shadow-none transition-[background-color,border-color,color,box-shadow,transform] hover:border-white/24 hover:bg-white/14 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30 active:translate-y-px disabled:opacity-60",
                     isCollapsed ? "size-11 w-11 px-0" : "w-full px-3",
                   )}
                   aria-label="Cerrar sesión"
@@ -230,10 +230,10 @@ export function Sidebar({
   return (
     <CurrentUserAccessProvider access={access}>
       <div className="min-h-dvh overflow-x-clip bg-background text-charcoal">
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-surface/78 px-4 shadow-soft backdrop-blur-xl lg:hidden">
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-white/12 bg-sidebar px-4 text-white shadow-soft lg:hidden">
         <button
           type="button"
-          className="grid size-10 place-items-center rounded-full border border-border bg-surface/82 text-warm-brown shadow-soft backdrop-blur-md transition-colors hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+          className="grid size-10 place-items-center rounded-full border border-white/12 bg-white/8 text-white/72 shadow-none transition-colors hover:bg-white/14 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30"
           onClick={() => setMobileOpen(true)}
           aria-label="Abrir navegación"
         >
@@ -243,18 +243,18 @@ export function Sidebar({
           <p className="font-heading text-xl font-bold leading-none">
             Nutrición Con Enfoque
           </p>
-          <p className="mt-0.5 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-muted">
+          <p className="mt-0.5 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white/60">
             {roleLabel}
           </p>
         </div>
-        <div className="grid size-10 place-items-center rounded-full bg-accent text-xs font-extrabold">
+        <div className="grid size-10 place-items-center rounded-full bg-white text-xs font-extrabold text-primary">
           {initials}
         </div>
       </header>
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 h-screen h-dvh z-40 hidden overflow-x-visible border-r border-border bg-surface/76 shadow-card backdrop-blur-2xl transition-[width] duration-300 ease-[var(--ease-premium)] lg:block",
+          "fixed inset-y-0 left-0 z-40 hidden h-screen h-dvh overflow-x-visible border-r border-white/10 bg-sidebar text-white shadow-card transition-[width] duration-300 ease-[var(--ease-premium)] lg:block",
           collapsed ? "w-20" : "w-72",
         )}
       >
@@ -266,7 +266,7 @@ export function Sidebar({
           <>
             <motion.button
               aria-label="Cerrar navegación"
-              className="fixed inset-0 z-50 bg-charcoal/24 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-50 bg-charcoal/55 lg:hidden"
               initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -274,7 +274,7 @@ export function Sidebar({
               type="button"
             />
             <motion.aside
-              className="fixed inset-y-0 left-0 h-screen h-dvh z-50 w-[min(21rem,calc(100vw-2rem))] overflow-x-hidden border-r border-border bg-surface/88 shadow-premium backdrop-blur-2xl lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 h-screen h-dvh w-[min(21rem,calc(100vw-2rem))] overflow-x-hidden border-r border-white/10 bg-sidebar text-white shadow-premium lg:hidden"
               initial={reduceMotion ? false : { x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -287,8 +287,10 @@ export function Sidebar({
       </AnimatePresence>
 
       <main
+        id="main-content"
+        tabIndex={-1}
         className={cn(
-          "min-h-dvh min-w-0 transition-[padding] duration-300 ease-[var(--ease-premium)] lg:pl-72",
+          "min-h-dvh min-w-0 scroll-mt-20 transition-[padding] duration-300 ease-[var(--ease-premium)] focus-visible:outline-none lg:pl-72",
           collapsed && "lg:pl-20",
         )}
       >
@@ -310,7 +312,7 @@ export function Sidebar({
       <button
         type="button"
         className={cn(
-          "fixed bottom-5 z-50 hidden size-11 place-items-center rounded-full border border-border bg-surface/82 text-warm-brown shadow-pop backdrop-blur-lg transition-[left,background-color,color,box-shadow,transform] hover:bg-primary hover:text-charcoal hover:shadow-glow focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 lg:grid",
+          "fixed bottom-5 z-50 hidden size-11 place-items-center rounded-full border border-white/18 bg-sidebar text-white/76 shadow-card transition-[left,background-color,color,box-shadow,transform] hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30 active:translate-y-px lg:grid",
           collapsed
             ? "left-[calc(5rem-1.375rem)]"
             : "left-[calc(18rem-1.375rem)]",

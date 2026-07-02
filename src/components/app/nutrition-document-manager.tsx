@@ -137,7 +137,7 @@ function CurrentMealPlanCard({
   professionalName?: string | null;
 }) {
   return (
-    <section className="rounded-[28px] border border-primary/30 bg-primary-soft/70 p-5 shadow-soft sm:p-6">
+    <section className="h-fit self-start rounded-[28px] border border-primary/30 bg-primary-soft/70 p-5 shadow-soft sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           <div className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-surface text-warm-brown">
@@ -212,7 +212,7 @@ function DocumentCard({
   return (
     <article
       className={cn(
-        "flex min-w-0 flex-col rounded-[24px] border border-border bg-background p-5 shadow-soft",
+        "flex h-fit min-w-0 self-start flex-col rounded-[24px] border border-border bg-background p-5 shadow-soft",
         isInactive && "opacity-70",
       )}
     >
@@ -533,7 +533,7 @@ function DocumentEditForm({
   }
 
   return (
-    <section className="rounded-[28px] border border-primary/25 bg-primary-soft/65 p-5 shadow-soft sm:p-6">
+    <section className="h-fit self-start rounded-[28px] border border-primary/25 bg-primary-soft/65 p-5 shadow-soft sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
@@ -626,7 +626,7 @@ function ClientMealPlanSummary({
   clients: NutritionDocumentClientRecord[];
 }) {
   return (
-    <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+    <section className="h-fit self-start rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
       <div className="flex items-center gap-3">
         <div className="grid size-11 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
           <FileText className="size-5" aria-hidden="true" />
@@ -643,14 +643,14 @@ function ClientMealPlanSummary({
 
       <div className="mt-5 grid gap-3">
         {clients.length === 0 ? (
-          <div className="rounded-[20px] border border-dashed border-border bg-background p-5 text-sm font-semibold text-muted">
+          <div className="h-fit self-start rounded-[20px] border border-dashed border-border bg-background p-5 text-sm font-semibold text-muted">
             No hay clientas de nutrición disponibles para asignar documentos.
           </div>
         ) : (
           clients.map((client) => (
             <div
               key={client.id}
-              className="flex flex-col gap-3 rounded-[20px] border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between"
+              className="flex h-fit flex-col gap-3 self-start rounded-[20px] border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="min-w-0">
                 <p className="font-extrabold text-charcoal">{client.name}</p>
@@ -765,8 +765,8 @@ export function NutritionDocumentManager({
         />
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr] xl:items-start">
-        <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+      <div className="grid items-start gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+        <section className="h-fit self-start rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
           <div className="flex items-center gap-3">
             <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
               <Plus className="size-5" aria-hidden="true" />
@@ -788,7 +788,7 @@ export function NutritionDocumentManager({
         <ClientMealPlanSummary clients={clients} />
       </div>
 
-      <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+      <section className="h-fit self-start rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
         <div className="flex items-center gap-3">
           <div className="grid size-11 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
             <FileText className="size-5" aria-hidden="true" />
@@ -803,7 +803,7 @@ export function NutritionDocumentManager({
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <div className="mt-6 grid items-start gap-4 lg:grid-cols-2">
           {mealPlanDocuments.length > 0 ? (
             mealPlanDocuments.map((document) => (
               <DocumentCard
@@ -832,7 +832,7 @@ export function NutritionDocumentManager({
               />
             ))
           ) : (
-            <div className="rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center lg:col-span-2">
+            <div className="h-fit self-start rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center lg:col-span-2">
               <p className="font-extrabold text-charcoal">
                 Todavía no hay documentos PDF cargados.
               </p>

@@ -12,9 +12,11 @@ export const metadata: Metadata = {
 
 export default function BlogLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-dvh flex-col bg-[var(--blog-cream)] text-[var(--blog-night)] [--blog-clay:#DB3854] [--blog-cream:#FFF8E8] [--blog-forest:#44509F] [--blog-mint:#FFE9AD] [--blog-muted:#656B78] [--blog-night:#071C33] [--blog-paper:#FFFFFF] [--blog-peach:#F87F52] [--blog-rose:#FFF8E8] [--blog-sage:#FFE9AD] [--blog-sand:#F87F52] [font-family:var(--font-landing-sans)]">
+    <div className="flex min-h-dvh flex-col bg-[var(--blog-cream)] text-[var(--blog-night)] [--blog-clay:var(--primary)] [--blog-cream:var(--background)] [--blog-forest:var(--secondary)] [--blog-mint:var(--secondary-soft)] [--blog-muted:var(--muted-foreground)] [--blog-night:var(--foreground)] [--blog-paper:var(--surface)] [--blog-peach:var(--primary)] [--blog-rose:var(--primary-soft)] [--blog-sage:var(--surface-muted)] [--blog-sand:var(--secondary-soft)] [font-family:var(--font-landing-sans)]">
       <BlogNavbar />
-      <main className="flex-1">{children}</main>
+      <main id="main-content" className="flex-1">
+        {children}
+      </main>
       <BlogFooter />
     </div>
   );

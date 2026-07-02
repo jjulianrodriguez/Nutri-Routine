@@ -1,4 +1,90 @@
-alter type public.profile_role add value if not exists 'admin';
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_type t
+    join pg_namespace n on n.oid = t.typnamespace
+    where n.nspname = 'public'
+      and t.typname = 'profile_role'
+  ) then
+    create type public.profile_role as enum ('professional', 'client', 'admin');
+  elsif not exists (
+    select 1
+    from pg_enum e
+    join pg_type t on t.oid = e.enumtypid
+    join pg_namespace n on n.oid = t.typnamespace
+    where n.nspname = 'public'
+      and t.typname = 'profile_role'
+      and e.enumlabel = 'admin'
+  ) then
+    alter type public.profile_role add value 'admin';
+  end if;
+end $$;
+
+grant usage on type public.profile_role to anon;
+grant usage on type public.profile_role to authenticated;
+
+alter table public.profiles
+  drop constraint if exists profiles_role_check;
+
+drop policy if exists "profiles_insert_own" on public.profiles;
+drop policy if exists "profiles_update_own" on public.profiles;
+
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'profiles'
+      and column_name = 'role'
+      and udt_name <> 'profile_role'
+  ) then
+    alter table public.profiles
+      alter column role drop default;
+
+    alter table public.profiles
+      alter column role type public.profile_role
+      using (
+        case role::text
+          when 'professional' then 'professional'::public.profile_role
+          when 'client' then 'client'::public.profile_role
+          when 'coach' then 'professional'::public.profile_role
+          else 'client'::public.profile_role
+        end
+      );
+  end if;
+end $$;
+
+alter table public.profiles
+  alter column role set default 'client'::public.profile_role;
+
+alter table public.profiles
+  alter column role set not null;
+
+create policy "profiles_insert_own"
+on public.profiles
+for insert
+to authenticated
+with check (
+  (select auth.uid()) is not null
+  and (select auth.uid()) = id
+  and role = 'client'::public.profile_role
+);
+
+create policy "profiles_update_own"
+on public.profiles
+for update
+to authenticated
+using (
+  (select auth.uid()) is not null
+  and (select auth.uid()) = id
+)
+with check (
+  (select auth.uid()) is not null
+  and (select auth.uid()) = id
+  and role = 'client'::public.profile_role
+);
 
 do $$
 begin

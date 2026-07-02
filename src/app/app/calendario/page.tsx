@@ -50,7 +50,7 @@ export default async function CalendarPage({
       />
 
       <section
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4"
         aria-label="Resumen del calendario"
       >
         <StatTile
@@ -59,9 +59,9 @@ export default async function CalendarPage({
           detail="Visibles segun tus permisos"
         />
         <StatTile
-          label="Pendientes"
+          label="Programados"
           value={String(pendingEvents)}
-          detail="Citas y recordatorios por atender"
+          detail="Citas y recordatorios activos"
         />
         <StatTile
           label="Completados"

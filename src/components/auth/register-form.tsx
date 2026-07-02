@@ -140,15 +140,14 @@ export function RegisterForm() {
           }
           aria-invalid={Boolean(errors.accessCode)}
           className={inputClasses}
-          placeholder="Código privado"
+          placeholder="Código privado entregado por tu profesional"
           {...register("accessCode")}
         />
         <p
           id="register-access-code-help"
           className="mt-2 text-sm font-semibold leading-6 text-stone"
         >
-          Usa el código privado que te entregó tu profesional o el equipo de
-          administración.
+          Código privado entregado por tu profesional.
         </p>
         <FieldError
           id="register-access-code-error"
@@ -221,7 +220,7 @@ export function RegisterForm() {
           role="status"
         >
           <AlertDescription className="font-semibold text-success">
-            {successMessage}
+            {successMessage} Cuando confirmes tu email, podés iniciar sesión.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -229,7 +228,7 @@ export function RegisterForm() {
       <motion.button
         type="submit"
         disabled={isSubmitting}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-espresso py-4 text-sm font-extrabold text-white shadow-soft transition-colors hover:bg-charcoal disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-extrabold text-primary-foreground shadow-soft transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
         whileHover={isSubmitting ? undefined : { y: -1 }}
         whileTap={isSubmitting ? undefined : { scale: 0.99 }}
       >

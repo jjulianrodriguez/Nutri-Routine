@@ -30,7 +30,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
 
   if (posts.length === 0) {
     return (
-      <div className="rounded-[2rem] border border-dashed border-[var(--blog-night)]/16 bg-[rgb(255_252_248_/_0.54)] px-6 py-14 text-center shadow-[0_28px_86px_-66px_rgb(26_48_56_/_0.22)] backdrop-blur-xl">
+      <div className="rounded-[2rem] border border-dashed border-[var(--blog-night)]/16 bg-[var(--blog-paper)] px-6 py-14 text-center shadow-[0_28px_86px_-66px_rgb(var(--raspberry-rgb)_/_0.22)]">
         <h2
           style={{
             fontFamily: "var(--font-landing-display)",
@@ -49,7 +49,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
 
   return (
     <div className="relative">
-      <div className="flex gap-2 overflow-x-auto rounded-full border border-[var(--blog-night)]/8 bg-[rgb(255_252_248_/_0.4)] p-2 shadow-[0_22px_70px_-56px_rgb(26_48_56_/_0.2)] backdrop-blur-xl">
+      <div className="flex gap-2 overflow-x-auto rounded-full border border-[var(--blog-night)]/8 bg-[var(--blog-paper)] p-2 shadow-[0_22px_70px_-56px_rgb(var(--raspberry-rgb)_/_0.2)]">
         {blogCategories.map((category) => {
           const isActive = category === activeCategory;
 
@@ -60,10 +60,10 @@ export function BlogIndex({ posts }: BlogIndexProps) {
               aria-pressed={isActive}
               onClick={() => setActiveCategory(category)}
               className={[
-                "min-h-11 shrink-0 rounded-full border px-4 py-2 text-sm font-black transition-all duration-300",
+                "min-h-11 shrink-0 rounded-full border px-4 py-2 text-sm font-black transition-[background-color,border-color,color,box-shadow] duration-300",
                 isActive
-                  ? "border-[var(--blog-night)]/10 bg-[var(--blog-night)] text-[var(--blog-paper)] shadow-[0_18px_46px_-34px_rgb(26_48_56_/_0.4)]"
-                  : "border-[var(--blog-night)]/10 bg-[rgb(255_252_248_/_0.56)] text-[var(--blog-muted)] hover:border-[var(--blog-clay)]/30 hover:text-[var(--blog-night)]",
+                  ? "border-[var(--blog-night)]/10 bg-[var(--blog-night)] text-[var(--blog-paper)] shadow-[0_18px_46px_-34px_rgb(var(--raspberry-rgb)_/_0.4)]"
+                  : "border-[var(--blog-night)]/10 bg-[var(--blog-paper)] text-[var(--blog-muted)] hover:border-[var(--blog-clay)]/30 hover:text-[var(--blog-night)]",
               ].join(" ")}
             >
               {category}

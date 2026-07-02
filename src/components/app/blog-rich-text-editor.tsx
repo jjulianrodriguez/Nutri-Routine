@@ -27,9 +27,19 @@ import {
   Underline,
   Undo2,
   Unlink,
+  X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useEffect, useRef, useState, forwardRef } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
 import { BlogContentRenderer } from "@/components/blog/BlogContentRenderer";
@@ -54,6 +64,8 @@ type BlogRichTextEditorProps = {
 
 type ToolbarButtonProps = {
   active?: boolean;
+  ariaExpanded?: boolean;
+  buttonRef?: RefObject<HTMLButtonElement | null>;
   disabled?: boolean;
   icon: LucideIcon;
   label: string;
@@ -61,6 +73,7 @@ type ToolbarButtonProps = {
 };
 
 const BLOG_TEXT_ALIGNMENTS = ["left", "center", "right"] as const;
+const POPOVER_COLLISION_PADDING = 12;
 
 type BlogTextAlign = (typeof BLOG_TEXT_ALIGNMENTS)[number];
 
@@ -252,16 +265,16 @@ const BlogTextColorExtension = Mark.create({
             return styleColor;
           }
           if (el.classList.contains("blog-color-teal")) {
-            return "#44509F";
+            return "#2F5F66";
           }
           if (el.classList.contains("blog-color-accent")) {
-            return "#F87F52";
+            return "#B82D52";
           }
           if (el.classList.contains("blog-color-charcoal")) {
-            return "#071C33";
+            return "#171417";
           }
           if (el.classList.contains("blog-color-warm")) {
-            return "#DB3854";
+            return "#6F6870";
           }
           return null;
         },
@@ -422,6 +435,8 @@ function normalizeEditorUrl(value: string) {
 
 function ToolbarButton({
   active = false,
+  ariaExpanded,
+  buttonRef,
   disabled = false,
   icon: Icon,
   label,
@@ -431,8 +446,10 @@ function ToolbarButton({
     <Tooltip>
       <TooltipTrigger asChild>
         <button
+          ref={buttonRef}
           type="button"
           aria-label={label}
+          aria-expanded={ariaExpanded}
           aria-pressed={active}
           disabled={disabled}
           title={label}
@@ -455,23 +472,165 @@ function ToolbarButton({
   );
 }
 
+function getPopoverStyle(
+  trigger: HTMLElement,
+  width: number,
+): CSSProperties {
+  const rect = trigger.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const popoverWidth = Math.min(
+    width,
+    viewportWidth - POPOVER_COLLISION_PADDING * 2,
+  );
+  const left = Math.min(
+    Math.max(rect.left, POPOVER_COLLISION_PADDING),
+    viewportWidth - popoverWidth - POPOVER_COLLISION_PADDING,
+  );
+  const hasRoomBelow = rect.bottom + 10 + 260 < viewportHeight;
+  const top = hasRoomBelow
+    ? rect.bottom + 8
+    : Math.max(POPOVER_COLLISION_PADDING, rect.top - 268);
+
+  return {
+    left,
+    top,
+    width: popoverWidth,
+  };
+}
+
+function ToolbarPopover({
+  children,
+  className,
+  isOpen,
+  onOpenChange,
+  triggerRef,
+  width,
+}: {
+  children: ReactNode;
+  className?: string;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  triggerRef: RefObject<HTMLElement | null>;
+  width: number;
+}) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [style, setStyle] = useState<CSSProperties | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const updatePosition = () => {
+      const trigger = triggerRef.current;
+      if (!trigger) {
+        onOpenChange(false);
+        return;
+      }
+
+      setStyle(getPopoverStyle(trigger, width));
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [isOpen, onOpenChange, triggerRef, width]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (
+        contentRef.current?.contains(target) ||
+        triggerRef.current?.contains(target)
+      ) {
+        return;
+      }
+
+      onOpenChange(false);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onOpenChange(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onOpenChange, triggerRef]);
+
+  if (!isOpen || !style) {
+    return null;
+  }
+
+  return createPortal(
+    <div
+      ref={contentRef}
+      className={cn(
+        "fixed z-[160] max-h-[min(20rem,calc(100dvh-1.5rem))] overflow-y-auto rounded-[18px] border border-border bg-surface p-2 shadow-premium outline-none",
+        className,
+      )}
+      style={style}
+    >
+      {children}
+    </div>,
+    document.body,
+  );
+}
+
+function ToolbarGroup({
+  children,
+  label,
+}: {
+  children: ReactNode;
+  label: string;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label={label}
+      className="inline-flex shrink-0 items-center gap-1.5 rounded-[18px] border border-border/70 bg-surface/70 p-1.5 shadow-[inset_0_1px_0_rgb(var(--bone-rgb)/0.55)]"
+    >
+      <span className="hidden px-1.5 text-[0.64rem] font-extrabold uppercase text-muted sm:inline">
+        {label}
+      </span>
+      {children}
+    </div>
+  );
+}
+
 function SizeDropdown({
   disabled = false,
   value,
   onChange,
+  isOpen,
+  onOpenChange,
 }: {
   disabled?: boolean;
   value: string;
   onChange: (value: string) => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleOutsideClick = () => setIsOpen(false);
-    window.addEventListener("click", handleOutsideClick);
-    return () => window.removeEventListener("click", handleOutsideClick);
-  }, [isOpen]);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const sizes = [
     { label: "10px", value: "10px" },
@@ -494,16 +653,19 @@ function SizeDropdown({
   const currentLabel = sizes.find((s) => s.value === value)?.label || value || "16px (Normal)";
 
   return (
-    <div className="relative inline-block text-left">
+    <>
       <button
+        ref={triggerRef}
         type="button"
         disabled={disabled}
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen(!isOpen);
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        onMouseDown={(e) => {
+          e.preventDefault();
+          onOpenChange(!isOpen);
         }}
         className={cn(
-          "inline-flex h-10 items-center justify-between gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-all focus:outline-none focus:ring-3 focus:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
+          "inline-flex h-10 items-center justify-between gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
           disabled && "pointer-events-none opacity-45"
         )}
       >
@@ -511,18 +673,24 @@ function SizeDropdown({
         <span>{currentLabel}</span>
       </button>
 
-      {isOpen && (
-        <div className="absolute left-0 mt-1 z-50 max-h-60 w-32 overflow-y-auto rounded-[14px] border border-border bg-surface p-1 shadow-premium">
+      <ToolbarPopover
+        triggerRef={triggerRef}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        width={150}
+        className="p-1.5"
+      >
           {sizes.map((size) => (
             <button
               key={size.value}
               type="button"
-              onClick={() => {
+              onMouseDown={(event) => {
+                event.preventDefault();
                 onChange(size.value);
-                setIsOpen(false);
+                onOpenChange(false);
               }}
               className={cn(
-                "flex w-full items-center px-3 py-1.5 text-xs font-bold rounded-[8px] transition-colors hover:bg-primary-soft hover:text-charcoal",
+                "flex min-h-9 w-full items-center rounded-[10px] px-3 py-1.5 text-xs font-bold transition-colors hover:bg-primary-soft hover:text-charcoal",
                 value === size.value || (size.value === "16px" && !value)
                   ? "bg-primary-soft text-teal"
                   : "text-muted"
@@ -531,9 +699,8 @@ function SizeDropdown({
               {size.label}
             </button>
           ))}
-        </div>
-      )}
-    </div>
+      </ToolbarPopover>
+    </>
   );
 }
 
@@ -541,49 +708,44 @@ function ColorDropdown({
   disabled = false,
   value,
   onChange,
+  isOpen,
+  onOpenChange,
 }: {
   disabled?: boolean;
   value: string;
   onChange: (value: string) => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [hexInput, setHexInput] = useState(value && value !== "default" ? value : "");
-
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      setHexInput(value && value !== "default" ? value : "");
-    });
-
-    return () => window.cancelAnimationFrame(frame);
-  }, [value]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleOutsideClick = () => setIsOpen(false);
-    window.addEventListener("click", handleOutsideClick);
-    return () => window.removeEventListener("click", handleOutsideClick);
-  }, [isOpen]);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const hexInputValue = value && value !== "default" ? value : "";
 
   const presetColors = [
     { label: "Auto", value: "default", class: "" },
-    { label: "Amarantha", value: "#DB3854", class: "bg-[#DB3854]" },
-    { label: "Basketball", value: "#F87F52", class: "bg-[#F87F52]" },
-    { label: "Lu Lee", value: "#44509F", class: "bg-[#44509F]" },
-    { label: "Navy", value: "#071C33", class: "bg-[#071C33]" },
-    { label: "Charcoal", value: "#535353", class: "bg-[#535353]" },
-    { label: "Muted", value: "#656B78", class: "bg-[#656B78]" },
+    { label: "Raspberry", value: "#B82D52", class: "bg-[#B82D52]" },
+    { label: "Raspberry suave", value: "#F7E4EA", class: "bg-[#F7E4EA]" },
+    { label: "Mineral", value: "#2F5F66", class: "bg-[#2F5F66]" },
+    { label: "Mineral suave", value: "#E6F0F1", class: "bg-[#E6F0F1]" },
+    { label: "Tinta", value: "#171417", class: "bg-[#171417]" },
+    { label: "Neutro", value: "#6F6870", class: "bg-[#6F6870]" },
   ];
 
   const currentSwatchStyle = value && value !== "default" ? { backgroundColor: value } : undefined;
 
   return (
-    <div className="relative inline-block text-left" onClick={(e) => e.stopPropagation()}>
+    <>
       <button
+        ref={triggerRef}
         type="button"
         disabled={disabled}
-        onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        onMouseDown={(event) => {
+          event.preventDefault();
+          onOpenChange(!isOpen);
+        }}
         className={cn(
-          "inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-all focus:outline-none focus:ring-3 focus:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
+          "inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
           disabled && "pointer-events-none opacity-45"
         )}
       >
@@ -598,8 +760,13 @@ function ColorDropdown({
         )}
       </button>
 
-      {isOpen && (
-        <div className="absolute left-0 mt-1 z-50 w-52 rounded-[18px] border border-border bg-surface p-3 shadow-premium">
+      <ToolbarPopover
+        triggerRef={triggerRef}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        width={232}
+        className="p-3"
+      >
           <p className="mb-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">
             Paleta de colores
           </p>
@@ -609,12 +776,13 @@ function ColorDropdown({
                 key={color.value}
                 type="button"
                 title={color.label}
-                onClick={() => {
+                onMouseDown={(event) => {
+                  event.preventDefault();
                   onChange(color.value);
-                  setIsOpen(false);
+                  onOpenChange(false);
                 }}
                 className={cn(
-                  "relative flex size-6 shrink-0 items-center justify-center rounded-full border border-border transition-transform active:scale-95 hover:scale-110",
+                  "relative flex size-6 shrink-0 items-center justify-center rounded-full border border-border transition-[border-color,box-shadow,transform] hover:border-primary/35 hover:shadow-soft active:scale-95",
                   value === color.value || (color.value === "default" && (!value || value === "default"))
                     ? "ring-2 ring-teal ring-offset-1"
                     : ""
@@ -637,7 +805,7 @@ function ColorDropdown({
               <label className="relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] border border-border bg-background transition-colors hover:bg-surface-hover">
                 <input
                   type="color"
-                  value={value && value !== "default" && value.startsWith("#") ? value : "#44509F"}
+                  value={value && value !== "default" && value.startsWith("#") ? value : "#2F5F66"}
                   onChange={(e) => {
                     onChange(e.target.value);
                   }}
@@ -645,16 +813,16 @@ function ColorDropdown({
                 />
                 <span
                   className="size-5 rounded-[4px] border border-charcoal/10"
-                  style={{ backgroundColor: value && value !== "default" ? value : "#44509F" }}
+                  style={{ backgroundColor: value && value !== "default" ? value : "#2F5F66" }}
                 />
               </label>
               <input
                 type="text"
                 placeholder="#HEX"
-                value={hexInput}
+                defaultValue={hexInputValue}
+                key={hexInputValue}
                 onChange={(e) => {
                   const val = e.target.value;
-                  setHexInput(val);
                   if (/^#[0-9A-F]{6}$/i.test(val) || /^#[0-9A-F]{3}$/i.test(val)) {
                     onChange(val);
                   }
@@ -663,9 +831,8 @@ function ColorDropdown({
               />
             </div>
           </div>
-        </div>
-      )}
-    </div>
+      </ToolbarPopover>
+    </>
   );
 }
 
@@ -673,49 +840,44 @@ function HighlightDropdown({
   disabled = false,
   value,
   onChange,
+  isOpen,
+  onOpenChange,
 }: {
   disabled?: boolean;
   value: string;
   onChange: (value: string) => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [hexInput, setHexInput] = useState(value && value !== "default" ? value : "");
-
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      setHexInput(value && value !== "default" ? value : "");
-    });
-
-    return () => window.cancelAnimationFrame(frame);
-  }, [value]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleOutsideClick = () => setIsOpen(false);
-    window.addEventListener("click", handleOutsideClick);
-    return () => window.removeEventListener("click", handleOutsideClick);
-  }, [isOpen]);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const hexInputValue = value && value !== "default" ? value : "";
 
   const presetColors = [
     { label: "Sin resaltado", value: "default", class: "" },
-    { label: "Banana Light", value: "#FFE9AD", class: "bg-[#FFE9AD]" },
-    { label: "Almost Dawn", value: "#FFF8E8", class: "bg-[#FFF8E8]" },
-    { label: "Amarantha suave", value: "#F8CAD2", class: "bg-[#F8CAD2]" },
-    { label: "Basketball suave", value: "#FFE0D2", class: "bg-[#FFE0D2]" },
-    { label: "Lu Lee suave", value: "#DDE1FF", class: "bg-[#DDE1FF]" },
-    { label: "Neutro", value: "#E9ECEF", class: "bg-[#E9ECEF]" },
+    { label: "Raspberry", value: "#B82D52", class: "bg-[#B82D52]" },
+    { label: "Raspberry suave", value: "#F7E4EA", class: "bg-[#F7E4EA]" },
+    { label: "Mineral", value: "#2F5F66", class: "bg-[#2F5F66]" },
+    { label: "Mineral suave", value: "#E6F0F1", class: "bg-[#E6F0F1]" },
+    { label: "Superficie", value: "#F4F1EF", class: "bg-[#F4F1EF]" },
+    { label: "Blanco", value: "#FFFFFF", class: "bg-[#FFFFFF]" },
   ];
 
   const currentSwatchStyle = value && value !== "default" ? { backgroundColor: value } : undefined;
 
   return (
-    <div className="relative inline-block text-left" onClick={(e) => e.stopPropagation()}>
+    <>
       <button
+        ref={triggerRef}
         type="button"
         disabled={disabled}
-        onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        onMouseDown={(event) => {
+          event.preventDefault();
+          onOpenChange(!isOpen);
+        }}
         className={cn(
-          "inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-all focus:outline-none focus:ring-3 focus:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
+          "inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
           disabled && "pointer-events-none opacity-45"
         )}
       >
@@ -730,8 +892,13 @@ function HighlightDropdown({
         )}
       </button>
 
-      {isOpen && (
-        <div className="absolute left-0 mt-1 z-50 w-52 rounded-[18px] border border-border bg-surface p-3 shadow-premium">
+      <ToolbarPopover
+        triggerRef={triggerRef}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        width={232}
+        className="p-3"
+      >
           <p className="mb-2 text-[10px] font-extrabold uppercase tracking-wider text-muted">
             Color de resaltado
           </p>
@@ -741,19 +908,20 @@ function HighlightDropdown({
                 key={color.value}
                 type="button"
                 title={color.label}
-                onClick={() => {
+                onMouseDown={(event) => {
+                  event.preventDefault();
                   onChange(color.value);
-                  setIsOpen(false);
+                  onOpenChange(false);
                 }}
                 className={cn(
-                  "relative flex size-6 shrink-0 items-center justify-center rounded-full border border-border transition-transform active:scale-95 hover:scale-110",
+                  "relative flex size-6 shrink-0 items-center justify-center rounded-full border border-border transition-[border-color,box-shadow,transform] hover:border-primary/35 hover:shadow-soft active:scale-95",
                   value === color.value || (color.value === "default" && (!value || value === "default"))
                     ? "ring-2 ring-teal ring-offset-1"
                     : ""
                 )}
               >
                 {color.value === "default" ? (
-                  <span className="text-[9px] font-bold text-charcoal">✕</span>
+                  <X className="size-3 text-charcoal" aria-hidden="true" />
                 ) : (
                   <span className={cn("size-full rounded-full", color.class)} />
                 )}
@@ -769,7 +937,7 @@ function HighlightDropdown({
               <label className="relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] border border-border bg-background transition-colors hover:bg-surface-hover">
                 <input
                   type="color"
-                  value={value && value !== "default" && value.startsWith("#") ? value : "#FFE9AD"}
+                  value={value && value !== "default" && value.startsWith("#") ? value : "#F7E4EA"}
                   onChange={(e) => {
                     onChange(e.target.value);
                   }}
@@ -777,16 +945,16 @@ function HighlightDropdown({
                 />
                 <span
                   className="size-5 rounded-[4px] border border-charcoal/10"
-                  style={{ backgroundColor: value && value !== "default" ? value : "#FFE9AD" }}
+                  style={{ backgroundColor: value && value !== "default" ? value : "#F7E4EA" }}
                 />
               </label>
               <input
                 type="text"
                 placeholder="#HEX"
-                value={hexInput}
+                defaultValue={hexInputValue}
+                key={hexInputValue}
                 onChange={(e) => {
                   const val = e.target.value;
-                  setHexInput(val);
                   if (/^#[0-9A-F]{6}$/i.test(val) || /^#[0-9A-F]{3}$/i.test(val)) {
                     onChange(val);
                   }
@@ -795,32 +963,105 @@ function HighlightDropdown({
               />
             </div>
           </div>
-        </div>
-      )}
-    </div>
+      </ToolbarPopover>
+    </>
   );
 }
 
-function ToolbarDivider() {
-  return <span className="mx-1 hidden h-8 w-px bg-border sm:block" />;
-}
+function LinkDropdown({
+  disabled = false,
+  editor,
+  isOpen,
+  onOpenChange,
+}: {
+  disabled?: boolean;
+  editor: Editor | null;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [hrefValue, setHrefValue] = useState("");
 
-function setEditorLink(editor: Editor) {
-  const currentHref = String(editor.getAttributes("link").href ?? "");
-  const input = window.prompt("URL del enlace", currentHref || "https://");
+  const applyLink = () => {
+    if (!editor) {
+      return;
+    }
 
-  if (input === null) {
-    return;
-  }
+    const href = normalizeEditorUrl(hrefValue);
 
-  const href = normalizeEditorUrl(input);
+    if (!href) {
+      toast.error("Usa una URL http(s), mailto:, tel: o una ruta interna.");
+      return;
+    }
 
-  if (!href) {
-    toast.error("Usa una URL http(s), mailto:, tel: o una ruta interna.");
-    return;
-  }
+    editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
+    onOpenChange(false);
+  };
 
-  editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
+  return (
+    <>
+      <ToolbarButton
+        active={editor?.isActive("link")}
+        ariaExpanded={isOpen}
+        buttonRef={triggerRef}
+        disabled={disabled}
+        icon={LinkIcon}
+        label="Agregar enlace"
+        onClick={() => {
+          setHrefValue(String(editor?.getAttributes("link").href ?? ""));
+          onOpenChange(!isOpen);
+        }}
+      />
+
+      <ToolbarPopover
+        triggerRef={triggerRef}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        width={280}
+        className="p-3"
+      >
+        <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted">
+          URL del enlace
+        </label>
+        <input
+          type="url"
+          value={hrefValue}
+          onChange={(event) => setHrefValue(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              applyLink();
+            }
+          }}
+          placeholder="https://..."
+          className="mt-2 h-10 w-full rounded-[10px] border border-border bg-background px-3 text-sm font-semibold text-charcoal outline-none focus:border-primary/40 focus:ring-2 focus:ring-ring/20"
+        />
+        <div className="mt-3 flex items-center justify-end gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onMouseDown={(event) => {
+              event.preventDefault();
+              onOpenChange(false);
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onMouseDown={(event) => {
+              event.preventDefault();
+              applyLink();
+            }}
+          >
+            Aplicar
+          </Button>
+        </div>
+      </ToolbarPopover>
+    </>
+  );
 }
 
 function unsetEditorLink(editor: Editor) {
@@ -889,10 +1130,10 @@ const editorContentClasses = [
   "[&_.ProseMirror_a]:font-bold [&_.ProseMirror_a]:text-teal [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:underline-offset-4",
   "[&_.ProseMirror_.blog-align-center]:text-center [&_.ProseMirror_.blog-align-left]:text-left [&_.ProseMirror_.blog-align-right]:text-right",
   "[&_.ProseMirror_.blog-color-accent]:text-lavender-dark [&_.ProseMirror_.blog-color-charcoal]:text-charcoal [&_.ProseMirror_.blog-color-teal]:text-teal [&_.ProseMirror_.blog-color-warm]:text-warm-brown",
-  "[&_.ProseMirror_.blog-highlight]:rounded-[8px] [&_.ProseMirror_.blog-highlight]:bg-accent-soft [&_.ProseMirror_.blog-highlight]:px-1.5 [&_.ProseMirror_.blog-highlight]:py-0.5 [&_.ProseMirror_.blog-highlight]:font-semibold [&_.ProseMirror_.blog-highlight]:text-charcoal",
+  "[&_.ProseMirror_.blog-highlight]:rounded-[8px] [&_.ProseMirror_.blog-highlight]:bg-accent-soft [&_.ProseMirror_.blog-highlight]:px-1.5 [&_.ProseMirror_.blog-highlight]:py-0.5",
   "[&_.ProseMirror_.blog-text-large]:text-xl [&_.ProseMirror_.blog-text-large]:leading-9 [&_.ProseMirror_.blog-text-small]:text-sm [&_.ProseMirror_.blog-text-small]:leading-6",
   "[&_.ProseMirror_blockquote]:my-5 [&_.ProseMirror_blockquote]:rounded-[18px] [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-sage [&_.ProseMirror_blockquote]:bg-primary-soft [&_.ProseMirror_blockquote]:px-4 [&_.ProseMirror_blockquote]:py-3 [&_.ProseMirror_blockquote]:font-semibold [&_.ProseMirror_blockquote]:text-charcoal",
-  "[&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h1]:mt-8 [&_.ProseMirror_h1]:font-serif [&_.ProseMirror_h1]:text-4xl [&_.ProseMirror_h1]:font-semibold [&_.ProseMirror_h1]:leading-tight [&_.ProseMirror_h1]:text-charcoal",
+  "[&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h1]:mt-8 [&_.ProseMirror_h1]:font-serif [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-semibold [&_.ProseMirror_h1]:leading-tight [&_.ProseMirror_h1]:text-charcoal sm:[&_.ProseMirror_h1]:text-4xl",
   "[&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:mt-7 [&_.ProseMirror_h2]:font-serif [&_.ProseMirror_h2]:text-3xl [&_.ProseMirror_h2]:font-semibold [&_.ProseMirror_h2]:leading-tight [&_.ProseMirror_h2]:text-charcoal",
   "[&_.ProseMirror_h3]:mb-3 [&_.ProseMirror_h3]:mt-6 [&_.ProseMirror_h3]:font-serif [&_.ProseMirror_h3]:text-2xl [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:leading-tight [&_.ProseMirror_h3]:text-charcoal",
   "[&_.ProseMirror_hr]:my-8 [&_.ProseMirror_hr]:border-0 [&_.ProseMirror_hr]:border-t [&_.ProseMirror_hr]:border-border",
@@ -905,218 +1146,74 @@ interface BlogEditorToolbarProps {
   disabled?: boolean;
   className?: string;
   error?: boolean;
+  toolbarId: string;
+  activeMenuId: string | null;
+  setActiveMenuId: (id: string | null) => void;
 }
 
 export const BlogEditorToolbar = forwardRef<HTMLDivElement, BlogEditorToolbarProps>(
-  ({ editor, disabled = false, className, error = false }, ref) => {
+  ({ editor, disabled = false, className, error = false, toolbarId, activeMenuId, setActiveMenuId }, ref) => {
     const toolbarDisabled = disabled || !editor;
     const activeTextAlign = getActiveTextAlign(editor);
     const activeTextColor = getActiveTextColor(editor);
     const activeHighlightColor = getActiveHighlightColor(editor);
     const activeTextSize = getActiveTextSize(editor);
+    const runToolbarAction = (action: () => void) => {
+      setActiveMenuId(null);
+      action();
+    };
 
     return (
       <TooltipProvider>
         <div
           ref={ref}
           className={cn(
-            "flex flex-wrap items-center gap-1.5 p-2 bg-background/95 backdrop-blur-md",
+            "relative z-30 flex items-center gap-2 overflow-x-auto bg-background/95 p-2 backdrop-blur-md sm:flex-wrap",
             error && "border-danger/40",
             className
           )}
           aria-label="Herramientas de formato del blog"
           role="toolbar"
         >
-          <ToolbarButton
-            active={editor?.isActive("bold")}
-            disabled={toolbarDisabled}
-            icon={Bold}
-            label="Negrita"
-            onClick={() => editor?.chain().focus().toggleBold().run()}
-          />
-          <ToolbarButton
-            active={editor?.isActive("italic")}
-            disabled={toolbarDisabled}
-            icon={Italic}
-            label="Cursiva"
-            onClick={() => editor?.chain().focus().toggleItalic().run()}
-          />
-          <ToolbarButton
-            active={editor?.isActive("underline")}
-            disabled={toolbarDisabled}
-            icon={Underline}
-            label="Subrayado"
-            onClick={() => editor?.chain().focus().toggleUnderline().run()}
-          />
-          <HighlightDropdown
-            disabled={toolbarDisabled}
-            value={activeHighlightColor}
-            onChange={(color) => {
-              editor?.chain().focus().setBlogHighlight(color).run();
-            }}
-          />
-          <SizeDropdown
-            disabled={toolbarDisabled}
-            value={activeTextSize}
-            onChange={(nextSize) => {
-              editor?.chain().focus().setBlogTextSize(nextSize).run();
-            }}
-          />
-          <ColorDropdown
-            disabled={toolbarDisabled}
-            value={activeTextColor}
-            onChange={(color) => {
-              editor?.chain().focus().setBlogTextColor(color).run();
-            }}
-          />
+          <ToolbarGroup label="Texto">
+            <ToolbarButton active={editor?.isActive("bold")} disabled={toolbarDisabled} icon={Bold} label="Negrita" onClick={() => runToolbarAction(() => editor?.chain().focus().toggleBold().run())} />
+            <ToolbarButton active={editor?.isActive("italic")} disabled={toolbarDisabled} icon={Italic} label="Cursiva" onClick={() => runToolbarAction(() => editor?.chain().focus().toggleItalic().run())} />
+            <ToolbarButton active={editor?.isActive("underline")} disabled={toolbarDisabled} icon={Underline} label="Subrayado" onClick={() => runToolbarAction(() => editor?.chain().focus().toggleUnderline().run())} />
+            <SizeDropdown disabled={toolbarDisabled} value={activeTextSize} onChange={(nextSize) => editor?.chain().focus().setBlogTextSize(nextSize).run()} isOpen={activeMenuId === `${toolbarId}-size`} onOpenChange={(open) => setActiveMenuId(open ? `${toolbarId}-size` : null)} />
+          </ToolbarGroup>
 
-          <ToolbarDivider />
+          <ToolbarGroup label="Estructura">
+            <ToolbarButton active={editor?.isActive("paragraph")} disabled={toolbarDisabled} icon={Pilcrow} label="Parrafo" onClick={() => runToolbarAction(() => editor?.chain().focus().setParagraph().run())} />
+            <ToolbarButton active={editor?.isActive("heading", { level: 1 })} disabled={toolbarDisabled} icon={Heading1} label="Titulo H1" onClick={() => runToolbarAction(() => editor?.chain().focus().toggleHeading({ level: 1 }).run())} />
+            <ToolbarButton active={editor?.isActive("heading", { level: 2 })} disabled={toolbarDisabled} icon={Heading2} label="Titulo H2" onClick={() => runToolbarAction(() => editor?.chain().focus().toggleHeading({ level: 2 }).run())} />
+            <ToolbarButton active={editor?.isActive("heading", { level: 3 })} disabled={toolbarDisabled} icon={Heading3} label="Titulo H3" onClick={() => runToolbarAction(() => editor?.chain().focus().toggleHeading({ level: 3 }).run())} />
+          </ToolbarGroup>
 
-          <ToolbarButton
-            active={editor?.isActive("paragraph")}
-            disabled={toolbarDisabled}
-            icon={Pilcrow}
-            label="Parrafo"
-            onClick={() => editor?.chain().focus().setParagraph().run()}
-          />
-          <ToolbarButton
-            active={editor?.isActive("heading", { level: 1 })}
-            disabled={toolbarDisabled}
-            icon={Heading1}
-            label="Titulo H1"
-            onClick={() =>
-              editor?.chain().focus().toggleHeading({ level: 1 }).run()
-            }
-          />
-          <ToolbarButton
-            active={editor?.isActive("heading", { level: 2 })}
-            disabled={toolbarDisabled}
-            icon={Heading2}
-            label="Titulo H2"
-            onClick={() =>
-              editor?.chain().focus().toggleHeading({ level: 2 }).run()
-            }
-          />
-          <ToolbarButton
-            active={editor?.isActive("heading", { level: 3 })}
-            disabled={toolbarDisabled}
-            icon={Heading3}
-            label="Titulo H3"
-            onClick={() =>
-              editor?.chain().focus().toggleHeading({ level: 3 }).run()
-            }
-          />
+          <ToolbarGroup label="Color">
+            <ColorDropdown disabled={toolbarDisabled} value={activeTextColor} onChange={(color) => editor?.chain().focus().setBlogTextColor(color).run()} isOpen={activeMenuId === `${toolbarId}-color`} onOpenChange={(open) => setActiveMenuId(open ? `${toolbarId}-color` : null)} />
+            <HighlightDropdown disabled={toolbarDisabled} value={activeHighlightColor} onChange={(color) => editor?.chain().focus().setBlogHighlight(color).run()} isOpen={activeMenuId === `${toolbarId}-highlight`} onOpenChange={(open) => setActiveMenuId(open ? `${toolbarId}-highlight` : null)} />
+          </ToolbarGroup>
 
-          <ToolbarButton
-            active={activeTextAlign === "left"}
-            disabled={toolbarDisabled}
-            icon={AlignLeft}
-            label="Alinear izquierda"
-            onClick={() =>
-              editor?.chain().focus().setBlogTextAlign("left").run()
-            }
-          />
-          <ToolbarButton
-            active={activeTextAlign === "center"}
-            disabled={toolbarDisabled}
-            icon={AlignCenter}
-            label="Alinear centro"
-            onClick={() =>
-              editor?.chain().focus().setBlogTextAlign("center").run()
-            }
-          />
-          <ToolbarButton
-            active={activeTextAlign === "right"}
-            disabled={toolbarDisabled}
-            icon={AlignRight}
-            label="Alinear derecha"
-            onClick={() =>
-              editor?.chain().focus().setBlogTextAlign("right").run()
-            }
-          />
+          <ToolbarGroup label="Alineacion">
+            <ToolbarButton active={activeTextAlign === "left"} disabled={toolbarDisabled} icon={AlignLeft} label="Alinear izquierda" onClick={() => runToolbarAction(() => editor?.chain().focus().setBlogTextAlign("left").run())} />
+            <ToolbarButton active={activeTextAlign === "center"} disabled={toolbarDisabled} icon={AlignCenter} label="Alinear centro" onClick={() => runToolbarAction(() => editor?.chain().focus().setBlogTextAlign("center").run())} />
+            <ToolbarButton active={activeTextAlign === "right"} disabled={toolbarDisabled} icon={AlignRight} label="Alinear derecha" onClick={() => runToolbarAction(() => editor?.chain().focus().setBlogTextAlign("right").run())} />
+            <ToolbarButton active={editor?.isActive("bulletList")} disabled={toolbarDisabled} icon={List} label="Lista con vinetas" onClick={() => runToolbarAction(() => editor?.chain().focus().toggleBulletList().run())} />
+            <ToolbarButton active={editor?.isActive("orderedList")} disabled={toolbarDisabled} icon={ListOrdered} label="Lista numerada" onClick={() => runToolbarAction(() => editor?.chain().focus().toggleOrderedList().run())} />
+          </ToolbarGroup>
 
-          <ToolbarDivider />
+          <ToolbarGroup label="Enlaces">
+            <LinkDropdown editor={editor} disabled={toolbarDisabled} isOpen={activeMenuId === `${toolbarId}-link`} onOpenChange={(open) => setActiveMenuId(open ? `${toolbarId}-link` : null)} />
+            <ToolbarButton disabled={toolbarDisabled || !editor?.isActive("link")} icon={Unlink} label="Quitar enlace" onClick={() => runToolbarAction(() => editor && unsetEditorLink(editor))} />
+          </ToolbarGroup>
 
-          <ToolbarButton
-            active={editor?.isActive("bulletList")}
-            disabled={toolbarDisabled}
-            icon={List}
-            label="Lista con vinetas"
-            onClick={() => editor?.chain().focus().toggleBulletList().run()}
-          />
-          <ToolbarButton
-            active={editor?.isActive("orderedList")}
-            disabled={toolbarDisabled}
-            icon={ListOrdered}
-            label="Lista numerada"
-            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-          />
-          <ToolbarButton
-            active={editor?.isActive("blockquote")}
-            disabled={toolbarDisabled}
-            icon={Quote}
-            label="Cita"
-            onClick={() => editor?.chain().focus().toggleBlockquote().run()}
-          />
-          <ToolbarButton
-            disabled={toolbarDisabled}
-            icon={Minus}
-            label="Separador"
-            onClick={() => editor?.chain().focus().setHorizontalRule().run()}
-          />
-
-          <ToolbarDivider />
-
-          <ToolbarButton
-            active={editor?.isActive("link")}
-            disabled={toolbarDisabled}
-            icon={LinkIcon}
-            label="Agregar enlace"
-            onClick={() => {
-              if (editor) {
-                setEditorLink(editor);
-              }
-            }}
-          />
-          <ToolbarButton
-            disabled={toolbarDisabled || !editor?.isActive("link")}
-            icon={Unlink}
-            label="Quitar enlace"
-            onClick={() => {
-              if (editor) {
-                unsetEditorLink(editor);
-              }
-            }}
-          />
-          <ToolbarButton
-            disabled={toolbarDisabled}
-            icon={Eraser}
-            label="Limpiar formato"
-            onClick={() =>
-              editor
-                ?.chain()
-                .focus()
-                .unsetAllMarks()
-                .unsetBlogTextAlign()
-                .clearNodes()
-                .run()
-            }
-          />
-
-          <ToolbarDivider />
-
-          <ToolbarButton
-            disabled={toolbarDisabled || !editor?.can().undo()}
-            icon={Undo2}
-            label="Deshacer"
-            onClick={() => editor?.chain().focus().undo().run()}
-          />
-          <ToolbarButton
-            disabled={toolbarDisabled || !editor?.can().redo()}
-            icon={Redo2}
-            label="Rehacer"
-            onClick={() => editor?.chain().focus().redo().run()}
-          />
+          <ToolbarGroup label="Herramientas">
+            <ToolbarButton active={editor?.isActive("blockquote")} disabled={toolbarDisabled} icon={Quote} label="Cita" onClick={() => runToolbarAction(() => editor?.chain().focus().toggleBlockquote().run())} />
+            <ToolbarButton disabled={toolbarDisabled} icon={Minus} label="Separador" onClick={() => runToolbarAction(() => editor?.chain().focus().setHorizontalRule().run())} />
+            <ToolbarButton disabled={toolbarDisabled} icon={Eraser} label="Limpiar formato" onClick={() => runToolbarAction(() => editor?.chain().focus().unsetAllMarks().unsetBlogTextAlign().clearNodes().run())} />
+            <ToolbarButton disabled={toolbarDisabled || !editor?.can().undo()} icon={Undo2} label="Deshacer" onClick={() => runToolbarAction(() => editor?.chain().focus().undo().run())} />
+            <ToolbarButton disabled={toolbarDisabled || !editor?.can().redo()} icon={Redo2} label="Rehacer" onClick={() => runToolbarAction(() => editor?.chain().focus().redo().run())} />
+          </ToolbarGroup>
         </div>
       </TooltipProvider>
     );
@@ -1135,15 +1232,17 @@ export function BlogRichTextEditor({
   value,
 }: BlogRichTextEditorProps) {
   const [showPreview, setShowPreview] = useState(false);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [toolbarState, setToolbarState] = useState({
     textLength: 0,
     version: 0,
     wordCount: 0,
   });
   const containerRef = useRef<HTMLDivElement>(null);
+  const floatingVisibleRef = useRef(false);
   const mainToolbarRef = useRef<HTMLDivElement>(null);
   const [showFloatingToolbar, setShowFloatingToolbar] = useState(false);
-  const [floatingStyle, setFloatingStyle] = useState<React.CSSProperties>({});
+  const [floatingStyle, setFloatingStyle] = useState<CSSProperties>({});
   const isEmpty = !value.trim();
   const editor = useEditor({
     editable: !disabled,
@@ -1262,7 +1361,14 @@ export function BlogRichTextEditor({
     let isContainerIntersecting = false;
 
     const updateVisibility = () => {
-      setShowFloatingToolbar(isContainerIntersecting && !isMainToolbarIntersecting);
+      const nextVisible = isContainerIntersecting && !isMainToolbarIntersecting;
+
+      if (floatingVisibleRef.current !== nextVisible) {
+        floatingVisibleRef.current = nextVisible;
+        setActiveMenuId(null);
+      }
+
+      setShowFloatingToolbar(nextVisible);
     };
 
     const observer = new IntersectionObserver(
@@ -1322,18 +1428,25 @@ export function BlogRichTextEditor({
         editor={editor}
         disabled={disabled}
         error={error}
+        toolbarId="main"
+        activeMenuId={activeMenuId}
+        setActiveMenuId={setActiveMenuId}
         className="rounded-t-[22px] border border-input shadow-soft"
       />
 
       {showFloatingToolbar && (
         <div
           style={floatingStyle}
-          className="fixed top-16 lg:top-0 z-40 rounded-b-[22px] border-x border-b border-input bg-background/95 shadow-premium backdrop-blur-md transition-all overflow-hidden"
+          className="fixed top-3 z-[160] max-h-[45dvh] overflow-y-auto transition-[left,top,opacity,transform] lg:top-4"
         >
           <BlogEditorToolbar
             editor={editor}
             disabled={disabled}
             error={error}
+            toolbarId="floating"
+            activeMenuId={activeMenuId}
+            setActiveMenuId={setActiveMenuId}
+            className="rounded-[22px] border border-input shadow-premium"
           />
         </div>
       )}
@@ -1383,7 +1496,6 @@ export function BlogRichTextEditor({
             className="mt-4"
             content={value}
             emptyMessage="La vista previa aparecerá cuando escribas contenido."
-            variant="preview"
           />
         </div>
       ) : null}

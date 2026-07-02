@@ -112,7 +112,7 @@ async function listNutritionClients(
     : supabase
         .from("client_profiles")
         .select("profile_id, assigned_nutritionist_id")
-        .not("assigned_nutritionist_id", "is", null);
+        .eq("assigned_nutritionist_id", access.userId);
 
   const { data, error } = await query;
 

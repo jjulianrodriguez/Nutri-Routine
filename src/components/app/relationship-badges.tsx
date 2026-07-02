@@ -21,13 +21,13 @@ type AssignedProfessionalCard = {
 };
 
 const badgeToneClasses: Record<RelationshipBadgeTone, string> = {
-  accent: "border-accent/30 bg-accent-soft text-charcoal",
+  accent: "border-accent bg-accent-soft text-charcoal",
   danger: "border-danger/20 bg-danger/10 text-danger",
   muted: "border-border bg-background text-muted",
-  neutral: "border-accent/25 bg-cream/80 text-charcoal",
-  primary: "border-primary/30 bg-primary-soft text-charcoal",
-  success: "border-success/20 bg-success/10 text-success",
-  warning: "border-warning/25 bg-warning/10 text-warning",
+  neutral: "border-secondary-accent bg-secondary-accent-soft text-charcoal",
+  primary: "border-primary bg-primary text-charcoal",
+  success: "border-success bg-success text-charcoal",
+  warning: "border-warning bg-warning text-charcoal",
 };
 
 export function RelationshipBadge({
@@ -204,7 +204,7 @@ export function AssignedProfessionalCards({
     return (
       <div
         className={cn(
-          "rounded-[20px] border border-dashed border-border bg-background p-4",
+          "h-fit self-start rounded-[20px] border border-dashed border-border bg-background p-4",
           className,
         )}
       >
@@ -217,14 +217,14 @@ export function AssignedProfessionalCards({
   }
 
   return (
-    <div className={cn("grid gap-3 sm:grid-cols-2", className)}>
+    <div className={cn("grid items-start gap-3 sm:grid-cols-2", className)}>
       {professionals.map((professional) => {
         const Icon = professional.icon;
 
         return (
           <article
             key={`${professional.id}-${professional.planLabel}`}
-            className="rounded-[20px] border border-border bg-background p-4"
+            className="h-fit self-start rounded-[20px] border border-border bg-background p-4"
           >
             <div className="flex items-start gap-3">
               <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-charcoal">

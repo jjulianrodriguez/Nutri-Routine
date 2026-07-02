@@ -83,12 +83,15 @@ function SidebarLink({
           onClick={onNavigate}
           className={cn(
             "relative flex h-11 min-w-0 items-center gap-3 rounded-control border px-3 text-sm font-bold transition-[background-color,border-color,color,box-shadow] duration-200",
-            "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
+            "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
             collapsed && "mx-auto size-11 w-11 justify-center gap-0 px-0",
             !collapsed && hasSubItems && "flex-1",
             isActive
-              ? "border-primary/45 bg-primary-soft text-charcoal shadow-soft"
-              : "border-transparent text-warm-brown hover:border-primary/25 hover:bg-surface/72 hover:text-charcoal hover:shadow-soft",
+              ? cn(
+                  "border-[var(--sidebar-primary)] bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] shadow-none before:absolute before:bottom-1 before:top-1 before:w-1 before:rounded-r-full before:bg-[var(--sidebar-primary-foreground)]",
+                  collapsed ? "before:-left-3" : "before:-left-4",
+                )
+              : "border-transparent text-white/68 hover:border-white/14 hover:bg-white/10 hover:text-white",
           )}
           aria-current={isActive ? "page" : undefined}
           aria-label={collapsed ? label : undefined}
@@ -98,9 +101,9 @@ function SidebarLink({
           {unreadCount > 0 ? (
             <span
               className={cn(
-                "ml-auto grid min-w-5 place-items-center rounded-full bg-accent px-1.5 py-0.5 text-[0.65rem] font-extrabold leading-none text-charcoal",
+                "ml-auto grid min-w-5 place-items-center rounded-full bg-white px-1.5 py-0.5 text-[0.65rem] font-extrabold leading-none text-primary-hover",
                 collapsed &&
-                  "absolute -right-1 -top-1 ml-0 min-w-4 border-2 border-surface px-1",
+                  "absolute -right-1 -top-1 ml-0 min-w-4 border-2 border-sidebar px-1",
               )}
               aria-label={`${unreadCount} notificaciones sin leer`}
             >
@@ -171,7 +174,7 @@ export function SidebarNav({
       {sections.map((section) => (
         <div key={section.label} className="min-w-0 space-y-2">
           {!collapsed ? (
-            <p className="px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-muted">
+            <p className="px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-white/45">
               {section.label}
             </p>
           ) : null}
@@ -222,9 +225,9 @@ export function SidebarNav({
                       <button
                         type="button"
                         className={cn(
-                          "grid size-11 shrink-0 place-items-center rounded-control border border-transparent text-muted transition-[background-color,border-color,color] duration-200",
-                          "hover:border-primary/25 hover:bg-surface/72 hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20",
-                          isExpanded && "text-warm-brown",
+                          "grid size-11 shrink-0 place-items-center rounded-control border border-transparent text-white/58 transition-[background-color,border-color,color] duration-200",
+                          "hover:border-white/14 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
+                          isExpanded && "border-white/14 bg-white/12 text-white",
                         )}
                         aria-controls={subNavId}
                         aria-expanded={isExpanded}
@@ -244,7 +247,7 @@ export function SidebarNav({
                   {!collapsed && hasSubItems && isExpanded ? (
                     <div
                       id={subNavId}
-                      className="ml-5 mt-1 space-y-1 border-l border-border/80 pl-3"
+                      className="ml-5 mt-1 space-y-1 border-l border-white/16 pl-3"
                     >
                       {item.subItems?.map((subItem) => {
                         const isSubItemActive = subItem.href === currentHref;
@@ -255,11 +258,11 @@ export function SidebarNav({
                             href={subItem.href}
                             onClick={onNavigate}
                             className={cn(
-                              "block rounded-[12px] px-3 py-1.5 text-xs font-extrabold text-muted transition-colors",
-                              "hover:bg-surface/72 hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20",
+                              "block rounded-[12px] px-3 py-1.5 text-xs font-extrabold text-white/56 transition-colors",
+                              "hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
                               isSubItemActive &&
-                                "bg-primary-soft/70 text-charcoal",
-                              !isSubItemActive && isActive && "text-warm-brown",
+                                "bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)]",
+                              !isSubItemActive && isActive && "text-white/76",
                             )}
                             aria-current={isSubItemActive ? "page" : undefined}
                           >

@@ -2,6 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  AlertCircle,
+  CheckCircle2,
   Eye,
   EyeOff,
   Loader2,
@@ -57,6 +59,8 @@ type BlogConfirmation =
       values: BlogPostValues;
     };
 
+type SaveStatus = "idle" | "dirty" | "saving" | "saved" | "error";
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("es-CR", {
     dateStyle: "medium",
@@ -76,6 +80,62 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
+function SaveStatusBadge({ status }: { status: SaveStatus }) {
+  const config = {
+    dirty: {
+      className: "border-warning/30 bg-warning-soft text-warm-brown",
+      icon: AlertCircle,
+      label: "Cambios sin guardar",
+    },
+    error: {
+      className: "border-danger/30 bg-danger/10 text-danger",
+      icon: AlertCircle,
+      label: "Error al guardar",
+    },
+    idle: {
+      className: "border-border bg-background text-muted",
+      icon: CheckCircle2,
+      label: "Sin cambios pendientes",
+    },
+    saved: {
+      className: "border-success/30 bg-success/10 text-success",
+      icon: CheckCircle2,
+      label: "Guardado",
+    },
+    saving: {
+      className: "border-primary/30 bg-primary-soft text-charcoal",
+      icon: Loader2,
+      label: "Guardando...",
+    },
+  } satisfies Record<
+    SaveStatus,
+    { className: string; icon: typeof AlertCircle; label: string }
+  >;
+  const current = config[status];
+  const Icon = current.icon;
+
+  return (
+    <span
+      className={[
+        "inline-flex min-h-9 items-center gap-2 rounded-full border px-3 py-1 text-xs font-extrabold",
+        current.className,
+      ].join(" ")}
+      aria-live="polite"
+    >
+      <Icon
+        className={[
+          "size-3.5",
+          status === "saving" ? "animate-spin" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        aria-hidden="true"
+      />
+      {current.label}
+    </span>
+  );
+}
+
 export function BlogManager({
   initialPosts = [],
   mode = "manage",
@@ -85,11 +145,13 @@ export function BlogManager({
   const [editingPost, setEditingPost] = useState<AdminBlogPost | null>(null);
   const [confirmation, setConfirmation] =
     useState<BlogConfirmation | null>(null);
+  const [saveStatusOverride, setSaveStatusOverride] =
+    useState<Extract<SaveStatus, "idle" | "saved" | "error">>("idle");
   const [serverMessage, setServerMessage] = useState("");
   const {
     clearErrors,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors, isDirty, isSubmitting },
     handleSubmit,
     register,
     reset,
@@ -110,6 +172,12 @@ export function BlogManager({
   const contentValue = useWatch({ control, name: "content" });
   const isManageMode = mode === "manage";
   const showEditor = mode === "create" || Boolean(editingPost);
+  const hasUnsavedChanges = isDirty && !isSubmitting;
+  const saveStatus: SaveStatus = isSubmitting
+    ? "saving"
+    : isDirty
+      ? "dirty"
+      : saveStatusOverride;
 
   useEffect(() => {
     if (editingPost) {
@@ -117,9 +185,64 @@ export function BlogManager({
     }
   }, [editingPost]);
 
+  useEffect(() => {
+    if (!hasUnsavedChanges) {
+      return;
+    }
+
+    const message =
+      "Tienes cambios sin guardar. Si sales ahora, se perderan.";
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = message;
+    };
+    const handleDocumentClick = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) {
+        return;
+      }
+
+      const anchor = target.closest("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement)) {
+        return;
+      }
+
+      if (anchor.target === "_blank" || anchor.hasAttribute("download")) {
+        return;
+      }
+
+      if (window.confirm(message)) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("click", handleDocumentClick, true);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("click", handleDocumentClick, true);
+    };
+  }, [hasUnsavedChanges]);
+
+  function confirmDiscardChanges() {
+    return (
+      !hasUnsavedChanges ||
+      window.confirm("Tienes cambios sin guardar. Si continuas, se perderan.")
+    );
+  }
+
   function startEditing(post: AdminBlogPost) {
+    if (!confirmDiscardChanges()) {
+      return;
+    }
+
     setEditingPost(post);
     setServerMessage("");
+    setSaveStatusOverride("idle");
     clearErrors();
     reset({
       category: post.category,
@@ -130,9 +253,14 @@ export function BlogManager({
     });
   }
 
-  function clearForm() {
+  function clearForm(nextStatus: Extract<SaveStatus, "idle" | "saved"> = "idle") {
+    if (nextStatus === "idle" && !confirmDiscardChanges()) {
+      return;
+    }
+
     setEditingPost(null);
     setServerMessage("");
+    setSaveStatusOverride(nextStatus);
     clearErrors();
     reset({
       category: "Bienestar",
@@ -148,13 +276,26 @@ export function BlogManager({
     post: AdminBlogPost | null,
   ) {
     setServerMessage("");
+    setSaveStatusOverride("idle");
     clearErrors("root");
 
-    const result = post
-      ? await updateBlogPost({ ...values, id: post.id })
-      : await createBlogPost(values);
+    let result: BlogActionResult;
+
+    try {
+      result = post
+        ? await updateBlogPost({ ...values, id: post.id })
+        : await createBlogPost(values);
+    } catch {
+      const message =
+        "No pudimos guardar el blog. Revisa tu conexion e intenta de nuevo.";
+      setSaveStatusOverride("error");
+      setServerMessage(message);
+      toast.error(message);
+      return;
+    }
 
     if (result.status === "error") {
+      setSaveStatusOverride("error");
       if (result.fieldErrors) {
         Object.entries(result.fieldErrors).forEach(([field, message]) => {
           if (message) {
@@ -169,7 +310,7 @@ export function BlogManager({
     }
 
     toast.success(result.message);
-    clearForm();
+    clearForm("saved");
     router.refresh();
   }
 
@@ -308,12 +449,15 @@ export function BlogManager({
               {editingPost ? "Editar blog" : "Crear blog"}
             </h2>
           </div>
-          {editingPost ? (
-            <Button type="button" variant="ghost" onClick={clearForm}>
-              <X className="size-4" aria-hidden="true" />
-              Cancelar
-            </Button>
-          ) : null}
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <SaveStatusBadge status={saveStatus} />
+            {editingPost ? (
+              <Button type="button" variant="ghost" onClick={() => clearForm()}>
+                <X className="size-4" aria-hidden="true" />
+                Cancelar
+              </Button>
+            ) : null}
+          </div>
         </div>
 
         <form
@@ -545,44 +689,60 @@ export function BlogManager({
                         ) : (
                           <EyeOff className="size-3" aria-hidden="true" />
                         )}
-                        {post.published ? "Visible" : "Oculto"}
+                        {post.published ? "Publicado" : "Oculto"}
                       </span>
                       {post.is_pinned ? (
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-extrabold text-charcoal">
                           <Pin className="size-3" aria-hidden="true" />
-                          Principal
+                          Anclado
                         </span>
                       ) : null}
                     </div>
-                    <CardActionsMenu
-                      label={post.title}
-                      items={[
-                        {
-                          icon: Pencil,
-                          label: "Editar",
-                          onSelect: () => startEditing(post),
-                        },
-                        {
-                          icon: post.published ? EyeOff : Eye,
-                          label: post.published ? "Ocultar" : "Mostrar",
-                          onSelect: () =>
-                            setConfirmation({ post, type: "visibility" }),
-                        },
-                        {
-                          icon: post.is_pinned ? PinOff : Pin,
-                          label: post.is_pinned ? "Desanclar" : "Anclar",
-                          onSelect: () =>
-                            setConfirmation({ post, type: "pinned" }),
-                        },
-                        {
-                          destructive: true,
-                          icon: Trash2,
-                          label: "Eliminar",
-                          onSelect: () => confirmDelete(post),
-                          separatorBefore: true,
-                        },
-                      ]}
-                    />
+                    <div className="flex shrink-0 items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => startEditing(post)}
+                      >
+                        <Pencil className="size-3.5" aria-hidden="true" />
+                        Editar
+                      </Button>
+                      <CardActionsMenu
+                        label={post.title}
+                        items={[
+                          ...(post.published && post.slug
+                            ? [
+                                {
+                                  external: true,
+                                  href: `/blog/${post.slug}`,
+                                  icon: Eye,
+                                  label: "Ver publicado",
+                                },
+                              ]
+                            : []),
+                          {
+                            icon: post.published ? EyeOff : Eye,
+                            label: post.published ? "Ocultar" : "Mostrar",
+                            onSelect: () =>
+                              setConfirmation({ post, type: "visibility" }),
+                          },
+                          {
+                            icon: post.is_pinned ? PinOff : Pin,
+                            label: post.is_pinned ? "Desanclar" : "Anclar",
+                            onSelect: () =>
+                              setConfirmation({ post, type: "pinned" }),
+                          },
+                          {
+                            destructive: true,
+                            icon: Trash2,
+                            label: "Eliminar",
+                            onSelect: () => confirmDelete(post),
+                            separatorBefore: true,
+                          },
+                        ]}
+                      />
+                    </div>
                   </div>
 
                   <h3 className="mt-4 text-2xl font-semibold leading-tight text-charcoal">
@@ -613,11 +773,17 @@ export function BlogManager({
         ) : (
           <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
             <p className="font-extrabold text-charcoal">
-              Aun no hay blogs creados.
+              Todavia no hay blogs publicados.
             </p>
             <p className="mt-2 text-sm leading-6 text-muted">
-              El primer blog que guardes aparecerá en esta lista.
+              Crea el primer blog y decide si queda publicado, oculto o anclado.
             </p>
+            <Button asChild className="mt-5">
+              <Link href="/app/blog">
+                <Plus className="size-4" aria-hidden="true" />
+                Crear primer blog
+              </Link>
+            </Button>
           </div>
         )}
         </section>

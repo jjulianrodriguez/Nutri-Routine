@@ -20,12 +20,24 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme}
       position="top-right"
       className="toaster group"
+      containerAriaLabel="Notificaciones"
       icons={{
-        success: <CircleCheckIcon className="size-4 text-success" />,
-        info: <InfoIcon className="size-4 text-primary" />,
-        warning: <TriangleAlertIcon className="size-4 text-warning" />,
-        error: <OctagonXIcon className="size-4 text-danger" />,
-        loading: <Loader2Icon className="size-4 animate-spin text-primary" />,
+        success: (
+          <CircleCheckIcon className="size-4 text-success" aria-hidden="true" />
+        ),
+        info: <InfoIcon className="size-4 text-primary" aria-hidden="true" />,
+        warning: (
+          <TriangleAlertIcon className="size-4 text-warning" aria-hidden="true" />
+        ),
+        error: (
+          <OctagonXIcon className="size-4 text-danger" aria-hidden="true" />
+        ),
+        loading: (
+          <Loader2Icon
+            className="size-4 animate-spin text-primary"
+            aria-hidden="true"
+          />
+        ),
       }}
       style={
         {

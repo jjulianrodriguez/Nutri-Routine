@@ -133,7 +133,7 @@ export default async function RoutineAssignmentsPage({
         </Alert>
       ) : null}
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid items-start gap-4 sm:grid-cols-3">
         <StatTile
           label="Clientes disponibles"
           value={String(clients.length)}
@@ -191,7 +191,7 @@ export default async function RoutineAssignmentsPage({
             </span>
           </EmptyState>
         ) : (
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid items-start gap-4 lg:grid-cols-2">
             {clients.map((client) => {
               const assignment = client.currentAssignment;
               const relationBadge = getAssignedRelationBadge({
@@ -204,7 +204,7 @@ export default async function RoutineAssignmentsPage({
               return (
                 <article
                   key={client.id}
-                  className="rounded-[24px] border border-border bg-background p-5 shadow-soft"
+                  className="h-fit self-start rounded-[24px] border border-border bg-background p-5 shadow-soft"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex min-w-0 items-center gap-3">
@@ -251,7 +251,7 @@ export default async function RoutineAssignmentsPage({
                     </span>
                   </div>
 
-                  <div className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-2">
+                  <div className="mt-4 grid items-start gap-3 border-t border-border pt-4 sm:grid-cols-2">
                     <div>
                       <p className="text-xs font-extrabold uppercase tracking-wide text-muted">
                         Plan de entrenamiento
@@ -296,7 +296,7 @@ export default async function RoutineAssignmentsPage({
                         />
                       </div>
 
-                      <div className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-3">
+                      <div className="mt-4 grid items-start gap-3 border-t border-border pt-4 sm:grid-cols-3">
                         <AssignmentMeta
                           icon={CalendarDays}
                           label="Inicio"

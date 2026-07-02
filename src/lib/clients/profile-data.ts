@@ -76,6 +76,7 @@ export type ClientAdministrativeProfile = {
   medicalConditions: string | null;
   nutritionPlans: ClientPlanSummary[];
   personalInfoHidden: boolean;
+  physicalProfileExists: boolean;
   phone: string | null;
   professionalNotes: string | null;
   role: "client";
@@ -256,7 +257,7 @@ export async function getClientAdministrativeProfile(
     supabase
       .from("client_profiles")
       .select(
-        "profile_id, assigned_nutritionist_id, assigned_trainer_id, created_at, updated_at",
+        "profile_id, assigned_nutritionist_id, assigned_trainer_id",
       )
       .eq("profile_id", clientId)
       .maybeSingle(),
@@ -385,6 +386,7 @@ export async function getClientAdministrativeProfile(
       : null,
     nutritionPlans,
     personalInfoHidden: !canViewPersonalInfo,
+    physicalProfileExists: Boolean(personalDetails),
     phone: canViewPersonalInfo ? personalDetails?.phone ?? null : null,
     professionalNotes: canViewSensitiveNotes
       ? personalDetails?.professional_notes ?? null
@@ -394,7 +396,6 @@ export async function getClientAdministrativeProfile(
     trainingPlans,
     updatedAt:
       personalDetails?.updated_at ??
-      clientProfile?.updated_at ??
       profile.updated_at,
     weightKg: canViewHealthData ? personalDetails?.weight_kg ?? null : null,
   };

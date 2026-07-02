@@ -1,11 +1,12 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
-import type { Tables } from "@/types/database";
+import type { Enums, Tables } from "@/types/database";
 
 type ResourceRow = Tables<"resources">;
 type ResourceFolderRow = Tables<"resource_folders">;
 type ProfileRow = Pick<Tables<"profiles">, "full_name" | "id">;
+type ResourceArea = Enums<"service_area">;
 
 export type MultimediaResource = Pick<
   ResourceRow,
@@ -46,9 +47,26 @@ export type ResourceFolder = Pick<
 };
 
 export type ResourceLibraryData = {
+  areaCounts: Record<ResourceArea, number>;
   folders: ResourceFolder[];
+  pagination: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    page: number;
+    pageSize: number;
+    totalCount: number;
+  };
   resources: MultimediaResource[];
+  totalResourceCount: number;
 };
+
+type ResourceLibraryFilters = {
+  area?: ResourceArea | null;
+  folderId?: string | null;
+};
+
+const RESOURCE_LIBRARY_PAGE_SIZE = 48;
+const RESOURCE_LIBRARY_MAX_PAGE_SIZE = 96;
 
 async function getProfilesById(ids: string[]) {
   const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
@@ -71,53 +89,196 @@ async function getProfilesById(ids: string[]) {
   );
 }
 
-export async function getVisibleResourceLibrary({
+function normalizePage(value?: number) {
+  if (!value || !Number.isFinite(value) || value < 1) {
+    return 1;
+  }
+
+  return Math.floor(value);
+}
+
+function normalizePageSize(value?: number) {
+  if (!value || !Number.isFinite(value) || value < 1) {
+    return RESOURCE_LIBRARY_PAGE_SIZE;
+  }
+
+  return Math.min(Math.floor(value), RESOURCE_LIBRARY_MAX_PAGE_SIZE);
+}
+
+async function resolveCount(
+  query: PromiseLike<{ count: number | null; error: unknown }>,
+) {
+  const { count, error } = await query;
+
+  if (error) {
+    return 0;
+  }
+
+  return count ?? 0;
+}
+
+async function countResourcesByArea({
   includeCreator,
 }: {
   includeCreator: boolean;
+}) {
+  const supabase = await createClient();
+  const areas: ResourceArea[] = ["general", "nutrition", "training"];
+  const counts = await Promise.all(
+    areas.map((area) => {
+      let query = supabase
+        .from("resources")
+        .select("id", { count: "exact", head: true })
+        .eq("area", area);
+
+      if (!includeCreator) {
+        query = query.eq("status", "active");
+      }
+
+      return resolveCount(query);
+    }),
+  );
+
+  return {
+    general: counts[0] ?? 0,
+    nutrition: counts[1] ?? 0,
+    training: counts[2] ?? 0,
+  } satisfies Record<ResourceArea, number>;
+}
+
+async function countFolderDocuments({
+  area,
+  folderRows,
+  includeCreator,
+}: {
+  area?: ResourceArea | null;
+  folderRows: ResourceFolderRow[];
+  includeCreator: boolean;
+}) {
+  if (folderRows.length === 0) {
+    return new Map<string, number>();
+  }
+
+  const supabase = await createClient();
+  const counts = await Promise.all(
+    folderRows.map((folder) => {
+      let query = supabase
+        .from("resources")
+        .select("id", { count: "exact", head: true })
+        .eq("folder_id", folder.id);
+
+      if (area) {
+        query = query.eq("area", area);
+      }
+
+      if (!includeCreator) {
+        query = query.eq("status", "active");
+      }
+
+      return resolveCount(query);
+    }),
+  );
+
+  return new Map(folderRows.map((folder, index) => [folder.id, counts[index] ?? 0]));
+}
+
+export async function getVisibleResourceLibrary({
+  filters = {},
+  includeCreator,
+  page,
+  pageSize,
+}: {
+  filters?: ResourceLibraryFilters;
+  includeCreator: boolean;
+  page?: number;
+  pageSize?: number;
 }): Promise<ResourceLibraryData> {
   const supabase = await createClient();
-  const [resourcesResult, foldersResult] = await Promise.all([
-    supabase
-      .from("resources")
-      .select(
-        "id, title, description, file_url, area, uploaded_by, created_at, updated_at, kind, folder_id, storage_bucket, storage_path, file_name, file_size, mime_type, status",
-      )
-      .order("updated_at", { ascending: false }),
-    supabase
-      .from("resource_folders")
-      .select(
-        "id, name, description, area, active, created_by, created_at, updated_at",
-      )
-      .order("name", { ascending: true }),
-  ]);
+  const currentPage = normalizePage(page);
+  const normalizedPageSize = normalizePageSize(pageSize);
+  const rangeStart = (currentPage - 1) * normalizedPageSize;
+  const rangeEnd = rangeStart + normalizedPageSize - 1;
+  let foldersQuery = supabase
+    .from("resource_folders")
+    .select(
+      "id, name, description, area, active, created_by, created_at, updated_at",
+    )
+    .order("name", { ascending: true });
 
-  const resourceRows = (resourcesResult.data ?? []) as ResourceRow[];
+  if (filters.area) {
+    foldersQuery = foldersQuery.eq("area", filters.area);
+  }
+
+  if (!includeCreator) {
+    foldersQuery = foldersQuery.eq("active", true);
+  }
+
+  const foldersResult = await foldersQuery;
   const folderRows = (foldersResult.data ?? []) as ResourceFolderRow[];
+  const validFolderId =
+    filters.folderId && folderRows.some((folder) => folder.id === filters.folderId)
+      ? filters.folderId
+      : null;
+  let resourcesQuery = supabase
+    .from("resources")
+    .select(
+      "id, title, description, file_url, area, uploaded_by, created_at, updated_at, kind, folder_id, storage_bucket, storage_path, file_name, file_size, mime_type, status",
+      { count: "exact" },
+    )
+    .order("updated_at", { ascending: false });
+
+  if (filters.area) {
+    resourcesQuery = resourcesQuery.eq("area", filters.area);
+  }
+
+  if (validFolderId) {
+    resourcesQuery = resourcesQuery.eq("folder_id", validFolderId);
+  } else {
+    resourcesQuery = resourcesQuery.is("folder_id", null);
+  }
+
+  if (!includeCreator) {
+    resourcesQuery = resourcesQuery.eq("status", "active");
+  }
+
+  const resourcesResult = await resourcesQuery.range(rangeStart, rangeEnd);
+  const resourceRows = (resourcesResult.data ?? []) as ResourceRow[];
+  const totalResourceCount = resourcesResult.count ?? resourceRows.length;
 
   if (resourcesResult.error && foldersResult.error) {
     return {
+      areaCounts: {
+        general: 0,
+        nutrition: 0,
+        training: 0,
+      },
       folders: [],
+      pagination: {
+        hasNextPage: false,
+        hasPreviousPage: currentPage > 1,
+        page: currentPage,
+        pageSize: normalizedPageSize,
+        totalCount: 0,
+      },
       resources: [],
+      totalResourceCount: 0,
     };
   }
 
-  const countsByFolder = new Map<string, number>();
-  resourceRows.forEach((resource) => {
-    if (resource.folder_id) {
-      countsByFolder.set(
-        resource.folder_id,
-        (countsByFolder.get(resource.folder_id) ?? 0) + 1,
-      );
-    }
-  });
-
-  const creatorNames = includeCreator
-    ? await getProfilesById([
-        ...resourceRows.map((resource) => resource.uploaded_by),
-        ...folderRows.map((folder) => folder.created_by),
-      ])
-    : new Map<string, string>();
+  const [areaCounts, countsByFolder, creatorNames] = await Promise.all([
+    countResourcesByArea({ includeCreator }),
+    countFolderDocuments({
+      area: filters.area,
+      folderRows,
+      includeCreator,
+    }),
+    includeCreator
+      ? getProfilesById([
+          ...resourceRows.map((resource) => resource.uploaded_by),
+          ...folderRows.map((folder) => folder.created_by),
+        ])
+      : Promise.resolve(new Map<string, string>()),
+  ]);
   const folderNames = new Map(
     folderRows.map((folder) => [folder.id, folder.name]),
   );
@@ -150,8 +311,17 @@ export async function getVisibleResourceLibrary({
   }));
 
   return {
+    areaCounts,
     folders,
+    pagination: {
+      hasNextPage: rangeEnd + 1 < totalResourceCount,
+      hasPreviousPage: currentPage > 1,
+      page: currentPage,
+      pageSize: normalizedPageSize,
+      totalCount: totalResourceCount,
+    },
     resources,
+    totalResourceCount,
   };
 }
 

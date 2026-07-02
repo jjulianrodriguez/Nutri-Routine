@@ -138,7 +138,7 @@ export default async function HistoricalRoutineDetailPage({
         </div>
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <DetailValue
           icon={History}
           label="Estado"
@@ -220,7 +220,7 @@ function DetailValue({
   value: string;
 }) {
   return (
-    <div className="rounded-[22px] border border-border bg-surface p-4 shadow-soft">
+    <div className="h-fit self-start rounded-[22px] border border-border bg-surface p-4 shadow-soft">
       <Icon className="size-4 text-warm-brown" aria-hidden="true" />
       <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
         {label}

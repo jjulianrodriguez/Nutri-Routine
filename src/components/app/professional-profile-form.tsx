@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Save } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -53,9 +53,10 @@ export function ProfessionalProfileForm({
   const [successMessage, setSuccessMessage] = useState("");
   const {
     clearErrors,
-    formState: { errors, isSubmitting },
+    formState: { errors, isDirty, isSubmitting },
     handleSubmit,
     register,
+    reset,
     setError,
   } = useForm<ProfessionalProfileValues>({
     defaultValues: initialValues,
@@ -82,12 +83,30 @@ export function ProfessionalProfileForm({
     }
 
     setSuccessMessage(result.message);
+    reset(values);
     toast.success(result.message);
     router.refresh();
   }
 
   return (
     <form className="space-y-7" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <div className="rounded-[20px] border border-primary/25 bg-primary-soft/60 p-4 text-sm leading-6 text-muted">
+        <p className="font-extrabold text-charcoal">Visibilidad del perfil</p>
+        <p className="mt-1">
+          Esta informacion ayuda a tus clientes asignados y al equipo admin a
+          entender tu area, experiencia y disponibilidad. El nombre y el correo
+          de acceso se muestran fuera de este formulario como resumen.
+        </p>
+      </div>
+
+      <section className="space-y-5">
+        <div>
+          <h3 className="font-extrabold text-charcoal">Datos profesionales</h3>
+          <p className="mt-1 text-sm leading-6 text-muted">
+            Contacto profesional, enlaces y presentacion breve.
+          </p>
+        </div>
+
       <div className="grid gap-5 lg:grid-cols-2">
         <div>
           <Label htmlFor="professionalPhone" className="font-extrabold text-charcoal">
@@ -149,6 +168,17 @@ export function ProfessionalProfileForm({
         />
         <FieldError id="professional-bio-error" message={errors.bio?.message} />
       </div>
+      </section>
+
+      <section className="space-y-5">
+        <div>
+          <h3 className="font-extrabold text-charcoal">
+            Experiencia y enfoque
+          </h3>
+          <p className="mt-1 text-sm leading-6 text-muted">
+            Trayectoria, certificaciones y temas que trabajas con clientes.
+          </p>
+        </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
         <div>
@@ -227,6 +257,21 @@ export function ProfessionalProfileForm({
           message={errors.focusAreas?.message}
         />
       </fieldset>
+      </section>
+
+      <section
+        id="disponibilidad"
+        className="scroll-mt-24 space-y-5 rounded-[22px] border border-border bg-background p-4"
+      >
+        <div>
+          <h3 className="font-extrabold text-charcoal">
+            Disponibilidad editable
+          </h3>
+          <p className="mt-1 text-sm leading-6 text-muted">
+            Estos campos son la fuente real para tus dias, horarios y mensaje de
+            respuesta.
+          </p>
+        </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
         <div>
@@ -304,6 +349,7 @@ export function ProfessionalProfileForm({
           message={errors.availabilitySchedule?.message}
         />
       </div>
+      </section>
 
       {serverMessage || errors.root?.message ? (
         <Alert
@@ -327,19 +373,40 @@ export function ProfessionalProfileForm({
         </Alert>
       ) : null}
 
-      <Button type="submit" disabled={isSubmitting} size="lg">
-        {isSubmitting ? (
-          <>
-            <Loader2 className="size-4 animate-spin" />
-            Guardando...
-          </>
-        ) : (
-          <>
-            <Save className="size-4" />
-            Guardar perfil profesional
-          </>
-        )}
-      </Button>
+      <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[24px] border border-border bg-surface/90 p-4 shadow-card backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3 text-sm leading-6">
+          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
+            {isDirty ? (
+              <AlertCircle className="size-4" aria-hidden="true" />
+            ) : (
+              <CheckCircle2 className="size-4" aria-hidden="true" />
+            )}
+          </span>
+          <div>
+            <p className="font-extrabold text-charcoal">
+              {isDirty ? "Perfil profesional con cambios" : "Perfil profesional al dia"}
+            </p>
+            <p className="text-muted" aria-live="polite">
+              {isDirty
+                ? "Guarda para actualizar tu informacion visible."
+                : "No hay cambios sin guardar."}
+            </p>
+          </div>
+        </div>
+        <Button type="submit" disabled={isSubmitting || !isDirty} size="lg">
+          {isSubmitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Guardando...
+            </>
+          ) : (
+            <>
+              <Save className="size-4" />
+              Guardar perfil profesional
+            </>
+          )}
+        </Button>
+      </div>
     </form>
   );
 }

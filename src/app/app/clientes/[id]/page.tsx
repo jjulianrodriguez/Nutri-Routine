@@ -135,7 +135,7 @@ function DetailItem({
   return (
     <div
       className={cn(
-        "rounded-[18px] border border-border bg-background p-4",
+        "h-fit self-start rounded-[18px] border border-border bg-background p-4",
         className,
       )}
     >
@@ -179,7 +179,7 @@ function ServiceCard({
   return (
     <div
       className={cn(
-        "rounded-[22px] border p-5",
+        "h-fit self-start rounded-[22px] border p-5",
         active
           ? "border-primary/35 bg-primary-soft/60"
           : "border-border bg-background",
@@ -224,7 +224,7 @@ function PlanCard({
   return (
     <article
       className={cn(
-        "rounded-[20px] border p-4",
+        "h-fit self-start rounded-[20px] border p-4",
         plan.state === "expired"
           ? "border-danger/20 bg-danger/5"
           : "border-border bg-background",
@@ -344,15 +344,18 @@ export default async function ClientProfilePage({
 }) {
   const access = await requireCurrentUserAccess();
   const { id } = await params;
-  const [client, habitData, activationData] = await Promise.all([
-    getClientAdministrativeProfile(id, access),
-    getNutritionHabitTrackerData(access, id),
-    listClientActivationData("all", access),
-  ]);
+  const client = await getClientAdministrativeProfile(id, access);
 
   if (!client) {
     notFound();
   }
+
+  const [habitData, activationData] = await Promise.all([
+    client.canViewNutritionPlans
+      ? getNutritionHabitTrackerData(access, client.id)
+      : Promise.resolve(null),
+    listClientActivationData("all", access),
+  ]);
 
   const activationClient = activationData.clients.find(
     (item) => item.id === client.id,
@@ -398,7 +401,7 @@ export default async function ClientProfilePage({
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
+      <section className="grid items-start gap-4 md:grid-cols-2">
         <ServiceCard
           active={client.hasNutritionService}
           assignedId={client.assignedNutritionistId}
@@ -460,7 +463,7 @@ export default async function ClientProfilePage({
         </div>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+      <div className="grid items-start gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <AppPanel
           title="Información personal"
           description="Datos compartidos por el cliente para su seguimiento."
@@ -476,7 +479,7 @@ export default async function ClientProfilePage({
                   profesionales por ahora.
                 </EmptyState>
               ) : (
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid items-start gap-3 sm:grid-cols-2">
                   <DetailItem
                     icon={Mail}
                     label="Email"
@@ -518,7 +521,7 @@ export default async function ClientProfilePage({
                   profesionales por ahora.
                 </EmptyState>
               ) : (
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid items-start gap-3 sm:grid-cols-2">
                   <DetailItem
                     icon={Scale}
                     label="Peso"
@@ -594,7 +597,7 @@ export default async function ClientProfilePage({
           description="Estado y fechas del registro del cliente."
           tone="accent"
         >
-          <div className="grid gap-3">
+          <div className="grid items-start gap-3">
             <DetailItem
               icon={ShieldCheck}
               label="Estado de cuenta"
@@ -614,7 +617,7 @@ export default async function ClientProfilePage({
         </AppPanel>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid items-start gap-6 xl:grid-cols-2">
         <PlansPanel
           canView={client.canViewNutritionPlans}
           description="Plan actual e historial alimenticio visible según la asignación profesional."
@@ -638,10 +641,16 @@ export default async function ClientProfilePage({
           description="Cumplimiento semanal visible para la profesional asignada."
           tone="primary"
         >
-          <HabitTracker
-            data={habitData}
-            isClient={false}
-          />
+          {habitData ? (
+            <HabitTracker
+              data={habitData}
+              isClient={false}
+            />
+          ) : (
+            <EmptyState>
+              No se pudo cargar el seguimiento de habitos para este cliente.
+            </EmptyState>
+          )}
         </AppPanel>
       ) : null}
     </AppScreen>

@@ -1,42 +1,31 @@
 import type { Metadata } from "next";
-import { Manrope, Newsreader, Plus_Jakarta_Sans, Sora } from "next/font/google";
+import { Instrument_Sans, Manrope } from "next/font/google";
 import Script from "next/script";
 
 import { Providers } from "./providers";
 import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
-const display = Sora({
+const display = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
 });
 
-const manrope = Manrope({
+const geist = Manrope({
   subsets: ["latin"],
-  variable: "--font-manrope",
-  display: "swap",
-});
-
-const landingDisplay = Newsreader({
-  subsets: ["latin"],
-  weight: "variable",
-  style: ["normal", "italic"],
-  axes: ["opsz"],
-  variable: "--font-landing-display",
-  display: "swap",
-});
-
-const landingSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-landing-sans",
+  variable: "--font-geist",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Nutrición Con Enfoque · Mariana y Camila Rodríguez Méndez",
+  applicationName: "Nutrición Con Enfoque",
+  title: {
+    default: "Nutrición Con Enfoque · Nutrición y entrenamiento personalizado",
+    template: "%s · Nutrición Con Enfoque",
+  },
   description:
-    "Nutrición funcional e integrativa con la Dra. Mariana Rodríguez Méndez + entrenamiento personalizado con Camila Rodríguez Méndez.",
+    "Acompañamiento privado de nutrición funcional, entrenamiento personalizado y seguimiento profesional con Mariana y Camila Rodríguez Méndez.",
 };
 
 export default function RootLayout({
@@ -49,7 +38,7 @@ export default function RootLayout({
       lang="es"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${display.variable} ${manrope.variable} ${landingDisplay.variable} ${landingSans.variable}`}
+      className={`${display.variable} ${geist.variable}`}
     >
       <head>
         <Script
@@ -59,6 +48,9 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <a className="skip-link" href="#main-content">
+          Saltar al contenido
+        </a>
         <Providers>{children}</Providers>
       </body>
     </html>

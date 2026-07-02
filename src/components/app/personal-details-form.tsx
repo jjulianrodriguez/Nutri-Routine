@@ -1,7 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Save, Trash2 } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  LockKeyhole,
+  Save,
+  Trash2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -57,10 +64,16 @@ export function PersonalDetailsForm({
   hasSavedDetails,
   initialValues,
   maxBirthDate,
+  privacySettings,
 }: {
   hasSavedDetails: boolean;
   initialValues: PersonalDetailsValues;
   maxBirthDate: string;
+  privacySettings: {
+    healthData: boolean;
+    personalInfo: boolean;
+    sensitiveNotes: boolean;
+  };
 }) {
   const router = useRouter();
   const [hasDetails, setHasDetails] = useState(hasSavedDetails);
@@ -72,7 +85,7 @@ export function PersonalDetailsForm({
   const {
     clearErrors,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors, isDirty, isSubmitting },
     handleSubmit,
     register,
     reset,
@@ -109,6 +122,7 @@ export function PersonalDetailsForm({
     );
     setHasDetails(containsData);
     setSuccessMessage(result.message);
+    reset(values);
     toast.success(result.message);
     router.refresh();
   }
@@ -155,6 +169,33 @@ export function PersonalDetailsForm({
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <div className="rounded-[20px] border border-primary/25 bg-primary-soft/60 p-4">
+        <div className="flex items-start gap-3">
+          <LockKeyhole
+            className="mt-0.5 size-5 shrink-0 text-warm-brown"
+            aria-hidden="true"
+          />
+          <div>
+            <h3 className="font-extrabold text-charcoal">Antes de guardar</h3>
+            <p className="mt-1 text-sm leading-6 text-muted">
+              Tus profesionales asignados ven estos datos solo si lo permitiste
+              en Configuracion. Ahora mismo: datos personales{" "}
+              <strong>
+                {privacySettings.personalInfo ? "visibles" : "ocultos"}
+              </strong>
+              , datos fisicos y salud{" "}
+              <strong>{privacySettings.healthData ? "visibles" : "ocultos"}</strong>
+              , notas sensibles{" "}
+              <strong>
+                {privacySettings.sensitiveNotes ? "visibles" : "ocultas"}
+              </strong>
+              . Admin autorizado puede revisarlos para soporte o gestion del
+              plan.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-5 md:grid-cols-2">
         <div>
           <Label htmlFor="personalPhone" className="font-extrabold text-charcoal">
@@ -579,10 +620,30 @@ export function PersonalDetailsForm({
         </Alert>
       ) : null}
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[24px] border border-border bg-surface/90 p-4 shadow-card backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-start gap-3 text-sm leading-6">
+          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
+            {isDirty ? (
+              <AlertCircle className="size-4" aria-hidden="true" />
+            ) : (
+              <CheckCircle2 className="size-4" aria-hidden="true" />
+            )}
+          </span>
+          <div>
+            <p className="font-extrabold text-charcoal">
+              {isDirty ? "Datos personales con cambios" : "Datos personales al dia"}
+            </p>
+            <p className="text-muted" aria-live="polite">
+              {isDirty
+                ? "Guarda para actualizar tu perfil privado."
+                : "No hay cambios sin guardar."}
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row">
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !isDirty}
           size="lg"
         >
           {isSubmitting ? (
@@ -605,6 +666,7 @@ export function PersonalDetailsForm({
             Borrar datos opcionales
           </Button>
         ) : null}
+        </div>
       </div>
 
       <ConfirmationDialog

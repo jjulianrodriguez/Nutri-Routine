@@ -581,7 +581,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
         </Alert>
       ) : null}
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           label="Clientes visibles"
           value={String(data.counts.all)}
@@ -646,7 +646,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                 {hasActiveFilters ? "Filtros aplicados" : "Vista completa"}
               </span>
             </summary>
-            <div className="grid gap-3 border-t border-border px-4 py-4 sm:grid-cols-2 xl:grid-cols-5">
+            <div className="grid items-start gap-3 border-t border-border px-4 py-4 sm:grid-cols-2 xl:grid-cols-5">
               <SelectField
                 defaultValue={planFilter}
                 id="plan-filter"
@@ -898,7 +898,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
         description="Referencia rápida para asignaciones desde el detalle del cliente."
         tone="accent"
       >
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid items-start gap-3 md:grid-cols-2">
           <div className="flex items-center justify-between gap-3 rounded-[18px] border border-charcoal/10 bg-surface px-4 py-3">
             <span className="inline-flex items-center gap-2 font-extrabold text-charcoal">
               <Leaf className="size-5 text-warm-brown" aria-hidden="true" />

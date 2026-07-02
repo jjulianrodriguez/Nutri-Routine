@@ -1,4 +1,5 @@
 import {
+  ImageIcon,
   LockKeyhole,
   Mail,
   MessageCircle,
@@ -98,7 +99,7 @@ function InfoCard({
   label: string;
 }) {
   return (
-    <div className="rounded-[18px] border border-border bg-background p-4">
+    <div className="h-fit self-start rounded-[18px] border border-border bg-background p-4">
       <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
         {label}
       </p>
@@ -147,7 +148,7 @@ async function ClientProfile({
         ]}
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label="Plan" value={planBadge} detail={planSummary.planStatusLabel} />
         <StatTile
           label="Nutricion"
@@ -172,7 +173,13 @@ async function ClientProfile({
       <section id="informacion-personal" className="scroll-mt-24">
         <AppPanel title="Informacion personal" description="Datos basicos de tu cuenta y contacto.">
           <div className="mb-5 flex flex-col gap-4 rounded-[20px] border border-border bg-background p-4 sm:flex-row sm:items-center">
-            <ClientAvatar name={access.displayName} size="lg" src={avatarUrl} />
+            <div className="shrink-0">
+              <ClientAvatar name={access.displayName} size="lg" src={avatarUrl} />
+              <p className="mt-2 flex items-center gap-1 text-xs font-bold text-muted">
+                <ImageIcon className="size-3.5" aria-hidden="true" />
+                Avatar solo lectura
+              </p>
+            </div>
             <div className="min-w-0">
               <UserRound className="mb-3 size-5 text-warm-brown" />
               <h2 className="break-words font-extrabold text-charcoal">
@@ -214,6 +221,11 @@ async function ClientProfile({
             hasSavedDetails={personalDetails.hasSavedDetails}
             initialValues={personalDetails.values}
             maxBirthDate={new Date().toISOString().slice(0, 10)}
+            privacySettings={{
+              healthData: settings.allowAssignedProfessionalsHealthData,
+              personalInfo: settings.allowAssignedProfessionalsPersonalInfo,
+              sensitiveNotes: settings.allowAssignedProfessionalsSensitiveNotes,
+            }}
           />
         </AppPanel>
       </section>
@@ -274,7 +286,7 @@ async function ClientProfile({
 
       <section id="resumen-plan" className="scroll-mt-24">
         <AppPanel title="Resumen del plan" description="Estado actual de tus servicios activos.">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
             <InfoCard label="Plan activo">{planSummary.activePlanLabel}</InfoCard>
             <InfoCard label="Estado">{planSummary.planStatusLabel}</InfoCard>
             <InfoCard label="Fecha de inicio">{formatDate(planSummary.planStartDate)}</InfoCard>
@@ -323,7 +335,7 @@ async function ProfessionalProfile({
         ]}
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           label="Clientes activos"
           value={String(summary.activeClients)}
@@ -352,7 +364,13 @@ async function ProfessionalProfile({
           description="Datos visibles y editables de tu perfil profesional."
         >
           <div className="mb-5 flex flex-col gap-4 rounded-[20px] border border-border bg-background p-4 sm:flex-row sm:items-center">
-            <ClientAvatar name={access.displayName} size="lg" src={avatarUrl} />
+            <div className="shrink-0">
+              <ClientAvatar name={access.displayName} size="lg" src={avatarUrl} />
+              <p className="mt-2 flex items-center gap-1 text-xs font-bold text-muted">
+                <ImageIcon className="size-3.5" aria-hidden="true" />
+                Avatar solo lectura
+              </p>
+            </div>
             <div className="min-w-0">
               <h2 className="break-words font-extrabold text-charcoal">
                 {access.displayName}
@@ -382,34 +400,15 @@ async function ProfessionalProfile({
       <section id="experiencia" className="scroll-mt-24">
         <AppPanel
           title="Experiencia"
-          description="Trayectoria, certificaciones y areas de enfoque."
+          description="Trayectoria, certificaciones, areas de enfoque y disponibilidad editable."
         >
           <ProfessionalProfileForm initialValues={professionalProfile.values} />
         </AppPanel>
       </section>
 
-      <section id="disponibilidad" className="scroll-mt-24">
-        <AppPanel
-          title="Disponibilidad"
-          description="Los horarios y mensajes de disponibilidad se editan en el formulario profesional anterior para evitar duplicar guardado."
-        >
-          <div className="grid gap-4 md:grid-cols-3">
-            <InfoCard label="Dias disponibles">
-              {professionalProfile.values.availabilityDays || "Pendiente"}
-            </InfoCard>
-            <InfoCard label="Horarios">
-              {professionalProfile.values.availabilitySchedule || "Pendiente"}
-            </InfoCard>
-            <InfoCard label="Mensaje automatico">
-              {professionalProfile.values.availabilityNote || "Pendiente"}
-            </InfoCard>
-          </div>
-        </AppPanel>
-      </section>
-
       <section id="resumen-profesional" className="scroll-mt-24">
         <AppPanel title="Resumen profesional" description="Actividad creada por tu cuenta.">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
             <InfoCard label="Clientes activos">{summary.activeClients}</InfoCard>
             <InfoCard label="Clientes de entrenamiento">{summary.trainingClients}</InfoCard>
             <InfoCard label="Clientes de nutricion">{summary.nutritionClients}</InfoCard>
@@ -449,7 +448,13 @@ export default async function ProfilePage() {
           description="Resumen basico de la cuenta universal."
         >
           <div className="mb-5 flex items-center gap-4 rounded-[20px] border border-border bg-background p-4">
-            <ClientAvatar name={access.displayName} src={avatarUrl} />
+            <div className="shrink-0">
+              <ClientAvatar name={access.displayName} src={avatarUrl} />
+              <p className="mt-2 flex items-center gap-1 text-xs font-bold text-muted">
+                <ImageIcon className="size-3.5" aria-hidden="true" />
+                Avatar solo lectura
+              </p>
+            </div>
             <div>
               <ShieldCheck className="mb-3 size-5 text-warm-brown" />
               <h2 className="font-extrabold text-charcoal">{access.displayName}</h2>

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Save } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -43,9 +43,10 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
   const [successMessage, setSuccessMessage] = useState("");
   const {
     clearErrors,
-    formState: { errors, isSubmitting },
+    formState: { errors, isDirty, isSubmitting },
     handleSubmit,
     register,
+    reset,
     setError,
   } = useForm<UpdateBasicAccountValues>({
     defaultValues: {
@@ -83,6 +84,7 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
     }
 
     setSuccessMessage(result.message);
+    reset(pendingUpdate);
     toast.success(result.message);
     router.refresh();
   }
@@ -91,7 +93,7 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
     <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div>
         <Label htmlFor="accountFullName" className="font-extrabold text-charcoal">
-          Nombre completo
+          Nombre completo visible
         </Label>
         <Input
           id="accountFullName"
@@ -102,6 +104,10 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
           aria-invalid={Boolean(errors.fullName)}
           {...register("fullName")}
         />
+        <p className="mt-2 text-xs leading-5 text-muted">
+          Este es el lugar donde se edita tu nombre. En Configuracion aparece
+          solo como resumen de cuenta.
+        </p>
         <FieldError
           id="account-full-name-error"
           message={errors.fullName?.message}
@@ -114,6 +120,9 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
         </p>
         <p className="mt-1 break-all font-bold text-charcoal">
           {email || "Email no disponible"}
+        </p>
+        <p className="mt-2 text-xs leading-5 text-muted">
+          El correo identifica tu acceso y no se cambia desde este formulario.
         </p>
       </div>
 
@@ -139,19 +148,40 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
         </Alert>
       ) : null}
 
-      <Button type="submit" disabled={isSubmitting} size="lg">
-        {isSubmitting ? (
-          <>
-            <Loader2 className="size-4 animate-spin" />
-            Guardando...
-          </>
-        ) : (
-          <>
-            <Save className="size-4" />
-            Guardar cambios
-          </>
-        )}
-      </Button>
+      <div className="flex flex-col gap-3 rounded-[20px] border border-border bg-surface/82 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3 text-sm leading-6">
+          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
+            {isDirty ? (
+              <AlertCircle className="size-4" aria-hidden="true" />
+            ) : (
+              <CheckCircle2 className="size-4" aria-hidden="true" />
+            )}
+          </span>
+          <div>
+            <p className="font-extrabold text-charcoal">
+              {isDirty ? "Nombre con cambios pendientes" : "Nombre sin cambios"}
+            </p>
+            <p className="text-muted" aria-live="polite">
+              {isDirty
+                ? "Guarda para actualizar como te ve la app."
+                : "No hay cambios sin guardar."}
+            </p>
+          </div>
+        </div>
+        <Button type="submit" disabled={isSubmitting || !isDirty} size="lg">
+          {isSubmitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Guardando...
+            </>
+          ) : (
+            <>
+              <Save className="size-4" />
+              Guardar cambios
+            </>
+          )}
+        </Button>
+      </div>
 
       <ConfirmationDialog
         open={Boolean(pendingUpdate)}

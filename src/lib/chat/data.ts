@@ -226,23 +226,26 @@ async function getUnreadCounts(
     return counts;
   }
 
-  const { data, error } = await supabase
-    .from("chat_messages")
-    .select("conversation_id")
-    .in("conversation_id", uniqueIds)
-    .neq("sender_id", currentUserId)
-    .is("read_at", null);
+  const results = await Promise.all(
+    uniqueIds.map(async (conversationId) => {
+      const { count, error } = await supabase
+        .from("chat_messages")
+        .select("id", { count: "exact", head: true })
+        .eq("conversation_id", conversationId)
+        .neq("sender_id", currentUserId)
+        .is("read_at", null);
 
-  if (error) {
-    logChatError("unread", error);
-    return counts;
-  }
+      if (error) {
+        logChatError("unread", error);
+        return [conversationId, 0] as const;
+      }
 
-  for (const message of data ?? []) {
-    counts.set(
-      message.conversation_id,
-      (counts.get(message.conversation_id) ?? 0) + 1,
-    );
+      return [conversationId, count ?? 0] as const;
+    }),
+  );
+
+  for (const [conversationId, count] of results) {
+    counts.set(conversationId, count);
   }
 
   return counts;

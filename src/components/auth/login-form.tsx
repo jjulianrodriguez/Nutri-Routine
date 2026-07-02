@@ -145,7 +145,7 @@ export function LoginForm({ initialError }: LoginFormProps) {
       <motion.button
         type="submit"
         disabled={isSubmitting}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-espresso py-4 text-sm font-extrabold text-white shadow-soft transition-colors hover:bg-charcoal disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-extrabold text-primary-foreground shadow-soft transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
         whileHover={isSubmitting ? undefined : { y: -1 }}
         whileTap={isSubmitting ? undefined : { scale: 0.99 }}
       >

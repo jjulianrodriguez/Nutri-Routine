@@ -377,7 +377,8 @@ export async function listProfessionalAccounts(): Promise<ProfessionalAccountLis
   const [
     { data: profiles, error: profilesError },
     { data: authUsers },
-    { data: clientAssignments, error: assignmentsError },
+    { data: nutritionAssignmentRows, error: nutritionAssignmentsError },
+    { data: trainingAssignmentRows, error: trainingAssignmentsError },
   ] =
     await Promise.all([
       adminSupabase
@@ -390,10 +391,15 @@ export async function listProfessionalAccounts(): Promise<ProfessionalAccountLis
       }),
       adminSupabase
         .from("client_profiles")
-        .select("assigned_nutritionist_id, assigned_trainer_id"),
+        .select("assigned_nutritionist_id")
+        .in("assigned_nutritionist_id", profileIds),
+      adminSupabase
+        .from("client_profiles")
+        .select("assigned_trainer_id")
+        .in("assigned_trainer_id", profileIds),
     ]);
 
-  if (profilesError || assignmentsError) {
+  if (profilesError || nutritionAssignmentsError || trainingAssignmentsError) {
     return {
       error: "No se pudieron cargar los perfiles profesionales.",
       items: [],
@@ -416,14 +422,16 @@ export async function listProfessionalAccounts(): Promise<ProfessionalAccountLis
   const nutritionAssignments = new Map<string, number>();
   const trainingAssignments = new Map<string, number>();
 
-  for (const assignment of clientAssignments ?? []) {
+  for (const assignment of nutritionAssignmentRows ?? []) {
     if (assignment.assigned_nutritionist_id) {
       nutritionAssignments.set(
         assignment.assigned_nutritionist_id,
         (nutritionAssignments.get(assignment.assigned_nutritionist_id) ?? 0) + 1,
       );
     }
+  }
 
+  for (const assignment of trainingAssignmentRows ?? []) {
     if (assignment.assigned_trainer_id) {
       trainingAssignments.set(
         assignment.assigned_trainer_id,

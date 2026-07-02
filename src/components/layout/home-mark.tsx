@@ -14,7 +14,7 @@ export function HomeMark({ className }: HomeMarkProps) {
       className={cn("group inline-flex items-center gap-3", className)}
     >
       <span
-        className="relative flex size-10 items-center justify-center rounded-full border border-charcoal/10 bg-white shadow-soft"
+        className="relative flex size-10 items-center justify-center rounded-full border border-charcoal/10 bg-[var(--color-bone)] shadow-soft"
         aria-hidden="true"
       >
         <svg viewBox="0 0 40 40" className="size-8" fill="none">

@@ -52,7 +52,7 @@ export default async function RoutinesPage() {
         </Button>
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid items-start gap-4 sm:grid-cols-3">
         <StatTile
           label="Entrenamientos"
           value={String(overview.routines.length)}
@@ -80,7 +80,7 @@ export default async function RoutinesPage() {
             y despues construye el primer entrenamiento.
           </EmptyState>
         ) : (
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid items-start gap-4 lg:grid-cols-2">
             {overview.routines.map((routine) => (
               <WorkoutSummaryCard
                 key={routine.id}

@@ -2,14 +2,18 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  CalendarCheck,
   CalendarClock,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  CheckCircle2,
   Clock,
+  CircleSlash,
   Dumbbell,
   Layers3,
   Leaf,
+  ListChecks,
   Loader2,
   Pencil,
   Plus,
@@ -19,7 +23,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Dialog as DialogPrimitive } from "radix-ui";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -38,6 +43,7 @@ import {
   AREA_LABELS,
   CALENDAR_EVENT_TYPES,
   EVENT_TYPE_LABELS,
+  STATUS_DESCRIPTIONS,
   STATUS_LABELS,
 } from "@/lib/calendar/constants";
 import type {
@@ -145,6 +151,35 @@ function formatFullDate(dateKey: string) {
   }).format(new Date(year, month - 1, day));
 }
 
+function formatShortDate(dateKey: string) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+
+  return new Intl.DateTimeFormat("es-CR", {
+    day: "numeric",
+    month: "short",
+    weekday: "short",
+  }).format(new Date(year, month - 1, day));
+}
+
+function formatMonthKeyFromDateKey(dateKey: string) {
+  return dateKey.slice(0, 7);
+}
+
+function eventToFormValues(event: CalendarEventItem): CalendarEventValues {
+  return {
+    area: event.area,
+    clientId: event.clientId,
+    date: event.dateKey,
+    description: event.description ?? "",
+    endTime: event.endTime ?? "",
+    eventType: event.eventType,
+    professionalId: event.professionalId,
+    startTime: event.startTime,
+    status: event.status,
+    title: event.title,
+  };
+}
+
 function buildCalendarHref(
   filters: CalendarFilters,
   overrides: Partial<CalendarFilters> = {},
@@ -245,6 +280,25 @@ function EventBadge({ event }: { event: CalendarEventItem }) {
   );
 }
 
+function StatusBadge({ status }: { status: CalendarEventItem["status"] }) {
+  return (
+    <span
+      className={cn(
+        "rounded-full border px-2.5 py-1 text-xs font-extrabold",
+        status === "scheduled" &&
+          "border-primary/25 bg-primary-soft text-charcoal",
+        status === "completed" &&
+          "border-accent/35 bg-accent-soft text-charcoal",
+        status === "cancelled" &&
+          "border-danger/20 bg-danger/5 text-danger",
+      )}
+      title={STATUS_DESCRIPTIONS[status]}
+    >
+      {STATUS_LABELS[status]}
+    </span>
+  );
+}
+
 function EventSummary({
   event,
   onEdit,
@@ -298,9 +352,7 @@ function EventSummary({
         <span className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-warm-brown">
           {EVENT_TYPE_LABELS[event.eventType]}
         </span>
-        <span className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-warm-brown">
-          {STATUS_LABELS[event.status]}
-        </span>
+        <StatusBadge status={event.status} />
       </div>
       <p className="mt-3 text-sm leading-6 text-muted">
         <span className="block font-bold text-charcoal">
@@ -343,9 +395,93 @@ function EmptyMonth({
   );
 }
 
+function UpcomingEventList({
+  events,
+  onOpen,
+  timeFormat,
+}: {
+  events: CalendarEventItem[];
+  onOpen: (event: CalendarEventItem) => void;
+  timeFormat: TimeFormatPreference;
+}) {
+  const nextEvent = events[0] ?? null;
+  const remainingEvents = events.slice(1);
+
+  return (
+    <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
+      <div className="flex items-center gap-3">
+        <div className="grid size-11 place-items-center rounded-full bg-primary-soft text-charcoal">
+          <ListChecks className="size-5" aria-hidden="true" />
+        </div>
+        <div>
+          <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
+            Próximos
+          </p>
+          <h2 className="text-xl font-bold text-charcoal">
+            Consultas y recordatorios
+          </h2>
+        </div>
+      </div>
+
+      {nextEvent ? (
+        <>
+          <button
+            type="button"
+            className="mt-5 w-full rounded-[22px] border border-primary/25 bg-primary-soft/70 p-4 text-left shadow-soft transition hover:border-primary/45 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+            onClick={() => onOpen(nextEvent)}
+          >
+            <span className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] text-warm-brown">
+              <CalendarClock className="size-4" aria-hidden="true" />
+              Próxima consulta o recordatorio
+            </span>
+            <span className="mt-2 block break-words text-lg font-extrabold text-charcoal">
+              {nextEvent.title}
+            </span>
+            <span className="mt-2 block text-sm font-bold text-muted">
+              {formatShortDate(nextEvent.dateKey)} ·{" "}
+              {formatTimeInputLabel(nextEvent.startTime, timeFormat)}
+            </span>
+          </button>
+
+          {remainingEvents.length > 0 ? (
+            <div className="mt-3 space-y-3">
+              {remainingEvents.map((event) => (
+                <button
+                  key={event.id}
+                  type="button"
+                  className="w-full rounded-[18px] border border-border bg-background p-4 text-left shadow-soft transition hover:border-primary/45 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+                  onClick={() => onOpen(event)}
+                >
+                  <span className="text-xs font-extrabold uppercase tracking-[0.12em] text-warm-brown">
+                    {formatShortDate(event.dateKey)} ·{" "}
+                    {formatTimeInputLabel(event.startTime, timeFormat)}
+                  </span>
+                  <span className="mt-1 block break-words text-base font-extrabold text-charcoal">
+                    {event.title}
+                  </span>
+                  <span className="mt-2 flex flex-wrap gap-2">
+                    <EventBadge event={event} />
+                    <span className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-warm-brown">
+                      {EVENT_TYPE_LABELS[event.eventType]}
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <div className="mt-5 rounded-[22px] border border-dashed border-border bg-background p-5 text-sm font-semibold leading-6 text-muted">
+          No hay eventos programados en los próximos 90 días con los filtros
+          actuales.
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function CalendarManager({ data }: CalendarManagerProps) {
   const router = useRouter();
-  const formRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState(data.defaultSelectedDate);
   const [selectedEventId, setSelectedEventId] = useState(
     data.events[0]?.id ?? "",
@@ -441,32 +577,22 @@ export function CalendarManager({ data }: CalendarManagerProps) {
   }
 
   function startCreating(dateKey = activeSelectedDate) {
+    setSelectedDate(dateKey);
     setFormOpen(true);
     setEditingEvent(null);
     setServerMessage("");
     clearErrors();
     reset(defaultFormValues({ data, date: dateKey }));
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function startEditing(event: CalendarEventItem) {
+    setSelectedDate(event.dateKey);
+    setSelectedEventId(event.id);
     setFormOpen(true);
     setEditingEvent(event);
     setServerMessage("");
     clearErrors();
-    reset({
-      area: event.area,
-      clientId: event.clientId,
-      date: event.dateKey,
-      description: event.description ?? "",
-      endTime: event.endTime ?? "",
-      eventType: event.eventType,
-      professionalId: event.professionalId,
-      startTime: event.startTime,
-      status: event.status,
-      title: event.title,
-    });
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    reset(eventToFormValues(event));
   }
 
   function canEditEvent(event: CalendarEventItem) {
@@ -496,8 +622,32 @@ export function CalendarManager({ data }: CalendarManagerProps) {
     }
 
     toast.success(result.message);
+    if (result.id) {
+      setSelectedEventId(result.id);
+    }
+    setSelectedDate(values.date);
     setFormOpen(false);
     clearForm();
+    router.refresh();
+  }
+
+  async function updateEventStatus(
+    event: CalendarEventItem,
+    status: CalendarEventItem["status"],
+  ) {
+    const result = await updateCalendarEvent({
+      ...eventToFormValues(event),
+      id: event.id,
+      status,
+    });
+
+    if (result.status === "error") {
+      toast.error(result.message);
+      return;
+    }
+
+    toast.success(result.message);
+    setSelectedEventId(event.id);
     router.refresh();
   }
 
@@ -523,6 +673,9 @@ export function CalendarManager({ data }: CalendarManagerProps) {
   }
 
   const monthLabel = formatMonthLabel(data.monthKey);
+  const todayKey = toDateKey(new Date());
+  const todayMonthKey = formatMonthKeyFromDateKey(todayKey);
+  const selectedIsToday = activeSelectedDate === todayKey;
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,0.75fr)] xl:items-start">
@@ -543,6 +696,32 @@ export function CalendarManager({ data }: CalendarManagerProps) {
           </div>
 
           <div className="flex flex-wrap gap-2">
+            {todayMonthKey === data.monthKey ? (
+              <Button
+                type="button"
+                variant={selectedIsToday ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  const todayEvents = eventsByDate.get(todayKey) ?? [];
+                  setSelectedDate(todayKey);
+                  setSelectedEventId(todayEvents[0]?.id ?? "");
+                }}
+              >
+                <CalendarCheck className="size-4" aria-hidden="true" />
+                Hoy
+              </Button>
+            ) : (
+              <Button asChild variant="outline" size="sm">
+                <Link
+                  href={buildCalendarHref(data.filters, {
+                    month: todayMonthKey,
+                  })}
+                >
+                  <CalendarCheck className="size-4" aria-hidden="true" />
+                  Hoy
+                </Link>
+              </Button>
+            )}
             <Button asChild variant="outline" size="sm">
               <Link
                 href={buildCalendarHref(data.filters, {
@@ -697,21 +876,16 @@ export function CalendarManager({ data }: CalendarManagerProps) {
           ))}
         </div>
 
-        {data.events.length === 0 ? (
-          <div className="mt-3">
-            <EmptyMonth canCreate={canCreate} onCreate={() => startCreating()} />
-          </div>
-        ) : (
-          <div className="mt-3 grid grid-cols-7 gap-1 sm:gap-2">
-            {days.map((day) => {
+        <div className="mt-3 grid grid-cols-7 gap-1 sm:gap-2">
+          {days.map((day) => {
               const dayEvents = eventsByDate.get(day.dateKey) ?? [];
-                  const isSelected = activeSelectedDate === day.dateKey;
+              const isSelected = activeSelectedDate === day.dateKey;
 
               return (
                 <div
                   key={day.dateKey}
                   className={cn(
-                    "min-h-20 rounded-[16px] border bg-background p-1.5 text-left shadow-soft sm:min-h-28 sm:p-2",
+                    "min-h-16 rounded-[16px] border bg-background p-1 text-left shadow-soft sm:min-h-28 sm:p-2",
                     day.inMonth ? "border-border" : "border-border/60 opacity-55",
                     isSelected && "border-primary/60 ring-3 ring-primary/20",
                     dayEvents.length > 0 && "bg-primary-soft/32",
@@ -752,18 +926,10 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                           </span>
                         </button>
                       ))}
-                      <div className="flex gap-1 sm:hidden">
-                        {dayEvents.slice(0, 3).map((event) => (
-                          <span
-                            key={event.id}
-                            className={cn(
-                              "size-2 rounded-full",
-                              event.area === "training" && "bg-primary",
-                              event.area === "nutrition" && "bg-accent",
-                              event.area === "general" && "bg-warm-brown",
-                            )}
-                          />
-                        ))}
+                      <div className="sm:hidden">
+                        <span className="inline-flex max-w-full items-center rounded-full border border-primary/20 bg-surface px-1.5 py-0.5 text-[0.62rem] font-extrabold text-charcoal">
+                          {dayEvents.length} ev.
+                        </span>
                       </div>
                       {dayEvents.length > 2 ? (
                         <p className="hidden px-2 text-[0.68rem] font-bold text-muted sm:block">
@@ -774,16 +940,42 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   ) : null}
                 </div>
               );
-            })}
+          })}
+        </div>
+
+        {data.events.length === 0 ? (
+          <div className="mt-5">
+            <EmptyMonth canCreate={canCreate} onCreate={() => startCreating()} />
           </div>
-        )}
+        ) : null}
       </section>
 
       <aside className="space-y-6">
         {formOpen ? (
+          <DialogPrimitive.Root
+            open={formOpen}
+            onOpenChange={(open) => {
+              setFormOpen(open);
+              if (!open) {
+                clearForm();
+              }
+            }}
+          >
+            <DialogPrimitive.Portal>
+              <DialogPrimitive.Overlay
+                className={cn(
+                  "fixed inset-0 z-[140] bg-charcoal/45 backdrop-blur-[2px]",
+                  "data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
+                  "data-[state=open]:animate-in data-[state=open]:fade-in-0",
+                )}
+              />
+              <DialogPrimitive.Content asChild>
           <section
-            ref={formRef}
-            className="scroll-mt-6 rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6"
+            className={cn(
+              "fixed inset-x-0 bottom-0 z-[150] max-h-[calc(100dvh-1rem)] overflow-y-auto overscroll-contain rounded-t-[28px] border border-border bg-surface p-5 shadow-premium focus-visible:outline-none sm:left-1/2 sm:top-1/2 sm:bottom-auto sm:w-[calc(100%-2rem)] sm:max-w-3xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[28px] sm:p-6",
+              "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 sm:data-[state=closed]:zoom-out-95",
+              "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 sm:data-[state=open]:zoom-in-95",
+            )}
           >
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -856,6 +1048,10 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                       </option>
                     ))}
                   </select>
+                  <p className="mt-2 text-xs font-semibold leading-5 text-muted">
+                    Los cambios del calendario se reflejan en notificaciones si
+                    la persona tiene activos los avisos de citas y recordatorios.
+                  </p>
                 </div>
 
                 <div>
@@ -871,6 +1067,10 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                       </option>
                     ))}
                   </select>
+                  <p className="mt-2 text-xs font-semibold leading-5 text-muted">
+                    Programado: activo. Completado: ya atendido. Cancelado:
+                    anulado y guardado como referencia.
+                  </p>
                 </div>
               </div>
 
@@ -1019,7 +1219,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   id="calendar-description"
                   rows={4}
                   maxLength={2000}
-                  className="mt-2 w-full resize-y rounded-[18px] border border-input bg-surface/90 px-4 py-3 text-base leading-7 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                  className="mt-2 min-h-32 w-full resize-y rounded-[18px] border border-input bg-surface/90 px-4 py-3 text-base leading-7 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
                   aria-invalid={Boolean(errors.description)}
                   aria-describedby={
                     errors.description
@@ -1059,13 +1259,16 @@ export function CalendarManager({ data }: CalendarManagerProps) {
               </div>
             </form>
           </section>
+              </DialogPrimitive.Content>
+            </DialogPrimitive.Portal>
+          </DialogPrimitive.Root>
         ) : null}
 
         <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
-                Dia seleccionado
+                {selectedIsToday ? "Hoy" : "Agenda del día"}
               </p>
               <h2 className="mt-2 text-2xl font-bold capitalize text-charcoal">
                 {formatFullDate(activeSelectedDate)}
@@ -1074,12 +1277,13 @@ export function CalendarManager({ data }: CalendarManagerProps) {
             {canCreate ? (
               <Button
                 type="button"
-                size="icon-sm"
+                size="sm"
                 variant="outline"
                 onClick={() => startCreating(activeSelectedDate)}
                 aria-label="Crear evento para el día seleccionado"
               >
                 <Plus className="size-4" aria-hidden="true" />
+                Crear
               </Button>
             ) : null}
           </div>
@@ -1099,9 +1303,37 @@ export function CalendarManager({ data }: CalendarManagerProps) {
           ) : (
             <div className="mt-5 rounded-[22px] border border-dashed border-border bg-background p-5 text-sm font-semibold leading-6 text-muted">
               No hay eventos para este día.
+              {canCreate ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  className="mt-4"
+                  onClick={() => startCreating(activeSelectedDate)}
+                >
+                  <Plus className="size-4" aria-hidden="true" />
+                  Crear evento
+                </Button>
+              ) : null}
             </div>
           )}
         </section>
+
+        <UpcomingEventList
+          events={data.upcomingEvents}
+          onOpen={(event) => {
+            setSelectedDate(event.dateKey);
+            setSelectedEventId(event.id);
+
+            if (formatMonthKeyFromDateKey(event.dateKey) !== data.monthKey) {
+              router.push(
+                buildCalendarHref(data.filters, {
+                  month: formatMonthKeyFromDateKey(event.dateKey),
+                }),
+              );
+            }
+          }}
+          timeFormat={timeFormat}
+        />
 
         <section className="rounded-[28px] border border-border bg-primary-soft/68 p-5 shadow-soft sm:p-6">
           <div className="flex items-center gap-3">
@@ -1125,9 +1357,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                 <RelationshipBadge>
                   {EVENT_TYPE_LABELS[selectedEvent.eventType]}
                 </RelationshipBadge>
-                <RelationshipBadge>
-                  {STATUS_LABELS[selectedEvent.status]}
-                </RelationshipBadge>
+                <StatusBadge status={selectedEvent.status} />
               </div>
 
               <dl className="grid gap-3 text-sm leading-6">
@@ -1170,7 +1400,52 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                     {selectedEvent.description || "Sin descripción adicional."}
                   </dd>
                 </div>
+                <div>
+                  <dt className="font-extrabold text-charcoal">Estado</dt>
+                  <dd className="mt-1 text-muted">
+                    {STATUS_DESCRIPTIONS[selectedEvent.status]}
+                  </dd>
+                </div>
               </dl>
+
+              {canEditEvent(selectedEvent) ? (
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  {selectedEvent.status !== "completed" ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        updateEventStatus(selectedEvent, "completed")
+                      }
+                    >
+                      <CheckCircle2 className="size-4" aria-hidden="true" />
+                      Marcar completado
+                    </Button>
+                  ) : null}
+                  {selectedEvent.status !== "cancelled" ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        updateEventStatus(selectedEvent, "cancelled")
+                      }
+                    >
+                      <CircleSlash className="size-4" aria-hidden="true" />
+                      Cancelar
+                    </Button>
+                  ) : null}
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => startEditing(selectedEvent)}
+                  >
+                    <Pencil className="size-4" aria-hidden="true" />
+                    Editar
+                  </Button>
+                </div>
+              ) : null}
             </div>
           ) : (
             <p className="mt-5 text-sm leading-6 text-muted">

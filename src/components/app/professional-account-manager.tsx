@@ -129,7 +129,7 @@ export function ProfessionalAccountManager({
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
       <AppPanel
         title="Datos profesionales"
         description="El email se conserva como dato de acceso y no se modifica desde esta pantalla."
@@ -282,8 +282,8 @@ export function ProfessionalAccountManager({
           title="Asignaciones"
           description="Las asignaciones se conservan cuando la cuenta se desactiva."
         >
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-            <div className="rounded-[18px] border border-border bg-background p-4">
+          <div className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-1">
+            <div className="h-fit self-start rounded-[18px] border border-border bg-background p-4">
               <Utensils className="size-4 text-warm-brown" aria-hidden="true" />
               <p className="mt-3 text-2xl font-semibold text-charcoal">
                 {professional.assignedNutritionClients}
@@ -292,7 +292,7 @@ export function ProfessionalAccountManager({
                 Clientes de nutrición
               </p>
             </div>
-            <div className="rounded-[18px] border border-border bg-background p-4">
+            <div className="h-fit self-start rounded-[18px] border border-border bg-background p-4">
               <Dumbbell className="size-4 text-warm-brown" aria-hidden="true" />
               <p className="mt-3 text-2xl font-semibold text-charcoal">
                 {professional.assignedTrainingClients}

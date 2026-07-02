@@ -5,20 +5,20 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-control border border-transparent bg-clip-padding text-sm font-bold whitespace-nowrap transition-[background-color,border-color,box-shadow,color,opacity,transform] outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/35 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-control border border-transparent bg-clip-padding text-sm font-bold whitespace-nowrap transition-[background-color,border-color,box-shadow,color,opacity,transform] outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/25 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/35 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         default:
-          "border-primary/15 bg-primary text-primary-foreground shadow-soft hover:bg-primary-hover hover:shadow-glow",
+          "border-primary bg-primary text-primary-foreground shadow-soft hover:border-primary-hover hover:bg-primary-hover hover:shadow-glow",
         outline:
-          "border-border bg-surface/85 text-foreground shadow-soft hover:border-primary/40 hover:bg-primary-soft/70 hover:text-primary-hover aria-expanded:border-primary/40 aria-expanded:bg-primary-soft/70 dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          "border-border bg-surface text-foreground shadow-none hover:border-secondary/35 hover:bg-surface-hover hover:text-foreground aria-expanded:border-secondary/35 aria-expanded:bg-surface-hover dark:border-input dark:bg-surface dark:hover:bg-surface-hover",
         secondary:
-          "border-secondary-accent/25 bg-secondary-accent-soft text-secondary-accent-foreground shadow-soft hover:border-secondary-accent/50 hover:bg-secondary-accent-soft hover:text-secondary-accent-foreground hover:shadow-glow aria-expanded:border-secondary-accent/50 aria-expanded:bg-secondary-accent-soft",
+          "border-secondary/15 bg-secondary-soft text-secondary-hover shadow-none hover:border-secondary/35 hover:bg-secondary-soft hover:text-secondary-hover aria-expanded:border-secondary/35 aria-expanded:bg-secondary-soft",
         ghost:
-          "text-muted hover:bg-teal-soft/80 hover:text-teal aria-expanded:bg-teal-soft aria-expanded:text-teal dark:hover:bg-muted/50",
+          "text-muted hover:bg-surface-hover hover:text-foreground aria-expanded:bg-surface-hover aria-expanded:text-foreground dark:hover:bg-surface-hover",
         destructive:
-          "border-danger/20 bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+          "border-danger/20 bg-destructive/10 text-destructive shadow-none hover:bg-destructive/16 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/18 dark:hover:bg-destructive/25 dark:focus-visible:ring-destructive/35",
         link: "rounded-sm text-primary underline-offset-4 hover:text-primary-hover hover:underline",
       },
       size: {

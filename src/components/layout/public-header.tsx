@@ -16,8 +16,14 @@ export function PublicHeader() {
           <a className="transition-colors hover:text-espresso" href="#servicios">
             Servicios
           </a>
+          <a className="transition-colors hover:text-espresso" href="#proceso">
+            Cómo funciona
+          </a>
           <a className="transition-colors hover:text-espresso" href="#enfoque">
             Enfoque
+          </a>
+          <a className="transition-colors hover:text-espresso" href="#confianza">
+            Confianza
           </a>
           <Link className="transition-colors hover:text-espresso" href="/login">
             Iniciar sesión
@@ -34,7 +40,7 @@ export function PublicHeader() {
           href="https://wa.me/50688332426"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-bold text-white shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-glow sm:px-5"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-soft transition-[background-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-glow sm:px-5"
         >
           <span className="hidden sm:inline">Agendar consulta</span>
           <span className="sm:hidden">Agendar</span>

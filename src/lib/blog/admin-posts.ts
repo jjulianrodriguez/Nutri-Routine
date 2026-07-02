@@ -15,6 +15,7 @@ export type AdminBlogPost = Pick<
   | "id"
   | "is_pinned"
   | "published"
+  | "slug"
   | "title"
   | "updated_at"
 > & {
@@ -26,7 +27,7 @@ export async function getAdminBlogPosts(): Promise<AdminBlogPost[]> {
   const { data: posts, error } = await supabase
     .from("blog_posts")
     .select(
-      "id, title, category, excerpt, content, author_id, published, is_pinned, created_at, updated_at",
+      "id, title, slug, category, excerpt, content, author_id, published, is_pinned, created_at, updated_at",
     )
     .order("is_pinned", { ascending: false })
     .order("updated_at", { ascending: false });

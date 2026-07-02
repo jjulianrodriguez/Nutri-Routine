@@ -455,7 +455,7 @@ function ResourceCard({
   return (
     <article
       className={cn(
-        "flex min-w-0 flex-col rounded-[20px] border border-border bg-background p-4 shadow-soft",
+        "flex h-fit min-w-0 self-start flex-col rounded-[20px] border border-border bg-background p-4 shadow-soft",
         isInactive && "opacity-70",
       )}
     >
@@ -471,7 +471,7 @@ function ResourceCard({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-charcoal px-2.5 py-1 text-xs font-extrabold text-white">
+            <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-primary-foreground">
               {kindLabel}
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-charcoal">
@@ -597,7 +597,7 @@ function FolderCard({
   return (
     <article
       className={cn(
-        "relative flex min-w-0 flex-col rounded-[20px] border border-border bg-background p-4 pt-6 shadow-soft",
+        "relative flex h-fit min-w-0 self-start flex-col rounded-[20px] border border-border bg-background p-4 pt-6 shadow-soft",
         isInactive && "opacity-70",
       )}
     >
@@ -609,7 +609,7 @@ function FolderCard({
           </div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-charcoal px-2.5 py-1 text-xs font-extrabold text-white">
+              <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-primary-foreground">
                 Carpeta
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-charcoal">
@@ -2044,7 +2044,7 @@ export function ResourceManager({
                 {filteredResources.length === 1 ? "" : "s"}
               </span>
             </div>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <div className="mt-4 grid items-start gap-4 md:grid-cols-2">
               {filteredResources.map((resource) => (
                 <ResourceCard
                   key={resource.id}
@@ -2112,7 +2112,7 @@ export function ResourceManager({
                   {filteredFolders.length === 1 ? "" : "s"}
                 </span>
               </div>
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="mt-4 grid items-start gap-4 md:grid-cols-2">
                 {filteredFolders.map((folder) => (
                   <FolderCard
                     key={folder.id}
@@ -2156,7 +2156,7 @@ export function ResourceManager({
                   {filteredResources.length === 1 ? "" : "s"}
                 </span>
               </div>
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="mt-4 grid items-start gap-4 md:grid-cols-2">
                 {filteredResources.map((resource) => (
                   <ResourceCard
                     key={resource.id}
@@ -2275,7 +2275,7 @@ export function ResourceManager({
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)] xl:items-start">
+    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)]">
       <div className="space-y-6">
         {editingPdfResource ? (
           <div ref={formRef}>

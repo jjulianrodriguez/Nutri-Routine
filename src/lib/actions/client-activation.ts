@@ -738,30 +738,69 @@ export async function listClientActivationData(
     );
   }
 
+  let clientAssignmentsQuery = actor.activationSupabase
+    .from("client_profiles")
+    .select("profile_id, assigned_nutritionist_id, assigned_trainer_id");
+
+  if (actor.role !== "admin") {
+    if (actor.canManageNutrition && actor.canManageTraining) {
+      clientAssignmentsQuery = clientAssignmentsQuery.or(
+        `assigned_nutritionist_id.eq.${actor.currentUserId},assigned_trainer_id.eq.${actor.currentUserId}`,
+      );
+    } else if (actor.canManageNutrition) {
+      clientAssignmentsQuery = clientAssignmentsQuery.eq(
+        "assigned_nutritionist_id",
+        actor.currentUserId,
+      );
+    } else if (actor.canManageTraining) {
+      clientAssignmentsQuery = clientAssignmentsQuery.eq(
+        "assigned_trainer_id",
+        actor.currentUserId,
+      );
+    }
+  }
+
   const [
-    { data: profileRows, error: profilesError },
     { data: clientAssignments, error: assignmentsError },
     { data: professionalRows, error: professionalsError },
   ] = await Promise.all([
-    actor.activationSupabase
-      .from("profiles")
-      .select("id, full_name, avatar_url, created_at, role")
-      .in("role", ["admin", "client", "professional"])
-      .order("created_at", { ascending: false }),
-    actor.activationSupabase
-      .from("client_profiles")
-      .select("profile_id, assigned_nutritionist_id, assigned_trainer_id"),
+    clientAssignmentsQuery,
     actor.activationSupabase
       .from("professional_profiles")
       .select("profile_id, specialty, is_active"),
   ]);
 
-  if (profilesError || assignmentsError || professionalsError) {
+  if (assignmentsError || professionalsError) {
+    return emptyClientActivationData("No se pudo cargar la lista de clientes.");
+  }
+
+  const visibleAssignedClientIds = new Set(
+    (clientAssignments ?? []).map((assignment) => assignment.profile_id),
+  );
+  let profilesQuery = actor.activationSupabase
+    .from("profiles")
+    .select("id, full_name, avatar_url, created_at, role")
+    .order("created_at", { ascending: false });
+
+  if (actor.role === "admin") {
+    profilesQuery = profilesQuery.in("role", ["admin", "client", "professional"]);
+  } else {
+    profilesQuery = profilesQuery.in("id", [
+      ...visibleAssignedClientIds,
+      actor.currentUserId,
+    ]);
+  }
+
+  const { data: profileRows, error: profilesError } = await profilesQuery;
+
+  if (profilesError) {
     return emptyClientActivationData("No se pudo cargar la lista de clientes.");
   }
 
   const clientProfiles = (profileRows ?? []).filter(
-    (profile) => profile.role === "client",
+    (profile) =>
+      profile.role === "client" &&
+      (actor.role === "admin" || visibleAssignedClientIds.has(profile.id)),
   );
   const professionalProfiles = (profileRows ?? []).filter(
     (profile) => profile.role === "admin" || profile.role === "professional",

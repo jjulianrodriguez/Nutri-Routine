@@ -99,7 +99,7 @@ function ClientTodayHabits({
               <Link href="/app/nutricion/habitos">Marcar hábitos</Link>
             </Button>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid items-start gap-3 sm:grid-cols-2">
             {pendingToday.slice(0, 4).map((assignment) => (
               <div
                 key={assignment.id}
@@ -148,7 +148,7 @@ export default async function NutritionPage() {
       <NutritionSectionNav active="plan" canManage={access.canManageNutrition} />
 
       {access.isClient ? null : (
-        <section className="grid gap-4 sm:grid-cols-2">
+        <section className="grid items-start gap-4 sm:grid-cols-2">
           <StatTile
             label="Clientas de nutrición"
             value={String(dashboardData?.assignedClientsCount ?? 0)}

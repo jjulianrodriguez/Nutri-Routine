@@ -398,7 +398,7 @@ export function WorkoutTemplateView({
                 </div>
                 <div className="mt-4 h-3 overflow-hidden rounded-full bg-background">
                   <div
-                    className="h-full rounded-full bg-primary transition-all"
+                    className="h-full rounded-full bg-primary transition-[width]"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>

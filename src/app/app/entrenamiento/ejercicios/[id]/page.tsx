@@ -99,7 +99,7 @@ export default async function ExerciseDetailPage({
         title="Descripción e instrucciones"
         description="Indicaciones disponibles para realizar el ejercicio."
       >
-        <div className="rounded-[20px] border border-border bg-surface p-4 shadow-soft">
+        <div className="h-fit self-start rounded-[20px] border border-border bg-surface p-4 shadow-soft">
           <FileText
             className="size-4 text-warm-brown"
             aria-hidden="true"
@@ -110,7 +110,7 @@ export default async function ExerciseDetailPage({
         </div>
       </AppPanel>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <DetailValue
           icon={Target}
           label="Grupo muscular"
@@ -142,14 +142,14 @@ export default async function ExerciseDetailPage({
         description="Recursos propios de este ejercicio para revisar tecnica o referencia."
       >
         {exercise.multimediaUrls.length > 0 ? (
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div className="grid items-start gap-3 lg:grid-cols-2">
             {exercise.multimediaUrls.map((url) => {
               const resource = getExternalResourcePresentation(url);
 
               return (
                 <article
                   key={url}
-                  className="rounded-[20px] border border-border bg-surface p-4 shadow-soft"
+                  className="h-fit self-start rounded-[20px] border border-border bg-surface p-4 shadow-soft"
                 >
                   <ExternalLink
                     className="size-4 text-warm-brown"
@@ -185,7 +185,7 @@ export default async function ExerciseDetailPage({
             })}
           </div>
         ) : (
-          <div className="rounded-[20px] border border-border bg-surface p-4 shadow-soft">
+          <div className="h-fit self-start rounded-[20px] border border-border bg-surface p-4 shadow-soft">
             <ExternalLink
               className="size-4 text-warm-brown"
               aria-hidden="true"
@@ -202,7 +202,7 @@ export default async function ExerciseDetailPage({
           title="Estado y registro"
         description="Información administrativa del ejercicio."
       >
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <DetailValue
             icon={Target}
             label="Estado"
@@ -240,7 +240,7 @@ function DetailValue({
   value: string;
 }) {
   return (
-    <div className="rounded-[20px] border border-border bg-surface p-4 shadow-soft">
+    <div className="h-fit self-start rounded-[20px] border border-border bg-surface p-4 shadow-soft">
       <Icon className="size-4 text-warm-brown" aria-hidden="true" />
       <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
         {label}

@@ -20,6 +20,18 @@ export function PublicFooter() {
           <div className="flex flex-col gap-3 text-sm">
             <p className="font-semibold text-muted">Enlaces</p>
             <Link
+              href="/#proceso"
+              className="text-warm-brown transition-colors hover:text-teal"
+            >
+              Cómo funciona
+            </Link>
+            <Link
+              href="/#confianza"
+              className="text-warm-brown transition-colors hover:text-teal"
+            >
+              Confianza
+            </Link>
+            <Link
               href="/login"
               className="text-warm-brown transition-colors hover:text-teal"
             >
@@ -43,6 +55,9 @@ export function PublicFooter() {
             >
               WhatsApp · 8833-2426
             </a>
+            <p className="text-warm-brown">
+              Consultas presenciales y virtuales desde Costa Rica.
+            </p>
           </div>
         </div>
 
