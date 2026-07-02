@@ -48,7 +48,7 @@ export default async function WorkoutTemplateDetailPage({
 
       {warning ? (
         <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">
-          <AlertDescription className="font-semibold text-warm-brown">
+          <AlertDescription className="font-semibold text-muted-foreground">
             {warning}
           </AlertDescription>
         </Alert>
@@ -107,11 +107,11 @@ function DetailValue({
 }) {
   return (
     <div className="rounded-[22px] border border-border bg-surface p-4 shadow-soft">
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
+      <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
         {label}
       </p>
-      <p className="mt-1 font-extrabold text-charcoal">{value}</p>
+      <p className="mt-1 font-extrabold text-foreground">{value}</p>
     </div>
   );
 }

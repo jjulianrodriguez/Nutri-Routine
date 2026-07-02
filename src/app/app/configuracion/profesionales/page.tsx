@@ -56,10 +56,10 @@ export default async function ProfessionalAccountsPage() {
       <FadeIn delay={0.04}>
         <div className="rounded-[22px] border border-primary/25 bg-primary-soft p-4">
           <div className="flex items-center gap-3">
-            <div className="grid size-10 place-items-center rounded-full bg-primary text-charcoal">
+            <div className="grid size-10 place-items-center rounded-full bg-primary text-primary-foreground">
               <ShieldCheck className="size-4" aria-hidden="true" />
             </div>
-            <p className="text-sm font-extrabold leading-6 text-charcoal">
+            <p className="text-sm font-extrabold leading-6 text-foreground">
               El código administrativo se verifica de forma segura.
             </p>
           </div>
@@ -80,7 +80,7 @@ export default async function ProfessionalAccountsPage() {
           title="Profesionales existentes"
           description="Selecciona una cuenta para editar datos, especialidad o estado."
         >
-          <div className="mb-4 inline-flex w-fit items-center gap-2 rounded-full bg-primary-soft px-3 py-2 text-sm font-extrabold text-charcoal">
+          <div className="mb-4 inline-flex w-fit items-center gap-2 rounded-full bg-primary-soft px-3 py-2 text-sm font-extrabold text-foreground">
             <Users className="size-4" aria-hidden="true" />
             {professionalAccounts.items.length}
           </div>
@@ -104,7 +104,7 @@ export default async function ProfessionalAccountsPage() {
                 >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="truncate text-base font-extrabold text-charcoal">
+                      <h2 className="truncate text-base font-extrabold text-foreground">
                         {item.fullName}
                       </h2>
                       <span
@@ -127,15 +127,15 @@ export default async function ProfessionalAccountsPage() {
                     </p>
                   </div>
                   <div>
-                    <span className="w-fit rounded-full bg-primary-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                    <span className="w-fit rounded-full bg-primary-soft px-3 py-1 text-xs font-extrabold text-foreground">
                       {specialtyLabels[item.specialty]}
                     </span>
-                    <div className="mt-3 flex items-center gap-2 text-xs font-bold text-warm-brown">
+                    <div className="mt-3 flex items-center gap-2 text-xs font-bold text-muted-foreground">
                       <CalendarDays className="size-3.5" aria-hidden="true" />
                       Alta {formatCreatedAt(item.createdAt)}
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2 text-xs font-extrabold text-charcoal">
+                  <div className="flex flex-wrap gap-2 text-xs font-extrabold text-foreground">
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1.5">
                       <Utensils className="size-3.5" aria-hidden="true" />
                       {item.assignedNutritionClients} nutrición
@@ -158,7 +158,7 @@ export default async function ProfessionalAccountsPage() {
             </div>
           ) : (
             <div className="rounded-[22px] border border-dashed border-border bg-background px-4 py-8 text-center">
-              <p className="font-extrabold text-charcoal">
+              <p className="font-extrabold text-foreground">
                 Aun no hay cuentas profesionales.
               </p>
               <p className="mt-2 text-sm text-muted">

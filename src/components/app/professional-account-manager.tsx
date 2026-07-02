@@ -40,7 +40,7 @@ const specialtyOptions = [
 ] as const;
 
 const inputClasses =
-  "mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+  "mt-2 h-12 rounded-control border-border bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   return message ? (
@@ -199,7 +199,7 @@ export function ProfessionalAccountManager({
             <textarea
               id="professional-bio"
               rows={5}
-              className="mt-2 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-primary/20"
+              className="mt-2 w-full resize-none rounded-control border border-border bg-surface px-4 py-3 text-sm text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-primary/20"
               placeholder="Notas o descripción profesional opcional"
               aria-describedby={
                 errors.bio ? "professional-bio-error" : undefined
@@ -284,8 +284,8 @@ export function ProfessionalAccountManager({
         >
           <div className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-1">
             <div className="h-fit self-start rounded-[18px] border border-border bg-background p-4">
-              <Utensils className="size-4 text-warm-brown" aria-hidden="true" />
-              <p className="mt-3 text-2xl font-semibold text-charcoal">
+              <Utensils className="size-4 text-muted-foreground" aria-hidden="true" />
+              <p className="mt-3 text-2xl font-semibold text-foreground">
                 {professional.assignedNutritionClients}
               </p>
               <p className="mt-1 text-sm font-bold text-muted">
@@ -293,8 +293,8 @@ export function ProfessionalAccountManager({
               </p>
             </div>
             <div className="h-fit self-start rounded-[18px] border border-border bg-background p-4">
-              <Dumbbell className="size-4 text-warm-brown" aria-hidden="true" />
-              <p className="mt-3 text-2xl font-semibold text-charcoal">
+              <Dumbbell className="size-4 text-muted-foreground" aria-hidden="true" />
+              <p className="mt-3 text-2xl font-semibold text-foreground">
                 {professional.assignedTrainingClients}
               </p>
               <p className="mt-1 text-sm font-bold text-muted">

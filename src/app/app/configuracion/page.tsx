@@ -35,7 +35,7 @@ function SectionNav({
         <Link
           key={item.href}
           href={item.href}
-          className="shrink-0 rounded-[16px] px-3 py-2 text-sm font-extrabold text-warm-brown transition-colors hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+          className="shrink-0 rounded-[16px] px-3 py-2 text-sm font-extrabold text-muted-foreground transition-colors hover:bg-primary-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
         >
           {item.label}
         </Link>
@@ -56,11 +56,11 @@ function SettingRow({
   return (
     <div className="h-fit self-start rounded-[18px] border border-border bg-background p-4">
       <div className="flex min-w-0 items-start gap-3">
-        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
+        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-muted-foreground">
           {icon}
         </span>
         <div className="min-w-0">
-          <h3 className="font-extrabold text-charcoal">{label}</h3>
+          <h3 className="font-extrabold text-foreground">{label}</h3>
           <div className="mt-1 min-w-0 break-words text-sm font-semibold leading-6 text-muted">
             {children}
           </div>
@@ -105,11 +105,11 @@ export default async function SettingsPage() {
             description="Resumen de acceso. Los datos personales editables viven en Mi perfil para evitar duplicar formularios."
           >
             <div className="mb-5 flex items-center gap-4 rounded-[20px] border border-border bg-background p-4">
-              <div className="grid size-12 place-items-center rounded-full bg-accent text-sm font-extrabold text-charcoal">
+              <div className="grid size-12 place-items-center rounded-full bg-secondary text-sm font-extrabold text-secondary-foreground">
                 {access.initials}
               </div>
               <div className="min-w-0">
-                <h2 className="font-extrabold text-charcoal">{access.displayName}</h2>
+                <h2 className="font-extrabold text-foreground">{access.displayName}</h2>
                 <p className="mt-1 truncate text-sm text-muted">{access.email}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <RelationshipBadge tone="primary">{access.roleLabel}</RelationshipBadge>

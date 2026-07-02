@@ -71,12 +71,12 @@ export default async function RoutineDetailPage({
       <TrainingSectionNav active="routines" />
 
       {inactiveExerciseCount > 0 ? (
-        <Alert className="rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-charcoal">
+        <Alert className="rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-foreground">
           <TriangleAlert
-            className="size-5 text-warm-brown"
+            className="size-5 text-muted-foreground"
             aria-hidden="true"
           />
-          <AlertDescription className="font-semibold leading-6 text-charcoal">
+          <AlertDescription className="font-semibold leading-6 text-foreground">
             {inactiveExerciseCount === 1
               ? "Este entrenamiento contiene 1 ejercicio desactivado."
               : `Este entrenamiento contiene ${inactiveExerciseCount} ejercicios desactivados.`}{" "}
@@ -115,25 +115,25 @@ export default async function RoutineDetailPage({
       <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="h-fit self-start rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Dificultad</p>
-          <p className="mt-3 text-xl font-extrabold text-charcoal">
+          <p className="mt-3 text-xl font-extrabold text-foreground">
             {difficultyLabels[routine.difficulty]}
           </p>
         </div>
         <div className="h-fit self-start rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Categoría</p>
-          <p className="mt-3 text-xl font-extrabold text-charcoal">
+          <p className="mt-3 text-xl font-extrabold text-foreground">
             {routine.category}
           </p>
         </div>
         <div className="h-fit self-start rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Publico objetivo</p>
-          <p className="mt-3 text-xl font-extrabold text-charcoal">
+          <p className="mt-3 text-xl font-extrabold text-foreground">
             {routine.targetAudience}
           </p>
         </div>
         <div className="h-fit self-start rounded-[24px] border border-border bg-surface p-5 shadow-soft">
           <p className="text-sm font-bold text-muted">Estado</p>
-          <p className="mt-3 text-xl font-extrabold text-charcoal">
+          <p className="mt-3 text-xl font-extrabold text-foreground">
             {routine.isActive ? "Activo" : "Inactivo"}
           </p>
         </div>
@@ -200,12 +200,12 @@ function MetaValue({
   value: string;
 }) {
   return (
-    <div className="h-fit self-start rounded-[18px] border border-charcoal/10 bg-surface p-4">
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
+    <div className="h-fit self-start rounded-[18px] border border-foreground/10 bg-surface p-4">
+      <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
         {label}
       </p>
-      <p className="mt-1 font-extrabold text-charcoal">{value}</p>
+      <p className="mt-1 font-extrabold text-foreground">{value}</p>
     </div>
   );
 }

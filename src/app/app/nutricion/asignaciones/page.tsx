@@ -40,8 +40,8 @@ export default async function NutritionAsignacionesPage({
 
       {habitData.clients.length > 0 && (
         <section className="flex flex-col gap-3 rounded-[22px] border border-border bg-surface p-4 shadow-soft sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2 text-sm font-extrabold text-charcoal">
-            <UserRound className="size-5 text-warm-brown" aria-hidden="true" />
+          <div className="flex items-center gap-2 text-sm font-extrabold text-foreground">
+            <UserRound className="size-5 text-muted-foreground" aria-hidden="true" />
             <span>Gestionar asignaciones de la clienta</span>
           </div>
           <NutritionClientSelector

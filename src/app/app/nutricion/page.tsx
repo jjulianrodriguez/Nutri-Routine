@@ -55,7 +55,7 @@ function ClientTodayHabits({
     >
       {todayAssignments.length === 0 ? (
         <EmptyState>
-          <span className="block font-extrabold text-charcoal">
+          <span className="block font-extrabold text-foreground">
             {emptyTitle}
           </span>
           <span className="mt-1 block">{emptyDescription}</span>
@@ -63,11 +63,11 @@ function ClientTodayHabits({
       ) : pendingToday.length === 0 ? (
         <div className="flex flex-col gap-4 rounded-[22px] border border-primary/25 bg-background p-5 shadow-soft sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
-            <span className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-primary-soft text-charcoal">
+            <span className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-primary-soft text-foreground">
               <CheckCircle2 className="size-5" aria-hidden="true" />
             </span>
             <div>
-              <p className="font-extrabold text-charcoal">
+              <p className="font-extrabold text-foreground">
                 Todo listo por hoy.
               </p>
               <p className="mt-1 text-sm leading-6 text-muted">
@@ -83,11 +83,11 @@ function ClientTodayHabits({
         <div className="space-y-4">
           <div className="flex flex-col gap-3 rounded-[22px] border border-border bg-background p-5 shadow-soft sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-start gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
+              <span className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-primary-soft text-muted-foreground">
                 <CalendarCheck2 className="size-5" aria-hidden="true" />
               </span>
               <div>
-                <p className="font-extrabold text-charcoal">
+                <p className="font-extrabold text-foreground">
                   Te faltan {pendingToday.length} de {todayAssignments.length} hábitos.
                 </p>
                 <p className="mt-1 text-sm leading-6 text-muted">
@@ -105,7 +105,7 @@ function ClientTodayHabits({
                 key={assignment.id}
                 className="rounded-[18px] border border-border bg-background px-4 py-3"
               >
-                <p className="font-extrabold text-charcoal">
+                <p className="font-extrabold text-foreground">
                   {assignment.habit.title}
                 </p>
                 {assignment.habit.description ? (

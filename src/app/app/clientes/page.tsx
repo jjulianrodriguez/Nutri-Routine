@@ -70,7 +70,7 @@ type ProfessionalOption = SelectOption & {
 };
 
 const selectClasses =
-  "mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none transition focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20";
+  "mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-foreground shadow-soft outline-none transition focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20";
 
 function normalizeSearch(value?: string) {
   return value?.trim().slice(0, 80) ?? "";
@@ -461,7 +461,7 @@ function ClientEmptyState({
   if (!hasAnyClients) {
     return (
       <EmptyState>
-        <span className="block font-extrabold text-charcoal">
+        <span className="block font-extrabold text-foreground">
           {isProfessional
             ? "Todavía no tenés clientes asignados"
             : "No hay clientes visibles"}
@@ -477,7 +477,7 @@ function ClientEmptyState({
 
   return (
     <EmptyState>
-      <span className="block font-extrabold text-charcoal">
+      <span className="block font-extrabold text-foreground">
         {hasActiveFilters
           ? "No encontramos clientes con esos filtros"
           : "No hay clientes visibles"}
@@ -637,7 +637,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
             open
             className="group rounded-[22px] border border-border bg-surface/70 shadow-soft"
           >
-            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-extrabold text-charcoal outline-none transition hover:bg-primary-soft/50 focus-visible:ring-3 focus-visible:ring-primary/20 [&::-webkit-details-marker]:hidden">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-extrabold text-foreground outline-none transition hover:bg-primary-soft/50 focus-visible:ring-3 focus-visible:ring-primary/20 [&::-webkit-details-marker]:hidden">
               <span className="inline-flex items-center gap-2">
                 <SlidersHorizontal className="size-4" aria-hidden="true" />
                 Filtros y orden
@@ -774,12 +774,12 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                               href={`/app/clientes/${client.id}`}
                               className="min-w-0 rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/35"
                             >
-                              <h2 className="truncate text-lg font-extrabold text-charcoal transition hover:text-warm-brown">
+                              <h2 className="truncate text-lg font-extrabold text-foreground transition hover:text-muted-foreground">
                                 {client.fullName}
                               </h2>
                             </Link>
                           ) : (
-                            <h2 className="truncate text-lg font-extrabold text-charcoal">
+                            <h2 className="truncate text-lg font-extrabold text-foreground">
                               {client.fullName}
                             </h2>
                           )}
@@ -803,7 +803,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                         <p className="mt-1 truncate text-sm text-muted">
                           {client.email || "Correo no disponible"}
                         </p>
-                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-bold text-warm-brown">
+                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-bold text-muted-foreground">
                           <span className="inline-flex items-center gap-1.5">
                             <CalendarDays
                               className="size-3.5"
@@ -838,7 +838,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
                         <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
                           Profesional asignado
                         </p>
-                        <p className="mt-1 truncate text-sm font-bold text-charcoal">
+                        <p className="mt-1 truncate text-sm font-bold text-foreground">
                           {getAssignedProfessionalSummary(client)}
                         </p>
                       </div>
@@ -899,18 +899,18 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
         tone="accent"
       >
         <div className="grid items-start gap-3 md:grid-cols-2">
-          <div className="flex items-center justify-between gap-3 rounded-[18px] border border-charcoal/10 bg-surface px-4 py-3">
-            <span className="inline-flex items-center gap-2 font-extrabold text-charcoal">
-              <Leaf className="size-5 text-warm-brown" aria-hidden="true" />
+          <div className="flex items-center justify-between gap-3 rounded-[18px] border border-foreground/10 bg-surface px-4 py-3">
+            <span className="inline-flex items-center gap-2 font-extrabold text-foreground">
+              <Leaf className="size-5 text-muted-foreground" aria-hidden="true" />
               Nutrición
             </span>
             <span className="text-sm font-bold text-muted">
               {data.nutritionists.length} disponibles
             </span>
           </div>
-          <div className="flex items-center justify-between gap-3 rounded-[18px] border border-charcoal/10 bg-surface px-4 py-3">
-            <span className="inline-flex items-center gap-2 font-extrabold text-charcoal">
-              <Dumbbell className="size-5 text-warm-brown" aria-hidden="true" />
+          <div className="flex items-center justify-between gap-3 rounded-[18px] border border-foreground/10 bg-surface px-4 py-3">
+            <span className="inline-flex items-center gap-2 font-extrabold text-foreground">
+              <Dumbbell className="size-5 text-muted-foreground" aria-hidden="true" />
               Entrenamiento
             </span>
             <span className="text-sm font-bold text-muted">

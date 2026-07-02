@@ -71,18 +71,18 @@ function getDifficultyLabel(value: string | null | undefined) {
 
 function getStatusClasses(tone: WorkoutSummaryStatusTone) {
   if (tone === "active") {
-    return "bg-primary text-charcoal";
+    return "bg-primary text-primary-foreground";
   }
 
   if (tone === "inactive") {
-    return "bg-stone-soft text-stone-hover";
+    return "bg-surface-muted text-foreground";
   }
 
   if (tone === "warning") {
     return "bg-danger/10 text-danger";
   }
 
-  return "bg-background text-warm-brown";
+  return "bg-background text-muted-foreground";
 }
 
 function FooterItem({ item }: { item: WorkoutSummaryMetaItem }) {
@@ -127,7 +127,7 @@ function SummaryContent({
         {dayNumber ? (
           <span
             className={cn(
-              "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-extrabold text-charcoal",
+              "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-extrabold text-foreground",
               isCurrent ? "bg-primary" : "bg-primary-soft",
             )}
           >
@@ -137,13 +137,13 @@ function SummaryContent({
         ) : null}
 
         {weekdayLabel ? (
-          <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-warm-brown">
+          <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-muted-foreground">
             {weekdayLabel}
           </span>
         ) : null}
 
         {currentLabel ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-background px-3 py-1 text-xs font-extrabold text-charcoal">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-background px-3 py-1 text-xs font-extrabold text-foreground">
             <CheckCircle2 className="size-3.5" aria-hidden="true" />
             {currentLabel}
           </span>
@@ -175,12 +175,12 @@ function SummaryContent({
       </div>
 
       {eyebrow ? (
-        <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-warm-brown">
+        <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
           {eyebrow}
         </p>
       ) : null}
 
-      <h3 className="mt-2 text-2xl font-semibold leading-tight text-charcoal">
+      <h3 className="mt-2 text-2xl font-semibold leading-tight text-foreground">
         {title}
       </h3>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
@@ -189,22 +189,22 @@ function SummaryContent({
 
       <div className="mt-4 flex flex-wrap gap-2">
         {difficultyLabel ? (
-          <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+          <span className="rounded-full bg-secondary-soft px-3 py-1 text-xs font-extrabold text-foreground">
             {difficultyLabel}
           </span>
         ) : null}
         {category ? (
-          <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-warm-brown">
+          <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-muted-foreground">
             {category}
           </span>
         ) : null}
         {targetAudience ? (
-          <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-warm-brown">
+          <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-muted-foreground">
             {targetAudience}
           </span>
         ) : null}
         {typeof exerciseCount === "number" ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-warm-brown">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-muted-foreground">
             <Dumbbell className="size-3.5" aria-hidden="true" />
             {exerciseCount} {exerciseCount === 1 ? "ejercicio" : "ejercicios"}
           </span>
@@ -212,7 +212,7 @@ function SummaryContent({
       </div>
 
       {href ? (
-        <span className="mt-4 inline-flex items-center gap-2 text-sm font-extrabold text-warm-brown transition group-hover:text-charcoal">
+        <span className="mt-4 inline-flex items-center gap-2 text-sm font-extrabold text-muted-foreground transition group-hover:text-foreground">
           {viewLabel ?? "Ver detalle"}
           <ArrowRight className="size-4 transition group-hover:translate-x-1" />
         </span>
@@ -286,7 +286,7 @@ export function WorkoutSummaryCard({
           {summary}
           <ChevronDown
             className={cn(
-              "mt-1 size-5 shrink-0 text-warm-brown transition",
+              "mt-1 size-5 shrink-0 text-muted-foreground transition",
               expanded && "rotate-180",
             )}
             aria-hidden="true"

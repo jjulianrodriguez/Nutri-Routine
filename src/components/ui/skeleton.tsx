@@ -47,7 +47,7 @@ function AppPanelSkeleton({
       className={cn(
         "rounded-card border p-5 shadow-soft sm:p-6",
         tone === "surface" && "border-border-soft bg-surface",
-        tone === "accent" && "border-secondary/20 bg-accent-soft",
+        tone === "accent" && "border-secondary/20 bg-secondary-soft",
         tone === "primary" && "border-primary/20 bg-primary-soft",
         className
       )}

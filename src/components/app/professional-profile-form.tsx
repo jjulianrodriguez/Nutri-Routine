@@ -18,9 +18,9 @@ import {
 } from "@/lib/validations/professional-profile";
 
 const inputClasses =
-  "mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+  "mt-2 h-12 rounded-control border-border bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
 const textareaClasses =
-  "mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger";
+  "mt-2 min-h-28 w-full resize-none rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger";
 
 const focusAreaOptions = [
   { label: "Perdida de grasa", value: "fat_loss" },
@@ -91,7 +91,7 @@ export function ProfessionalProfileForm({
   return (
     <form className="space-y-7" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="rounded-[20px] border border-primary/25 bg-primary-soft/60 p-4 text-sm leading-6 text-muted">
-        <p className="font-extrabold text-charcoal">Visibilidad del perfil</p>
+        <p className="font-extrabold text-foreground">Visibilidad del perfil</p>
         <p className="mt-1">
           Esta informacion ayuda a tus clientes asignados y al equipo admin a
           entender tu area, experiencia y disponibilidad. El nombre y el correo
@@ -101,7 +101,7 @@ export function ProfessionalProfileForm({
 
       <section className="space-y-5">
         <div>
-          <h3 className="font-extrabold text-charcoal">Datos profesionales</h3>
+          <h3 className="font-extrabold text-foreground">Datos profesionales</h3>
           <p className="mt-1 text-sm leading-6 text-muted">
             Contacto profesional, enlaces y presentacion breve.
           </p>
@@ -109,7 +109,7 @@ export function ProfessionalProfileForm({
 
       <div className="grid gap-5 lg:grid-cols-2">
         <div>
-          <Label htmlFor="professionalPhone" className="font-extrabold text-charcoal">
+          <Label htmlFor="professionalPhone" className="font-extrabold text-foreground">
             Telefono profesional
           </Label>
           <Input
@@ -131,7 +131,7 @@ export function ProfessionalProfileForm({
         </div>
 
         <div>
-          <Label htmlFor="professionalLinks" className="font-extrabold text-charcoal">
+          <Label htmlFor="professionalLinks" className="font-extrabold text-foreground">
             Redes o enlaces profesionales
           </Label>
           <Input
@@ -153,7 +153,7 @@ export function ProfessionalProfileForm({
       </div>
 
       <div>
-        <Label htmlFor="professionalBio" className="font-extrabold text-charcoal">
+        <Label htmlFor="professionalBio" className="font-extrabold text-foreground">
           Biografia corta
         </Label>
         <textarea
@@ -172,7 +172,7 @@ export function ProfessionalProfileForm({
 
       <section className="space-y-5">
         <div>
-          <h3 className="font-extrabold text-charcoal">
+          <h3 className="font-extrabold text-foreground">
             Experiencia y enfoque
           </h3>
           <p className="mt-1 text-sm leading-6 text-muted">
@@ -184,7 +184,7 @@ export function ProfessionalProfileForm({
         <div>
           <Label
             htmlFor="professionalExperience"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Experiencia
           </Label>
@@ -209,7 +209,7 @@ export function ProfessionalProfileForm({
         <div>
           <Label
             htmlFor="professionalCertifications"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Certificaciones
           </Label>
@@ -235,12 +235,12 @@ export function ProfessionalProfileForm({
       </div>
 
       <fieldset>
-        <legend className="font-extrabold text-charcoal">Areas de enfoque</legend>
+        <legend className="font-extrabold text-foreground">Areas de enfoque</legend>
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {focusAreaOptions.map((option) => (
             <label
               key={option.value}
-              className="flex min-h-11 items-center gap-3 rounded-[16px] border border-border bg-background px-3 py-2 text-sm font-bold text-warm-brown shadow-soft"
+              className="flex min-h-11 items-center gap-3 rounded-[16px] border border-border bg-background px-3 py-2 text-sm font-bold text-muted-foreground shadow-soft"
             >
               <input
                 type="checkbox"
@@ -264,7 +264,7 @@ export function ProfessionalProfileForm({
         className="scroll-mt-24 space-y-5 rounded-[22px] border border-border bg-background p-4"
       >
         <div>
-          <h3 className="font-extrabold text-charcoal">
+          <h3 className="font-extrabold text-foreground">
             Disponibilidad editable
           </h3>
           <p className="mt-1 text-sm leading-6 text-muted">
@@ -277,7 +277,7 @@ export function ProfessionalProfileForm({
         <div>
           <Label
             htmlFor="availabilityDays"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Dias disponibles
           </Label>
@@ -301,7 +301,7 @@ export function ProfessionalProfileForm({
         <div>
           <Label
             htmlFor="availabilityNote"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Nota o mensaje automatico
           </Label>
@@ -326,7 +326,7 @@ export function ProfessionalProfileForm({
       <div>
         <Label
           htmlFor="availabilitySchedule"
-          className="font-extrabold text-charcoal"
+          className="font-extrabold text-foreground"
         >
           Horarios de atencion
         </Label>
@@ -375,7 +375,7 @@ export function ProfessionalProfileForm({
 
       <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[24px] border border-border bg-surface/90 p-4 shadow-card backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3 text-sm leading-6">
-          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
+          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-muted-foreground">
             {isDirty ? (
               <AlertCircle className="size-4" aria-hidden="true" />
             ) : (
@@ -383,7 +383,7 @@ export function ProfessionalProfileForm({
             )}
           </span>
           <div>
-            <p className="font-extrabold text-charcoal">
+            <p className="font-extrabold text-foreground">
               {isDirty ? "Perfil profesional con cambios" : "Perfil profesional al dia"}
             </p>
             <p className="text-muted" aria-live="polite">

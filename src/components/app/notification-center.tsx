@@ -648,8 +648,8 @@ export function NotificationCenter({
             className={cn(
               "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-control px-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
               activeFilter === tab.id
-                ? "bg-primary text-charcoal shadow-soft"
-                : "text-muted hover:bg-surface hover:text-charcoal",
+                ? "bg-primary text-primary-foreground shadow-soft"
+                : "text-muted hover:bg-surface hover:text-foreground",
             )}
             onClick={() => setActiveFilter(tab.id)}
           >
@@ -715,8 +715,8 @@ export function NotificationCenter({
                     className={cn(
                       "grid size-11 shrink-0 place-items-center rounded-full border",
                       isUnread
-                        ? "border-primary/30 bg-primary text-charcoal"
-                        : "border-border bg-background text-warm-brown",
+                        ? "border-primary/30 bg-primary text-primary-foreground"
+                        : "border-border bg-background text-muted-foreground",
                     )}
                   >
                     {isProcessing ? (
@@ -735,7 +735,7 @@ export function NotificationCenter({
                         {presentation.label}
                       </span>
                       {isUnread ? (
-                        <span className="rounded-full bg-primary px-2 py-0.5 text-[0.68rem] font-extrabold text-charcoal">
+                        <span className="rounded-full bg-primary px-2 py-0.5 text-[0.68rem] font-extrabold text-primary-foreground">
                           Nueva
                         </span>
                       ) : null}
@@ -745,7 +745,7 @@ export function NotificationCenter({
                         </span>
                       ) : null}
                     </span>
-                    <span className="mt-2 block break-words text-sm font-bold leading-6 text-charcoal sm:text-base">
+                    <span className="mt-2 block break-words text-sm font-bold leading-6 text-foreground sm:text-base">
                       {displayMessage}
                     </span>
                     <span className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-muted">

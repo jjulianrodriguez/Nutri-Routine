@@ -35,7 +35,7 @@ const specialtyOptions = [
 ] as const;
 
 const inputClasses =
-  "mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+  "mt-2 h-12 rounded-control border-border bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) {
@@ -105,7 +105,7 @@ export function ProfessionalAccountForm() {
     <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="grid gap-5 lg:grid-cols-2">
         <div>
-          <Label htmlFor="fullName" className="font-extrabold text-charcoal">
+          <Label htmlFor="fullName" className="font-extrabold text-foreground">
             Nombre completo
           </Label>
           <Input
@@ -127,7 +127,7 @@ export function ProfessionalAccountForm() {
         </div>
 
         <div>
-          <Label htmlFor="email" className="font-extrabold text-charcoal">
+          <Label htmlFor="email" className="font-extrabold text-foreground">
             Email
           </Label>
           <Input
@@ -151,7 +151,7 @@ export function ProfessionalAccountForm() {
         <div>
           <Label
             htmlFor="temporaryPassword"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Contraseña temporal
           </Label>
@@ -178,7 +178,7 @@ export function ProfessionalAccountForm() {
         <div>
           <Label
             htmlFor="confirmTemporaryPassword"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Confirmar contraseña temporal
           </Label>
@@ -205,7 +205,7 @@ export function ProfessionalAccountForm() {
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div>
-          <Label htmlFor="specialty" className="font-extrabold text-charcoal">
+          <Label htmlFor="specialty" className="font-extrabold text-foreground">
             Tipo de profesional
           </Label>
           <select
@@ -232,7 +232,7 @@ export function ProfessionalAccountForm() {
         <div className="rounded-[20px] border border-primary/25 bg-primary-soft p-4">
           <Label
             htmlFor="adminAccessCode"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Código de acceso administrativo
           </Label>
@@ -240,7 +240,7 @@ export function ProfessionalAccountForm() {
             id="adminAccessCode"
             visibilityLabel="código administrativo"
             autoComplete="off"
-            className="mt-2 h-12 rounded-control border-primary/20 bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20"
+            className="mt-2 h-12 rounded-control border-primary/20 bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20"
             placeholder="Código privado de administración"
             aria-describedby={
               errors.adminAccessCode

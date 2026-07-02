@@ -27,7 +27,7 @@ export function NutritionClientSelector({
         onChange={(e) => {
           router.push(`${basePath}?client=${e.target.value}`);
         }}
-        className="h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-bold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+        className="h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-bold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
       >
         {clients.map((client) => (
           <option key={client.id} value={client.id}>

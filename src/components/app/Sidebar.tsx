@@ -229,7 +229,7 @@ export function Sidebar({
 
   return (
     <CurrentUserAccessProvider access={access}>
-      <div className="min-h-dvh overflow-x-clip bg-background text-charcoal">
+      <div className="min-h-dvh overflow-x-clip bg-background text-foreground">
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-white/12 bg-sidebar px-4 text-white shadow-soft lg:hidden">
         <button
           type="button"

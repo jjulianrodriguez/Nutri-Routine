@@ -64,7 +64,7 @@ export default async function WorkoutTemplatesPage() {
 
       {warning ? (
         <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">
-          <AlertDescription className="font-semibold text-warm-brown">
+          <AlertDescription className="font-semibold text-muted-foreground">
             {warning}
           </AlertDescription>
         </Alert>
@@ -124,19 +124,19 @@ export default async function WorkoutTemplatesPage() {
                     className="group min-w-0 flex-1"
                   >
                     <div className="flex flex-wrap gap-2">
-                      <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                      <span className="rounded-full bg-secondary-soft px-3 py-1 text-xs font-extrabold text-foreground">
                         Ciclo de {template.cycleDays} días
                       </span>
                       {template.identifier ? (
-                        <span className="max-w-full truncate rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-charcoal">
+                        <span className="max-w-full truncate rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-foreground">
                           ID: {template.identifier}
                         </span>
                       ) : null}
                       <span
                         className={
                           template.isActive
-                            ? "rounded-full bg-primary px-3 py-1 text-xs font-extrabold text-charcoal"
-                            : "rounded-full bg-stone-soft px-3 py-1 text-xs font-extrabold text-stone-hover"
+                            ? "rounded-full bg-primary px-3 py-1 text-xs font-extrabold text-primary-foreground"
+                            : "rounded-full bg-surface-muted px-3 py-1 text-xs font-extrabold text-foreground"
                         }
                       >
                         {template.isActive ? "Activa" : "Inactiva"}
@@ -150,13 +150,13 @@ export default async function WorkoutTemplatesPage() {
                         </span>
                       ) : null}
                     </div>
-                    <h2 className="mt-4 text-2xl font-semibold text-charcoal">
+                    <h2 className="mt-4 text-2xl font-semibold text-foreground">
                       {template.name}
                     </h2>
                     <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted">
                       {template.description || "Sin descripción adicional."}
                     </p>
-                    <span className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-warm-brown group-hover:text-charcoal">
+                    <span className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-muted-foreground group-hover:text-foreground">
                       Ver ciclo completo
                       <ArrowRight className="size-4 transition group-hover:translate-x-1" />
                     </span>

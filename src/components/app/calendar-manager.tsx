@@ -80,15 +80,15 @@ const AREA_DETAILS: Record<
 > = {
   general: {
     icon: Layers3,
-    tone: "border-accent/45 bg-accent-soft text-charcoal",
+    tone: "border-accent/45 bg-secondary-soft text-foreground",
   },
   nutrition: {
     icon: Leaf,
-    tone: "border-accent/40 bg-accent-soft/70 text-charcoal",
+    tone: "border-accent/40 bg-secondary-soft/70 text-foreground",
   },
   training: {
     icon: Dumbbell,
-    tone: "border-primary/40 bg-primary-soft text-charcoal",
+    tone: "border-primary/40 bg-primary-soft text-foreground",
   },
 };
 
@@ -286,9 +286,9 @@ function StatusBadge({ status }: { status: CalendarEventItem["status"] }) {
       className={cn(
         "rounded-full border px-2.5 py-1 text-xs font-extrabold",
         status === "scheduled" &&
-          "border-primary/25 bg-primary-soft text-charcoal",
+          "border-primary/25 bg-primary-soft text-foreground",
         status === "completed" &&
-          "border-accent/35 bg-accent-soft text-charcoal",
+          "border-accent/35 bg-secondary-soft text-foreground",
         status === "cancelled" &&
           "border-danger/20 bg-danger/5 text-danger",
       )}
@@ -327,11 +327,11 @@ function EventSummary({
           className="min-w-0 text-left focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
           onClick={() => onOpen(event)}
         >
-          <span className="block truncate text-sm font-extrabold text-warm-brown">
+          <span className="block truncate text-sm font-extrabold text-muted-foreground">
             {startTime}
             {endTime ? ` - ${endTime}` : ""}
           </span>
-          <h3 className="mt-1 break-words text-lg font-extrabold text-charcoal">
+          <h3 className="mt-1 break-words text-lg font-extrabold text-foreground">
             {event.title}
           </h3>
         </button>
@@ -349,13 +349,13 @@ function EventSummary({
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         <EventBadge event={event} />
-        <span className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-warm-brown">
+        <span className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-muted-foreground">
           {EVENT_TYPE_LABELS[event.eventType]}
         </span>
         <StatusBadge status={event.status} />
       </div>
       <p className="mt-3 text-sm leading-6 text-muted">
-        <span className="block font-bold text-charcoal">
+        <span className="block font-bold text-foreground">
           {event.clientName}
         </span>
         {event.clientEmail ? (
@@ -378,8 +378,8 @@ function EmptyMonth({
 }) {
   return (
     <div className="rounded-[24px] border border-dashed border-border bg-background px-5 py-10 text-center">
-      <CalendarDays className="mx-auto size-8 text-warm-brown" aria-hidden="true" />
-      <p className="mt-4 font-extrabold text-charcoal">
+      <CalendarDays className="mx-auto size-8 text-muted-foreground" aria-hidden="true" />
+      <p className="mt-4 font-extrabold text-foreground">
         Sin eventos este mes
       </p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted">
@@ -410,14 +410,14 @@ function UpcomingEventList({
   return (
     <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
       <div className="flex items-center gap-3">
-        <div className="grid size-11 place-items-center rounded-full bg-primary-soft text-charcoal">
+        <div className="grid size-11 place-items-center rounded-full bg-primary-soft text-foreground">
           <ListChecks className="size-5" aria-hidden="true" />
         </div>
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
             Próximos
           </p>
-          <h2 className="text-xl font-bold text-charcoal">
+          <h2 className="text-xl font-bold text-foreground">
             Consultas y recordatorios
           </h2>
         </div>
@@ -430,11 +430,11 @@ function UpcomingEventList({
             className="mt-5 w-full rounded-[22px] border border-primary/25 bg-primary-soft/70 p-4 text-left shadow-soft transition hover:border-primary/45 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
             onClick={() => onOpen(nextEvent)}
           >
-            <span className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] text-warm-brown">
+            <span className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] text-muted-foreground">
               <CalendarClock className="size-4" aria-hidden="true" />
               Próxima consulta o recordatorio
             </span>
-            <span className="mt-2 block break-words text-lg font-extrabold text-charcoal">
+            <span className="mt-2 block break-words text-lg font-extrabold text-foreground">
               {nextEvent.title}
             </span>
             <span className="mt-2 block text-sm font-bold text-muted">
@@ -452,16 +452,16 @@ function UpcomingEventList({
                   className="w-full rounded-[18px] border border-border bg-background p-4 text-left shadow-soft transition hover:border-primary/45 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
                   onClick={() => onOpen(event)}
                 >
-                  <span className="text-xs font-extrabold uppercase tracking-[0.12em] text-warm-brown">
+                  <span className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted-foreground">
                     {formatShortDate(event.dateKey)} ·{" "}
                     {formatTimeInputLabel(event.startTime, timeFormat)}
                   </span>
-                  <span className="mt-1 block break-words text-base font-extrabold text-charcoal">
+                  <span className="mt-1 block break-words text-base font-extrabold text-foreground">
                     {event.title}
                   </span>
                   <span className="mt-2 flex flex-wrap gap-2">
                     <EventBadge event={event} />
-                    <span className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-warm-brown">
+                    <span className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-muted-foreground">
                       {EVENT_TYPE_LABELS[event.eventType]}
                     </span>
                   </span>
@@ -685,7 +685,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
               Vista mensual
             </p>
-            <h2 className="mt-2 font-heading text-3xl font-bold capitalize text-charcoal">
+            <h2 className="mt-2 font-heading text-3xl font-bold capitalize text-foreground">
               {monthLabel}
             </h2>
             <p className="mt-2 text-sm leading-6 text-muted">
@@ -772,7 +772,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                 onChange={(event) =>
                   pushFilters({ clientId: event.currentTarget.value })
                 }
-                className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
               >
                 <option value="">Todos</option>
                 {data.clientOptions.map((client) => (
@@ -795,7 +795,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   onChange={(event) =>
                     pushFilters({ professionalId: event.currentTarget.value })
                   }
-                  className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                  className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
                 >
                   <option value="">Todos</option>
                   {data.professionalOptions.map((professional) => (
@@ -817,7 +817,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                     area: event.currentTarget.value as CalendarFilters["area"],
                   })
                 }
-                className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
               >
                 <option value="all">Todas</option>
                 {data.manageableAreas.map((area) => (
@@ -839,7 +839,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                       .value as CalendarFilters["status"],
                   })
                 }
-                className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
               >
                 <option value="all">Todos</option>
                 {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -895,8 +895,8 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                     type="button"
                     className={cn(
                       "flex size-8 items-center justify-center rounded-full text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
-                      day.isToday && "bg-accent text-charcoal",
-                      isSelected && !day.isToday && "bg-primary text-charcoal",
+                      day.isToday && "bg-secondary text-secondary-foreground",
+                      isSelected && !day.isToday && "bg-primary text-primary-foreground",
                     )}
                     onClick={() => {
                       setSelectedDate(day.dateKey);
@@ -914,7 +914,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                         <button
                           key={event.id}
                           type="button"
-                          className="hidden w-full min-w-0 rounded-[10px] border border-primary/20 bg-surface/86 px-2 py-1 text-left text-[0.7rem] font-extrabold text-charcoal shadow-soft transition hover:border-primary/45 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 sm:block"
+                          className="hidden w-full min-w-0 rounded-[10px] border border-primary/20 bg-surface/86 px-2 py-1 text-left text-[0.7rem] font-extrabold text-foreground shadow-soft transition hover:border-primary/45 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 sm:block"
                           onClick={() => {
                             setSelectedDate(day.dateKey);
                             setSelectedEventId(event.id);
@@ -927,7 +927,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                         </button>
                       ))}
                       <div className="sm:hidden">
-                        <span className="inline-flex max-w-full items-center rounded-full border border-primary/20 bg-surface px-1.5 py-0.5 text-[0.62rem] font-extrabold text-charcoal">
+                        <span className="inline-flex max-w-full items-center rounded-full border border-primary/20 bg-surface px-1.5 py-0.5 text-[0.62rem] font-extrabold text-foreground">
                           {dayEvents.length} ev.
                         </span>
                       </div>
@@ -982,7 +982,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                 <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
                   {editingEvent ? "Edición" : "Nuevo evento"}
                 </p>
-                <h2 className="mt-2 text-2xl font-bold text-charcoal">
+                <h2 className="mt-2 text-2xl font-bold text-foreground">
                   {editingEvent ? "Editar evento" : "Crear evento"}
                 </h2>
               </div>
@@ -1039,7 +1039,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   <Label htmlFor="calendar-event-type">Tipo</Label>
                   <select
                     id="calendar-event-type"
-                    className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                    className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
                     {...register("eventType")}
                   >
                     {CALENDAR_EVENT_TYPES.map((eventType) => (
@@ -1058,7 +1058,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   <Label htmlFor="calendar-status">Estado</Label>
                   <select
                     id="calendar-status"
-                    className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                    className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
                     {...register("status")}
                   >
                     {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -1078,7 +1078,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                 <Label htmlFor="calendar-client">Cliente relacionado</Label>
                 <select
                   id="calendar-client"
-                  className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                  className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
                   aria-invalid={Boolean(errors.clientId)}
                   aria-describedby={
                     errors.clientId ? "calendar-client-error" : undefined
@@ -1107,7 +1107,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   </Label>
                   <select
                     id="calendar-professional"
-                    className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                    className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
                     aria-invalid={Boolean(errors.professionalId)}
                     aria-describedby={
                       errors.professionalId
@@ -1192,7 +1192,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                 <Label htmlFor="calendar-area">Área</Label>
                 <select
                   id="calendar-area"
-                  className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                  className="mt-2 h-11 w-full rounded-md border border-input bg-surface/90 px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
                   aria-invalid={Boolean(errors.area)}
                   aria-describedby={
                     errors.area ? "calendar-area-error" : undefined
@@ -1219,7 +1219,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   id="calendar-description"
                   rows={4}
                   maxLength={2000}
-                  className="mt-2 min-h-32 w-full resize-y rounded-[18px] border border-input bg-surface/90 px-4 py-3 text-base leading-7 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+                  className="mt-2 min-h-32 w-full resize-none rounded-[18px] border border-input bg-surface/90 px-4 py-3 text-base leading-7 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
                   aria-invalid={Boolean(errors.description)}
                   aria-describedby={
                     errors.description
@@ -1270,7 +1270,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
                 {selectedIsToday ? "Hoy" : "Agenda del día"}
               </p>
-              <h2 className="mt-2 text-2xl font-bold capitalize text-charcoal">
+              <h2 className="mt-2 text-2xl font-bold capitalize text-foreground">
                 {formatFullDate(activeSelectedDate)}
               </h2>
             </div>
@@ -1337,14 +1337,14 @@ export function CalendarManager({ data }: CalendarManagerProps) {
 
         <section className="rounded-[28px] border border-border bg-primary-soft/68 p-5 shadow-soft sm:p-6">
           <div className="flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-full bg-surface text-warm-brown shadow-soft">
+            <div className="grid size-11 place-items-center rounded-full bg-surface text-muted-foreground shadow-soft">
               <CalendarClock className="size-5" aria-hidden="true" />
             </div>
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
                 Detalle
               </p>
-              <h2 className="text-xl font-bold text-charcoal">
+              <h2 className="text-xl font-bold text-foreground">
                 {selectedEvent ? selectedEvent.title : "Sin evento seleccionado"}
               </h2>
             </div>
@@ -1362,7 +1362,7 @@ export function CalendarManager({ data }: CalendarManagerProps) {
 
               <dl className="grid gap-3 text-sm leading-6">
                 <div>
-                  <dt className="font-extrabold text-charcoal">Fecha y hora</dt>
+                  <dt className="font-extrabold text-foreground">Fecha y hora</dt>
                   <dd className="mt-1 text-muted">
                     <Clock className="mr-1 inline size-4" aria-hidden="true" />
                     {formatFullDate(selectedEvent.dateKey)},{" "}
@@ -1376,9 +1376,9 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   </dd>
                 </div>
                 <div>
-                  <dt className="font-extrabold text-charcoal">Cliente</dt>
+                  <dt className="font-extrabold text-foreground">Cliente</dt>
                   <dd className="mt-1 text-muted">
-                    <span className="block font-bold text-charcoal">
+                    <span className="block font-bold text-foreground">
                       {selectedEvent.clientName}
                     </span>
                     {selectedEvent.clientEmail ? (
@@ -1389,19 +1389,19 @@ export function CalendarManager({ data }: CalendarManagerProps) {
                   </dd>
                 </div>
                 <div>
-                  <dt className="font-extrabold text-charcoal">Profesional</dt>
+                  <dt className="font-extrabold text-foreground">Profesional</dt>
                   <dd className="mt-1 text-muted">
                     {selectedEvent.professionalName}
                   </dd>
                 </div>
                 <div>
-                  <dt className="font-extrabold text-charcoal">Descripción</dt>
+                  <dt className="font-extrabold text-foreground">Descripción</dt>
                   <dd className="mt-1 whitespace-pre-wrap text-muted">
                     {selectedEvent.description || "Sin descripción adicional."}
                   </dd>
                 </div>
                 <div>
-                  <dt className="font-extrabold text-charcoal">Estado</dt>
+                  <dt className="font-extrabold text-foreground">Estado</dt>
                   <dd className="mt-1 text-muted">
                     {STATUS_DESCRIPTIONS[selectedEvent.status]}
                   </dd>

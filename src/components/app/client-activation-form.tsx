@@ -38,7 +38,7 @@ type ProfessionalPlanAction = {
 };
 
 const selectClasses =
-  "mt-2 h-12 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20";
+  "mt-2 h-12 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-foreground shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20";
 
 function getServiceType(
   nutritionEnabled: boolean,
@@ -101,8 +101,8 @@ function PlanToggle({
       className={cn(
         "flex min-h-14 w-full items-center justify-between gap-3 rounded-[18px] border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-55",
         active
-          ? "border-primary/40 bg-primary-soft text-charcoal"
-          : "border-border bg-surface text-warm-brown hover:border-primary/30 hover:bg-primary-soft/60",
+          ? "border-primary/40 bg-primary-soft text-foreground"
+          : "border-border bg-surface text-muted-foreground hover:border-primary/30 hover:bg-primary-soft/60",
       )}
     >
       <span className="flex items-center gap-3">
@@ -113,7 +113,7 @@ function PlanToggle({
         className={cn(
           "grid size-7 shrink-0 place-items-center rounded-full",
           active
-            ? "bg-primary text-charcoal"
+            ? "bg-primary text-primary-foreground"
             : "border border-border bg-background text-muted",
         )}
         aria-hidden="true"
@@ -170,17 +170,17 @@ function ProfessionalAreaAction({
         active
           ? assignedToCurrentUser
             ? "border-primary/35 bg-primary-soft/60"
-            : "border-warm-brown/25 bg-accent-soft/50"
+            : "border-secondary/25 bg-secondary-soft/50"
           : "border-border bg-surface",
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-background text-warm-brown">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-background text-muted-foreground">
             <Icon className="size-5" aria-hidden="true" />
           </span>
           <div className="min-w-0">
-            <p className="font-extrabold text-charcoal">
+            <p className="font-extrabold text-foreground">
               {active
                 ? assignedDisplayName ?? "Perfil incompleto"
                 : `Sin plan de ${label.toLowerCase()}`}
@@ -209,7 +209,7 @@ function ProfessionalAreaAction({
       </div>
 
       {blockedByOtherProfessional ? (
-        <p className="mt-4 rounded-[14px] border border-border bg-background px-3 py-2 text-xs font-bold leading-5 text-warm-brown">
+        <p className="mt-4 rounded-[14px] border border-border bg-background px-3 py-2 text-xs font-bold leading-5 text-muted-foreground">
           Este plan ya pertenece a{" "}
           {assignedDisplayName ?? "otro profesional"}. No puedes cambiarlo
           desde tu cuenta.
@@ -535,7 +535,7 @@ export function ClientActivationForm({
             <div>
               <Label
                 htmlFor={`nutritionist-${client.id}`}
-                className="font-extrabold text-charcoal"
+                className="font-extrabold text-foreground"
               >
                 Nutricionista
               </Label>
@@ -562,7 +562,7 @@ export function ClientActivationForm({
             <div>
               <Label
                 htmlFor={`trainer-${client.id}`}
-                className="font-extrabold text-charcoal"
+                className="font-extrabold text-foreground"
               >
                 Entrenadora
               </Label>
@@ -585,7 +585,7 @@ export function ClientActivationForm({
         </div>
       ) : (
         <Alert className="rounded-[18px] border-primary/25 bg-primary-soft px-4 py-3">
-          <AlertDescription className="font-semibold text-charcoal">
+          <AlertDescription className="font-semibold text-foreground">
             Sin planes activos, el usuario solo podrá entrar a configuración.
           </AlertDescription>
         </Alert>

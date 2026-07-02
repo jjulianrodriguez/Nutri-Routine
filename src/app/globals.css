@@ -757,9 +757,9 @@ html[data-reduced-motion="true"] *::after {
     [class*="bg-surface"],
     [class*="bg-background"],
     [class*="bg-primary-soft"],
-    [class*="bg-accent-soft"],
+    [class*="bg-secondary-soft"],
     [class*="bg-secondary-accent-soft"],
-    [class*="bg-cream"],
+    [class*="bg-surface-muted"],
     [class*="bg-card"],
     [class*="bg-popover"]
   ) {
@@ -841,6 +841,7 @@ textarea {
 
 textarea {
   border-radius: var(--radius-lg);
+  resize: none !important;
 }
 
 [data-slot="input"]:hover,
@@ -1037,19 +1038,19 @@ tbody th {
   }
 }
 
-.bg-primary.text-charcoal,
-.bg-teal.text-charcoal,
-.bg-terracotta.text-charcoal,
-.hover\:bg-primary.hover\:text-charcoal:hover,
-.hover\:bg-teal.hover\:text-charcoal:hover,
-.hover\:bg-terracotta.hover\:text-charcoal:hover {
+.bg-primary.text-foreground,
+.bg-secondary.text-foreground,
+.bg-primary.text-foreground,
+.hover\:bg-primary.hover\:text-foreground:hover,
+.hover\:bg-secondary.hover\:text-foreground:hover,
+.hover\:bg-primary.hover\:text-foreground:hover {
   color: var(--primary-foreground);
 }
 
-.bg-accent.text-charcoal,
-.bg-lavender.text-charcoal,
-.hover\:bg-accent.hover\:text-charcoal:hover,
-.hover\:bg-lavender.hover\:text-charcoal:hover {
+.bg-secondary.text-foreground,
+.bg-lavender.text-foreground,
+.hover\:bg-secondary.hover\:text-foreground:hover,
+.hover\:bg-lavender.hover\:text-foreground:hover {
   color: var(--accent-foreground);
 }
 
@@ -1088,12 +1089,12 @@ tbody th {
   color: var(--foreground);
 }
 
-.dark :where(.text-espresso, .hover\:text-espresso:hover) {
+.dark :where(.text-foreground, .hover\:text-foreground:hover) {
   color: var(--foreground);
 }
 
 .dark .bg-charcoal.text-white,
-.dark .bg-espresso .text-cream,
-.dark .bg-espresso.text-cream {
+.dark .bg-foreground .text-cream,
+.dark .bg-foreground.text-cream {
   color: var(--foreground);
 }

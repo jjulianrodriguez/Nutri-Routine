@@ -84,18 +84,18 @@ const metaIcons: Record<WorkoutTemplateMetaItem["kind"], LucideIcon> = {
 
 function getStatusClasses(tone: TemplateStatusTone) {
   if (tone === "active") {
-    return "bg-primary text-charcoal";
+    return "bg-primary text-primary-foreground";
   }
 
   if (tone === "inactive") {
-    return "bg-stone-soft text-stone-hover";
+    return "bg-surface-muted text-foreground";
   }
 
   if (tone === "warning") {
     return "bg-danger/10 text-danger";
   }
 
-  return "bg-surface text-charcoal";
+  return "bg-surface text-foreground";
 }
 
 function getDayLabel(dayNumber: number, currentDayNumber?: number | null) {
@@ -138,11 +138,11 @@ function SummaryStat({ item }: { item: WorkoutTemplateMetaItem }) {
 
   return (
     <div className="rounded-[20px] border border-border bg-surface p-4 shadow-soft">
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
+      <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
         {item.label}
       </p>
-      <p className="mt-1 break-words text-lg font-black leading-6 text-charcoal">
+      <p className="mt-1 break-words text-lg font-black leading-6 text-foreground">
         {item.value}
       </p>
     </div>
@@ -291,7 +291,7 @@ export function WorkoutTemplateView({
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-charcoal">
+              <span className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-foreground">
                 <Layers3 className="size-3.5" aria-hidden="true" />
                 Plantilla
               </span>
@@ -310,12 +310,12 @@ export function WorkoutTemplateView({
                   {statusLabel}
                 </span>
               ) : null}
-              <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-extrabold text-warm-brown">
+              <span className="rounded-full bg-background/80 px-3 py-1 text-xs font-extrabold text-muted-foreground">
                 {resolvedAssignedDayCount} de {snapshot.template.cycleDays}{" "}
                 {snapshot.template.cycleDays === 1 ? "día" : "días"}
               </span>
               {identifier && viewer === "professional" ? (
-                <span className="max-w-full truncate rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-warm-brown">
+                <span className="max-w-full truncate rounded-full border border-border bg-background px-3 py-1 text-xs font-extrabold text-muted-foreground">
                   ID: {identifier}
                 </span>
               ) : null}
@@ -329,7 +329,7 @@ export function WorkoutTemplateView({
 
             <h2
               id="workout-template-heading"
-              className="mt-5 max-w-4xl text-3xl font-semibold leading-tight text-charcoal sm:text-4xl"
+              className="mt-5 max-w-4xl text-3xl font-semibold leading-tight text-foreground sm:text-4xl"
             >
               {resolvedHeadline}
             </h2>
@@ -338,13 +338,13 @@ export function WorkoutTemplateView({
             </p>
 
             {topNote ? (
-              <p className="mt-3 rounded-[18px] border border-warm-brown/20 bg-surface px-4 py-3 text-sm font-semibold leading-6 text-warm-brown">
+              <p className="mt-3 rounded-[18px] border border-secondary/20 bg-surface px-4 py-3 text-sm font-semibold leading-6 text-muted-foreground">
                 {topNote}
               </p>
             ) : null}
 
             {usedFallbackDay ? (
-              <p className="mt-3 rounded-[18px] border border-warm-brown/20 bg-surface px-4 py-3 text-sm font-semibold leading-6 text-warm-brown">
+              <p className="mt-3 rounded-[18px] border border-secondary/20 bg-surface px-4 py-3 text-sm font-semibold leading-6 text-muted-foreground">
                 No encontramos el día calculado en la plantilla, así que te
                 mostramos el primer entrenamiento disponible. Consulta a tu
                 entrenador si algo no coincide.
@@ -389,10 +389,10 @@ export function WorkoutTemplateView({
                   Avance de hoy
                 </p>
                 <div className="mt-4 flex items-end justify-between gap-4">
-                  <p className="font-serif text-5xl font-semibold leading-none text-charcoal">
+                  <p className="font-serif text-5xl font-semibold leading-none text-foreground">
                     {progressPercent}%
                   </p>
-                  <p className="pb-1 text-right text-sm font-extrabold text-warm-brown">
+                  <p className="pb-1 text-right text-sm font-extrabold text-muted-foreground">
                     {completedCount}/{totalExercises.length} ejercicios
                   </p>
                 </div>
@@ -412,7 +412,7 @@ export function WorkoutTemplateView({
                       }.`}
                 </p>
                 {progress.completedAt ? (
-                  <p className="mt-3 rounded-[16px] bg-primary-soft px-4 py-3 text-sm font-extrabold text-charcoal">
+                  <p className="mt-3 rounded-[16px] bg-primary-soft px-4 py-3 text-sm font-extrabold text-foreground">
                     Entrenamiento completado.
                   </p>
                 ) : null}
@@ -422,10 +422,10 @@ export function WorkoutTemplateView({
                 <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
                   Vista de ciclo
                 </p>
-                <p className="mt-3 text-3xl font-black text-charcoal">
+                <p className="mt-3 text-3xl font-black text-foreground">
                   {snapshot.template.cycleDays} días
                 </p>
-                <p className="mt-2 text-sm font-semibold leading-6 text-warm-brown">
+                <p className="mt-2 text-sm font-semibold leading-6 text-muted-foreground">
                   {resolvedAssignedDayCount} de {snapshot.template.cycleDays}{" "}
                   {snapshot.template.cycleDays === 1
                     ? "día completo"
@@ -451,7 +451,7 @@ export function WorkoutTemplateView({
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
               Dias del ciclo
             </p>
-            <h3 className="mt-1 text-2xl font-semibold text-charcoal">
+            <h3 className="mt-1 text-2xl font-semibold text-foreground">
               Entrenamientos por día
             </h3>
           </div>

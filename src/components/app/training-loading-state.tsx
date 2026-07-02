@@ -16,14 +16,14 @@ export function TrainingLoadingState() {
         className="overflow-hidden rounded-[32px] border border-border bg-surface p-6 shadow-soft sm:p-8"
       >
         <div className="flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-full bg-primary-soft text-charcoal">
+          <span className="grid size-11 place-items-center rounded-full bg-primary-soft text-foreground">
             <Dumbbell className="size-5" aria-hidden="true" />
           </span>
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
               Entrenamiento
             </p>
-            <h1 className="mt-1 text-3xl font-semibold text-charcoal sm:text-4xl">
+            <h1 className="mt-1 text-3xl font-semibold text-foreground sm:text-4xl">
               Preparando entrenamiento
             </h1>
           </div>

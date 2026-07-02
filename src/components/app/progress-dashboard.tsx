@@ -179,7 +179,7 @@ function StatusPill({ children, tone = "neutral" }: { children: ReactNode; tone?
     <span
       className={cn(
         "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-extrabold",
-        tone === "good" && "bg-primary-soft text-charcoal",
+        tone === "good" && "bg-primary-soft text-foreground",
         tone === "neutral" && "bg-muted/10 text-muted",
         tone === "warn" && "bg-warning-soft text-warning",
       )}
@@ -207,15 +207,15 @@ function MetricCard({
           <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
             {label}
           </p>
-          <p className="mt-2 font-heading text-3xl font-bold leading-none text-charcoal">
+          <p className="mt-2 font-heading text-3xl font-bold leading-none text-foreground">
             {value}
           </p>
         </div>
-        <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-warm-brown">
+        <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-secondary">
           <Icon className="size-5" aria-hidden="true" />
         </div>
       </div>
-      <p className="mt-3 text-sm font-semibold leading-5 text-warm-brown">
+      <p className="mt-3 text-sm font-semibold leading-5 text-muted-foreground">
         {detail}
       </p>
     </article>
@@ -241,9 +241,9 @@ function EmptyProgressState({
   title: string;
 }) {
   return (
-    <div className="h-fit self-start rounded-[22px] border border-dashed border-border bg-cream/45 p-5">
-      <p className="font-extrabold text-charcoal">{title}</p>
-      <p className="mt-2 text-sm leading-6 text-muted">{description}</p>
+    <div className="h-fit self-start rounded-card border border-dashed border-border-soft bg-surface-muted/60 p-5">
+      <p className="font-extrabold text-foreground">{title}</p>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
       {action ? <div className="mt-4">{action}</div> : null}
     </div>
   );
@@ -265,10 +265,10 @@ function ClientSelectorPanel({
         className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
       >
         <input name="tab" type="hidden" value="resumen" />
-        <label className="grid gap-2 text-sm font-bold text-charcoal">
+        <label className="grid gap-2 text-sm font-bold text-foreground">
           Selecciona un cliente para ver su progreso
           <select
-            className="h-11 rounded-control border border-border bg-background px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus:border-primary"
+            className="h-11 rounded-control border border-border bg-background px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus:border-primary"
             defaultValue={selectedClient?.id ?? ""}
             name="client"
           >
@@ -319,7 +319,7 @@ function ProgressTabs({
               "inline-flex h-11 items-center justify-center gap-2 rounded-control px-3 text-sm font-extrabold transition",
               active
                 ? "bg-primary text-primary-foreground shadow-soft"
-                : "text-muted hover:bg-primary-soft hover:text-charcoal",
+                : "text-muted hover:bg-primary-soft hover:text-foreground",
             )}
             href={hrefForTab(tab.id, selectedClientId)}
           >
@@ -421,8 +421,8 @@ function LineTrendChart({
   if (points.length === 1) {
     return (
       <div className="h-fit self-start rounded-[20px] border border-border bg-background p-4">
-        <p className="text-sm font-extrabold text-charcoal">{label}</p>
-        <p className="mt-4 font-heading text-3xl font-bold text-charcoal">
+        <p className="text-sm font-extrabold text-foreground">{label}</p>
+        <p className="mt-4 font-heading text-3xl font-bold text-foreground">
           {formatValue(points[0].value, unit)}
         </p>
         <p className="mt-2 text-sm font-semibold text-muted">
@@ -446,7 +446,7 @@ function LineTrendChart({
     <div className="h-fit self-start rounded-[20px] border border-border bg-background p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-extrabold text-charcoal">{label}</p>
+          <p className="text-sm font-extrabold text-foreground">{label}</p>
           <p className="text-xs font-semibold text-muted">
             {formatShortDate(points[0].date)} - {formatShortDate(points[points.length - 1].date)}
           </p>
@@ -497,7 +497,7 @@ function BarHistoryChart({
 
   return (
     <div className="h-fit self-start rounded-[20px] border border-border bg-background p-4">
-      <p className="text-sm font-extrabold text-charcoal">{label}</p>
+      <p className="text-sm font-extrabold text-foreground">{label}</p>
       <div className="mt-5 grid h-40 grid-cols-[repeat(var(--bar-count),minmax(0,1fr))] items-end gap-2 [--bar-count:6] sm:[--bar-count:8]">
         {items.map((item) => (
           <div key={item.label} className="flex h-full flex-col justify-end gap-2">
@@ -536,7 +536,7 @@ function DeltaBadge({
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold",
-        delta <= 0 ? "bg-primary-soft text-charcoal" : "bg-warning-soft text-warning",
+        delta <= 0 ? "bg-primary-soft text-foreground" : "bg-warning-soft text-warning",
       )}
     >
       <Icon className="size-3.5" aria-hidden="true" />
@@ -570,8 +570,8 @@ function WeekdayHabitGrid({ nutrition }: { nutrition: NutritionProgressSummary }
             )}
           >
             <p className="text-xs font-extrabold text-muted">{day.shortLabel}</p>
-            <p className="mt-2 text-lg font-black text-charcoal">{percentage}%</p>
-            <p className="text-[0.68rem] font-bold text-warm-brown">
+            <p className="mt-2 text-lg font-black text-foreground">{percentage}%</p>
+            <p className="text-[0.68rem] font-bold text-muted-foreground">
               {completed}/{applicable.length}
             </p>
           </div>
@@ -599,14 +599,14 @@ function PlanMeta({
           <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
             Plan actual
           </p>
-          <h3 className="mt-1 text-lg font-black text-charcoal">{title}</h3>
+          <h3 className="mt-1 text-lg font-black text-foreground">{title}</h3>
         </div>
         <StatusPill tone={status === "active" ? "good" : "neutral"}>{status}</StatusPill>
       </div>
       {description ? (
         <p className="mt-3 text-sm leading-6 text-muted">{description}</p>
       ) : null}
-      <p className="mt-3 text-xs font-bold text-warm-brown">
+      <p className="mt-3 text-xs font-bold text-muted-foreground">
         Ultimo movimiento: {formatDate(createdAt)}
       </p>
     </div>
@@ -755,7 +755,7 @@ function NutritionTab({
                   key={assignment.id}
                   className="flex items-center justify-between gap-3 rounded-[16px] border border-border bg-background px-4 py-3"
                 >
-                  <span className="font-bold text-charcoal">{assignment.habit.title}</span>
+                  <span className="font-bold text-foreground">{assignment.habit.title}</span>
                   <StatusPill tone="warn">Pendiente</StatusPill>
                 </div>
               ))}
@@ -897,7 +897,7 @@ function TrainingTab({
                 key={item.id}
                 className="h-fit self-start rounded-[18px] border border-border bg-background p-4"
               >
-                <p className="font-extrabold text-charcoal">Dia del ciclo {item.cycleDay}</p>
+                <p className="font-extrabold text-foreground">Dia del ciclo {item.cycleDay}</p>
                 <p className="mt-2 text-sm font-semibold text-muted">
                   Ultimo registro: {formatDate(item.workoutDate)}
                 </p>
@@ -969,7 +969,6 @@ function MeasurementsTab({
   const weightSeries = getMetricSeries(measurements.entries, "weight");
   const bodyFatSeries = getMetricSeries(measurements.entries, "bodyFat");
   const hasMeasurementEntries = measurements.entries.length > 0;
-  const hasEnoughHistory = weightSeries.length >= 2 || bodyFatSeries.length >= 2;
 
   if (!measurements.profile.exists && !hasMeasurementEntries) {
     return (
@@ -1003,21 +1002,7 @@ function MeasurementsTab({
     );
   }
 
-  if (!hasMeasurementEntries) {
-    return (
-      <EmptyProgressState
-        action={
-          !access.isClient ? (
-            <Button asChild size="sm">
-              <Link href={`/app/clientes/${selectedClient.id}`}>Ver cliente</Link>
-            </Button>
-          ) : null
-        }
-        description="El perfil fisico tiene datos base, pero todavia no hay registros historicos de medidas."
-        title="Sin medidas registradas"
-      />
-    );
-  }
+
 
   return (
     <div className="space-y-5">
@@ -1077,16 +1062,9 @@ function MeasurementsTab({
         </div>
       </section>
 
-      {!hasEnoughHistory ? (
-        <EmptyProgressState
-          description="Hace falta al menos dos registros comparables de peso o grasa corporal para mostrar una tendencia."
-          title="Historial insuficiente"
-        />
-      ) : null}
-
       <AppPanel title="Medidas fisicas">
         {measurements.profile.bodyMeasurements ? (
-          <p className="rounded-[18px] border border-border bg-background p-4 text-sm leading-6 text-charcoal">
+          <p className="rounded-[18px] border border-border bg-background p-4 text-sm leading-6 text-foreground">
             {measurements.profile.bodyMeasurements}
           </p>
         ) : (
@@ -1150,10 +1128,10 @@ function SummaryTab({
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
               Vista actual
             </p>
-            <h2 className="mt-2 text-3xl font-black text-charcoal">
+            <h2 className="mt-2 text-3xl font-black text-foreground">
               {selectedClient.fullName}
             </h2>
-            <p className="mt-2 text-sm font-semibold text-warm-brown">
+            <p className="mt-2 text-sm font-semibold text-muted-foreground">
               Nutricion {selectedClient.hasNutritionService ? "activa" : "sin asignar"} · Entrenamiento{" "}
               {selectedClient.hasTrainingService ? "activo" : "sin asignar"}
             </p>
@@ -1243,7 +1221,7 @@ function SummaryTab({
             />
           </div>
           {measurements?.entries[0] ? (
-            <p className="mt-4 text-sm font-bold text-warm-brown">
+            <p className="mt-4 text-sm font-bold text-muted-foreground">
               Ultimo registro: {formatDate(measurements.entries[0].recorded_at)}
             </p>
           ) : null}
@@ -1256,7 +1234,7 @@ function SummaryTab({
             {appointment ? (
               <div className="flex items-center justify-between gap-3 rounded-[18px] border border-border bg-background p-4">
                 <div>
-                  <p className="font-extrabold text-charcoal">{appointment.title}</p>
+                  <p className="font-extrabold text-foreground">{appointment.title}</p>
                   <p className="text-sm font-semibold text-muted">
                     Proxima consulta: {formatDate(appointment.startsAt)}
                   </p>

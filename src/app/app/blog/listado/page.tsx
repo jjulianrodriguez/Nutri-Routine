@@ -27,7 +27,7 @@ export default async function AdminBlogListPage() {
 
       <section className="flex flex-wrap items-center justify-between gap-4 rounded-[24px] border border-border bg-surface p-5 shadow-soft">
         <div>
-          <p className="text-sm font-extrabold text-charcoal">
+          <p className="text-sm font-extrabold text-foreground">
             Gestión de publicaciones
           </p>
           <p className="mt-1 text-sm leading-6 text-muted">
@@ -79,10 +79,10 @@ export default async function AdminBlogListPage() {
             )}
             Anclado
           </div>
-          <p className="mt-3 line-clamp-2 font-serif text-2xl font-semibold leading-tight text-charcoal">
+          <p className="mt-3 line-clamp-2 font-serif text-2xl font-semibold leading-tight text-foreground">
             {pinnedPost?.title ?? "Sin blog anclado"}
           </p>
-          <p className="mt-4 flex items-center gap-2 text-sm font-bold text-warm-brown">
+          <p className="mt-4 flex items-center gap-2 text-sm font-bold text-muted-foreground">
             {pinnedPost ? (
               <Eye className="size-4" aria-hidden="true" />
             ) : (

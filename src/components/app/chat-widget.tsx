@@ -750,9 +750,8 @@ export function ChatWidget() {
       <AnimatePresence>
         {open ? (
           <motion.section
-            role="dialog"
+            role="region"
             aria-label="Panel de mensajes"
-            aria-modal="false"
             className="fixed bottom-4 left-3 right-3 top-20 z-50 flex min-h-0 flex-col overflow-hidden rounded-[28px] border border-border bg-surface shadow-premium sm:left-auto sm:bottom-20 sm:right-5 sm:top-auto sm:h-[min(38rem,calc(100dvh-7rem))] sm:w-[25rem]"
             initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

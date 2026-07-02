@@ -37,7 +37,7 @@ import type {
 import type { AssignableWorkoutTemplate } from "@/types/workout-template";
 
 const inputClasses =
-  "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft focus-visible:ring-primary/20";
+  "mt-2 rounded-control border-border bg-surface px-4 text-foreground shadow-soft focus-visible:ring-primary/20";
 const assignmentSectionClasses =
   "rounded-[24px] border border-border bg-surface p-5 shadow-soft";
 
@@ -320,8 +320,8 @@ export function WorkoutTemplateAssignmentForm({
 
       <section className={assignmentSectionClasses}>
         <div className="flex items-center gap-2">
-          <CheckCircle2 className="size-5 text-warm-brown" aria-hidden="true" />
-          <h2 className="font-extrabold text-charcoal">
+          <CheckCircle2 className="size-5 text-muted-foreground" aria-hidden="true" />
+          <h2 className="font-extrabold text-foreground">
             Seleccion para asignar
           </h2>
         </div>
@@ -366,8 +366,8 @@ export function WorkoutTemplateAssignmentForm({
 
       <section className={assignmentSectionClasses}>
         <div className="flex items-center gap-2">
-          <CalendarPlus className="size-5 text-warm-brown" aria-hidden="true" />
-          <h2 className="font-extrabold text-charcoal">
+          <CalendarPlus className="size-5 text-muted-foreground" aria-hidden="true" />
+          <h2 className="font-extrabold text-foreground">
             Fechas de asignación
           </h2>
         </div>
@@ -376,7 +376,7 @@ export function WorkoutTemplateAssignmentForm({
         <div>
           <Label
             htmlFor="assignment-duration"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Duracion
           </Label>
@@ -405,7 +405,7 @@ export function WorkoutTemplateAssignmentForm({
         <div>
           <Label
             htmlFor="assignment-start-date"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Fecha de inicio
           </Label>
@@ -442,10 +442,10 @@ export function WorkoutTemplateAssignmentForm({
       {missingAssignmentReasons.length > 0 ? (
         <Alert className="rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3">
           <TriangleAlert
-            className="size-5 text-warm-brown"
+            className="size-5 text-muted-foreground"
             aria-hidden="true"
           />
-          <AlertDescription className="font-semibold leading-6 text-charcoal">
+          <AlertDescription className="font-semibold leading-6 text-foreground">
             Para confirmar la asignación:{" "}
             {missingAssignmentReasons.join(" ")}
           </AlertDescription>
@@ -511,8 +511,8 @@ function SelectedEntity({
         className={cn(
           "grid size-11 shrink-0 place-items-center rounded-full",
           selected
-            ? "bg-primary text-charcoal"
-            : "bg-stone-soft text-stone-hover",
+            ? "bg-primary text-primary-foreground"
+            : "bg-surface-muted text-foreground",
         )}
       >
         <Icon className="size-5" aria-hidden="true" />
@@ -521,7 +521,7 @@ function SelectedEntity({
         <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
           {label}
         </p>
-        <p className="mt-1 truncate font-extrabold text-charcoal">{value}</p>
+        <p className="mt-1 truncate font-extrabold text-foreground">{value}</p>
         <p className="mt-1 truncate text-xs font-semibold text-muted">
           {detail}
         </p>

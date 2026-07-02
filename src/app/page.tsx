@@ -293,7 +293,7 @@ function SectionEyebrow({
       className={[
         "inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.68rem] font-black uppercase tracking-[0.18em]",
         light
-          ? "border border-[var(--color-bone)] bg-[var(--ln-paper)] text-[var(--ln-forest)] shadow-[0_16px_40px_-34px_rgb(var(--raspberry-rgb)_/_0.2)]"
+          ? "border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] text-[var(--ln-forest)] shadow-[0_16px_40px_-34px_rgb(var(--raspberry-rgb)_/_0.2)]"
           : "border border-[var(--ln-night)]/10 bg-[var(--ln-paper)] text-[var(--ln-forest)]",
       ].join(" ")}
     >
@@ -1226,7 +1226,7 @@ function TrustSection() {
 
             return (
               <Reveal key={item.title} delay={index * 0.06}>
-                <article className="h-full rounded-[1.6rem] border border-[var(--color-bone)]/10 p-6 shadow-[0_34px_96px_-72px_rgb(var(--raspberry-rgb)_/_0.7)]">
+                <article className="h-full rounded-[1.6rem] border border-[var(--ln-paper)]/14 p-6 shadow-[0_34px_96px_-72px_rgb(var(--raspberry-rgb)_/_0.7)]">
                   <span className="grid size-12 place-items-center rounded-full bg-[var(--ln-peach)] text-[var(--ln-night)]">
                     <Icon className="size-5" strokeWidth={1.8} />
                   </span>
@@ -1243,7 +1243,7 @@ function TrustSection() {
         <div className="mt-14 grid gap-4 lg:grid-cols-3">
           {faqs.map((item, index) => (
             <Reveal key={item.question} delay={index * 0.055}>
-              <article className="h-full rounded-[1.4rem] border border-[var(--color-bone)]/10 p-5">
+              <article className="h-full rounded-[1.4rem] border border-[var(--ln-paper)]/14 p-5">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--ln-peach)]">
                   FAQ
                 </p>

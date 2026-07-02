@@ -37,10 +37,10 @@ import type { RoutineListItem } from "@/types/routine";
 import type { WorkoutTemplateDetail } from "@/types/workout-template";
 
 const inputClasses =
-  "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+  "mt-2 rounded-control border-border bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
 const formSectionClasses =
   "rounded-[22px] border border-border bg-background p-4 sm:p-5";
-const legendClasses = "px-1 text-sm font-extrabold text-charcoal";
+const legendClasses = "px-1 text-sm font-extrabold text-foreground";
 
 function normalizeSearch(value: string) {
   return value
@@ -260,7 +260,7 @@ export function WorkoutTemplateEditor({
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted">
               {template ? "Editar plantilla" : "Nueva plantilla"}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-charcoal">
+            <h2 className="mt-2 text-2xl font-semibold text-foreground">
               Datos generales
             </h2>
           </div>
@@ -279,7 +279,7 @@ export function WorkoutTemplateEditor({
             <div>
             <Label
               htmlFor="template-name"
-              className="font-extrabold text-charcoal"
+              className="font-extrabold text-foreground"
             >
               Nombre
             </Label>
@@ -296,7 +296,7 @@ export function WorkoutTemplateEditor({
           <div>
             <Label
               htmlFor="template-identifier"
-              className="font-extrabold text-charcoal"
+              className="font-extrabold text-foreground"
             >
               Identificador interno
             </Label>
@@ -315,7 +315,7 @@ export function WorkoutTemplateEditor({
           <div>
             <Label
               htmlFor="template-cycle-days"
-              className="font-extrabold text-charcoal"
+              className="font-extrabold text-foreground"
             >
               Días del ciclo
             </Label>
@@ -338,7 +338,7 @@ export function WorkoutTemplateEditor({
           <legend className={legendClasses}>Notas de la plantilla</legend>
           <Label
             htmlFor="template-description"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Descripción
           </Label>
@@ -347,7 +347,7 @@ export function WorkoutTemplateEditor({
             rows={4}
             className={cn(
               inputClasses,
-              "min-h-28 w-full resize-y py-3 text-sm outline-none",
+              "min-h-28 w-full resize-none py-3 text-sm outline-none",
             )}
             placeholder="Objetivo general o indicaciones del ciclo."
             aria-invalid={Boolean(errors.description)}
@@ -356,7 +356,7 @@ export function WorkoutTemplateEditor({
           <FieldError message={errors.description?.message} />
         </fieldset>
 
-        <label className="mt-5 flex min-h-11 w-fit items-center gap-3 rounded-control border border-border bg-background px-4 text-sm font-extrabold text-charcoal">
+        <label className="mt-5 flex min-h-11 w-fit items-center gap-3 rounded-control border border-border bg-background px-4 text-sm font-extrabold text-foreground">
           <input
             type="checkbox"
             className="size-4 accent-[var(--primary)]"
@@ -368,11 +368,11 @@ export function WorkoutTemplateEditor({
 
       <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
         <div className="flex items-start gap-3">
-          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-soft text-charcoal">
+          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-soft text-foreground">
             <CalendarDays className="size-5" aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-2xl font-semibold text-charcoal">
+            <h2 className="text-2xl font-semibold text-foreground">
               Días de la plantilla
             </h2>
             <p className="mt-2 text-sm leading-6 text-muted">
@@ -457,7 +457,7 @@ export function WorkoutTemplateEditor({
                         className={cn(
                           "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-extrabold",
                           routine
-                            ? "bg-primary-soft text-charcoal"
+                            ? "bg-primary-soft text-foreground"
                             : "bg-danger/10 text-danger",
                         )}
                       >
@@ -475,7 +475,7 @@ export function WorkoutTemplateEditor({
                         {routine ? "Listo" : "Pendiente"}
                       </span>
                     </div>
-                    <h3 className="mt-2 break-words font-extrabold text-charcoal">
+                    <h3 className="mt-2 break-words font-extrabold text-foreground">
                       {routine?.name ?? "Sin entrenamiento"}
                     </h3>
                     <p className="mt-1 text-xs font-semibold text-muted">
@@ -507,7 +507,7 @@ export function WorkoutTemplateEditor({
                     id={`template-day-${day.dayNumber}-weekday`}
                     className={cn(
                       inputClasses,
-                      "min-h-11 w-full appearance-none pr-10 text-sm font-semibold text-charcoal outline-none",
+                      "min-h-11 w-full appearance-none pr-10 text-sm font-semibold text-foreground outline-none",
                     )}
                     aria-invalid={Boolean(
                       errors.days?.[day.dayNumber - 1]?.weekday,
@@ -654,8 +654,8 @@ function TemplateCompletionStat({
       <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
         {label}
       </p>
-      <p className="mt-2 text-3xl font-black text-charcoal">{value}</p>
-      <p className="mt-1 text-sm font-semibold text-warm-brown">{detail}</p>
+      <p className="mt-2 text-3xl font-black text-foreground">{value}</p>
+      <p className="mt-1 text-sm font-semibold text-muted-foreground">{detail}</p>
     </div>
   );
 }

@@ -18,7 +18,7 @@ import {
 } from "@/lib/validations/account";
 
 const inputClasses =
-  "mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+  "mt-2 h-12 rounded-control border-border bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) {
@@ -84,7 +84,7 @@ export function PasswordChangeForm() {
       <div>
         <Label
           htmlFor="currentPassword"
-          className="font-extrabold text-charcoal"
+          className="font-extrabold text-foreground"
         >
           Contraseña actual
         </Label>
@@ -112,7 +112,7 @@ export function PasswordChangeForm() {
       </div>
 
       <div>
-        <Label htmlFor="newPassword" className="font-extrabold text-charcoal">
+        <Label htmlFor="newPassword" className="font-extrabold text-foreground">
           Nueva contraseña
         </Label>
         <PasswordInput
@@ -139,7 +139,7 @@ export function PasswordChangeForm() {
       <div>
         <Label
           htmlFor="confirmNewPassword"
-          className="font-extrabold text-charcoal"
+          className="font-extrabold text-foreground"
         >
           Confirmar nueva contraseña
         </Label>

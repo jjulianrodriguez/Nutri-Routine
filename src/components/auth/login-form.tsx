@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -33,7 +32,7 @@ type LoginFormProps = {
 };
 
 const inputClasses =
-  "mt-2 h-[3.25rem] rounded-[16px] border-border bg-surface px-4 text-espresso shadow-none placeholder:text-stone/60 focus-visible:border-terracotta focus-visible:ring-4 focus-visible:ring-terracotta/20";
+  "mt-2 h-[3.25rem] rounded-control border-border bg-surface px-4 text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-focus-ring/20";
 
 export function LoginForm({ initialError }: LoginFormProps) {
   const router = useRouter();
@@ -86,7 +85,7 @@ export function LoginForm({ initialError }: LoginFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       <div>
-        <Label htmlFor="email" className="text-sm font-bold text-espresso">
+        <Label htmlFor="email" className="text-sm font-bold text-foreground">
           Email
         </Label>
         <Input
@@ -103,7 +102,7 @@ export function LoginForm({ initialError }: LoginFormProps) {
       </div>
 
       <div>
-        <Label htmlFor="password" className="text-sm font-bold text-espresso">
+        <Label htmlFor="password" className="text-sm font-bold text-foreground">
           Contraseña
         </Label>
         <PasswordInput
@@ -124,7 +123,7 @@ export function LoginForm({ initialError }: LoginFormProps) {
         <div className="mt-3 flex justify-end">
           <Link
             href="/forgot-password"
-            className="text-sm font-bold text-espresso underline decoration-terracotta decoration-2 underline-offset-4 transition-colors hover:text-terracotta"
+            className="text-sm font-bold text-primary underline decoration-primary-soft decoration-2 underline-offset-4 transition-colors hover:text-primary-hover"
           >
             ¿Olvidaste tu contraseña?
           </Link>
@@ -142,12 +141,10 @@ export function LoginForm({ initialError }: LoginFormProps) {
         </Alert>
       ) : null}
 
-      <motion.button
+      <button
         type="submit"
         disabled={isSubmitting}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-extrabold text-primary-foreground shadow-soft transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-        whileHover={isSubmitting ? undefined : { y: -1 }}
-        whileTap={isSubmitting ? undefined : { scale: 0.99 }}
+        className="flex w-full items-center justify-center gap-2 rounded-control bg-primary py-4 text-sm font-extrabold text-primary-foreground shadow-soft transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting ? (
           <>
@@ -160,14 +157,14 @@ export function LoginForm({ initialError }: LoginFormProps) {
             <ArrowRight className="size-4" />
           </>
         )}
-      </motion.button>
+      </button>
 
       <div className="pt-2 text-center text-sm">
-        <p className="text-stone">
+        <p className="text-muted-foreground">
           ¿No tenés cuenta?{" "}
           <Link
             href="/register"
-            className="font-bold text-espresso underline decoration-terracotta decoration-2 underline-offset-4 transition-colors hover:text-terracotta"
+            className="font-bold text-primary underline decoration-primary-soft decoration-2 underline-offset-4 transition-colors hover:text-primary-hover"
           >
             Registrate
           </Link>

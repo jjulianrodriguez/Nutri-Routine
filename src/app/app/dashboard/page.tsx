@@ -48,7 +48,7 @@ function RecordList({
           key={record.id}
           className="rounded-[20px] border border-border bg-background px-4 py-3"
         >
-          <h3 className="font-bold text-charcoal">{record.title}</h3>
+          <h3 className="font-bold text-foreground">{record.title}</h3>
           {record.detail ? (
             <p className="mt-1 text-sm text-muted">{record.detail}</p>
           ) : null}
@@ -82,11 +82,11 @@ function TrainingActionCard({
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-charcoal">
+          <span className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-foreground">
             <Play className="size-3.5" aria-hidden="true" />
             Entrenamiento de hoy
           </span>
-          <h3 className="mt-4 text-xl font-semibold text-charcoal">
+          <h3 className="mt-4 text-xl font-semibold text-foreground">
             {record.title}
           </h3>
           {record.detail ? (
@@ -96,11 +96,11 @@ function TrainingActionCard({
           ) : null}
         </div>
         <ArrowRight
-          className="mt-1 size-5 shrink-0 text-warm-brown transition group-hover:translate-x-1 group-hover:text-charcoal"
+          className="mt-1 size-5 shrink-0 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-foreground"
           aria-hidden="true"
         />
       </div>
-      <span className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-warm-brown transition group-hover:text-charcoal">
+      <span className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-muted-foreground transition group-hover:text-foreground">
         Empezar entrenamiento de hoy
         <ArrowRight className="size-4" aria-hidden="true" />
       </span>
@@ -124,8 +124,8 @@ function QuickLink({
       href={href}
       className="group rounded-[22px] border border-border bg-background p-4 transition hover:border-primary/40 hover:bg-primary-soft"
     >
-      <Icon className="size-5 text-warm-brown transition group-hover:text-charcoal" />
-      <h3 className="mt-4 font-extrabold text-charcoal">{label}</h3>
+      <Icon className="size-5 text-muted-foreground transition group-hover:text-foreground" />
+      <h3 className="mt-4 font-extrabold text-foreground">{label}</h3>
       <p className="mt-2 text-sm leading-6 text-muted">{description}</p>
     </Link>
   );
@@ -257,7 +257,7 @@ function ClientDashboard({
           >
             <Link
               href="/app/progreso"
-              className="inline-flex rounded-full bg-primary px-4 py-2 text-sm font-extrabold text-charcoal"
+              className="inline-flex rounded-full bg-primary px-4 py-2 text-sm font-extrabold text-primary-foreground"
             >
               Ver mi progreso
             </Link>

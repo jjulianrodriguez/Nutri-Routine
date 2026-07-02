@@ -90,7 +90,7 @@ export default async function ExerciseDetailPage({
         <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
           Nombre del ejercicio
         </p>
-        <h2 className="mt-2 text-2xl font-extrabold text-charcoal sm:text-3xl">
+        <h2 className="mt-2 text-2xl font-extrabold text-foreground sm:text-3xl">
           {readValue(exercise.name)}
         </h2>
       </section>
@@ -101,10 +101,10 @@ export default async function ExerciseDetailPage({
       >
         <div className="h-fit self-start rounded-[20px] border border-border bg-surface p-4 shadow-soft">
           <FileText
-            className="size-4 text-warm-brown"
+            className="size-4 text-muted-foreground"
             aria-hidden="true"
           />
-          <p className="mt-3 whitespace-pre-wrap text-sm font-semibold leading-7 text-charcoal">
+          <p className="mt-3 whitespace-pre-wrap text-sm font-semibold leading-7 text-foreground">
             {readValue(exercise.description)}
           </p>
         </div>
@@ -152,14 +152,14 @@ export default async function ExerciseDetailPage({
                   className="h-fit self-start rounded-[20px] border border-border bg-surface p-4 shadow-soft"
                 >
                   <ExternalLink
-                    className="size-4 text-warm-brown"
+                    className="size-4 text-muted-foreground"
                     aria-hidden="true"
                   />
                   <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
                     {resource.label}
                   </p>
                   <p
-                    className="mt-2 truncate text-sm font-semibold leading-6 text-charcoal"
+                    className="mt-2 truncate text-sm font-semibold leading-6 text-foreground"
                     translate="no"
                   >
                     {resource.domain}
@@ -187,10 +187,10 @@ export default async function ExerciseDetailPage({
         ) : (
           <div className="h-fit self-start rounded-[20px] border border-border bg-surface p-4 shadow-soft">
             <ExternalLink
-              className="size-4 text-warm-brown"
+              className="size-4 text-muted-foreground"
               aria-hidden="true"
             />
-            <p className="mt-3 font-extrabold text-charcoal">
+            <p className="mt-3 font-extrabold text-foreground">
               No indicado
             </p>
           </div>
@@ -241,11 +241,11 @@ function DetailValue({
 }) {
   return (
     <div className="h-fit self-start rounded-[20px] border border-border bg-surface p-4 shadow-soft">
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
+      <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
         {label}
       </p>
-      <p className="mt-1 break-words font-extrabold text-charcoal">
+      <p className="mt-1 break-words font-extrabold text-foreground">
         {value}
       </p>
     </div>

@@ -29,7 +29,7 @@ export function AppHeader({
       <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">
         {eyebrow}
       </p>
-      <h1 className="mt-4 max-w-4xl font-heading text-4xl font-bold leading-[1.04] text-charcoal sm:text-5xl">
+      <h1 className="mt-4 max-w-4xl font-heading text-4xl font-bold leading-[1.04] text-foreground sm:text-5xl">
         {title}
       </h1>
       <p className="mt-4 max-w-3xl text-base leading-7 text-muted">
@@ -55,12 +55,12 @@ export function AppPanel({
       className={cn(
         "h-fit self-start rounded-card border p-5 shadow-soft sm:p-6",
         tone === "surface" && "bg-surface",
-        tone === "accent" && "border-secondary/15 bg-accent-soft",
+        tone === "accent" && "border-secondary/15 bg-secondary-soft",
         tone === "primary" && "border-primary/15 bg-primary-soft",
         tone === "warm" && "border-border-soft bg-surface-muted",
       )}
     >
-      <h2 className="text-2xl font-bold leading-tight text-charcoal">
+      <h2 className="text-2xl font-bold leading-tight text-foreground">
         {title}
       </h2>
       {description ? (
@@ -86,7 +86,7 @@ export function StatTile({
       className="h-fit self-start rounded-card border border-border-soft p-5 shadow-soft"
     >
       <p className="text-sm font-bold text-muted">{label}</p>
-      <p className="mt-3 font-heading text-4xl font-bold leading-none text-charcoal">
+      <p className="mt-3 font-heading text-4xl font-bold leading-none text-foreground">
         {value}
       </p>
       <p className="mt-4 text-sm font-bold text-muted">{detail}</p>

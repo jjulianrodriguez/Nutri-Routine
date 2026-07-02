@@ -58,10 +58,10 @@ const difficultyLabels = {
 } as const;
 
 const inputClasses =
-  "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+  "mt-2 rounded-control border-border bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
 const formSectionClasses =
   "rounded-[22px] border border-border bg-background p-4 sm:p-5";
-const legendClasses = "px-1 text-sm font-extrabold text-charcoal";
+const legendClasses = "px-1 text-sm font-extrabold text-foreground";
 const libraryPath = "/app/entrenamiento/ejercicios";
 
 const defaultValues: ExerciseFormValues = {
@@ -457,7 +457,7 @@ export function ExerciseManager({
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted">
               {editingId ? "Edición" : "Nuevo ejercicio"}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-charcoal">
+            <h2 className="mt-2 text-2xl font-semibold text-foreground">
               {editingId ? "Actualizar ejercicio" : "Crear ejercicio"}
             </h2>
           </div>
@@ -481,7 +481,7 @@ export function ExerciseManager({
 
             <div className="grid gap-5">
               <div>
-            <Label htmlFor="exercise-name" className="font-extrabold text-charcoal">
+            <Label htmlFor="exercise-name" className="font-extrabold text-foreground">
               Nombre
             </Label>
             <Input
@@ -498,7 +498,7 @@ export function ExerciseManager({
           <div>
             <Label
               htmlFor="exercise-description"
-              className="font-extrabold text-charcoal"
+              className="font-extrabold text-foreground"
             >
               Descripción e instrucciones
             </Label>
@@ -507,7 +507,7 @@ export function ExerciseManager({
               rows={5}
               className={cn(
                 inputClasses,
-                "min-h-32 w-full resize-y py-3 text-sm outline-none",
+                "min-h-32 w-full resize-none py-3 text-sm outline-none",
               )}
               placeholder="Explica la tecnica, postura y puntos de control."
               aria-invalid={Boolean(errors.description)}
@@ -532,7 +532,7 @@ export function ExerciseManager({
             <div>
               <Label
                 htmlFor="exercise-difficulty"
-                className="font-extrabold text-charcoal"
+                className="font-extrabold text-foreground"
               >
                 Dificultad
               </Label>
@@ -552,7 +552,7 @@ export function ExerciseManager({
             <div>
               <Label
                 htmlFor="exercise-muscle-group"
-                className="font-extrabold text-charcoal"
+                className="font-extrabold text-foreground"
               >
                 Grupo muscular
               </Label>
@@ -593,7 +593,7 @@ export function ExerciseManager({
             <div>
               <Label
                 htmlFor="exercise-category"
-                className="font-extrabold text-charcoal"
+                className="font-extrabold text-foreground"
               >
                 Categoría
               </Label>
@@ -632,7 +632,7 @@ export function ExerciseManager({
             <div>
               <Label
                 htmlFor="exercise-type"
-                className="font-extrabold text-charcoal"
+                className="font-extrabold text-foreground"
               >
                 Tipo
               </Label>
@@ -694,7 +694,7 @@ export function ExerciseManager({
                     <div>
                       <Label
                         htmlFor={inputId}
-                        className="font-extrabold text-charcoal"
+                        className="font-extrabold text-foreground"
                       >
                         Recurso {index + 1}
                       </Label>
@@ -777,7 +777,7 @@ export function ExerciseManager({
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted">
               Biblioteca
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-charcoal">
+            <h2 className="mt-2 text-2xl font-semibold text-foreground">
               {pagination.totalCount} ejercicios encontrados
             </h2>
             <p className="mt-2 text-sm font-semibold text-muted">
@@ -788,7 +788,7 @@ export function ExerciseManager({
         </div>
 
         <form
-          className="mt-5 rounded-[22px] border border-charcoal/10 bg-background p-4"
+          className="mt-5 rounded-[22px] border border-foreground/10 bg-background p-4"
           onSubmit={applyLibraryFilters}
         >
           <div className="relative">
@@ -822,7 +822,7 @@ export function ExerciseManager({
                 onChange={(event) =>
                   updateDraftFilter("muscleGroup", event.target.value)
                 }
-                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
               >
                 <option value="all">Todos</option>
                 {filterOptions.muscleGroups.map((option) => (
@@ -846,7 +846,7 @@ export function ExerciseManager({
                 onChange={(event) =>
                   updateDraftFilter("difficulty", event.target.value)
                 }
-                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
               >
                 <option value="all">Todas</option>
                 {Object.entries(difficultyLabels).map(([value, label]) => (
@@ -870,7 +870,7 @@ export function ExerciseManager({
                 onChange={(event) =>
                   updateDraftFilter("status", event.target.value)
                 }
-                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
               >
                 {Object.entries(statusFilterLabels).map(([value, label]) => (
                   <option key={value} value={value}>
@@ -893,7 +893,7 @@ export function ExerciseManager({
                 onChange={(event) =>
                   updateDraftFilter("category", event.target.value)
                 }
-                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
               >
                 <option value="all">Todas</option>
                 {filterOptions.categories.map((option) => (
@@ -917,7 +917,7 @@ export function ExerciseManager({
                 onChange={(event) =>
                   updateDraftFilter("exerciseType", event.target.value)
                 }
-                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+                className="mt-2 h-11 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
               >
                 <option value="all">Todos</option>
                 {filterOptions.exerciseTypes.map((option) => (
@@ -977,13 +977,13 @@ export function ExerciseManager({
                       className={cn(
                         "inline-flex rounded-full px-3 py-1 text-xs font-extrabold",
                         exercise.isActive
-                          ? "bg-primary text-charcoal"
-                          : "bg-stone-soft text-stone-hover",
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-surface-muted text-foreground",
                       )}
                     >
                       {exercise.isActive ? "Activo" : "Inactivo"}
                     </span>
-                    <h3 className="mt-3 text-xl font-semibold leading-snug text-charcoal transition-colors group-hover:text-foreground sm:text-2xl">
+                    <h3 className="mt-3 text-xl font-semibold leading-snug text-foreground transition-colors group-hover:text-foreground sm:text-2xl">
                       {exercise.name}
                     </h3>
                     {exercise.description ? (
@@ -991,7 +991,7 @@ export function ExerciseManager({
                         {exercise.description}
                       </p>
                     ) : null}
-                    <span className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-warm-brown transition group-hover:text-charcoal">
+                    <span className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-muted-foreground transition group-hover:text-foreground">
                       Ver información completa
                       <ArrowRight className="size-4 transition group-hover:translate-x-1" />
                     </span>
@@ -1024,8 +1024,8 @@ export function ExerciseManager({
                   </div>
                 </div>
 
-                <div className="pointer-events-none relative z-10 mt-4 flex flex-wrap items-center gap-2 text-xs font-extrabold text-warm-brown">
-                  <span className="rounded-full bg-accent-soft px-3 py-1 text-charcoal">
+                <div className="pointer-events-none relative z-10 mt-4 flex flex-wrap items-center gap-2 text-xs font-extrabold text-muted-foreground">
+                  <span className="rounded-full bg-secondary-soft px-3 py-1 text-foreground">
                     {difficultyLabels[exercise.difficulty ?? "beginner"]}
                   </span>
                   <span
@@ -1050,7 +1050,7 @@ export function ExerciseManager({
                     className={cn(
                       "inline-flex items-center gap-1.5 rounded-full border px-3 py-1",
                       exercise.multimediaUrls.length > 0
-                        ? "border-primary/30 bg-primary-soft text-charcoal"
+                        ? "border-primary/30 bg-primary-soft text-foreground"
                         : "border-border bg-background text-muted",
                     )}
                   >
@@ -1080,7 +1080,7 @@ export function ExerciseManager({
             ))
           ) : (
             <div className="rounded-[22px] border border-dashed border-border bg-background p-8 text-center">
-              <p className="font-extrabold text-charcoal">
+              <p className="font-extrabold text-foreground">
                 No hay ejercicios que coincidan.
               </p>
               <p className="mt-2 text-sm text-muted">

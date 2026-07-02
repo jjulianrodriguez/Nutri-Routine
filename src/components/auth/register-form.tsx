@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -29,7 +28,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 }
 
 const inputClasses =
-  "mt-2 h-[3.25rem] rounded-[16px] border-border bg-surface px-4 text-espresso shadow-none placeholder:text-stone/60 focus-visible:border-terracotta focus-visible:ring-4 focus-visible:ring-terracotta/20";
+  "mt-2 h-[3.25rem] rounded-control border-border bg-surface px-4 text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-focus-ring/20";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -87,7 +86,7 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       <div>
-        <Label htmlFor="fullName" className="text-sm font-bold text-espresso">
+        <Label htmlFor="fullName" className="text-sm font-bold text-foreground">
           Nombre completo
         </Label>
         <Input
@@ -109,7 +108,7 @@ export function RegisterForm() {
       </div>
 
       <div>
-        <Label htmlFor="email" className="text-sm font-bold text-espresso">
+        <Label htmlFor="email" className="text-sm font-bold text-foreground">
           Email
         </Label>
         <Input
@@ -125,8 +124,8 @@ export function RegisterForm() {
         <FieldError id="register-email-error" message={errors.email?.message} />
       </div>
 
-      <div className="rounded-[18px] border border-border bg-primary-soft/45 p-4">
-        <Label htmlFor="accessCode" className="text-sm font-bold text-espresso">
+      <div className="rounded-card border border-border-soft bg-primary-soft/45 p-4">
+        <Label htmlFor="accessCode" className="text-sm font-bold text-foreground">
           Código de acceso
         </Label>
         <Input
@@ -145,7 +144,7 @@ export function RegisterForm() {
         />
         <p
           id="register-access-code-help"
-          className="mt-2 text-sm font-semibold leading-6 text-stone"
+          className="mt-2 text-sm font-semibold leading-6 text-muted-foreground"
         >
           Código privado entregado por tu profesional.
         </p>
@@ -156,7 +155,7 @@ export function RegisterForm() {
       </div>
 
       <div>
-        <Label htmlFor="password" className="text-sm font-bold text-espresso">
+        <Label htmlFor="password" className="text-sm font-bold text-foreground">
           Contraseña
         </Label>
         <PasswordInput
@@ -179,7 +178,7 @@ export function RegisterForm() {
       <div>
         <Label
           htmlFor="confirmPassword"
-          className="text-sm font-bold text-espresso"
+          className="text-sm font-bold text-foreground"
         >
           Confirmar contraseña
         </Label>
@@ -225,12 +224,10 @@ export function RegisterForm() {
         </Alert>
       ) : null}
 
-      <motion.button
+      <button
         type="submit"
         disabled={isSubmitting}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-extrabold text-primary-foreground shadow-soft transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
-        whileHover={isSubmitting ? undefined : { y: -1 }}
-        whileTap={isSubmitting ? undefined : { scale: 0.99 }}
+        className="flex w-full items-center justify-center gap-2 rounded-control bg-primary py-4 text-sm font-extrabold text-primary-foreground shadow-soft transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting ? (
           <>
@@ -243,14 +240,14 @@ export function RegisterForm() {
             <ArrowRight className="size-4" />
           </>
         )}
-      </motion.button>
+      </button>
 
       <div className="pt-2 text-center text-sm">
-        <p className="text-stone">
+        <p className="text-muted-foreground">
           ¿Ya tenés cuenta?{" "}
           <Link
             href="/login"
-            className="font-bold text-espresso underline decoration-terracotta decoration-2 underline-offset-4 transition-colors hover:text-terracotta"
+            className="font-bold text-primary underline decoration-primary-soft decoration-2 underline-offset-4 transition-colors hover:text-primary-hover"
           >
             Iniciá sesión
           </Link>

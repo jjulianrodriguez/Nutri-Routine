@@ -21,7 +21,7 @@ export default async function AdminBlogPage() {
 
       <section className="flex flex-wrap items-center justify-between gap-4 rounded-[24px] border border-border bg-surface p-5 shadow-soft">
         <div>
-          <p className="text-sm font-extrabold text-charcoal">
+          <p className="text-sm font-extrabold text-foreground">
             Gestionar publicaciones
           </p>
           <p className="mt-1 text-sm leading-6 text-muted">

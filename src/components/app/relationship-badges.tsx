@@ -21,13 +21,13 @@ type AssignedProfessionalCard = {
 };
 
 const badgeToneClasses: Record<RelationshipBadgeTone, string> = {
-  accent: "border-accent bg-accent-soft text-charcoal",
+  accent: "border-accent bg-secondary-soft text-foreground",
   danger: "border-danger/20 bg-danger/10 text-danger",
   muted: "border-border bg-background text-muted",
-  neutral: "border-secondary-accent bg-secondary-accent-soft text-charcoal",
-  primary: "border-primary bg-primary text-charcoal",
-  success: "border-success bg-success text-charcoal",
-  warning: "border-warning bg-warning text-charcoal",
+  neutral: "border-secondary-accent bg-secondary-accent-soft text-foreground",
+  primary: "border-primary bg-primary text-primary-foreground",
+  success: "border-success bg-success text-foreground",
+  warning: "border-warning bg-warning text-foreground",
 };
 
 export function RelationshipBadge({
@@ -208,7 +208,7 @@ export function AssignedProfessionalCards({
           className,
         )}
       >
-        <p className="font-extrabold text-charcoal">{emptyLabel}</p>
+        <p className="font-extrabold text-foreground">{emptyLabel}</p>
         <p className="mt-1 text-sm font-semibold leading-6 text-muted">
           Cuando se active un plan, el nombre de la profesional aparecerá aquí.
         </p>
@@ -227,11 +227,11 @@ export function AssignedProfessionalCards({
             className="h-fit self-start rounded-[20px] border border-border bg-background p-4"
           >
             <div className="flex items-start gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-charcoal">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-foreground">
                 <Icon className="size-5" aria-hidden="true" />
               </span>
               <div className="min-w-0">
-                <h3 className="break-words font-extrabold text-charcoal">
+                <h3 className="break-words font-extrabold text-foreground">
                   {professional.name ?? "Perfil incompleto"}
                 </h3>
                 <div className="mt-2 flex flex-wrap gap-2">

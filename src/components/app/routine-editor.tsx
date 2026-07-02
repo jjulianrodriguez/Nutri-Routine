@@ -71,10 +71,10 @@ const routineTargetAudienceOptions = [
 ] as const;
 
 const inputClasses =
-  "mt-2 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+  "mt-2 rounded-control border-border bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
 const formSectionClasses =
   "rounded-[22px] border border-border bg-background p-4 sm:p-5";
-const legendClasses = "px-1 text-sm font-extrabold text-charcoal";
+const legendClasses = "px-1 text-sm font-extrabold text-foreground";
 
 function normalizeSearch(value: string) {
   return value
@@ -218,8 +218,8 @@ function RoutineBuilderStat({
       <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
         {label}
       </p>
-      <p className="mt-2 text-3xl font-black text-charcoal">{value}</p>
-      <p className="mt-1 text-sm font-semibold text-warm-brown">{detail}</p>
+      <p className="mt-2 text-3xl font-black text-foreground">{value}</p>
+      <p className="mt-1 text-sm font-semibold text-muted-foreground">{detail}</p>
     </div>
   );
 }
@@ -378,7 +378,7 @@ export function RoutineEditor({
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted">
               {routine ? "Editar entrenamiento" : "Nuevo entrenamiento"}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-charcoal">
+            <h2 className="mt-2 text-2xl font-semibold text-foreground">
               Datos generales
             </h2>
           </div>
@@ -395,7 +395,7 @@ export function RoutineEditor({
 
           <div className="grid gap-5 lg:grid-cols-2">
             <div>
-            <Label htmlFor="routine-name" className="font-extrabold text-charcoal">
+            <Label htmlFor="routine-name" className="font-extrabold text-foreground">
               Nombre
             </Label>
             <Input
@@ -411,7 +411,7 @@ export function RoutineEditor({
           <div>
             <Label
               htmlFor="routine-category"
-              className="font-extrabold text-charcoal"
+              className="font-extrabold text-foreground"
             >
               Categoría
             </Label>
@@ -444,7 +444,7 @@ export function RoutineEditor({
           <div>
             <Label
               htmlFor="routine-difficulty"
-              className="font-extrabold text-charcoal"
+              className="font-extrabold text-foreground"
             >
               Dificultad
             </Label>
@@ -464,7 +464,7 @@ export function RoutineEditor({
           <div>
             <Label
               htmlFor="routine-audience"
-              className="font-extrabold text-charcoal"
+              className="font-extrabold text-foreground"
             >
               Publico objetivo
             </Label>
@@ -497,12 +497,12 @@ export function RoutineEditor({
         </fieldset>
 
         {inactiveSelectedCount > 0 ? (
-          <Alert className="mt-5 rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-charcoal">
+          <Alert className="mt-5 rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-foreground">
             <TriangleAlert
-              className="size-5 text-warm-brown"
+              className="size-5 text-muted-foreground"
               aria-hidden="true"
             />
-            <AlertDescription className="font-semibold leading-6 text-charcoal">
+            <AlertDescription className="font-semibold leading-6 text-foreground">
               {inactiveSelectedCount === 1
                 ? "Este entrenamiento contiene 1 ejercicio desactivado."
                 : `Este entrenamiento contiene ${inactiveSelectedCount} ejercicios desactivados.`}{" "}
@@ -516,7 +516,7 @@ export function RoutineEditor({
           <legend className={legendClasses}>Notas del entrenamiento</legend>
           <Label
             htmlFor="routine-description"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Descripción
           </Label>
@@ -525,7 +525,7 @@ export function RoutineEditor({
             rows={4}
             className={cn(
               inputClasses,
-              "min-h-32 w-full resize-y py-3 text-sm outline-none",
+              "min-h-32 w-full resize-none py-3 text-sm outline-none",
             )}
             placeholder="Objetivo, recomendaciones y contexto del entrenamiento."
             aria-invalid={Boolean(errors.description)}
@@ -534,7 +534,7 @@ export function RoutineEditor({
           <FieldError message={errors.description?.message} />
         </fieldset>
 
-        <label className="mt-5 flex min-h-11 w-fit items-center gap-3 rounded-control border border-border bg-background px-4 text-sm font-extrabold text-charcoal">
+        <label className="mt-5 flex min-h-11 w-fit items-center gap-3 rounded-control border border-border bg-background px-4 text-sm font-extrabold text-foreground">
           <input
             type="checkbox"
             className="size-4 accent-[var(--primary)]"
@@ -549,7 +549,7 @@ export function RoutineEditor({
           <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted">
             Constructor
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-charcoal">
+          <h2 className="mt-2 text-2xl font-semibold text-foreground">
             Ejercicios del entrenamiento
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted">
@@ -607,12 +607,12 @@ export function RoutineEditor({
         ) : null}
 
         {pendingExerciseCount > 0 ? (
-          <Alert className="mt-4 rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-charcoal">
+          <Alert className="mt-4 rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-foreground">
             <TriangleAlert
-              className="size-5 text-warm-brown"
+              className="size-5 text-muted-foreground"
               aria-hidden="true"
             />
-            <AlertDescription className="font-semibold leading-6 text-charcoal">
+            <AlertDescription className="font-semibold leading-6 text-foreground">
               Hay {pendingExerciseCount}{" "}
               {pendingExerciseCount === 1
                 ? "ejercicio pendiente"
@@ -679,7 +679,7 @@ export function RoutineEditor({
 
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex min-w-0 items-start gap-3">
-                      <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-charcoal">
+                      <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-foreground">
                         <Dumbbell className="size-4" aria-hidden="true" />
                       </div>
                       <div>
@@ -691,7 +691,7 @@ export function RoutineEditor({
                             className={cn(
                               "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-extrabold",
                               setupState.isConfigured
-                                ? "bg-primary-soft text-charcoal"
+                                ? "bg-primary-soft text-foreground"
                                 : "bg-danger/10 text-danger",
                             )}
                           >
@@ -711,10 +711,10 @@ export function RoutineEditor({
                               : `Pendiente: ${setupState.missing.join(", ")}`}
                           </span>
                         </div>
-                        <h3 className="mt-1 text-lg font-semibold text-charcoal">
+                        <h3 className="mt-1 text-lg font-semibold text-foreground">
                           {field.name}
                         </h3>
-                        <p className="mt-1 text-xs font-bold text-warm-brown">
+                        <p className="mt-1 text-xs font-bold text-muted-foreground">
                           {field.muscleGroup} - {field.exerciseType}
                         </p>
                         {isInactive ? (
@@ -768,7 +768,7 @@ export function RoutineEditor({
                     <div>
                       <Label
                         htmlFor={`routine-series-${index}`}
-                        className="font-extrabold text-charcoal"
+                        className="font-extrabold text-foreground"
                       >
                         Series
                       </Label>
@@ -786,7 +786,7 @@ export function RoutineEditor({
                     <div>
                       <Label
                         htmlFor={`routine-repetitions-${index}`}
-                        className="font-extrabold text-charcoal"
+                        className="font-extrabold text-foreground"
                       >
                         Repeticiones
                       </Label>
@@ -803,7 +803,7 @@ export function RoutineEditor({
                     <div>
                       <Label
                         htmlFor={`routine-rest-value-${index}`}
-                        className="font-extrabold text-charcoal"
+                        className="font-extrabold text-foreground"
                       >
                         Descanso
                       </Label>
@@ -813,13 +813,13 @@ export function RoutineEditor({
                           type="number"
                           min="0"
                           inputMode="numeric"
-                          className="rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20"
+                          className="rounded-control border-border bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20"
                           placeholder="Cantidad"
                           {...register(`exercises.${index}.restValue`)}
                         />
                         <select
                           aria-label={`Unidad de descanso para ${field.name}`}
-                          className="h-10 rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+                          className="h-10 rounded-control border border-border bg-surface px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
                           {...register(`exercises.${index}.restUnit`)}
                         >
                           <option value="seconds">Segundos</option>
@@ -838,7 +838,7 @@ export function RoutineEditor({
                   <div className="mt-4">
                     <Label
                       htmlFor={`routine-notes-${index}`}
-                      className="font-extrabold text-charcoal"
+                      className="font-extrabold text-foreground"
                     >
                       Notas especificas
                     </Label>
@@ -847,7 +847,7 @@ export function RoutineEditor({
                       rows={2}
                       className={cn(
                         inputClasses,
-                        "min-h-28 w-full resize-y py-3 text-sm outline-none",
+                        "min-h-28 w-full resize-none py-3 text-sm outline-none",
                       )}
                       placeholder="Opcional"
                       {...register(`exercises.${index}.notes`)}
@@ -861,8 +861,8 @@ export function RoutineEditor({
             })
           ) : (
             <div className="rounded-[22px] border border-dashed border-border bg-background p-8 text-center">
-              <Dumbbell className="mx-auto size-6 text-warm-brown" />
-              <p className="mt-3 font-extrabold text-charcoal">
+              <Dumbbell className="mx-auto size-6 text-muted-foreground" />
+              <p className="mt-3 font-extrabold text-foreground">
                 El entrenamiento aun no tiene ejercicios.
               </p>
               <p className="mt-2 text-sm text-muted">

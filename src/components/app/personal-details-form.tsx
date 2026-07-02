@@ -29,7 +29,7 @@ import {
 } from "@/lib/validations/personal-details";
 
 const fieldClasses =
-  "mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
+  "mt-2 h-12 rounded-control border-border bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20";
 
 const emptyValues: PersonalDetailsValues = {
   allergies: "",
@@ -172,11 +172,11 @@ export function PersonalDetailsForm({
       <div className="rounded-[20px] border border-primary/25 bg-primary-soft/60 p-4">
         <div className="flex items-start gap-3">
           <LockKeyhole
-            className="mt-0.5 size-5 shrink-0 text-warm-brown"
+            className="mt-0.5 size-5 shrink-0 text-muted-foreground"
             aria-hidden="true"
           />
           <div>
-            <h3 className="font-extrabold text-charcoal">Antes de guardar</h3>
+            <h3 className="font-extrabold text-foreground">Antes de guardar</h3>
             <p className="mt-1 text-sm leading-6 text-muted">
               Tus profesionales asignados ven estos datos solo si lo permitiste
               en Configuracion. Ahora mismo: datos personales{" "}
@@ -198,7 +198,7 @@ export function PersonalDetailsForm({
 
       <div className="grid gap-5 md:grid-cols-2">
         <div>
-          <Label htmlFor="personalPhone" className="font-extrabold text-charcoal">
+          <Label htmlFor="personalPhone" className="font-extrabold text-foreground">
             Teléfono
           </Label>
           <Input
@@ -225,7 +225,7 @@ export function PersonalDetailsForm({
         <div>
           <Label
             htmlFor="personalBirthDate"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Fecha de nacimiento
           </Label>
@@ -249,7 +249,7 @@ export function PersonalDetailsForm({
         <div>
           <Label
             htmlFor="personalGender"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Genero
           </Label>
@@ -276,7 +276,7 @@ export function PersonalDetailsForm({
           <div>
             <Label
               htmlFor="personalGenderDescription"
-              className="font-extrabold text-charcoal"
+              className="font-extrabold text-foreground"
             >
               Autodescripción
             </Label>
@@ -304,7 +304,7 @@ export function PersonalDetailsForm({
         <div>
           <Label
             htmlFor="personalWeight"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Peso
           </Label>
@@ -337,7 +337,7 @@ export function PersonalDetailsForm({
         <div>
           <Label
             htmlFor="personalHeight"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Altura
           </Label>
@@ -370,7 +370,7 @@ export function PersonalDetailsForm({
         <div>
           <Label
             htmlFor="personalBodyFat"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Porcentaje de grasa
           </Label>
@@ -404,7 +404,7 @@ export function PersonalDetailsForm({
       <div>
         <Label
           htmlFor="personalBodyMeasurements"
-          className="font-extrabold text-charcoal"
+          className="font-extrabold text-foreground"
         >
           Medidas fisicas por zonas
         </Label>
@@ -413,7 +413,7 @@ export function PersonalDetailsForm({
           rows={4}
           maxLength={4000}
           placeholder="Ejemplo: cintura, cadera, pecho, brazo, pierna u otras zonas relevantes"
-          className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+          className="mt-2 min-h-28 w-full resize-none rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
           aria-describedby={
             errors.bodyMeasurements
               ? "personal-body-measurements-error"
@@ -437,7 +437,7 @@ export function PersonalDetailsForm({
       <div>
         <Label
           htmlFor="personalMedicalConditions"
-          className="font-extrabold text-charcoal"
+          className="font-extrabold text-foreground"
         >
           Enfermedades o condiciones medicas
         </Label>
@@ -446,7 +446,7 @@ export function PersonalDetailsForm({
           rows={5}
           maxLength={4000}
           placeholder="Información que deseas conservar en tu perfil"
-          className="mt-2 min-h-32 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+          className="mt-2 min-h-32 w-full resize-none rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
           aria-describedby={
             errors.medicalConditions
               ? "personal-medical-conditions-error"
@@ -470,7 +470,7 @@ export function PersonalDetailsForm({
 
       <div className="grid gap-5 lg:grid-cols-2">
         <div>
-          <Label htmlFor="personalInjuries" className="font-extrabold text-charcoal">
+          <Label htmlFor="personalInjuries" className="font-extrabold text-foreground">
             Lesiones
           </Label>
           <textarea
@@ -478,7 +478,7 @@ export function PersonalDetailsForm({
             rows={4}
             maxLength={4000}
             placeholder="Lesiones actuales o historial relevante"
-            className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+            className="mt-2 min-h-28 w-full resize-none rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
             aria-describedby={errors.injuries ? "personal-injuries-error" : undefined}
             aria-invalid={Boolean(errors.injuries)}
             {...register("injuries")}
@@ -490,7 +490,7 @@ export function PersonalDetailsForm({
         </div>
 
         <div>
-          <Label htmlFor="personalAllergies" className="font-extrabold text-charcoal">
+          <Label htmlFor="personalAllergies" className="font-extrabold text-foreground">
             Alergias
           </Label>
           <textarea
@@ -498,7 +498,7 @@ export function PersonalDetailsForm({
             rows={4}
             maxLength={4000}
             placeholder="Alergias alimentarias, medicamentos u otras"
-            className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+            className="mt-2 min-h-28 w-full resize-none rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
             aria-describedby={errors.allergies ? "personal-allergies-error" : undefined}
             aria-invalid={Boolean(errors.allergies)}
             {...register("allergies")}
@@ -512,7 +512,7 @@ export function PersonalDetailsForm({
         <div>
           <Label
             htmlFor="personalImportantMedications"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Medicamentos importantes
           </Label>
@@ -521,7 +521,7 @@ export function PersonalDetailsForm({
             rows={4}
             maxLength={4000}
             placeholder="Medicamentos o suplementos relevantes para tu seguimiento"
-            className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+            className="mt-2 min-h-28 w-full resize-none rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
             aria-describedby={
               errors.importantMedications
                 ? "personal-important-medications-error"
@@ -539,7 +539,7 @@ export function PersonalDetailsForm({
         <div>
           <Label
             htmlFor="personalDietaryRestrictions"
-            className="font-extrabold text-charcoal"
+            className="font-extrabold text-foreground"
           >
             Restricciones alimentarias
           </Label>
@@ -548,7 +548,7 @@ export function PersonalDetailsForm({
             rows={4}
             maxLength={4000}
             placeholder="Preferencias, restricciones o alimentos a evitar"
-            className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+            className="mt-2 min-h-28 w-full resize-none rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
             aria-describedby={
               errors.dietaryRestrictions
                 ? "personal-dietary-restrictions-error"
@@ -567,7 +567,7 @@ export function PersonalDetailsForm({
       <div>
         <Label
           htmlFor="personalProfessionalNotes"
-          className="font-extrabold text-charcoal"
+          className="font-extrabold text-foreground"
         >
           Notas importantes para el profesional
         </Label>
@@ -576,7 +576,7 @@ export function PersonalDetailsForm({
           rows={4}
           maxLength={4000}
           placeholder="Informacion que tu profesional asignado debe considerar"
-          className="mt-2 min-h-28 w-full resize-y rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-charcoal shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
+          className="mt-2 min-h-28 w-full resize-none rounded-control border border-border bg-surface px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 aria-invalid:border-danger"
           aria-describedby={
             errors.professionalNotes
               ? "personal-professional-notes-error"
@@ -622,7 +622,7 @@ export function PersonalDetailsForm({
 
       <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[24px] border border-border bg-surface/90 p-4 shadow-card backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-start gap-3 text-sm leading-6">
-          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
+          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-muted-foreground">
             {isDirty ? (
               <AlertCircle className="size-4" aria-hidden="true" />
             ) : (
@@ -630,7 +630,7 @@ export function PersonalDetailsForm({
             )}
           </span>
           <div>
-            <p className="font-extrabold text-charcoal">
+            <p className="font-extrabold text-foreground">
               {isDirty ? "Datos personales con cambios" : "Datos personales al dia"}
             </p>
             <p className="text-muted" aria-live="polite">

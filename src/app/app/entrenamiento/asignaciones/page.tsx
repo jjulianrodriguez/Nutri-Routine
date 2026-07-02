@@ -127,7 +127,7 @@ export default async function RoutineAssignmentsPage({
 
       {warning ? (
         <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">
-          <AlertDescription className="font-semibold text-warm-brown">
+          <AlertDescription className="font-semibold text-muted-foreground">
             {warning}
           </AlertDescription>
         </Alert>
@@ -208,14 +208,14 @@ export default async function RoutineAssignmentsPage({
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex min-w-0 items-center gap-3">
-                      <div className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-soft text-charcoal">
+                      <div className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-soft text-foreground">
                         <UserRound className="size-5" aria-hidden="true" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
                           Cliente
                         </p>
-                        <h2 className="truncate text-xl font-semibold text-charcoal">
+                        <h2 className="truncate text-xl font-semibold text-foreground">
                           {client.name}
                         </h2>
                         {client.contact ? (
@@ -236,11 +236,11 @@ export default async function RoutineAssignmentsPage({
                     <span
                       className={cn(
                         "rounded-full px-3 py-1 text-xs font-extrabold",
-                        !assignment && "bg-stone-soft text-stone-hover",
+                        !assignment && "bg-surface-muted text-foreground",
                         assignment?.state === "active" &&
-                          "bg-primary text-charcoal",
+                          "bg-primary text-primary-foreground",
                         assignment?.state === "upcoming" &&
-                          "bg-teal-soft text-teal",
+                          "bg-secondary-soft text-secondary",
                         assignment?.state === "expired" &&
                           "bg-danger/10 text-danger",
                       )}
@@ -256,7 +256,7 @@ export default async function RoutineAssignmentsPage({
                       <p className="text-xs font-extrabold uppercase tracking-wide text-muted">
                         Plan de entrenamiento
                       </p>
-                      <p className="mt-1 text-sm font-extrabold text-charcoal">
+                      <p className="mt-1 text-sm font-extrabold text-foreground">
                         Activo
                       </p>
                     </div>
@@ -264,7 +264,7 @@ export default async function RoutineAssignmentsPage({
                       <p className="text-xs font-extrabold uppercase tracking-wide text-muted">
                         Responsable
                       </p>
-                      <p className="mt-1 truncate text-sm font-extrabold text-charcoal">
+                      <p className="mt-1 truncate text-sm font-extrabold text-foreground">
                         {client.assignedTrainerName ??
                           "Sin profesional asignado"}
                       </p>
@@ -272,17 +272,17 @@ export default async function RoutineAssignmentsPage({
                   </div>
 
                   {assignment ? (
-                    <div className="mt-5 rounded-[20px] border border-charcoal/10 bg-surface p-4">
+                    <div className="mt-5 rounded-[20px] border border-foreground/10 bg-surface p-4">
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <div className="flex items-center gap-2 text-sm font-bold text-warm-brown">
+                          <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
                             <CheckCircle2
                               className="size-4"
                               aria-hidden="true"
                             />
                             Plantilla asignada
                           </div>
-                          <h3 className="mt-2 text-lg font-extrabold text-charcoal">
+                          <h3 className="mt-2 text-lg font-extrabold text-foreground">
                             {assignment.title}
                           </h3>
                           <p className="mt-1 text-sm font-semibold text-muted">
@@ -346,11 +346,11 @@ function AssignmentMeta({
 }) {
   return (
     <div>
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
+      <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       <p className="mt-2 text-xs font-extrabold uppercase tracking-wide text-muted">
         {label}
       </p>
-      <p className="mt-1 text-sm font-extrabold text-charcoal">{value}</p>
+      <p className="mt-1 text-sm font-extrabold text-foreground">{value}</p>
     </div>
   );
 }

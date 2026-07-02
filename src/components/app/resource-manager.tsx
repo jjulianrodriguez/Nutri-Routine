@@ -463,7 +463,7 @@ function ResourceCard({
         <div
           className={cn(
             "grid size-12 shrink-0 place-items-center rounded-[16px] border border-border",
-            isPdf ? "bg-primary-soft text-primary-hover" : "bg-accent-soft text-warm-brown",
+            isPdf ? "bg-primary-soft text-primary-hover" : "bg-secondary-soft text-muted-foreground",
           )}
         >
           <PreviewIcon className="size-5" aria-hidden="true" />
@@ -474,7 +474,7 @@ function ResourceCard({
             <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-primary-foreground">
               {kindLabel}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-charcoal">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-foreground">
               <AreaIcon className="size-3.5" aria-hidden="true" />
               {getAreaLabel(resource.area)}
             </span>
@@ -484,7 +484,7 @@ function ResourceCard({
                   "rounded-full px-2.5 py-1 text-xs font-extrabold",
                   isInactive
                     ? "bg-muted/15 text-muted"
-                    : "bg-primary-soft text-charcoal",
+                    : "bg-primary-soft text-foreground",
                 )}
               >
                 {isInactive ? "Inactivo" : "Activo"}
@@ -492,7 +492,7 @@ function ResourceCard({
             ) : null}
           </div>
 
-          <h3 className="mt-2 min-w-0 break-words text-lg font-bold leading-tight text-charcoal">
+          <h3 className="mt-2 min-w-0 break-words text-lg font-bold leading-tight text-foreground">
             {resource.title}
           </h3>
           <p className="mt-1 truncate text-xs font-bold text-muted" translate="no">
@@ -512,7 +512,7 @@ function ResourceCard({
         {resource.description || area.summary}
       </p>
 
-      <dl className="mt-4 grid gap-3 border-t border-border pt-4 text-xs font-bold text-warm-brown sm:grid-cols-2">
+      <dl className="mt-4 grid gap-3 border-t border-border pt-4 text-xs font-bold text-muted-foreground sm:grid-cols-2">
         {resource.folderName ? (
           <div>
             <dt className="text-muted">Carpeta</dt>
@@ -601,10 +601,10 @@ function FolderCard({
         isInactive && "opacity-70",
       )}
     >
-      <div className="absolute left-5 top-0 h-3 w-24 -translate-y-px rounded-t-[14px] border border-b-0 border-border bg-accent-soft" />
+      <div className="absolute left-5 top-0 h-3 w-24 -translate-y-px rounded-t-[14px] border border-b-0 border-border bg-secondary-soft" />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex flex-1 items-start gap-3">
-          <div className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
+          <div className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-secondary-soft text-muted-foreground">
             <FolderOpen className="size-6" aria-hidden="true" />
           </div>
           <div className="min-w-0">
@@ -612,7 +612,7 @@ function FolderCard({
               <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-primary-foreground">
                 Carpeta
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-charcoal">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-extrabold text-foreground">
                 <AreaIcon className="size-3.5" aria-hidden="true" />
                 {getAreaLabel(folder.area)}
               </span>
@@ -622,14 +622,14 @@ function FolderCard({
                     "rounded-full px-2.5 py-1 text-xs font-extrabold",
                     isInactive
                       ? "bg-muted/15 text-muted"
-                      : "bg-primary-soft text-charcoal",
+                      : "bg-primary-soft text-foreground",
                   )}
                 >
                   {isInactive ? "Inactiva" : "Activa"}
                 </span>
               ) : null}
             </div>
-            <h3 className="mt-2 break-words text-lg font-bold leading-tight text-charcoal">
+            <h3 className="mt-2 break-words text-lg font-bold leading-tight text-foreground">
               {folder.name}
             </h3>
           </div>
@@ -668,7 +668,7 @@ function FolderCard({
       </p>
 
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
-        <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+        <span className="rounded-full bg-secondary-soft px-3 py-1 text-xs font-extrabold text-foreground">
           {folder.documentCount} documentos
         </span>
         <Button asChild size="sm" variant="outline">
@@ -703,7 +703,7 @@ function AreaSelector({
       value={value}
       disabled={disabled}
       onChange={(event) => onChange?.(event.target.value as ResourceArea)}
-      className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+      className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
     >
       {manageableAreas.map((area) => (
         <option key={area} value={area}>
@@ -790,11 +790,11 @@ function FolderManager({
       className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6"
     >
       <div className="flex items-center gap-3">
-        <div className="grid size-11 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
+        <div className="grid size-11 place-items-center rounded-[16px] bg-secondary-soft text-muted-foreground">
           <Folder className="size-5" aria-hidden="true" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-charcoal">
+          <h2 className="text-2xl font-bold text-foreground">
             Carpetas
           </h2>
           <p className="mt-1 text-sm leading-6 text-muted">
@@ -805,7 +805,7 @@ function FolderManager({
 
       <form className="mt-5 space-y-4" onSubmit={onSubmit} noValidate>
         <div>
-          <Label htmlFor="resource-folder-name" className="font-extrabold text-charcoal">
+          <Label htmlFor="resource-folder-name" className="font-extrabold text-foreground">
             Nombre
           </Label>
           <Input
@@ -823,7 +823,7 @@ function FolderManager({
         </div>
 
         <div>
-          <Label htmlFor="resource-folder-description" className="font-extrabold text-charcoal">
+          <Label htmlFor="resource-folder-description" className="font-extrabold text-foreground">
             Descripcion opcional
           </Label>
           <textarea
@@ -834,7 +834,7 @@ function FolderManager({
             maxLength={500}
             defaultValue={editingFolder?.description ?? ""}
             disabled={isPending}
-            className="mt-2 w-full resize-y rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+            className="mt-2 w-full resize-none rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
           />
           <FieldError
             id="resource-folder-description-error"
@@ -843,7 +843,7 @@ function FolderManager({
         </div>
 
         <div>
-          <Label htmlFor="resource-folder-area" className="font-extrabold text-charcoal">
+          <Label htmlFor="resource-folder-area" className="font-extrabold text-foreground">
             Area
           </Label>
           <AreaSelector
@@ -900,7 +900,7 @@ function FolderManager({
                   className="min-w-0 text-left"
                   onClick={() => startEditing(folder)}
                 >
-                  <p className="truncate font-extrabold text-charcoal">
+                  <p className="truncate font-extrabold text-foreground">
                     {folder.name}
                   </p>
                   <p className="mt-1 text-xs font-bold text-muted">
@@ -1004,11 +1004,11 @@ function PdfUploadForm({
   return (
     <section className="rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
       <div className="flex items-center gap-3">
-        <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
+        <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-muted-foreground">
           <Upload className="size-5" aria-hidden="true" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-charcoal">Subir PDF</h2>
+          <h2 className="text-2xl font-bold text-foreground">Subir PDF</h2>
           <p className="mt-1 text-sm leading-6 text-muted">
             Puede quedar sin carpeta o dentro de una carpeta.
           </p>
@@ -1017,7 +1017,7 @@ function PdfUploadForm({
 
       <form className="mt-5 space-y-4" onSubmit={onSubmit} noValidate>
         <div>
-          <Label htmlFor="pdf-area" className="font-extrabold text-charcoal">
+          <Label htmlFor="pdf-area" className="font-extrabold text-foreground">
             Area
           </Label>
           <AreaSelector
@@ -1031,7 +1031,7 @@ function PdfUploadForm({
         </div>
 
         <div>
-          <Label htmlFor="pdf-folder" className="font-extrabold text-charcoal">
+          <Label htmlFor="pdf-folder" className="font-extrabold text-foreground">
             Carpeta opcional
           </Label>
           <select
@@ -1042,7 +1042,7 @@ function PdfUploadForm({
             defaultValue={
               selectedFolder?.area === selectedArea ? selectedFolder.id : ""
             }
-            className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+            className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
           >
             <option value="">Sin carpeta</option>
             {availableFolders.map((folder) => (
@@ -1055,7 +1055,7 @@ function PdfUploadForm({
         </div>
 
         <div>
-          <Label htmlFor="pdf-title" className="font-extrabold text-charcoal">
+          <Label htmlFor="pdf-title" className="font-extrabold text-foreground">
             Titulo
           </Label>
           <Input
@@ -1070,7 +1070,7 @@ function PdfUploadForm({
         </div>
 
         <div>
-          <Label htmlFor="pdf-description" className="font-extrabold text-charcoal">
+          <Label htmlFor="pdf-description" className="font-extrabold text-foreground">
             Descripcion opcional
           </Label>
           <textarea
@@ -1079,13 +1079,13 @@ function PdfUploadForm({
             rows={4}
             maxLength={2000}
             disabled={isPending}
-            className="mt-2 w-full resize-y rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+            className="mt-2 w-full resize-none rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
           />
           <FieldError id="pdf-description-error" message={fieldErrors.description} />
         </div>
 
         <div>
-          <Label htmlFor="pdf-file" className="font-extrabold text-charcoal">
+          <Label htmlFor="pdf-file" className="font-extrabold text-foreground">
             Archivo PDF
           </Label>
           <Input
@@ -1190,7 +1190,7 @@ function PdfEditForm({
           <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
             Edicion
           </p>
-          <h2 className="mt-2 text-2xl font-bold text-charcoal">
+          <h2 className="mt-2 text-2xl font-bold text-foreground">
             Editar PDF
           </h2>
         </div>
@@ -1204,7 +1204,7 @@ function PdfEditForm({
         <input type="hidden" name="id" value={resource.id} />
 
         <div>
-          <Label htmlFor="pdf-edit-title" className="font-extrabold text-charcoal">
+          <Label htmlFor="pdf-edit-title" className="font-extrabold text-foreground">
             Titulo
           </Label>
           <Input
@@ -1220,7 +1220,7 @@ function PdfEditForm({
         </div>
 
         <div>
-          <Label htmlFor="pdf-edit-area" className="font-extrabold text-charcoal">
+          <Label htmlFor="pdf-edit-area" className="font-extrabold text-foreground">
             Area
           </Label>
           <AreaSelector
@@ -1234,7 +1234,7 @@ function PdfEditForm({
         </div>
 
         <div>
-          <Label htmlFor="pdf-edit-folder" className="font-extrabold text-charcoal">
+          <Label htmlFor="pdf-edit-folder" className="font-extrabold text-foreground">
             Carpeta opcional
           </Label>
           <select
@@ -1243,7 +1243,7 @@ function PdfEditForm({
             name="folderId"
             disabled={isPending}
             defaultValue={selectedArea === resource.area ? resource.folder_id ?? "" : ""}
-            className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+            className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
           >
             <option value="">Sin carpeta</option>
             {availableFolders.map((folder) => (
@@ -1256,7 +1256,7 @@ function PdfEditForm({
         </div>
 
         <div>
-          <Label htmlFor="pdf-edit-description" className="font-extrabold text-charcoal">
+          <Label htmlFor="pdf-edit-description" className="font-extrabold text-foreground">
             Descripcion opcional
           </Label>
           <textarea
@@ -1266,7 +1266,7 @@ function PdfEditForm({
             maxLength={2000}
             defaultValue={resource.description ?? ""}
             disabled={isPending}
-            className="mt-2 w-full resize-y rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+            className="mt-2 w-full resize-none rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
           />
           <FieldError
             id="pdf-edit-description-error"
@@ -1275,7 +1275,7 @@ function PdfEditForm({
         </div>
 
         <div>
-          <Label htmlFor="pdf-edit-file" className="font-extrabold text-charcoal">
+          <Label htmlFor="pdf-edit-file" className="font-extrabold text-foreground">
             Reemplazar PDF opcional
           </Label>
           <Input
@@ -1442,7 +1442,7 @@ function ExternalResourceForm({
           <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
             {editingResource ? "Edicion" : "Nuevo enlace"}
           </p>
-          <h2 className="mt-2 text-2xl font-bold text-charcoal">
+          <h2 className="mt-2 text-2xl font-bold text-foreground">
             {editingResource ? "Editar enlace" : "Crear enlace"}
           </h2>
         </div>
@@ -1460,12 +1460,12 @@ function ExternalResourceForm({
         noValidate
       >
         <div>
-          <Label htmlFor="resource-title" className="font-extrabold text-charcoal">
+          <Label htmlFor="resource-title" className="font-extrabold text-foreground">
             Titulo
           </Label>
           <Input
             id="resource-title"
-            className="mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft"
+            className="mt-2 h-12 rounded-control border-border bg-surface px-4 text-foreground shadow-soft"
             aria-describedby={errors.title ? "resource-title-error" : undefined}
             aria-invalid={Boolean(errors.title)}
             autoComplete="off"
@@ -1476,14 +1476,14 @@ function ExternalResourceForm({
         </div>
 
         <div>
-          <Label htmlFor="resource-description" className="font-extrabold text-charcoal">
+          <Label htmlFor="resource-description" className="font-extrabold text-foreground">
             Descripcion opcional
           </Label>
           <textarea
             id="resource-description"
             rows={4}
             maxLength={2000}
-            className="mt-2 w-full resize-y rounded-[22px] border border-input bg-surface/90 px-4 py-4 text-base leading-7 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 disabled:opacity-50"
+            className="mt-2 w-full resize-none rounded-[22px] border border-input bg-surface/90 px-4 py-4 text-base leading-7 text-foreground shadow-soft outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 disabled:opacity-50"
             aria-describedby={
               errors.description ? "resource-description-error" : undefined
             }
@@ -1497,14 +1497,14 @@ function ExternalResourceForm({
         </div>
 
         <div>
-          <Label htmlFor="resource-url" className="font-extrabold text-charcoal">
+          <Label htmlFor="resource-url" className="font-extrabold text-foreground">
             URL externa
           </Label>
           <Input
             id="resource-url"
             type="url"
             inputMode="url"
-            className="mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft"
+            className="mt-2 h-12 rounded-control border-border bg-surface px-4 text-foreground shadow-soft"
             aria-describedby={errors.url ? "resource-url-error" : undefined}
             aria-invalid={Boolean(errors.url)}
             autoComplete="off"
@@ -1517,7 +1517,7 @@ function ExternalResourceForm({
         </div>
 
         <fieldset>
-          <legend className="text-sm font-extrabold text-charcoal">
+          <legend className="text-sm font-extrabold text-foreground">
             Tipo de acceso
           </legend>
           <div className="mt-3 grid gap-3">
@@ -1542,11 +1542,11 @@ function ExternalResourceForm({
                     {...register("area")}
                   />
                   <Icon
-                    className="size-5 shrink-0 text-warm-brown"
+                    className="size-5 shrink-0 text-muted-foreground"
                     aria-hidden="true"
                   />
                   <span>
-                    <span className="block font-extrabold text-charcoal">
+                    <span className="block font-extrabold text-foreground">
                       {details.label}
                     </span>
                     <span className="mt-1 block text-xs leading-5 text-muted">
@@ -1561,12 +1561,12 @@ function ExternalResourceForm({
         </fieldset>
 
         <div>
-          <Label htmlFor="resource-folder" className="font-extrabold text-charcoal">
+          <Label htmlFor="resource-folder" className="font-extrabold text-foreground">
             Carpeta opcional
           </Label>
           <select
             id="resource-folder"
-            className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+            className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
             aria-describedby={
               errors.folderId ? "resource-folder-error" : undefined
             }
@@ -1844,7 +1844,7 @@ export function ResourceManager({
               Biblioteca de materiales
             </p>
           )}
-          <h2 className="mt-2 break-words text-3xl font-semibold text-charcoal">
+          <h2 className="mt-2 break-words text-3xl font-semibold text-foreground">
             {selectedFolder ? selectedFolder.name : "Recursos disponibles"}
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
@@ -1898,7 +1898,7 @@ export function ResourceManager({
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Buscar por titulo, carpeta, tipo o area"
-              className="h-12 rounded-control border-border bg-surface pl-11 pr-4 text-charcoal shadow-soft"
+              className="h-12 rounded-control border-border bg-surface pl-11 pr-4 text-foreground shadow-soft"
               autoComplete="off"
             />
           </div>
@@ -1947,7 +1947,7 @@ export function ResourceManager({
               <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
                 Area
               </p>
-              <span className="inline-flex min-h-9 items-center gap-1.5 rounded-control border border-border bg-surface px-3 text-sm font-bold text-charcoal shadow-soft">
+              <span className="inline-flex min-h-9 items-center gap-1.5 rounded-control border border-border bg-surface px-3 text-sm font-bold text-foreground shadow-soft">
                 {getAreaLabel(selectedFolder.area)}
               </span>
             </div>
@@ -2031,7 +2031,7 @@ export function ResourceManager({
               <div>
                 <h3
                   id="folder-resources-title"
-                  className="text-lg font-extrabold text-charcoal"
+                  className="text-lg font-extrabold text-foreground"
                 >
                   Documentos de la carpeta
                 </h3>
@@ -2039,7 +2039,7 @@ export function ResourceManager({
                   Solo se muestran recursos dentro de esta carpeta.
                 </p>
               </div>
-              <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+              <span className="rounded-full bg-secondary-soft px-3 py-1 text-xs font-extrabold text-foreground">
                 {filteredResources.length} recurso
                 {filteredResources.length === 1 ? "" : "s"}
               </span>
@@ -2072,7 +2072,7 @@ export function ResourceManager({
           </section>
         ) : hasActiveLocalFilters ? (
           <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
-            <p className="font-extrabold text-charcoal">
+            <p className="font-extrabold text-foreground">
               No encontramos recursos con esos filtros.
             </p>
             <p className="mt-2 text-sm leading-6 text-muted">
@@ -2081,7 +2081,7 @@ export function ResourceManager({
           </div>
         ) : (
           <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
-            <p className="font-extrabold text-charcoal">
+            <p className="font-extrabold text-foreground">
               Esta carpeta todavia no tiene documentos.
             </p>
             <p className="mt-2 text-sm leading-6 text-muted">
@@ -2099,7 +2099,7 @@ export function ResourceManager({
                 <div>
                   <h3
                     id="resource-folders-title"
-                    className="text-lg font-extrabold text-charcoal"
+                    className="text-lg font-extrabold text-foreground"
                   >
                     Carpetas
                   </h3>
@@ -2107,7 +2107,7 @@ export function ResourceManager({
                     Organizacion principal de la biblioteca.
                   </p>
                 </div>
-                <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                <span className="rounded-full bg-secondary-soft px-3 py-1 text-xs font-extrabold text-foreground">
                   {filteredFolders.length} carpeta
                   {filteredFolders.length === 1 ? "" : "s"}
                 </span>
@@ -2143,7 +2143,7 @@ export function ResourceManager({
                 <div>
                   <h3
                     id="root-resources-title"
-                    className="text-lg font-extrabold text-charcoal"
+                    className="text-lg font-extrabold text-foreground"
                   >
                     Recursos sin carpeta
                   </h3>
@@ -2151,7 +2151,7 @@ export function ResourceManager({
                     PDFs y enlaces disponibles en el nivel principal.
                   </p>
                 </div>
-                <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-extrabold text-foreground">
                   {filteredResources.length} recurso
                   {filteredResources.length === 1 ? "" : "s"}
                 </span>
@@ -2186,7 +2186,7 @@ export function ResourceManager({
         </div>
       ) : hasAnyContentInScope || hasActiveFilters ? (
         <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
-          <p className="font-extrabold text-charcoal">
+          <p className="font-extrabold text-foreground">
             No encontramos recursos con esos filtros.
           </p>
           <p className="mt-2 text-sm leading-6 text-muted">
@@ -2195,7 +2195,7 @@ export function ResourceManager({
         </div>
       ) : (
         <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
-          <p className="font-extrabold text-charcoal">
+          <p className="font-extrabold text-foreground">
             {emptyMessage ?? "Todavia no hay recursos disponibles."}
           </p>
           <p className="mt-2 text-sm leading-6 text-muted">

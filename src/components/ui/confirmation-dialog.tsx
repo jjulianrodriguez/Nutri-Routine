@@ -84,7 +84,7 @@ export function ConfirmationDialog({
             <Icon className="size-5" aria-hidden="true" />
           </div>
 
-          <AlertDialogPrimitive.Title className="mt-5 break-words text-2xl font-extrabold text-charcoal">
+          <AlertDialogPrimitive.Title className="mt-5 break-words text-2xl font-extrabold text-foreground">
             {title}
           </AlertDialogPrimitive.Title>
           <AlertDialogPrimitive.Description className="mt-3 text-pretty text-sm leading-6 text-muted">

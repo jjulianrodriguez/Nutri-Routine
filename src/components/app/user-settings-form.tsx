@@ -69,12 +69,12 @@ function SettingsControl({
       <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           {icon ? (
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-muted-foreground">
               {icon}
             </span>
           ) : null}
           <div className="min-w-0">
-            <h3 className="font-extrabold text-charcoal">{label}</h3>
+            <h3 className="font-extrabold text-foreground">{label}</h3>
             <p className="mt-1 text-sm font-semibold leading-6 text-muted">
               {description}
             </p>
@@ -140,7 +140,7 @@ function SelectRow({
         <select
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 min-w-40 rounded-control border border-border bg-surface px-4 text-sm font-bold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+          className="h-11 min-w-40 rounded-control border border-border bg-surface px-4 text-sm font-bold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -246,7 +246,7 @@ export function UserSettingsForm({
         >
           <div className="space-y-3">
             <div className="rounded-[20px] border border-primary/25 bg-primary-soft/60 p-4 text-sm leading-6 text-muted">
-              <p className="font-extrabold text-charcoal">
+              <p className="font-extrabold text-foreground">
                 Que significa compartir estos datos
               </p>
               <p className="mt-1">
@@ -357,7 +357,7 @@ export function UserSettingsForm({
       <div className="xl:col-span-2">
         <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[24px] border border-border bg-surface/90 p-4 shadow-card backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3 text-sm leading-6">
-            <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
+            <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-muted-foreground">
               {hasPendingChanges ? (
                 <AlertCircle className="size-4" aria-hidden="true" />
               ) : (
@@ -365,7 +365,7 @@ export function UserSettingsForm({
               )}
             </span>
             <div>
-              <p className="font-extrabold text-charcoal">
+              <p className="font-extrabold text-foreground">
                 {hasPendingChanges ? "Cambios pendientes" : "Configuracion al dia"}
               </p>
               <p className="text-muted" aria-live="polite">

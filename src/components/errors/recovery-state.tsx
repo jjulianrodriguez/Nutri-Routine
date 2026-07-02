@@ -65,16 +65,16 @@ export function RecoveryState({
   return (
     <Card
       className={cn(
-        "relative mx-auto w-full max-w-3xl overflow-hidden border-charcoal/10 bg-surface py-0 shadow-premium",
+        "relative mx-auto w-full max-w-3xl overflow-hidden border-foreground/10 bg-surface py-0 shadow-premium",
         className,
       )}
       aria-labelledby="recovery-state-title"
       aria-describedby="recovery-state-description"
       role={kind === "unexpected" ? "alert" : "region"}
     >
-      <div className="h-2 bg-[var(--color-papaya)]" aria-hidden="true" />
+      <div className="h-2 bg-primary" aria-hidden="true" />
       <CardHeader className="gap-4 px-6 pt-7 sm:px-9 sm:pt-9">
-        <div className="grid size-14 place-items-center rounded-full border border-charcoal/10 bg-primary-soft text-warm-brown">
+        <div className="grid size-14 place-items-center rounded-full border border-foreground/10 bg-primary-soft text-muted-foreground">
           <Icon className="size-6" aria-hidden="true" />
         </div>
         <div>
@@ -83,14 +83,14 @@ export function RecoveryState({
           </p>
           <h1
             id="recovery-state-title"
-            className="mt-3 max-w-2xl text-4xl font-semibold leading-tight text-charcoal sm:text-5xl"
+            className="mt-3 max-w-2xl text-4xl font-semibold leading-tight text-foreground sm:text-5xl"
           >
             {title}
           </h1>
         </div>
         <CardDescription
           id="recovery-state-description"
-          className="max-w-2xl text-base leading-7 text-warm-brown"
+          className="max-w-2xl text-base leading-7 text-muted-foreground"
         >
           {description}
         </CardDescription>

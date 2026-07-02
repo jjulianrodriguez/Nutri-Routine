@@ -68,15 +68,15 @@ export function RoutineExerciseList({
             className="rounded-[22px] border border-border bg-background p-5"
           >
             <div className="flex items-start gap-4">
-              <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary text-sm font-extrabold text-charcoal">
+              <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary text-sm font-extrabold text-primary-foreground">
                 <span className="sr-only">Orden </span>
                 {index + 1}
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="text-xl font-semibold text-charcoal">
+                <h3 className="text-xl font-semibold text-foreground">
                   {item.exercise.name}
                 </h3>
-                <p className="mt-1 text-sm font-bold text-warm-brown">
+                <p className="mt-1 text-sm font-bold text-muted-foreground">
                   {item.exercise.category} · {item.exercise.muscleGroup} ·{" "}
                   {item.exercise.exerciseType}
                 </p>
@@ -119,7 +119,7 @@ export function RoutineExerciseList({
               <div className="mt-4 rounded-[16px] border border-primary/25 bg-primary-soft/35 p-4">
                 <div className="flex items-center gap-2">
                   <ExternalLink
-                    className="size-4 text-warm-brown"
+                    className="size-4 text-muted-foreground"
                     aria-hidden="true"
                   />
                   <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
@@ -163,7 +163,7 @@ export function RoutineExerciseList({
                 <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
                   Notas
                 </p>
-                <p className="mt-2 text-sm leading-6 text-charcoal">
+                <p className="mt-2 text-sm leading-6 text-foreground">
                   {item.notes}
                 </p>
               </div>
@@ -196,32 +196,32 @@ function CompactRoutineExercise({
   return (
     <article className="flex min-h-52 min-w-0 flex-col rounded-[18px] border border-border border-l-4 border-l-primary bg-surface p-4 shadow-[0_8px_22px_rgba(63,49,40,0.06)] sm:p-5">
       <div className="flex min-w-0 items-start gap-3 border-b border-border pb-4">
-        <div className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-sm font-black text-charcoal">
+        <div className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-sm font-black text-primary-foreground">
           <span className="sr-only">Orden </span>
           {order}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-warm-brown">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-muted-foreground">
             Ejercicio
           </p>
           <h4
-            className="mt-1 line-clamp-2 text-lg font-black leading-6 tracking-[-0.01em] text-charcoal"
+            className="mt-1 line-clamp-2 text-lg font-black leading-6 tracking-[-0.01em] text-foreground"
             title={item.exercise.name}
           >
             {item.exercise.name}
           </h4>
           <div className="mt-3 flex flex-wrap gap-2">
-            <span className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-extrabold text-warm-brown">
+            <span className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-extrabold text-muted-foreground">
               {item.exercise.muscleGroup}
             </span>
             {item.exercise.difficulty ? (
-              <span className="rounded-full bg-accent-soft px-2.5 py-1 text-xs font-extrabold text-charcoal">
+              <span className="rounded-full bg-secondary-soft px-2.5 py-1 text-xs font-extrabold text-foreground">
                 {difficultyLabels[item.exercise.difficulty] ??
                   item.exercise.difficulty}
               </span>
             ) : null}
             {multimediaUrls.length > 0 ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-xs font-extrabold text-charcoal">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-xs font-extrabold text-foreground">
                 <ExternalLink className="size-3.5" aria-hidden="true" />
                 {multimediaUrls.length}{" "}
                 {multimediaUrls.length === 1 ? "recurso" : "recursos"}
@@ -248,7 +248,7 @@ function CompactRoutineExercise({
 
       {hasExtraDetails ? (
         <details className="group mt-auto pt-4">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-control border border-border bg-background px-3.5 text-sm font-extrabold text-warm-brown outline-none transition hover:border-primary/40 hover:text-charcoal focus-visible:ring-3 focus-visible:ring-ring/35 [&::-webkit-details-marker]:hidden">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-control border border-border bg-background px-3.5 text-sm font-extrabold text-muted-foreground outline-none transition hover:border-primary/40 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/35 [&::-webkit-details-marker]:hidden">
             Ver detalles
             <ChevronDown
               className="size-4 transition group-open:rotate-180"
@@ -262,7 +262,7 @@ function CompactRoutineExercise({
               </p>
             ) : null}
             {item.durationMinutes !== null ? (
-              <p className="text-sm font-semibold text-charcoal">
+              <p className="text-sm font-semibold text-foreground">
                 Duración estimada: {item.durationMinutes} min
               </p>
             ) : null}
@@ -271,7 +271,7 @@ function CompactRoutineExercise({
                 <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted">
                   Notas
                 </p>
-                <p className="mt-1 text-sm leading-5 text-charcoal">
+                <p className="mt-1 text-sm leading-5 text-foreground">
                   {item.notes}
                 </p>
               </div>
@@ -327,7 +327,7 @@ function CompactValue({
       <p className="truncate text-[11px] font-extrabold uppercase tracking-wide text-muted">
         {label}
       </p>
-      <p className="mt-1 break-words text-sm font-black leading-5 text-charcoal">
+      <p className="mt-1 break-words text-sm font-black leading-5 text-foreground">
         {value}
       </p>
     </div>
@@ -345,11 +345,11 @@ function RoutineValue({
 }) {
   return (
     <div className="rounded-[16px] border border-border bg-surface p-3">
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
+      <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       <p className="mt-2 text-xs font-extrabold uppercase tracking-wide text-muted">
         {label}
       </p>
-      <p className="mt-1 font-extrabold text-charcoal">{value}</p>
+      <p className="mt-1 font-extrabold text-foreground">{value}</p>
     </div>
   );
 }

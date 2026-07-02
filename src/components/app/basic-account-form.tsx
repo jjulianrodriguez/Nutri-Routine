@@ -92,14 +92,14 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
   return (
     <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div>
-        <Label htmlFor="accountFullName" className="font-extrabold text-charcoal">
+        <Label htmlFor="accountFullName" className="font-extrabold text-foreground">
           Nombre completo visible
         </Label>
         <Input
           id="accountFullName"
           type="text"
           autoComplete="name"
-          className="mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft placeholder:text-muted focus-visible:ring-primary/20"
+          className="mt-2 h-12 rounded-control border-border bg-surface px-4 text-foreground shadow-soft placeholder:text-muted focus-visible:ring-primary/20"
           aria-describedby={errors.fullName ? "account-full-name-error" : undefined}
           aria-invalid={Boolean(errors.fullName)}
           {...register("fullName")}
@@ -118,7 +118,7 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
         <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
           Email
         </p>
-        <p className="mt-1 break-all font-bold text-charcoal">
+        <p className="mt-1 break-all font-bold text-foreground">
           {email || "Email no disponible"}
         </p>
         <p className="mt-2 text-xs leading-5 text-muted">
@@ -150,7 +150,7 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
 
       <div className="flex flex-col gap-3 rounded-[20px] border border-border bg-surface/82 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3 text-sm leading-6">
-          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-warm-brown">
+          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-muted-foreground">
             {isDirty ? (
               <AlertCircle className="size-4" aria-hidden="true" />
             ) : (
@@ -158,7 +158,7 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
             )}
           </span>
           <div>
-            <p className="font-extrabold text-charcoal">
+            <p className="font-extrabold text-foreground">
               {isDirty ? "Nombre con cambios pendientes" : "Nombre sin cambios"}
             </p>
             <p className="text-muted" aria-live="polite">

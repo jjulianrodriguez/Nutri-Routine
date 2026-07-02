@@ -113,7 +113,7 @@ function TodayFocus({
   if (todayAssignments.length === 0) {
     return (
       <div className="h-fit self-start rounded-[22px] border border-border bg-surface p-5 text-sm font-semibold text-muted shadow-soft">
-        <p className="font-extrabold text-charcoal">Hoy no tienes hábitos programados.</p>
+        <p className="font-extrabold text-foreground">Hoy no tienes hábitos programados.</p>
         <p className="mt-1">Tu tracker semanal queda disponible para revisar otros días.</p>
       </div>
     );
@@ -123,11 +123,11 @@ function TodayFocus({
     <div className="h-fit self-start rounded-[22px] border border-border bg-surface p-5 shadow-soft">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-[14px] bg-primary-soft text-warm-brown">
+          <span className="grid size-10 shrink-0 place-items-center rounded-[14px] bg-primary-soft text-muted-foreground">
             <CalendarCheck2 className="size-5" aria-hidden="true" />
           </span>
           <div>
-            <p className="font-extrabold text-charcoal">
+            <p className="font-extrabold text-foreground">
               {pendingToday.length === 0
                 ? "Hoy está completo."
                 : `Faltan ${pendingToday.length} de ${todayAssignments.length} hábitos de hoy.`}
@@ -139,7 +139,7 @@ function TodayFocus({
             </p>
           </div>
         </div>
-        <span className="rounded-full bg-background px-3 py-1 text-xs font-extrabold text-warm-brown">
+        <span className="rounded-full bg-background px-3 py-1 text-xs font-extrabold text-muted-foreground">
           Hoy
         </span>
       </div>
@@ -151,7 +151,7 @@ function TodayFocus({
               key={assignment.id}
               className="h-fit self-start rounded-[16px] border border-border bg-background px-4 py-3"
             >
-              <p className="font-extrabold text-charcoal">
+              <p className="font-extrabold text-foreground">
                 {assignment.habit.title}
               </p>
               {assignment.habit.description ? (
@@ -211,8 +211,8 @@ function HabitDayToggle({
       className={cn(
         "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[14px] border px-3 py-2 text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:cursor-not-allowed",
         completed
-          ? "border-primary/50 bg-primary text-charcoal shadow-soft"
-          : "border-border bg-surface text-warm-brown hover:border-primary/35 hover:bg-primary-soft",
+          ? "border-primary/50 bg-primary text-primary-foreground shadow-soft"
+          : "border-border bg-surface text-muted-foreground hover:border-primary/35 hover:bg-primary-soft",
         !canToggle && "opacity-70",
         isToday && "ring-2 ring-primary/25",
       )}
@@ -280,7 +280,7 @@ function HabitWeekGrid({
   if (assignments.length === 0) {
     return (
       <div className="rounded-[22px] border border-dashed border-border bg-surface/58 p-5 text-sm font-semibold leading-6 text-muted shadow-soft">
-        <p className="font-extrabold text-charcoal">
+        <p className="font-extrabold text-foreground">
           Todavía no hay hábitos para esta semana.
         </p>
         <p className="mt-1">
@@ -305,14 +305,14 @@ function HabitWeekGrid({
                   key={day.date}
                   className={cn(
                     "px-3 py-3 text-center text-xs font-extrabold uppercase tracking-[0.12em] relative",
-                    day.isToday ? "text-charcoal bg-primary-soft/30 font-black rounded-t-[14px]" : "text-muted",
+                    day.isToday ? "text-foreground bg-primary-soft/30 font-black rounded-t-[14px]" : "text-muted",
                   )}
                 >
                   {day.isToday && (
                     <span className="absolute inset-x-0 top-0 h-1 bg-primary rounded-full" />
                   )}
                   <span>{day.shortLabel}</span>
-                  <span className="mt-1 block text-[0.68rem] font-bold normal-case tracking-normal text-warm-brown">
+                  <span className="mt-1 block text-[0.68rem] font-bold normal-case tracking-normal text-muted-foreground">
                     {day.date.slice(5)}
                   </span>
                 </th>
@@ -323,7 +323,7 @@ function HabitWeekGrid({
             {assignments.map((assignment) => (
               <tr key={assignment.id} className="border-b border-border last:border-b-0">
                 <td className="px-4 py-4 align-top">
-                  <p className="font-extrabold text-charcoal">
+                  <p className="font-extrabold text-foreground">
                     {assignment.habit.title}
                   </p>
                   {assignment.habit.description ? (
@@ -363,7 +363,7 @@ function HabitWeekGrid({
             key={assignment.id}
             className="h-fit self-start rounded-[24px] border border-border bg-surface p-4 shadow-soft"
           >
-            <h3 className="font-extrabold text-charcoal">
+            <h3 className="font-extrabold text-foreground">
               {assignment.habit.title}
             </h3>
             {assignment.habit.description ? (
@@ -512,7 +512,7 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
   return (
     <div className="grid items-start gap-5 xl:grid-cols-[0.9fr_1.1fr]">
       <div className="h-fit self-start rounded-[22px] border border-border bg-background p-4">
-        <h3 className="font-extrabold text-charcoal">
+        <h3 className="font-extrabold text-foreground">
           {editing ? "Editar hábito" : "Crear hábito"}
         </h3>
         <div className="mt-4 space-y-4">
@@ -532,11 +532,11 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
               id="habit-description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              className="mt-2 min-h-24 w-full rounded-control border border-border bg-surface px-3 py-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+              className="mt-2 min-h-24 w-full rounded-control border border-border bg-surface px-3 py-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
               placeholder="Indicaciones breves para la clienta"
             />
           </div>
-          <label className="flex min-h-11 items-center gap-3 rounded-[16px] border border-border bg-surface px-3 py-2 text-sm font-bold text-warm-brown">
+          <label className="flex min-h-11 items-center gap-3 rounded-[16px] border border-border bg-surface px-3 py-2 text-sm font-bold text-muted-foreground">
             <input
               type="checkbox"
               checked={active}
@@ -568,15 +568,15 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
 
       <div className="space-y-3" aria-busy={isPending}>
         {isPending ? (
-          <div className="flex items-center gap-2 rounded-[18px] border border-primary/25 bg-primary-soft px-4 py-3 text-sm font-extrabold text-charcoal">
+          <div className="flex items-center gap-2 rounded-[18px] border border-primary/25 bg-primary-soft px-4 py-3 text-sm font-extrabold text-foreground">
             <Loader2 className="size-4 animate-spin" aria-hidden="true" />
             Guardando cambios del catálogo...
           </div>
         ) : null}
         {habits.length === 0 ? (
           <Alert className="rounded-[22px] border-dashed border-primary/35 bg-primary-soft/70 p-5">
-            <AlertDescription className="flex items-start gap-3 font-semibold text-charcoal">
-              <span className="grid size-10 shrink-0 place-items-center rounded-[14px] bg-surface text-warm-brown">
+            <AlertDescription className="flex items-start gap-3 font-semibold text-foreground">
+              <span className="grid size-10 shrink-0 place-items-center rounded-[14px] bg-surface text-muted-foreground">
                 <Plus className="size-5" aria-hidden="true" />
               </span>
               <span>
@@ -601,14 +601,14 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-start gap-2">
-                      <h4 className="min-w-0 max-w-full truncate text-lg font-extrabold leading-tight text-charcoal">
+                      <h4 className="min-w-0 max-w-full truncate text-lg font-extrabold leading-tight text-foreground">
                         {habit.title}
                       </h4>
                       <span
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold",
                           habit.active
-                            ? "bg-primary-soft text-charcoal"
+                            ? "bg-primary-soft text-foreground"
                             : "bg-muted/15 text-muted",
                         )}
                       >
@@ -634,7 +634,7 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
                         <p className="text-[0.7rem] font-extrabold uppercase tracking-[0.12em] text-muted">
                           Frecuencia/días
                         </p>
-                        <p className="mt-1 text-sm font-bold text-charcoal">
+                        <p className="mt-1 text-sm font-bold text-foreground">
                           Se define en Asignaciones
                         </p>
                       </div>
@@ -642,7 +642,7 @@ function HabitManager({ habits }: { habits: HabitSummary[] }) {
                         <p className="text-[0.7rem] font-extrabold uppercase tracking-[0.12em] text-muted">
                           Estado
                         </p>
-                        <p className="mt-1 text-sm font-bold text-charcoal">
+                        <p className="mt-1 text-sm font-bold text-foreground">
                           {habit.active
                             ? "Disponible para asignar"
                             : "Oculto para nuevas asignaciones"}
@@ -823,7 +823,7 @@ function AssignmentManager({
   if (clients.length === 0) {
     return (
       <Alert className="rounded-[18px] border-primary/25 bg-primary-soft">
-        <AlertDescription className="font-semibold text-charcoal">
+        <AlertDescription className="font-semibold text-foreground">
           No hay clientas de nutrición disponibles para gestionar hábitos.
           Revisa las asignaciones activas antes de crear un seguimiento.
         </AlertDescription>
@@ -834,7 +834,7 @@ function AssignmentManager({
   return (
     <div className="grid items-start gap-5 xl:grid-cols-[0.9fr_1.1fr]">
       <div className="h-fit self-start rounded-[22px] border border-border bg-background p-4">
-        <h3 className="font-extrabold text-charcoal">Asignar hábito</h3>
+        <h3 className="font-extrabold text-foreground">Asignar hábito</h3>
         <p className="mt-1 text-sm leading-6 text-muted">
           La clienta verá este hábito solo durante la vigencia y en los días que selecciones.
         </p>
@@ -848,7 +848,7 @@ function AssignmentManager({
                 setClientId(event.target.value);
                 router.push(`${pathname}?client=${event.target.value}`);
               }}
-              className="mt-2 h-12 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+              className="mt-2 h-12 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
             >
               {clients.map((client) => (
                 <option key={client.id} value={client.id}>
@@ -864,7 +864,7 @@ function AssignmentManager({
               id="habit-select"
               value={habitId}
               onChange={(event) => setHabitId(event.target.value)}
-              className="mt-2 h-12 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-charcoal shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
+              className="mt-2 h-12 w-full rounded-control border border-border bg-surface px-3 text-sm font-semibold text-foreground shadow-soft outline-none focus-visible:ring-3 focus-visible:ring-primary/20"
             >
               {activeHabits.length === 0 ? (
                 <option value="">Crea un hábito activo primero</option>
@@ -879,8 +879,8 @@ function AssignmentManager({
 
           <div>
             <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-              <p className="text-sm font-bold text-charcoal">Días aplicables</p>
-              <p className="text-xs font-extrabold text-warm-brown">
+              <p className="text-sm font-bold text-foreground">Días aplicables</p>
+              <p className="text-xs font-extrabold text-muted-foreground">
                 {daysOfWeek.length} de 7 seleccionados
               </p>
             </div>
@@ -902,8 +902,8 @@ function AssignmentManager({
                     className={cn(
                       "flex min-h-16 items-center justify-between gap-2 rounded-[16px] border px-3 py-2 text-left text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
                       selected
-                        ? "border-primary/65 bg-primary text-charcoal shadow-soft"
-                        : "border-border bg-surface text-muted hover:border-primary/35 hover:bg-primary-soft/50 hover:text-charcoal",
+                        ? "border-primary/65 bg-primary text-primary-foreground shadow-soft"
+                        : "border-border bg-surface text-muted hover:border-primary/35 hover:bg-primary-soft/50 hover:text-foreground",
                     )}
                   >
                     <span className="min-w-0">
@@ -911,7 +911,7 @@ function AssignmentManager({
                       <span
                         className={cn(
                           "mt-1 block text-[0.68rem] font-bold leading-none",
-                          selected ? "text-charcoal" : "text-warm-brown",
+                          selected ? "text-foreground" : "text-muted-foreground",
                         )}
                       >
                         {selected ? "Seleccionado" : "No seleccionado"}
@@ -921,7 +921,7 @@ function AssignmentManager({
                       className={cn(
                         "grid size-6 shrink-0 place-items-center rounded-full border",
                         selected
-                          ? "border-charcoal/25 bg-surface/70"
+                          ? "border-foreground/25 bg-surface/70"
                           : "border-border bg-background",
                       )}
                     >
@@ -981,15 +981,15 @@ function AssignmentManager({
 
       <div className="space-y-3" aria-busy={isPending}>
         {isPending ? (
-          <div className="flex items-center gap-2 rounded-[18px] border border-primary/25 bg-primary-soft px-4 py-3 text-sm font-extrabold text-charcoal">
+          <div className="flex items-center gap-2 rounded-[18px] border border-primary/25 bg-primary-soft px-4 py-3 text-sm font-extrabold text-foreground">
             <Loader2 className="size-4 animate-spin" aria-hidden="true" />
             Guardando asignación...
           </div>
         ) : null}
         {assignments.length === 0 ? (
           <Alert className="rounded-[22px] border-dashed border-primary/35 bg-primary-soft/70 p-5">
-            <AlertDescription className="flex items-start gap-3 font-semibold text-charcoal">
-              <span className="grid size-10 shrink-0 place-items-center rounded-[14px] bg-surface text-warm-brown">
+            <AlertDescription className="flex items-start gap-3 font-semibold text-foreground">
+              <span className="grid size-10 shrink-0 place-items-center rounded-[14px] bg-surface text-muted-foreground">
                 <Check className="size-5" aria-hidden="true" />
               </span>
               <span>
@@ -1017,14 +1017,14 @@ function AssignmentManager({
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-start gap-2">
-                      <h4 className="min-w-0 max-w-full truncate text-lg font-extrabold leading-tight text-charcoal">
+                      <h4 className="min-w-0 max-w-full truncate text-lg font-extrabold leading-tight text-foreground">
                         {assignment.habit.title}
                       </h4>
                       <span
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold",
                           assignment.active
-                            ? "bg-primary-soft text-charcoal"
+                            ? "bg-primary-soft text-foreground"
                             : "bg-muted/15 text-muted",
                         )}
                       >
@@ -1053,7 +1053,7 @@ function AssignmentManager({
                           {selectedDays.map((day) => (
                             <span
                               key={day.value}
-                              className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-extrabold text-charcoal"
+                              className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-extrabold text-foreground"
                             >
                               {day.label}
                             </span>
@@ -1064,10 +1064,10 @@ function AssignmentManager({
                         <p className="text-[0.7rem] font-extrabold uppercase tracking-[0.12em] text-muted">
                           Vigencia
                         </p>
-                        <p className="mt-2 text-sm font-bold leading-5 text-charcoal">
+                        <p className="mt-2 text-sm font-bold leading-5 text-foreground">
                           Desde {formatDate(assignment.startDate)}
                         </p>
-                        <p className="text-sm font-semibold leading-5 text-warm-brown">
+                        <p className="text-sm font-semibold leading-5 text-muted-foreground">
                           {assignment.endDate
                             ? `Hasta ${formatDate(assignment.endDate)}`
                             : "Sin fecha final"}
@@ -1075,7 +1075,7 @@ function AssignmentManager({
                       </div>
                     </div>
                     <p className="mt-3 flex items-start gap-2 text-sm leading-5 text-muted">
-                      <Info className="mt-0.5 size-4 shrink-0 text-warm-brown" aria-hidden="true" />
+                      <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                       <span>
                         Aparecerá en el tracker de la clienta solo durante estos días y vigencia.
                       </span>
@@ -1168,8 +1168,8 @@ export function HabitTracker({
       ) : null}
 
       {!isManagementView && !isClient && data.selectedClient ? (
-        <div className="flex flex-wrap items-center gap-2 rounded-[20px] border border-border bg-surface px-4 py-3 text-sm font-extrabold text-charcoal shadow-soft">
-          <UserRound className="size-4 text-warm-brown" aria-hidden="true" />
+        <div className="flex flex-wrap items-center gap-2 rounded-[20px] border border-border bg-surface px-4 py-3 text-sm font-extrabold text-foreground shadow-soft">
+          <UserRound className="size-4 text-muted-foreground" aria-hidden="true" />
           Viendo progreso de {data.selectedClient.fullName}
         </div>
       ) : null}
@@ -1187,7 +1187,7 @@ export function HabitTracker({
 
       {!isClient && showCatalog && (
         <section className="h-fit self-start rounded-[28px] border border-border bg-surface/82 p-5 shadow-soft backdrop-blur-lg sm:p-6">
-          <h2 className="text-2xl font-bold leading-tight text-charcoal">
+          <h2 className="text-2xl font-bold leading-tight text-foreground">
             Hábitos personalizados
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted">
@@ -1201,7 +1201,7 @@ export function HabitTracker({
 
       {!isClient && showAssignments && (
         <section className="h-fit self-start rounded-[28px] border border-primary/30 bg-primary-soft/70 p-5 shadow-soft backdrop-blur-lg sm:p-6">
-          <h2 className="text-2xl font-bold leading-tight text-charcoal">
+          <h2 className="text-2xl font-bold leading-tight text-foreground">
             Asignaciones
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted">
@@ -1218,7 +1218,7 @@ export function HabitTracker({
               />
             ) : (
               <Alert className="rounded-[18px] border-primary/25 bg-surface">
-                <AlertDescription className="font-semibold text-charcoal">
+                <AlertDescription className="font-semibold text-foreground">
                   Selecciona o asigna una clienta de nutrición para empezar.
                 </AlertDescription>
               </Alert>

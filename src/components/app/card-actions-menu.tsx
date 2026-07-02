@@ -26,7 +26,7 @@ type CardActionsMenuProps = {
 };
 
 const itemClasses =
-  "flex min-h-10 cursor-default select-none items-center gap-3 rounded-control px-3 py-2 text-sm font-bold text-charcoal outline-none transition-colors focus:bg-primary-soft focus:text-primary-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50";
+  "flex min-h-10 cursor-default select-none items-center gap-3 rounded-control px-3 py-2 text-sm font-bold text-foreground outline-none transition-colors focus:bg-primary-soft focus:text-primary-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50";
 
 export function CardActionsMenu({ items, label }: CardActionsMenuProps) {
   if (items.length === 0) {

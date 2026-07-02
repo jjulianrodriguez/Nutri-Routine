@@ -82,7 +82,7 @@ function SectionNav({
         <Link
           key={item.href}
           href={item.href}
-          className="shrink-0 rounded-[16px] px-3 py-2 text-sm font-extrabold text-warm-brown transition-colors hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+          className="shrink-0 rounded-[16px] px-3 py-2 text-sm font-extrabold text-muted-foreground transition-colors hover:bg-primary-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
         >
           {item.label}
         </Link>
@@ -103,7 +103,7 @@ function InfoCard({
       <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
         {label}
       </p>
-      <div className="mt-2 text-sm font-bold leading-6 text-charcoal">
+      <div className="mt-2 text-sm font-bold leading-6 text-foreground">
         {children}
       </div>
     </div>
@@ -181,8 +181,8 @@ async function ClientProfile({
               </p>
             </div>
             <div className="min-w-0">
-              <UserRound className="mb-3 size-5 text-warm-brown" />
-              <h2 className="break-words font-extrabold text-charcoal">
+              <UserRound className="mb-3 size-5 text-muted-foreground" />
+              <h2 className="break-words font-extrabold text-foreground">
                 {access.displayName}
               </h2>
               {access.email ? (
@@ -206,9 +206,9 @@ async function ClientProfile({
           description="Informacion privada para tu seguimiento profesional."
         >
           <div className="mb-5 flex items-start gap-3 rounded-[20px] border border-primary/25 bg-primary-soft/60 p-4">
-            <LockKeyhole className="mt-0.5 size-5 shrink-0 text-warm-brown" aria-hidden="true" />
+            <LockKeyhole className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
             <div>
-              <h3 className="font-extrabold text-charcoal">
+              <h3 className="font-extrabold text-foreground">
                 Privacidad por defecto
               </h3>
               <p className="mt-1 text-sm leading-6 text-muted">
@@ -372,7 +372,7 @@ async function ProfessionalProfile({
               </p>
             </div>
             <div className="min-w-0">
-              <h2 className="break-words font-extrabold text-charcoal">
+              <h2 className="break-words font-extrabold text-foreground">
                 {access.displayName}
               </h2>
               <p className="mt-1 flex items-center gap-2 break-all text-sm font-semibold text-muted">
@@ -456,8 +456,8 @@ export default async function ProfilePage() {
               </p>
             </div>
             <div>
-              <ShieldCheck className="mb-3 size-5 text-warm-brown" />
-              <h2 className="font-extrabold text-charcoal">{access.displayName}</h2>
+              <ShieldCheck className="mb-3 size-5 text-muted-foreground" />
+              <h2 className="font-extrabold text-foreground">{access.displayName}</h2>
               <p className="mt-1 text-sm text-muted">{access.email}</p>
             </div>
           </div>

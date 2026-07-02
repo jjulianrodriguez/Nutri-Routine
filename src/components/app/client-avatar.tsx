@@ -30,7 +30,7 @@ export function ClientAvatar({
   return (
     <div
       className={cn(
-        "grid shrink-0 place-items-center overflow-hidden rounded-full bg-accent font-extrabold text-charcoal",
+        "grid shrink-0 place-items-center overflow-hidden rounded-full bg-secondary font-extrabold text-secondary-foreground",
         sizeClasses[size],
         className,
       )}

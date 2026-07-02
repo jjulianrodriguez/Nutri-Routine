@@ -83,7 +83,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 function SaveStatusBadge({ status }: { status: SaveStatus }) {
   const config = {
     dirty: {
-      className: "border-warning/30 bg-warning-soft text-warm-brown",
+      className: "border-warning/30 bg-warning-soft text-muted-foreground",
       icon: AlertCircle,
       label: "Cambios sin guardar",
     },
@@ -103,7 +103,7 @@ function SaveStatusBadge({ status }: { status: SaveStatus }) {
       label: "Guardado",
     },
     saving: {
-      className: "border-primary/30 bg-primary-soft text-charcoal",
+      className: "border-primary/30 bg-primary-soft text-foreground",
       icon: Loader2,
       label: "Guardando...",
     },
@@ -445,7 +445,7 @@ export function BlogManager({
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
               {editingPost ? "Edición" : "Nuevo contenido"}
             </p>
-            <h2 className="mt-2 text-3xl font-semibold text-charcoal">
+            <h2 className="mt-2 text-3xl font-semibold text-foreground">
               {editingPost ? "Editar blog" : "Crear blog"}
             </h2>
           </div>
@@ -466,12 +466,12 @@ export function BlogManager({
           noValidate
         >
           <div>
-            <Label htmlFor="blog-title" className="font-extrabold text-charcoal">
+            <Label htmlFor="blog-title" className="font-extrabold text-foreground">
               Titulo
             </Label>
             <Input
               id="blog-title"
-              className="mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft"
+              className="mt-2 h-12 rounded-control border-border bg-surface px-4 text-foreground shadow-soft"
               aria-describedby={errors.title ? "blog-title-error" : undefined}
               aria-invalid={Boolean(errors.title)}
               maxLength={180}
@@ -483,14 +483,14 @@ export function BlogManager({
           <div>
             <Label
               htmlFor="blog-category"
-              className="font-extrabold text-charcoal"
+              className="font-extrabold text-foreground"
             >
               Categoría
             </Label>
             <Input
               id="blog-category"
               list="blog-category-options"
-              className="mt-2 h-12 rounded-control border-border bg-surface px-4 text-charcoal shadow-soft"
+              className="mt-2 h-12 rounded-control border-border bg-surface px-4 text-foreground shadow-soft"
               aria-describedby={[
                 "blog-category-help",
                 errors.category ? "blog-category-error" : "",
@@ -523,7 +523,7 @@ export function BlogManager({
           <div>
             <Label
               htmlFor="blog-content"
-              className="font-extrabold text-charcoal"
+              className="font-extrabold text-foreground"
             >
               Contenido
             </Label>
@@ -575,7 +575,7 @@ export function BlogManager({
                 {...register("published")}
               />
               <span>
-                <span className="block font-extrabold text-charcoal">
+                <span className="block font-extrabold text-foreground">
                   Visible
                 </span>
                 <span className="mt-1 block text-xs leading-5 text-muted">
@@ -597,7 +597,7 @@ export function BlogManager({
                 })}
               />
               <span>
-                <span className="block font-extrabold text-charcoal">
+                <span className="block font-extrabold text-foreground">
                   Blog principal
                 </span>
                 <span className="mt-1 block text-xs leading-5 text-muted">
@@ -609,7 +609,7 @@ export function BlogManager({
 
           {isPinned ? (
             <Alert className="rounded-[18px] border-primary/30 bg-primary-soft px-4 py-3">
-              <AlertDescription className="font-semibold text-charcoal">
+              <AlertDescription className="font-semibold text-foreground">
                 Un blog principal siempre queda visible.
               </AlertDescription>
             </Alert>
@@ -655,7 +655,7 @@ export function BlogManager({
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
               Biblioteca
             </p>
-            <h2 className="mt-2 text-3xl font-semibold text-charcoal">
+            <h2 className="mt-2 text-3xl font-semibold text-foreground">
               Blogs creados
             </h2>
           </div>
@@ -681,7 +681,7 @@ export function BlogManager({
                           "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold",
                           post.published
                             ? "bg-success/10 text-success"
-                            : "bg-stone-soft text-warm-brown",
+                            : "bg-surface-muted text-muted-foreground",
                         ].join(" ")}
                       >
                         {post.published ? (
@@ -692,7 +692,7 @@ export function BlogManager({
                         {post.published ? "Publicado" : "Oculto"}
                       </span>
                       {post.is_pinned ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-extrabold text-charcoal">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-extrabold text-primary-foreground">
                           <Pin className="size-3" aria-hidden="true" />
                           Anclado
                         </span>
@@ -745,18 +745,18 @@ export function BlogManager({
                     </div>
                   </div>
 
-                  <h3 className="mt-4 text-2xl font-semibold leading-tight text-charcoal">
+                  <h3 className="mt-4 text-2xl font-semibold leading-tight text-foreground">
                     {post.title}
                   </h3>
                   <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted">
                     {post.excerpt}
                   </p>
 
-                  <span className="mt-4 inline-flex rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-warm-brown">
+                  <span className="mt-4 inline-flex rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-muted-foreground">
                     {post.category}
                   </span>
 
-                  <dl className="mt-4 grid gap-2 text-xs font-bold text-warm-brown sm:grid-cols-2">
+                  <dl className="mt-4 grid gap-2 text-xs font-bold text-muted-foreground sm:grid-cols-2">
                     <div>
                       <dt className="text-muted">Autor</dt>
                       <dd className="mt-1">{post.authorName}</dd>
@@ -772,7 +772,7 @@ export function BlogManager({
           </div>
         ) : (
           <div className="mt-6 rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center">
-            <p className="font-extrabold text-charcoal">
+            <p className="font-extrabold text-foreground">
               Todavia no hay blogs publicados.
             </p>
             <p className="mt-2 text-sm leading-6 text-muted">

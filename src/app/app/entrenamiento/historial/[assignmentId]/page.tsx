@@ -127,11 +127,11 @@ export default async function HistoricalRoutineDetailPage({
 
       <div className="flex items-start gap-3 rounded-[22px] border border-primary/30 bg-primary-soft/55 p-4">
         <History
-          className="mt-0.5 size-5 shrink-0 text-warm-brown"
+          className="mt-0.5 size-5 shrink-0 text-muted-foreground"
           aria-hidden="true"
         />
         <div>
-          <p className="font-extrabold text-charcoal">Copia histórica</p>
+          <p className="font-extrabold text-foreground">Copia histórica</p>
           <p className="mt-1 text-sm leading-6 text-muted">
             {historicalMessage}
           </p>
@@ -221,11 +221,11 @@ function DetailValue({
 }) {
   return (
     <div className="h-fit self-start rounded-[22px] border border-border bg-surface p-4 shadow-soft">
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
+      <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
         {label}
       </p>
-      <p className="mt-1 text-sm font-extrabold leading-6 text-charcoal">
+      <p className="mt-1 text-sm font-extrabold leading-6 text-foreground">
         {value}
       </p>
     </div>

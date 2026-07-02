@@ -458,10 +458,10 @@ function ToolbarButton({
             onClick();
           }}
           className={cn(
-            "inline-flex size-10 shrink-0 items-center justify-center rounded-[14px] border text-charcoal transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/35 disabled:pointer-events-none disabled:opacity-45",
+            "inline-flex size-10 shrink-0 items-center justify-center rounded-[14px] border text-foreground transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/35 disabled:pointer-events-none disabled:opacity-45",
             active
-              ? "border-teal/35 bg-primary text-charcoal shadow-soft"
-              : "border-border bg-surface text-muted hover:border-primary/40 hover:bg-primary-soft hover:text-charcoal",
+              ? "border-secondary/35 bg-primary text-primary-foreground shadow-soft"
+              : "border-border bg-surface text-muted hover:border-primary/40 hover:bg-primary-soft hover:text-foreground",
           )}
         >
           <Icon className="size-4" aria-hidden="true" />
@@ -665,7 +665,7 @@ function SizeDropdown({
           onOpenChange(!isOpen);
         }}
         className={cn(
-          "inline-flex h-10 items-center justify-between gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
+          "inline-flex h-10 items-center justify-between gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-foreground shadow-sm transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
           disabled && "pointer-events-none opacity-45"
         )}
       >
@@ -690,9 +690,9 @@ function SizeDropdown({
                 onOpenChange(false);
               }}
               className={cn(
-                "flex min-h-9 w-full items-center rounded-[10px] px-3 py-1.5 text-xs font-bold transition-colors hover:bg-primary-soft hover:text-charcoal",
+                "flex min-h-9 w-full items-center rounded-[10px] px-3 py-1.5 text-xs font-bold transition-colors hover:bg-primary-soft hover:text-foreground",
                 value === size.value || (size.value === "16px" && !value)
-                  ? "bg-primary-soft text-teal"
+                  ? "bg-primary-soft text-secondary"
                   : "text-muted"
               )}
             >
@@ -745,14 +745,14 @@ function ColorDropdown({
           onOpenChange(!isOpen);
         }}
         className={cn(
-          "inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
+          "inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-foreground shadow-sm transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
           disabled && "pointer-events-none opacity-45"
         )}
       >
         <Palette className="size-4 text-muted" />
         {currentSwatchStyle ? (
           <span
-            className="size-3.5 rounded-full border border-charcoal/10"
+            className="size-3.5 rounded-full border border-foreground/10"
             style={currentSwatchStyle}
           />
         ) : (
@@ -789,7 +789,7 @@ function ColorDropdown({
                 )}
               >
                 {color.value === "default" ? (
-                  <span className="text-[9px] font-bold text-charcoal">A</span>
+                  <span className="text-[9px] font-bold text-foreground">A</span>
                 ) : (
                   <span className={cn("size-full rounded-full", color.class)} />
                 )}
@@ -812,7 +812,7 @@ function ColorDropdown({
                   className="sr-only"
                 />
                 <span
-                  className="size-5 rounded-[4px] border border-charcoal/10"
+                  className="size-5 rounded-[4px] border border-foreground/10"
                   style={{ backgroundColor: value && value !== "default" ? value : "#2F5F66" }}
                 />
               </label>
@@ -827,7 +827,7 @@ function ColorDropdown({
                     onChange(val);
                   }
                 }}
-                className="h-8 w-full rounded-[8px] border border-border bg-background px-2 text-xs font-bold uppercase text-charcoal outline-none focus:border-primary/40 focus:ring-1 focus:ring-ring"
+                className="h-8 w-full rounded-[8px] border border-border bg-background px-2 text-xs font-bold uppercase text-foreground outline-none focus:border-primary/40 focus:ring-1 focus:ring-ring"
               />
             </div>
           </div>
@@ -877,14 +877,14 @@ function HighlightDropdown({
           onOpenChange(!isOpen);
         }}
         className={cn(
-          "inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-charcoal shadow-sm transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
+          "inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-border bg-surface px-3 text-xs font-bold text-foreground shadow-sm transition-[background-color,border-color,box-shadow,color] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/25 hover:border-primary/40 hover:bg-primary-soft",
           disabled && "pointer-events-none opacity-45"
         )}
       >
         <Highlighter className="size-4 text-muted" />
         {currentSwatchStyle ? (
           <span
-            className="size-3.5 rounded-full border border-charcoal/10"
+            className="size-3.5 rounded-full border border-foreground/10"
             style={currentSwatchStyle}
           />
         ) : (
@@ -921,7 +921,7 @@ function HighlightDropdown({
                 )}
               >
                 {color.value === "default" ? (
-                  <X className="size-3 text-charcoal" aria-hidden="true" />
+                  <X className="size-3 text-foreground" aria-hidden="true" />
                 ) : (
                   <span className={cn("size-full rounded-full", color.class)} />
                 )}
@@ -944,7 +944,7 @@ function HighlightDropdown({
                   className="sr-only"
                 />
                 <span
-                  className="size-5 rounded-[4px] border border-charcoal/10"
+                  className="size-5 rounded-[4px] border border-foreground/10"
                   style={{ backgroundColor: value && value !== "default" ? value : "#F7E4EA" }}
                 />
               </label>
@@ -959,7 +959,7 @@ function HighlightDropdown({
                     onChange(val);
                   }
                 }}
-                className="h-8 w-full rounded-[8px] border border-border bg-background px-2 text-xs font-bold uppercase text-charcoal outline-none focus:border-primary/40 focus:ring-1 focus:ring-ring"
+                className="h-8 w-full rounded-[8px] border border-border bg-background px-2 text-xs font-bold uppercase text-foreground outline-none focus:border-primary/40 focus:ring-1 focus:ring-ring"
               />
             </div>
           </div>
@@ -1034,7 +1034,7 @@ function LinkDropdown({
             }
           }}
           placeholder="https://..."
-          className="mt-2 h-10 w-full rounded-[10px] border border-border bg-background px-3 text-sm font-semibold text-charcoal outline-none focus:border-primary/40 focus:ring-2 focus:ring-ring/20"
+          className="mt-2 h-10 w-full rounded-[10px] border border-border bg-background px-3 text-sm font-semibold text-foreground outline-none focus:border-primary/40 focus:ring-2 focus:ring-ring/20"
         />
         <div className="mt-3 flex items-center justify-end gap-2">
           <Button
@@ -1127,15 +1127,15 @@ function getActiveHighlightColor(editor: Editor | null): string {
 const editorContentClasses = [
   "relative overflow-hidden rounded-b-[22px] border-x border-b border-input bg-surface/90 shadow-soft",
   "[&_.ProseMirror]:min-h-[20rem] [&_.ProseMirror]:px-4 [&_.ProseMirror]:py-4 [&_.ProseMirror]:text-base [&_.ProseMirror]:leading-7 [&_.ProseMirror]:text-foreground [&_.ProseMirror]:outline-none sm:[&_.ProseMirror]:px-5",
-  "[&_.ProseMirror_a]:font-bold [&_.ProseMirror_a]:text-teal [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:underline-offset-4",
+  "[&_.ProseMirror_a]:font-bold [&_.ProseMirror_a]:text-secondary [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:underline-offset-4",
   "[&_.ProseMirror_.blog-align-center]:text-center [&_.ProseMirror_.blog-align-left]:text-left [&_.ProseMirror_.blog-align-right]:text-right",
-  "[&_.ProseMirror_.blog-color-accent]:text-lavender-dark [&_.ProseMirror_.blog-color-charcoal]:text-charcoal [&_.ProseMirror_.blog-color-teal]:text-teal [&_.ProseMirror_.blog-color-warm]:text-warm-brown",
-  "[&_.ProseMirror_.blog-highlight]:rounded-[8px] [&_.ProseMirror_.blog-highlight]:bg-accent-soft [&_.ProseMirror_.blog-highlight]:px-1.5 [&_.ProseMirror_.blog-highlight]:py-0.5",
+  "[&_.ProseMirror_.blog-color-accent]:text-primary [&_.ProseMirror_.blog-color-charcoal]:text-foreground [&_.ProseMirror_.blog-color-teal]:text-secondary [&_.ProseMirror_.blog-color-warm]:text-muted-foreground",
+  "[&_.ProseMirror_.blog-highlight]:rounded-[8px] [&_.ProseMirror_.blog-highlight]:bg-secondary-soft [&_.ProseMirror_.blog-highlight]:px-1.5 [&_.ProseMirror_.blog-highlight]:py-0.5",
   "[&_.ProseMirror_.blog-text-large]:text-xl [&_.ProseMirror_.blog-text-large]:leading-9 [&_.ProseMirror_.blog-text-small]:text-sm [&_.ProseMirror_.blog-text-small]:leading-6",
-  "[&_.ProseMirror_blockquote]:my-5 [&_.ProseMirror_blockquote]:rounded-[18px] [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-sage [&_.ProseMirror_blockquote]:bg-primary-soft [&_.ProseMirror_blockquote]:px-4 [&_.ProseMirror_blockquote]:py-3 [&_.ProseMirror_blockquote]:font-semibold [&_.ProseMirror_blockquote]:text-charcoal",
-  "[&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h1]:mt-8 [&_.ProseMirror_h1]:font-serif [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-semibold [&_.ProseMirror_h1]:leading-tight [&_.ProseMirror_h1]:text-charcoal sm:[&_.ProseMirror_h1]:text-4xl",
-  "[&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:mt-7 [&_.ProseMirror_h2]:font-serif [&_.ProseMirror_h2]:text-3xl [&_.ProseMirror_h2]:font-semibold [&_.ProseMirror_h2]:leading-tight [&_.ProseMirror_h2]:text-charcoal",
-  "[&_.ProseMirror_h3]:mb-3 [&_.ProseMirror_h3]:mt-6 [&_.ProseMirror_h3]:font-serif [&_.ProseMirror_h3]:text-2xl [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:leading-tight [&_.ProseMirror_h3]:text-charcoal",
+  "[&_.ProseMirror_blockquote]:my-5 [&_.ProseMirror_blockquote]:rounded-card [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-primary [&_.ProseMirror_blockquote]:bg-primary-soft [&_.ProseMirror_blockquote]:px-4 [&_.ProseMirror_blockquote]:py-3 [&_.ProseMirror_blockquote]:font-semibold [&_.ProseMirror_blockquote]:text-foreground",
+  "[&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h1]:mt-8 [&_.ProseMirror_h1]:font-heading [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-semibold [&_.ProseMirror_h1]:leading-tight [&_.ProseMirror_h1]:text-foreground sm:[&_.ProseMirror_h1]:text-4xl",
+  "[&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:mt-7 [&_.ProseMirror_h2]:font-heading [&_.ProseMirror_h2]:text-3xl [&_.ProseMirror_h2]:font-semibold [&_.ProseMirror_h2]:leading-tight [&_.ProseMirror_h2]:text-foreground",
+  "[&_.ProseMirror_h3]:mb-3 [&_.ProseMirror_h3]:mt-6 [&_.ProseMirror_h3]:font-heading [&_.ProseMirror_h3]:text-2xl [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:leading-tight [&_.ProseMirror_h3]:text-foreground",
   "[&_.ProseMirror_hr]:my-8 [&_.ProseMirror_hr]:border-0 [&_.ProseMirror_hr]:border-t [&_.ProseMirror_hr]:border-border",
   "[&_.ProseMirror_li]:my-1.5 [&_.ProseMirror_li]:pl-1 [&_.ProseMirror_ol]:my-5 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p]:my-4 [&_.ProseMirror_u]:underline [&_.ProseMirror_ul]:my-5 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6",
   "[&_.ProseMirror>*:first-child]:mt-0 [&_.ProseMirror>*:last-child]:mb-0",

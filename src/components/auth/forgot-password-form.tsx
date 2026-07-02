@@ -18,7 +18,7 @@ import {
 } from "@/lib/validations/auth";
 
 const inputClasses =
-  "mt-2 h-[3.25rem] rounded-[16px] border-border bg-surface px-4 text-espresso shadow-none placeholder:text-stone/60 focus-visible:border-terracotta focus-visible:ring-4 focus-visible:ring-terracotta/20";
+  "mt-2 h-[3.25rem] rounded-control border-border bg-surface px-4 text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-focus-ring/20";
 
 export function ForgotPasswordForm() {
   const [serverMessage, setServerMessage] = useState("");
@@ -60,7 +60,7 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       <div>
-        <Label htmlFor="email" className="text-sm font-bold text-espresso">
+        <Label htmlFor="email" className="text-sm font-bold text-foreground">
           Email
         </Label>
         <Input
@@ -111,7 +111,7 @@ export function ForgotPasswordForm() {
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="h-[3.25rem] w-full rounded-full bg-primary text-sm font-extrabold text-primary-foreground hover:bg-primary-hover"
+        className="h-[3.25rem] w-full rounded-control bg-primary text-sm font-extrabold text-primary-foreground hover:bg-primary-hover"
       >
         {isSubmitting ? (
           <>
@@ -129,7 +129,7 @@ export function ForgotPasswordForm() {
       <div className="pt-2 text-center text-sm">
         <Link
           href="/login"
-          className="inline-flex items-center gap-2 font-bold text-espresso underline decoration-terracotta decoration-2 underline-offset-4 transition-colors hover:text-terracotta"
+          className="inline-flex items-center gap-2 font-bold text-primary underline decoration-primary-soft decoration-2 underline-offset-4 transition-colors hover:text-primary-hover"
         >
           <ArrowLeft className="size-4" />
           Volver a iniciar sesión

@@ -244,5 +244,16 @@ Unless explicitly requested, do not:
 * Change database schemas unrelated to the task.
 * Run destructive commands.
 * Expose secrets or private data.
+* Use any git commands other than `git status`. Do NOT ever use `git checkout`, `git restore`, `git reset`, `git commit`, or any command that modifies the git tree or working directory.
 
 Focus only on the assigned task.
+
+---
+
+## Post-Task Verification
+
+After completing code changes, you must:
+1. Run `npm run lint` to verify that there are no linter errors.
+2. Run `npm run build` to ensure the application compiles successfully and changes do not break the build.
+3. Test the changes in the browser (or request the user to use the `/browser` command if visual interaction is needed) to verify that the UI works exactly as a human user would experience it and fulfills the requested objective.
+Wait for these commands to finish and confirm their success to the user before considering the task complete.

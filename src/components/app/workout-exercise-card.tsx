@@ -72,19 +72,19 @@ export function WorkoutExerciseCard({
             className={cn(
               "grid size-10 shrink-0 place-items-center rounded-full text-sm font-extrabold",
               completed
-                ? "bg-primary text-charcoal"
-                : "bg-surface text-warm-brown",
+                ? "bg-primary text-primary-foreground"
+                : "bg-surface text-muted-foreground",
             )}
           >
             {order}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h4 className="text-xl font-semibold leading-tight text-charcoal">
+              <h4 className="text-xl font-semibold leading-tight text-foreground">
                 {exercise.exercise.name}
               </h4>
               {completed ? (
-                <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-charcoal">
+                <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-primary-foreground">
                   Realizado
                 </span>
               ) : null}
@@ -94,7 +94,7 @@ export function WorkoutExerciseCard({
                 </span>
               ) : null}
             </div>
-            <p className="mt-1 text-sm font-bold text-warm-brown">
+            <p className="mt-1 text-sm font-bold text-muted-foreground">
               {exercise.exercise.muscleGroup} / {exercise.exercise.category}
               {showProfessionalMeta ? ` / ${exercise.exercise.exerciseType}` : ""}
             </p>
@@ -155,7 +155,7 @@ export function WorkoutExerciseCard({
 
       {hasDetails ? (
         <details className="group mt-4">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-control border border-border bg-surface px-4 text-sm font-extrabold text-warm-brown outline-none transition hover:border-primary/40 hover:text-charcoal focus-visible:ring-3 focus-visible:ring-ring/35 [&::-webkit-details-marker]:hidden">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-control border border-border bg-surface px-4 text-sm font-extrabold text-muted-foreground outline-none transition hover:border-primary/40 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/35 [&::-webkit-details-marker]:hidden">
             Instrucciones y recursos
             <ChevronDown
               className="size-4 transition group-open:rotate-180"
@@ -173,7 +173,7 @@ export function WorkoutExerciseCard({
                 <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted">
                   Notas
                 </p>
-                <p className="mt-1 text-sm leading-6 text-charcoal">
+                <p className="mt-1 text-sm leading-6 text-foreground">
                   {exercise.notes}
                 </p>
               </div>
@@ -226,11 +226,11 @@ function ExerciseValue({
 }) {
   return (
     <div className="rounded-[16px] border border-border bg-surface px-3 py-3">
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
+      <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       <p className="mt-2 text-[11px] font-extrabold uppercase tracking-wide text-muted">
         {label}
       </p>
-      <p className="mt-1 break-words text-sm font-extrabold text-charcoal">
+      <p className="mt-1 break-words text-sm font-extrabold text-foreground">
         {value}
       </p>
     </div>

@@ -67,8 +67,8 @@ export function NutritionSectionNav({
             className={cn(
               "inline-flex min-h-11 items-center gap-2 rounded-control border px-4 text-sm font-extrabold transition-colors",
               isActive
-                ? "border-primary/30 bg-primary text-charcoal"
-                : "border-transparent text-warm-brown hover:border-primary/20 hover:bg-primary-soft hover:text-charcoal",
+                ? "border-primary/30 bg-primary text-primary-foreground"
+                : "border-transparent text-muted-foreground hover:border-primary/20 hover:bg-primary-soft hover:text-foreground",
             )}
           >
             <Icon className="size-4" aria-hidden="true" />

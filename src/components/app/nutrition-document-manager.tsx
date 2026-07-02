@@ -140,18 +140,18 @@ function CurrentMealPlanCard({
     <section className="h-fit self-start rounded-[28px] border border-primary/30 bg-primary-soft/70 p-5 shadow-soft sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          <div className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-surface text-warm-brown">
+          <div className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-surface text-muted-foreground">
             <FileText className="size-5" aria-hidden="true" />
           </div>
           <div className="min-w-0">
             <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
               Plan vigente
             </p>
-            <h2 className="mt-2 break-words text-2xl font-bold leading-tight text-charcoal">
+            <h2 className="mt-2 break-words text-2xl font-bold leading-tight text-foreground">
               {document?.title ?? "Tu plan aparecerá aquí"}
             </h2>
             {document ? (
-              <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-warm-brown">
+              <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-muted-foreground">
                 <div>
                   <dt className="sr-only">Actualizado</dt>
                   <dd>Actualizado {formatDate(document.updatedAt)}</dd>
@@ -218,14 +218,14 @@ function DocumentCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-3">
-          <div className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
+          <div className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-primary-soft text-muted-foreground">
             <FileText className="size-5" aria-hidden="true" />
           </div>
           <div className="min-w-0">
             <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
               {documentTypeLabel}
             </p>
-            <h3 className="mt-1 break-words text-xl font-extrabold leading-tight text-charcoal">
+            <h3 className="mt-1 break-words text-xl font-extrabold leading-tight text-foreground">
               {document.title}
             </h3>
           </div>
@@ -268,7 +268,7 @@ function DocumentCard({
         {document.description || "Documento PDF disponible para consulta."}
       </p>
 
-      <dl className="mt-5 grid gap-3 border-t border-border pt-4 text-xs font-bold text-warm-brown sm:grid-cols-2">
+      <dl className="mt-5 grid gap-3 border-t border-border pt-4 text-xs font-bold text-muted-foreground sm:grid-cols-2">
         {document.clientName ? (
           <div>
             <dt className="text-muted">Clienta asignada</dt>
@@ -294,7 +294,7 @@ function DocumentCard({
                   "rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider",
                   isInactive
                     ? "bg-muted/15 text-muted"
-                    : "bg-primary-soft text-charcoal",
+                    : "bg-primary-soft text-foreground",
                 )}
               >
                 {isInactive ? "Inactivo" : "Activo"}
@@ -371,14 +371,14 @@ function MealPlanUploadForm({
     <form className="space-y-4" onSubmit={onSubmit} noValidate>
       {clients.length === 0 ? (
         <Alert className="rounded-[18px] border-primary/25 bg-primary-soft">
-          <AlertDescription className="font-semibold text-charcoal">
+          <AlertDescription className="font-semibold text-foreground">
             No tienes clientas de nutrición asignadas para subir planes de alimentación.
           </AlertDescription>
         </Alert>
       ) : null}
 
       <div>
-        <Label htmlFor="meal-plan-client" className="font-extrabold text-charcoal">
+        <Label htmlFor="meal-plan-client" className="font-extrabold text-foreground">
           Clienta
         </Label>
         <select
@@ -386,7 +386,7 @@ function MealPlanUploadForm({
           name="clientId"
           required
           disabled={isPending}
-          className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-charcoal shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+          className="mt-2 h-12 w-full rounded-control border border-input bg-surface px-4 text-sm font-semibold text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
         >
           <option value="">Seleccionar clienta</option>
           {clients.map((client) => (
@@ -399,7 +399,7 @@ function MealPlanUploadForm({
       </div>
 
       <div>
-        <Label htmlFor="meal-plan-title" className="font-extrabold text-charcoal">
+        <Label htmlFor="meal-plan-title" className="font-extrabold text-foreground">
           Título
         </Label>
         <Input
@@ -414,7 +414,7 @@ function MealPlanUploadForm({
       </div>
 
       <div>
-        <Label htmlFor="meal-plan-description" className="font-extrabold text-charcoal">
+        <Label htmlFor="meal-plan-description" className="font-extrabold text-foreground">
           Descripción opcional
         </Label>
         <textarea
@@ -423,7 +423,7 @@ function MealPlanUploadForm({
           rows={4}
           maxLength={2000}
           disabled={isPending}
-          className="mt-2 w-full resize-y rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+          className="mt-2 w-full resize-none rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
         />
         <FieldError
           id="meal-plan-description-error"
@@ -432,7 +432,7 @@ function MealPlanUploadForm({
       </div>
 
       <div>
-        <Label htmlFor="meal-plan-file" className="font-extrabold text-charcoal">
+        <Label htmlFor="meal-plan-file" className="font-extrabold text-foreground">
           PDF
         </Label>
         <Input
@@ -539,7 +539,7 @@ function DocumentEditForm({
           <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
             Edición
           </p>
-          <h2 className="mt-2 text-2xl font-bold text-charcoal">
+          <h2 className="mt-2 text-2xl font-bold text-foreground">
             Editar documento
           </h2>
         </div>
@@ -553,7 +553,7 @@ function DocumentEditForm({
         <input type="hidden" name="id" value={document.id} />
 
         <div>
-          <Label htmlFor="document-edit-title" className="font-extrabold text-charcoal">
+          <Label htmlFor="document-edit-title" className="font-extrabold text-foreground">
             Título
           </Label>
           <Input
@@ -568,7 +568,7 @@ function DocumentEditForm({
         </div>
 
         <div>
-          <Label htmlFor="document-edit-description" className="font-extrabold text-charcoal">
+          <Label htmlFor="document-edit-description" className="font-extrabold text-foreground">
             Descripción opcional
           </Label>
           <textarea
@@ -577,13 +577,13 @@ function DocumentEditForm({
             rows={4}
             maxLength={2000}
             defaultValue={document.description ?? ""}
-            className="mt-2 w-full resize-y rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+            className="mt-2 w-full resize-none rounded-[20px] border border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground shadow-soft outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
           />
           <FieldError id="document-edit-description-error" message={fieldErrors.description} />
         </div>
 
         <div>
-          <Label htmlFor="document-edit-file" className="font-extrabold text-charcoal">
+          <Label htmlFor="document-edit-file" className="font-extrabold text-foreground">
             Reemplazar PDF opcional
           </Label>
           <Input
@@ -628,11 +628,11 @@ function ClientMealPlanSummary({
   return (
     <section className="h-fit self-start rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
       <div className="flex items-center gap-3">
-        <div className="grid size-11 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
+        <div className="grid size-11 place-items-center rounded-[16px] bg-secondary-soft text-muted-foreground">
           <FileText className="size-5" aria-hidden="true" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-charcoal">
+          <h2 className="text-2xl font-bold text-foreground">
             Plan por clienta
           </h2>
           <p className="mt-1 text-sm leading-6 text-muted">
@@ -653,7 +653,7 @@ function ClientMealPlanSummary({
               className="flex h-fit flex-col gap-3 self-start rounded-[20px] border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="min-w-0">
-                <p className="font-extrabold text-charcoal">{client.name}</p>
+                <p className="font-extrabold text-foreground">{client.name}</p>
                 <p className="mt-1 text-sm leading-6 text-muted">
                   {client.currentMealPlan
                     ? client.currentMealPlan.title
@@ -768,11 +768,11 @@ export function NutritionDocumentManager({
       <div className="grid items-start gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <section className="h-fit self-start rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
           <div className="flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-warm-brown">
+            <div className="grid size-11 place-items-center rounded-[16px] bg-primary-soft text-muted-foreground">
               <Plus className="size-5" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-charcoal">
+              <h2 className="text-2xl font-bold text-foreground">
                 Subir plan de alimentación
               </h2>
               <p className="mt-1 text-sm leading-6 text-muted">
@@ -790,11 +790,11 @@ export function NutritionDocumentManager({
 
       <section className="h-fit self-start rounded-[28px] border border-border bg-surface p-5 shadow-soft sm:p-6">
         <div className="flex items-center gap-3">
-          <div className="grid size-11 place-items-center rounded-[16px] bg-accent-soft text-warm-brown">
+          <div className="grid size-11 place-items-center rounded-[16px] bg-secondary-soft text-muted-foreground">
             <FileText className="size-5" aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-charcoal">
+            <h2 className="text-2xl font-bold text-foreground">
               Planes cargados
             </h2>
             <p className="mt-1 text-sm leading-6 text-muted">
@@ -833,7 +833,7 @@ export function NutritionDocumentManager({
             ))
           ) : (
             <div className="h-fit self-start rounded-[22px] border border-dashed border-border bg-background px-5 py-12 text-center lg:col-span-2">
-              <p className="font-extrabold text-charcoal">
+              <p className="font-extrabold text-foreground">
                 Todavía no hay documentos PDF cargados.
               </p>
               <p className="mt-2 text-sm leading-6 text-muted">

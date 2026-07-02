@@ -72,10 +72,10 @@ export function AssignmentEntitySelector({
     <section
       className={cn(
         "min-w-0 rounded-[24px] border bg-background/75 p-4",
-        error ? "border-danger/35" : "border-charcoal/10",
+        error ? "border-danger/35" : "border-foreground/10",
       )}
     >
-      <Label htmlFor={id} className="font-extrabold text-charcoal">
+      <Label htmlFor={id} className="font-extrabold text-foreground">
         {label}
       </Label>
       <p
@@ -96,7 +96,7 @@ export function AssignmentEntitySelector({
           type="search"
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          className="h-12 rounded-control border-border bg-surface pl-11 pr-4 text-charcoal shadow-soft"
+          className="h-12 rounded-control border-border bg-surface pl-11 pr-4 text-foreground shadow-soft"
           placeholder={searchPlaceholder}
           autoComplete="off"
         />
@@ -185,7 +185,7 @@ export function ClientSearchCard({
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="truncate font-extrabold text-charcoal">
+                <h3 className="truncate font-extrabold text-foreground">
                   {client.name}
                 </h3>
                 <p className="mt-1 truncate text-xs font-semibold text-muted">
@@ -193,7 +193,7 @@ export function ClientSearchCard({
                 </p>
               </div>
               <ChevronRight
-                className="mt-1 size-4 shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-charcoal"
+                className="mt-1 size-4 shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-foreground"
                 aria-hidden="true"
               />
             </div>
@@ -209,7 +209,7 @@ export function ClientSearchCard({
             <p className="mt-2 truncate text-xs font-semibold text-muted">
               {client.assignedTrainerName ?? "Sin profesional asignado"}
             </p>
-            <p className="mt-2 text-xs font-bold text-warm-brown">
+            <p className="mt-2 text-xs font-bold text-muted-foreground">
               {client.currentAssignment
                 ? `Plantilla actual: ${client.currentAssignment.title}`
                 : "Sin plantilla activa"}
@@ -265,21 +265,21 @@ export function RoutineSearchCard({
         aria-label={`Abrir detalle de ${routine.name}`}
       >
         <div className="flex items-start gap-3">
-          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-soft text-charcoal">
+          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-soft text-foreground">
             <Dumbbell className="size-5" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="truncate font-extrabold text-charcoal">
+                <h3 className="truncate font-extrabold text-foreground">
                   {routine.name}
                 </h3>
-                <p className="mt-1 text-xs font-bold text-warm-brown">
+                <p className="mt-1 text-xs font-bold text-muted-foreground">
                   {difficultyLabels[routine.difficulty]} / {routine.category}
                 </p>
               </div>
               <ChevronRight
-                className="mt-1 size-4 shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-charcoal"
+                className="mt-1 size-4 shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-foreground"
                 aria-hidden="true"
               />
             </div>
@@ -342,22 +342,22 @@ export function WorkoutTemplateSearchCard({
         aria-label={`Abrir detalle de ${template.name}`}
       >
         <div className="flex items-start gap-3">
-          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-charcoal">
+          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-secondary-soft text-foreground">
             <Layers3 className="size-5" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="break-words font-extrabold text-charcoal">
+                <h3 className="break-words font-extrabold text-foreground">
                   {template.name}
                 </h3>
-                <p className="mt-1 text-xs font-bold text-warm-brown">
+                <p className="mt-1 text-xs font-bold text-muted-foreground">
                   Ciclo de {template.cycleDays}{" "}
                   {template.cycleDays === 1 ? "día" : "días"}
                 </p>
               </div>
               <ChevronRight
-                className="mt-1 size-4 shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-charcoal"
+                className="mt-1 size-4 shrink-0 text-muted transition group-hover:translate-x-0.5 group-hover:text-foreground"
                 aria-hidden="true"
               />
             </div>
@@ -365,7 +365,7 @@ export function WorkoutTemplateSearchCard({
               {template.description || "Sin descripción adicional."}
             </p>
             {template.identifier ? (
-              <p className="mt-3 w-fit max-w-full truncate rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+              <p className="mt-3 w-fit max-w-full truncate rounded-full bg-secondary-soft px-3 py-1 text-xs font-extrabold text-foreground">
                 ID: {template.identifier}
               </p>
             ) : null}
@@ -428,8 +428,8 @@ export function ExerciseSearchCard({
             className={cn(
               "grid size-11 shrink-0 place-items-center rounded-full",
               selected
-                ? "bg-primary text-charcoal"
-                : "bg-primary-soft text-charcoal",
+                ? "bg-primary text-primary-foreground"
+                : "bg-primary-soft text-foreground",
             )}
           >
             <Dumbbell className="size-5" aria-hidden="true" />
@@ -437,10 +437,10 @@ export function ExerciseSearchCard({
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="break-words font-extrabold text-charcoal">
+                <h3 className="break-words font-extrabold text-foreground">
                   {exercise.name}
                 </h3>
-                <p className="mt-1 text-xs font-bold text-warm-brown">
+                <p className="mt-1 text-xs font-bold text-muted-foreground">
                   {exercise.muscleGroup} / {difficulty}
                 </p>
               </div>
@@ -449,14 +449,14 @@ export function ExerciseSearchCard({
                   className={cn(
                     "rounded-full px-2.5 py-1 text-[0.7rem] font-extrabold",
                     exercise.isActive
-                      ? "bg-primary-soft text-charcoal"
+                      ? "bg-primary-soft text-foreground"
                       : "bg-danger/10 text-danger",
                   )}
                 >
                   {exercise.isActive ? "Activo" : "Desactivado"}
                 </span>
                 <ChevronRight
-                  className="size-4 text-muted transition group-hover:translate-x-0.5 group-hover:text-charcoal"
+                  className="size-4 text-muted transition group-hover:translate-x-0.5 group-hover:text-foreground"
                   aria-hidden="true"
                 />
               </div>

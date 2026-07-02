@@ -310,19 +310,19 @@ async function ClientTrainingPage({
                 <>
                   <div className="flex items-start justify-between gap-3">
                     <History
-                      className="size-5 text-warm-brown"
+                      className="size-5 text-muted-foreground"
                       aria-hidden="true"
                     />
                     <div className="flex flex-wrap justify-end gap-2">
-                      <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+                      <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-extrabold text-foreground">
                         Copia histórica
                       </span>
-                      <span className="rounded-full bg-background px-3 py-1 text-xs font-extrabold text-charcoal">
+                      <span className="rounded-full bg-background px-3 py-1 text-xs font-extrabold text-foreground">
                         {assignmentStateLabels[assignment.state]}
                       </span>
                     </div>
                   </div>
-                  <h3 className="mt-4 text-lg font-extrabold text-charcoal">
+                  <h3 className="mt-4 text-lg font-extrabold text-foreground">
                     {assignment.title}
                   </h3>
                   <p className="mt-2 text-sm text-muted">
@@ -333,17 +333,17 @@ async function ClientTrainingPage({
                     Esta es una copia histórica de la plantilla asignada.
                   </p>
                   {relativeCreatedLabel ? (
-                    <p className="mt-2 text-xs font-extrabold uppercase tracking-[0.12em] text-warm-brown">
+                    <p className="mt-2 text-xs font-extrabold uppercase tracking-[0.12em] text-muted-foreground">
                       Asignada {relativeCreatedLabel}
                     </p>
                   ) : null}
                   {isArchivedBeforeEnd ? (
-                    <p className="mt-2 rounded-[14px] bg-primary-soft px-3 py-2 text-xs font-bold leading-5 text-charcoal">
+                    <p className="mt-2 rounded-[14px] bg-primary-soft px-3 py-2 text-xs font-bold leading-5 text-foreground">
                       Archivada antes de terminar su periodo original.
                     </p>
                   ) : null}
                   {assignment.completedDayCount > 0 ? (
-                    <p className="mt-3 text-sm font-extrabold text-charcoal">
+                    <p className="mt-3 text-sm font-extrabold text-foreground">
                       {assignment.completedDayCount}{" "}
                       {assignment.completedDayCount === 1
                         ? "día completado"
@@ -351,7 +351,7 @@ async function ClientTrainingPage({
                     </p>
                   ) : null}
                   {assignment.detailAvailable ? (
-                    <span className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-warm-brown transition group-hover:text-charcoal">
+                    <span className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-extrabold text-muted-foreground transition group-hover:text-foreground">
                       Ver detalle
                       <ArrowRight
                         className="size-4 transition group-hover:translate-x-1"
@@ -370,7 +370,7 @@ async function ClientTrainingPage({
                 <Link
                   key={assignment.id}
                   href={`/app/entrenamiento/historial/${assignment.id}`}
-                  className="group h-fit self-start rounded-[20px] border border-charcoal/10 bg-surface p-4 outline-none transition hover:border-primary/50 hover:shadow-soft focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/35"
+                  className="group h-fit self-start rounded-[20px] border border-foreground/10 bg-surface p-4 outline-none transition hover:border-primary/50 hover:shadow-soft focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/35"
                   aria-label={`Ver detalle de ${assignment.title}`}
                 >
                   {content}
@@ -378,7 +378,7 @@ async function ClientTrainingPage({
               ) : (
                 <article
                   key={assignment.id}
-                  className="h-fit self-start rounded-[20px] border border-charcoal/10 bg-background/70 p-4"
+                  className="h-fit self-start rounded-[20px] border border-foreground/10 bg-background/70 p-4"
                 >
                   {content}
                 </article>
@@ -386,8 +386,8 @@ async function ClientTrainingPage({
             })}
           </div>
         ) : (
-          <div className="rounded-[20px] border border-charcoal/10 bg-surface p-4">
-            <NotebookTabs className="size-5 text-warm-brown" />
+          <div className="rounded-[20px] border border-foreground/10 bg-surface p-4">
+            <NotebookTabs className="size-5 text-muted-foreground" />
             <p className="mt-4 text-sm font-semibold leading-6 text-muted">
               Todavia no hay plantillas anteriores.
             </p>
@@ -448,17 +448,17 @@ export default async function TrainingPage() {
           href="/app/entrenamiento/ejercicios"
           className="group h-fit self-start rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
         >
-          <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-charcoal">
+          <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-foreground">
             <Dumbbell className="size-5" aria-hidden="true" />
           </div>
-          <h2 className="mt-5 text-3xl font-semibold text-charcoal">
+          <h2 className="mt-5 text-3xl font-semibold text-foreground">
             Ejercicios
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
             Crea, edita y desactiva ejercicios. Aquí se guardan instrucciones,
             dificultad, grupo muscular, categoría, tipo y recurso externo.
           </p>
-          <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
+          <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-muted-foreground group-hover:text-foreground">
             Gestionar ejercicios
             <ArrowRight className="size-4 transition group-hover:translate-x-1" />
           </span>
@@ -466,19 +466,19 @@ export default async function TrainingPage() {
 
         <Link
           href="/app/entrenamiento/rutinas"
-          className="group h-fit self-start rounded-[28px] border border-charcoal/10 bg-accent-soft p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/40"
+          className="group h-fit self-start rounded-[28px] border border-foreground/10 bg-secondary-soft p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/40"
         >
-          <div className="grid size-12 place-items-center rounded-full bg-surface text-charcoal">
+          <div className="grid size-12 place-items-center rounded-full bg-surface text-foreground">
             <ListChecks className="size-5" aria-hidden="true" />
           </div>
-          <h2 className="mt-5 text-3xl font-semibold text-charcoal">
+          <h2 className="mt-5 text-3xl font-semibold text-foreground">
             Entrenamientos
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
             Construye sesiones para un día seleccionando ejercicios y
             configurando series, repeticiones, descanso, notas y orden.
           </p>
-          <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
+          <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-muted-foreground group-hover:text-foreground">
             Gestionar entrenamientos
             <ArrowRight className="size-4 transition group-hover:translate-x-1" />
           </span>
@@ -488,17 +488,17 @@ export default async function TrainingPage() {
           href="/app/entrenamiento/plantillas"
           className="group h-fit self-start rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
         >
-          <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-charcoal">
+          <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-foreground">
             <Layers3 className="size-5" aria-hidden="true" />
           </div>
-          <h2 className="mt-5 text-3xl font-semibold text-charcoal">
+          <h2 className="mt-5 text-3xl font-semibold text-foreground">
             Plantillas
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
             Organiza entrenamientos por días para crear ciclos semanales o
             personalizados que puedas reutilizar.
           </p>
-          <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
+          <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-muted-foreground group-hover:text-foreground">
             Gestionar plantillas
             <ArrowRight className="size-4 transition group-hover:translate-x-1" />
           </span>
@@ -508,17 +508,17 @@ export default async function TrainingPage() {
           href="/app/entrenamiento/asignaciones"
           className="group h-fit self-start rounded-[28px] border border-border bg-surface p-6 shadow-soft transition hover:border-primary/40 hover:bg-primary-soft/30"
         >
-          <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-charcoal">
+          <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-foreground">
             <ClipboardCheck className="size-5" aria-hidden="true" />
           </div>
-          <h2 className="mt-5 text-3xl font-semibold text-charcoal">
+          <h2 className="mt-5 text-3xl font-semibold text-foreground">
             Asignaciones
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
             Consulta los clientes disponibles, asigna plantillas activas y
             conserva el historial de cada periodo.
           </p>
-          <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-warm-brown group-hover:text-charcoal">
+          <span className="mt-6 inline-flex min-h-11 items-center gap-2 font-extrabold text-muted-foreground group-hover:text-foreground">
             Gestionar asignaciones
             <ArrowRight className="size-4 transition group-hover:translate-x-1" />
           </span>

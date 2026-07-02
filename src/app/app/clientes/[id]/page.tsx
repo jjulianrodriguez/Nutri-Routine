@@ -139,11 +139,11 @@ function DetailItem({
         className,
       )}
     >
-      <Icon className="size-4 text-warm-brown" aria-hidden="true" />
+      <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
       <p className="mt-3 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
         {label}
       </p>
-      <p className="mt-1 break-words font-bold text-charcoal">{value}</p>
+      <p className="mt-1 break-words font-bold text-foreground">{value}</p>
     </div>
   );
 }
@@ -186,8 +186,8 @@ function ServiceCard({
       )}
     >
       <div className="flex items-center justify-between gap-3">
-        <Icon className="size-5 text-warm-brown" aria-hidden="true" />
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-charcoal">
+        <Icon className="size-5 text-muted-foreground" aria-hidden="true" />
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-foreground">
           {active ? (
             <CheckCircle2 className="size-3.5" aria-hidden="true" />
           ) : (
@@ -199,7 +199,7 @@ function ServiceCard({
       <p className="mt-4 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
         {label}
       </p>
-      <p className="mt-1 font-bold text-charcoal">
+      <p className="mt-1 font-bold text-foreground">
         {active ? professional ?? "Sin profesional asignado" : "Sin plan activo"}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -232,10 +232,10 @@ function PlanCard({
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <span className="inline-flex rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-charcoal">
+          <span className="inline-flex rounded-full bg-surface px-3 py-1 text-xs font-extrabold text-foreground">
             {planStateLabels[plan.state]}
           </span>
-          <h3 className="mt-3 text-lg font-extrabold text-charcoal">
+          <h3 className="mt-3 text-lg font-extrabold text-foreground">
             {plan.title}
           </h3>
           {plan.description ? (
@@ -259,7 +259,7 @@ function PlanCard({
         ) : null}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-charcoal/10 pt-3 text-xs font-bold text-warm-brown">
+      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-foreground/10 pt-3 text-xs font-bold text-muted-foreground">
         <span>Inicio: {formatDate(plan.startDate)}</span>
         <span>Fin: {formatDate(plan.endDate)}</span>
         {plan.durationWeeks ? <span>{plan.durationWeeks} semanas</span> : null}
@@ -312,7 +312,7 @@ function PlansPanel({
 
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <History className="size-4 text-warm-brown" aria-hidden="true" />
+              <History className="size-4 text-muted-foreground" aria-hidden="true" />
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
                 Historial ({history.length})
               </p>
@@ -382,7 +382,7 @@ export default async function ClientProfilePage({
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted">
               Perfil del cliente
             </p>
-            <h1 className="mt-3 break-words text-4xl font-semibold leading-tight text-charcoal sm:text-5xl">
+            <h1 className="mt-3 break-words text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
               {client.fullName}
             </h1>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -393,7 +393,7 @@ export default async function ClientProfilePage({
                   hasTrainingService: client.hasTrainingService,
                 })}
               </RelationshipBadge>
-              <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-extrabold text-charcoal">
+              <span className="rounded-full bg-secondary-soft px-3 py-1 text-xs font-extrabold text-foreground">
                 Cuenta: {accountStatusLabels[client.accountStatus]}
               </span>
             </div>
