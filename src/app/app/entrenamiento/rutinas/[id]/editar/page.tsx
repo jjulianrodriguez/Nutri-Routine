@@ -5,40 +5,40 @@ import { RoutineEditor } from "@/components/app/routine-editor";
 import { TrainingSectionNav } from "@/components/app/training-section-nav";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
-  getRoutineDetail,
-  listExerciseOptions,
+ getRoutineDetail,
+ listExerciseOptions,
 } from "@/lib/routines/data";
 
 export default async function EditRoutinePage({
-  params,
+ params,
 }: {
-  params: Promise<{ id: string }>;
+ params: Promise<{ id: string }>;
 }) {
-  const access = await requireRouteAccess("/app/entrenamiento/rutinas");
+ const access = await requireRouteAccess("/app/entrenamiento/rutinas");
 
-  if (!access.canManageTraining) {
-    redirect("/app/entrenamiento");
-  }
+ if (!access.canManageTraining) {
+ redirect("/app/entrenamiento");
+ }
 
-  const { id } = await params;
-  const [routine, catalog] = await Promise.all([
-    getRoutineDetail(id),
-    listExerciseOptions(),
-  ]);
+ const { id } = await params;
+ const [routine, catalog] = await Promise.all([
+ getRoutineDetail(id),
+ listExerciseOptions(),
+ ]);
 
-  if (!routine) {
-    notFound();
-  }
+ if (!routine) {
+ notFound();
+ }
 
-  return (
-    <AppScreen>
-      <AppHeader
-        eyebrow="Editar entrenamiento"
-        title={routine.name}
-        description="Actualiza la información general, cambia el orden o ajusta la configuración de cada ejercicio."
-      />
-      <TrainingSectionNav active="routines" />
-      <RoutineEditor exerciseOptions={catalog} routine={routine} />
-    </AppScreen>
-  );
+ return (
+ <AppScreen>
+ <AppHeader
+ eyebrow="Editar entrenamiento"
+ title={routine.name}
+ description="Actualiza la información general, cambia el orden o ajusta la configuración de cada ejercicio."
+ />
+ <TrainingSectionNav active="routines" />
+ <RoutineEditor exerciseOptions={catalog} routine={routine} />
+ </AppScreen>
+ );
 }

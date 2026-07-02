@@ -5,23 +5,23 @@ import { getUnreadNotificationCount } from "@/lib/notifications/data";
 import { getUserSettings } from "@/lib/user-settings/data";
 
 export default async function PrivateAppLayout({
-  children,
+ children,
 }: Readonly<{
-  children: React.ReactNode;
+ children: React.ReactNode;
 }>) {
-  const access = await requireCurrentUserAccess();
-  const [settings, unreadNotifications] = await Promise.all([
-    getUserSettings(access.userId),
-    getUnreadNotificationCount(access.userId),
-  ]);
+ const access = await requireCurrentUserAccess();
+ const [settings, unreadNotifications] = await Promise.all([
+ getUserSettings(access.userId),
+ getUnreadNotificationCount(access.userId),
+ ]);
 
-  return (
-    <Sidebar
-      access={access}
-      unreadNotifications={unreadNotifications}
-    >
-      <UserPreferenceApplier settings={settings} />
-      {children}
-    </Sidebar>
-  );
+ return (
+ <Sidebar
+ access={access}
+ unreadNotifications={unreadNotifications}
+ >
+ <UserPreferenceApplier settings={settings} />
+ {children}
+ </Sidebar>
+ );
 }

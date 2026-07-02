@@ -5,24 +5,24 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Crear cuenta",
-  description:
-    "Registro privado con código entregado por tu profesional de Nutrición Con Enfoque.",
+ title: "Crear cuenta",
+ description:
+ "Registro privado con código entregado por tu profesional de Nutrición Con Enfoque.",
 };
 
 export default async function RegisterPage() {
-  const user = await getCurrentUser();
+ const user = await getCurrentUser();
 
-  if (user) {
-    redirect("/app");
-  }
+ if (user) {
+ redirect("/app");
+ }
 
-  return (
-    <AuthCard
-      headline="Empezá con calma"
-      subtitle="Creá tu cuenta y ordená tu bienestar con acompañamiento"
-    >
-      <RegisterForm />
-    </AuthCard>
-  );
+ return (
+ <AuthCard
+ headline="Empezá con calma"
+ subtitle="Creá tu cuenta y ordená tu bienestar con acompañamiento"
+ >
+ <RegisterForm />
+ </AuthCard>
+ );
 }

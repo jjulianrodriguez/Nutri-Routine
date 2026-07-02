@@ -1,33 +1,33 @@
 import { notFound, redirect } from "next/navigation";
 
 import {
-  getAppRouteKind,
-  getAppRoutePath,
+ getAppRouteKind,
+ getAppRoutePath,
 } from "@/lib/auth/access-rules";
 import {
-  requireCurrentUserAccess,
-  requireRouteAccess,
+ requireCurrentUserAccess,
+ requireRouteAccess,
 } from "@/lib/auth/current-user-access";
 
 type GuardedAliasPageProps = {
-  params: Promise<{
-    segments?: string[];
-  }>;
+ params: Promise<{
+ segments?: string[];
+ }>;
 };
 
 export default async function GuardedAliasPage({
-  params,
+ params,
 }: GuardedAliasPageProps) {
-  const { segments = [] } = await params;
-  const pathname = `/app/${segments.join("/")}`;
-  const route = getAppRouteKind(pathname);
+ const { segments = [] } = await params;
+ const pathname = `/app/${segments.join("/")}`;
+ const route = getAppRouteKind(pathname);
 
-  if (!route) {
-    await requireCurrentUserAccess();
+ if (!route) {
+ await requireCurrentUserAccess();
 
-    notFound();
-  }
+ notFound();
+ }
 
-  await requireRouteAccess(pathname);
-  redirect(getAppRoutePath(route));
+ await requireRouteAccess(pathname);
+ redirect(getAppRoutePath(route));
 }

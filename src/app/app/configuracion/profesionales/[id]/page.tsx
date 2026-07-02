@@ -9,39 +9,39 @@ import { getProfessionalAccount } from "@/lib/actions/professional-accounts";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 
 export default async function ProfessionalAccountDetailPage({
-  params,
+ params,
 }: {
-  params: Promise<{ id: string }>;
+ params: Promise<{ id: string }>;
 }) {
-  const access = await requireRouteAccess("/app/configuracion/profesionales");
+ const access = await requireRouteAccess("/app/configuracion/profesionales");
 
-  if (!access.canManageProfessionalAccounts) {
-    redirect("/app/dashboard");
-  }
+ if (!access.canManageProfessionalAccounts) {
+ redirect("/app/dashboard");
+ }
 
-  const { id } = await params;
-  const result = await getProfessionalAccount(id);
+ const { id } = await params;
+ const result = await getProfessionalAccount(id);
 
-  if (!result.item) {
-    notFound();
-  }
+ if (!result.item) {
+ notFound();
+ }
 
-  return (
-    <AppScreen>
-      <AppHeader
-        eyebrow="Gestion profesional"
-        title={result.item.fullName}
-        description="Edita los datos permitidos, controla el acceso profesional y revisa asignaciones antes de eliminar."
-      />
+ return (
+ <AppScreen>
+ <AppHeader
+ eyebrow="Gestion profesional"
+ title={result.item.fullName}
+ description="Edita los datos permitidos, controla el acceso profesional y revisa asignaciones antes de eliminar."
+ />
 
-      <Button asChild variant="outline" size="lg">
-        <Link href="/app/configuracion/profesionales">
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          Volver a profesionales
-        </Link>
-      </Button>
+ <Button asChild variant="outline" size="lg">
+ <Link href="/app/configuracion/profesionales">
+ <ArrowLeft className="size-4" aria-hidden="true" />
+ Volver a profesionales
+ </Link>
+ </Button>
 
-      <ProfessionalAccountManager professional={result.item} />
-    </AppScreen>
-  );
+ <ProfessionalAccountManager professional={result.item} />
+ </AppScreen>
+ );
 }

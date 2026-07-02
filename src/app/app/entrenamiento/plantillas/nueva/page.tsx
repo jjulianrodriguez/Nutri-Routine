@@ -7,42 +7,42 @@ import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getRoutineManagementOverview } from "@/lib/routines/data";
 
 export default async function NewWorkoutTemplatePage({
-  searchParams,
+ searchParams,
 }: {
-  searchParams: Promise<{ training?: string | string[] }>;
+ searchParams: Promise<{ training?: string | string[] }>;
 }) {
-  const access = await requireRouteAccess(
-    "/app/entrenamiento/plantillas/nueva",
-  );
+ const access = await requireRouteAccess(
+ "/app/entrenamiento/plantillas/nueva",
+ );
 
-  if (!access.canManageTraining) {
-    redirect("/app/entrenamiento");
-  }
+ if (!access.canManageTraining) {
+ redirect("/app/entrenamiento");
+ }
 
-  const [overview, query] = await Promise.all([
-    getRoutineManagementOverview(),
-    searchParams,
-  ]);
-  const requestedTrainingId =
-    typeof query.training === "string" ? query.training : "";
-  const defaultRoutineId = overview.routines.some(
-    (routine) => routine.id === requestedTrainingId && routine.isActive,
-  )
-    ? requestedTrainingId
-    : "";
+ const [overview, query] = await Promise.all([
+ getRoutineManagementOverview(),
+ searchParams,
+ ]);
+ const requestedTrainingId =
+ typeof query.training === "string" ? query.training : "";
+ const defaultRoutineId = overview.routines.some(
+ (routine) => routine.id === requestedTrainingId && routine.isActive,
+ )
+ ? requestedTrainingId
+ : "";
 
-  return (
-    <AppScreen>
-      <AppHeader
-        eyebrow="Nueva plantilla"
-        title="Crear plantilla de entrenamiento"
-        description="Define los días del ciclo y asigna un entrenamiento diario a cada uno."
-      />
-      <TrainingSectionNav active="templates" />
-      <WorkoutTemplateEditor
-        defaultRoutineId={defaultRoutineId}
-        routines={overview.routines}
-      />
-    </AppScreen>
-  );
+ return (
+ <AppScreen>
+ <AppHeader
+ eyebrow="Nueva plantilla"
+ title="Crear plantilla de entrenamiento"
+ description="Define los días del ciclo y asigna un entrenamiento diario a cada uno."
+ />
+ <TrainingSectionNav active="templates" />
+ <WorkoutTemplateEditor
+ defaultRoutineId={defaultRoutineId}
+ routines={overview.routines}
+ />
+ </AppScreen>
+ );
 }
