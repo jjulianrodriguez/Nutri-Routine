@@ -25,7 +25,7 @@ export function AppHeader({
   title: string;
 }) {
   return (
-    <section className="h-fit self-start overflow-hidden rounded-card border border-border-soft bg-surface p-6 shadow-card sm:p-8">
+    <section className="h-fit self-start p-6 sm:p-8">
       <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">
         {eyebrow}
       </p>
