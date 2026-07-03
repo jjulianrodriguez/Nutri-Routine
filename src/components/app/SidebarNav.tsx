@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 
 import {
@@ -46,6 +47,18 @@ const iconMap: Record<AppNavIcon, LucideIcon> = {
  settings: Settings,
  training: Dumbbell,
 };
+
+const inactiveLinkStyle = {
+ color: "var(--sidebar-link-muted)",
+} satisfies CSSProperties;
+
+const inactiveSubLinkStyle = {
+ color: "var(--sidebar-link-muted-subtle)",
+} satisfies CSSProperties;
+
+const inactiveNestedLinkStyle = {
+ color: "var(--sidebar-link-muted-nested-active)",
+} satisfies CSSProperties;
 
 type SidebarNavProps = {
  access: CurrentUserAccess;
@@ -81,17 +94,20 @@ function SidebarLink({
  <Link
  href={href}
  onClick={onNavigate}
+ data-sidebar-active={isActive ? "true" : "false"}
+ data-sidebar-link="item"
+ style={isActive ? undefined : inactiveLinkStyle}
  className={cn(
- "relative flex h-11 min-w-0 items-center gap-3 rounded-control px-3 text-sm font-bold transition-[background-color,border-color,color,box-shadow] duration-200",
+ "relative flex h-11 min-w-0 items-center gap-3 rounded-control px-3 text-sm font-semibold transition-[background-color,color,box-shadow] duration-200 ease-[var(--ease-premium)]",
  "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
  collapsed && "mx-auto size-11 w-11 justify-center gap-0 px-0",
  !collapsed && hasSubItems && "flex-1",
  isActive
  ? cn(
- "border-[var(--sidebar-primary)] bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] shadow-none before:absolute before:bottom-1 before:top-1 before:w-1 before:rounded-r-full before:bg-[var(--sidebar-primary-foreground)]",
+ "font-extrabold text-white shadow-none before:absolute before:bottom-1 before:top-1 before:w-1 before:rounded-r-full before:bg-white",
  collapsed ? "before:-left-3" : "before:-left-4",
  )
- : "border-transparent text-white/68 hover:border-white/14 hover:bg-white/10 hover:text-white",
+ : "text-[var(--sidebar-link-muted)] hover:bg-white/[0.055] hover:text-[var(--sidebar-link-muted-hover)]",
  )}
  aria-current={isActive ? "page" : undefined}
  aria-label={collapsed ? label : undefined}
@@ -225,9 +241,9 @@ export function SidebarNav({
  <button
  type="button"
  className={cn(
- "grid size-11 shrink-0 place-items-center rounded-control border-transparent text-white/58 transition-[background-color,border-color,color] duration-200",
- "hover:border-white/14 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
- isExpanded && "border-white/14 bg-white/12 text-white",
+ "grid size-11 shrink-0 place-items-center rounded-control text-[var(--sidebar-link-muted-control)] transition-[background-color,color] duration-200 ease-[var(--ease-premium)]",
+ "hover:bg-white/[0.055] hover:text-[var(--sidebar-link-muted-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
+ isExpanded && "text-white",
  )}
  aria-controls={subNavId}
  aria-expanded={isExpanded}
@@ -257,12 +273,23 @@ export function SidebarNav({
  key={subItem.href}
  href={subItem.href}
  onClick={onNavigate}
+ data-sidebar-active={isSubItemActive ? "true" : "false"}
+ data-sidebar-link="subitem"
+ style={
+ isSubItemActive
+ ? undefined
+ : isActive
+ ? inactiveNestedLinkStyle
+ : inactiveSubLinkStyle
+ }
  className={cn(
- "block rounded-[12px] px-3 py-1.5 text-xs font-extrabold text-white/56 transition-colors",
- "hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
+ "block rounded-[12px] px-3 py-1.5 text-xs font-bold text-[var(--sidebar-link-muted-subtle)] transition-[background-color,color] duration-200 ease-[var(--ease-premium)]",
+ "hover:bg-white/[0.055] hover:text-[var(--sidebar-link-muted-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
  isSubItemActive &&
- "bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)]",
- !isSubItemActive && isActive && "text-white/76",
+ "font-extrabold text-white",
+ !isSubItemActive &&
+ isActive &&
+ "text-[var(--sidebar-link-muted-nested-active)]",
  )}
  aria-current={isSubItemActive ? "page" : undefined}
  >

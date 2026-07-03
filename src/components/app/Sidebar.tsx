@@ -266,7 +266,7 @@ export function Sidebar({
  <>
  <motion.button
  aria-label="Cerrar navegación"
- className="fixed inset-0 z-50 bg-charcoal/55 lg:hidden"
+              className="fixed inset-0 z-50 bg-foreground/55 lg:hidden"
  initial={reduceMotion ? false : { opacity: 0 }}
  animate={{ opacity: 1 }}
  exit={{ opacity: 0 }}

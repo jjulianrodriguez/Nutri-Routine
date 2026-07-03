@@ -17,7 +17,6 @@ import {
  createProfessionalAccountSchema,
  type CreateProfessionalAccountValues,
 } from "@/lib/validations/professional-accounts";
-import { cn } from "@/lib/utils";
 
 const specialtyOptions = [
  {
@@ -35,7 +34,7 @@ const specialtyOptions = [
 ] as const;
 
 const selectClasses =
-  "mt-2 h-11 w-full min-w-0 rounded-control bg-black/5 px-4 py-2 text-base text-foreground shadow-none transition-all outline-none placeholder:text-muted-foreground hover:bg-black/10 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-2 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 md:text-sm dark:bg-white/5 dark:hover:bg-white/10 dark:focus-visible:ring-primary/40 appearance-none";
+  "mt-2 h-11 w-full min-w-0 appearance-none rounded-control bg-surface px-4 py-2 text-base text-foreground outline-none ring-2 ring-primary/30 transition-[background-color,box-shadow,color] placeholder:text-muted-foreground focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:bg-danger/10 aria-invalid:ring-danger/40 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft";
 
 function FieldError({ id, message }: { id: string; message?: string }) {
  if (!message) {

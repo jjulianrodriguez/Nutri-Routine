@@ -37,7 +37,7 @@ import type {
 import type { AssignableWorkoutTemplate } from "@/types/workout-template";
 
 const inputClasses =
- "mt-2 rounded-control bg-surface px-4 text-foreground focus-visible:ring-primary/20";
+  "mt-2 rounded-control bg-surface px-4 text-foreground ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft outline-none";
 const assignmentSectionClasses =
  "rounded-[24px] bg-surface p-5 ";
 

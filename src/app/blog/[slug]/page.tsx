@@ -53,7 +53,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
  </Link>
 
  <header className="mt-10 overflow-hidden rounded-[2.4rem] border-[var(--blog-night)]/10 bg-[var(--blog-paper)] p-5 shadow-[0_40px_120px_-86px_rgb(var(--raspberry-rgb)_/_0.28)] sm:mt-14 sm:p-7">
- <div className="relative overflow-hidden rounded-[1.8rem] border-[var(--blog-night)]/8 bg-[var(--blog-paper)] p-6 sm:p-10">
+ <div className="relative overflow-hidden rounded-[1.8rem] border-[var(--blog-night)]/8 bg-[var(--blog-sage)] p-6 sm:p-10">
  <div className="hidden" />
  <div className="hidden" />
  <div className="relative">
@@ -61,7 +61,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
  <span className="rounded-full bg-[var(--blog-sage)] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[var(--blog-night)]">
  {post.category}
  </span>
- <span className="inline-flex items-center gap-2 rounded-full border-[var(--blog-night)]/10 bg-[var(--blog-paper)] px-4 py-2 text-xs font-black text-[var(--blog-muted)] shadow-[0_14px_38px_-30px_rgb(var(--raspberry-rgb)_/_0.2)]">
+ <span className="inline-flex items-center gap-2 rounded-full border-[var(--blog-night)]/10 bg-[var(--blog-paper)] px-4 py-2 text-xs font-black text-[var(--blog-muted)]">
  <Clock className="size-3.5" />
  {post.readTime} de lectura
  </span>

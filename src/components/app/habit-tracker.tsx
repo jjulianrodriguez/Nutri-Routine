@@ -43,9 +43,9 @@ import {
 import { cn } from "@/lib/utils";
 
 const selectClasses =
-  "mt-2 h-11 w-full min-w-0 rounded-control bg-black/5 px-4 py-2 text-base text-foreground shadow-none transition-all outline-none placeholder:text-muted-foreground hover:bg-black/10 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-2 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 md:text-sm dark:bg-white/5 dark:hover:bg-white/10 dark:focus-visible:ring-primary/40 appearance-none";
+  "mt-2 h-11 w-full min-w-0 rounded-control bg-surface px-4 py-2 text-base text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft appearance-none";
 const textareaClasses =
-  "mt-2 min-h-28 w-full resize-none rounded-control bg-black/5 px-4 py-3 text-sm leading-6 text-foreground shadow-none transition-all outline-none placeholder:text-muted-foreground hover:bg-black/10 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-2 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 dark:bg-white/5 dark:hover:bg-white/10 dark:focus-visible:ring-primary/40";
+  "mt-2 min-h-28 w-full resize-none rounded-control bg-surface px-4 py-3 text-sm leading-6 text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 dark:ring-primary/40 dark:focus:bg-primary-soft";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -902,7 +902,7 @@ function AssignmentManager({
  aria-label={`${selected ? "Quitar" : "Seleccionar"} ${day.label}`}
  onClick={() => toggleDay(day.value)}
  className={cn(
- "group flex h-11 items-center justify-between gap-3 rounded-[14px] border px-4 py-2 text-sm font-extrabold transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 active:scale-[0.98]",
+ "group flex h-11 items-center justify-between gap-3 rounded-[14px] border px-4 py-2 text-sm font-extrabold transition-[background-color,border-color,box-shadow,color,transform] duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 active:scale-[0.98]",
  selected
  ? "border-primary/20 bg-primary/10 text-primary"
  : "border-transparent bg-surface text-muted-foreground hover:bg-surface/80 hover:text-foreground",
@@ -911,7 +911,7 @@ function AssignmentManager({
  <span className="truncate">{day.label}</span>
  <span
  className={cn(
- "flex size-4 shrink-0 items-center justify-center transition-all duration-200",
+ "flex size-4 shrink-0 items-center justify-center transition-[background-color,border-color,box-shadow,color,transform] duration-200",
  selected ? "scale-100 opacity-100" : "scale-50 opacity-0",
  )}
  >

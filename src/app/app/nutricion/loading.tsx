@@ -1,40 +1,55 @@
-import { AppHeader, AppScreen } from "@/components/app/AppScreen";
+import { RouteLoadingFrame } from "@/components/app/route-loading-frame";
+import {
+ AppPanelSkeleton,
+ ListRowSkeleton,
+ PageHeaderSkeleton,
+ SectionNavSkeleton,
+ Skeleton,
+ StatTileSkeleton,
+} from "@/components/ui/skeleton";
 
 export default function NutritionLoading() {
  return (
- <AppScreen>
- <AppHeader
- eyebrow="Cargando nutrición"
- title="Nutrición"
- description="Preparando la sección de nutrición..."
- />
+ <RouteLoadingFrame>
+ <PageHeaderSkeleton />
+ <SectionNavSkeleton count={3} />
 
- <div className="flex animate-pulse flex-wrap gap-2 rounded-[22px] bg-surface p-2 ">
- {[1, 2, 3].map((i) => (
- <div key={i} className="h-11 w-32 rounded-control bg-border/40" />
- ))}
- </div>
-
- <section className="grid gap-4 sm:grid-cols-2">
- <div className="animate-pulse rounded-[24px] bg-surface p-5 ">
- <div className="mb-3 h-4 w-24 rounded-full bg-border/40" />
- <div className="mb-2 h-8 w-16 rounded-full bg-border/40" />
- <div className="h-3 w-32 rounded-full bg-border/40" />
- </div>
- <div className="animate-pulse rounded-[24px] bg-surface p-5 ">
- <div className="mb-3 h-4 w-24 rounded-full bg-border/40" />
- <div className="mb-2 h-8 w-16 rounded-full bg-border/40" />
- <div className="h-3 w-32 rounded-full bg-border/40" />
- </div>
+ <section className="grid items-start gap-4 sm:grid-cols-2">
+ <StatTileSkeleton />
+ <StatTileSkeleton />
  </section>
 
- <div className="mt-8 animate-pulse space-y-5">
- <div className="flex items-center justify-between">
- <div className="h-8 w-48 rounded-full bg-border/40" />
- <div className="h-10 w-32 rounded-control bg-border/40" />
+ <section className="grid items-start gap-6 xl:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)]">
+ <div className="space-y-6">
+ <AppPanelSkeleton tone="primary" items={1} />
+ <AppPanelSkeleton items={1} />
  </div>
- <div className="h-64 rounded-[28px] bg-surface" />
+
+ <section className="rounded-card bg-surface p-5 sm:p-6">
+ <div className="flex flex-wrap items-start justify-between gap-4">
+ <div>
+ <Skeleton className="h-3 w-36" />
+ <Skeleton className="mt-2 h-8 w-60" />
+ <Skeleton className="mt-2 h-3.5 w-full max-w-xl" />
  </div>
- </AppScreen>
+ <Skeleton className="h-10 w-36" />
+ </div>
+ <div className="mt-5 rounded-card bg-background p-4">
+ <Skeleton className="h-12 w-full" />
+ <div className="mt-4 flex flex-wrap gap-2">
+ <Skeleton className="h-9 w-24" />
+ <Skeleton className="h-9 w-28" />
+ <Skeleton className="h-9 w-24" />
+ </div>
+ </div>
+ <div className="mt-6 space-y-3">
+ <ListRowSkeleton avatar action />
+ <ListRowSkeleton avatar action />
+ </div>
+ </section>
+ </section>
+
+ <AppPanelSkeleton tone="primary" items={2} />
+ </RouteLoadingFrame>
  );
 }

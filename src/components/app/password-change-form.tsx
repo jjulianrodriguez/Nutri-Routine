@@ -18,7 +18,7 @@ import {
 } from "@/lib/validations/account";
 
 const inputClasses =
- "mt-2 h-12 rounded-control bg-surface px-4 text-foreground placeholder:text-muted focus-visible:ring-primary/20";
+  "mt-2 h-12 rounded-control bg-surface px-4 text-foreground placeholder:text-muted ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft";
 
 function FieldError({ id, message }: { id: string; message?: string }) {
  if (!message) {

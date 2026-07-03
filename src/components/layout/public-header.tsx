@@ -40,7 +40,7 @@ export function PublicHeader() {
  href="https://wa.me/50688332426"
  target="_blank"
  rel="noopener noreferrer"
- className="inline-flex items-center justify-center gap-2 rounded-control bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground transition-[background-color,box-shadow] duration-200 hover:bg-primary-hover sm:px-5"
+ className="primary-action-button inline-flex items-center justify-center gap-2 rounded-control bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground transition-[background-color,box-shadow] duration-200 hover:bg-primary-hover sm:px-5"
  >
  <span className="hidden sm:inline">Agendar consulta</span>
  <span className="sm:hidden">Agendar</span>

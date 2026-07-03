@@ -18,7 +18,7 @@ import {
 } from "@/lib/validations/professional-profile";
 
 const textareaClasses =
-  "mt-2 min-h-28 w-full resize-none rounded-control bg-black/5 px-4 py-3 text-sm leading-6 text-foreground shadow-none transition-all outline-none placeholder:text-muted-foreground hover:bg-black/10 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-2 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 dark:bg-white/5 dark:hover:bg-white/10 dark:focus-visible:ring-primary/40";
+  "mt-2 min-h-28 w-full resize-none rounded-control bg-surface px-4 py-3 text-sm leading-6 text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 dark:ring-primary/40 dark:focus:bg-primary-soft";
 
 const focusAreaOptions = [
  { label: "Perdida de grasa", value: "fat_loss" },

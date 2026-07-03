@@ -19,7 +19,7 @@ import {
 } from "@/lib/validations/auth";
 
 const inputClasses =
- "mt-2 h-[3.25rem] rounded-control bg-surface px-4 text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-focus-ring/20";
+ "mt-2 h-[3.25rem] rounded-control bg-surface px-4 text-foreground placeholder:text-muted-foreground/70 ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft outline-none";
 
 function FieldError({ id, message }: { id: string; message?: string }) {
  if (!message) {

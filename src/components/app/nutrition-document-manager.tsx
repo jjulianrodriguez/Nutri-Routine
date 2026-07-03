@@ -386,7 +386,7 @@ function MealPlanUploadForm({
  name="clientId"
  required
  disabled={isPending}
- className="mt-2 h-11 w-full min-w-0 rounded-control bg-black/5 px-4 py-2 text-base text-foreground shadow-none transition-all outline-none hover:bg-black/10 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-white/5 dark:hover:bg-white/10 dark:focus-visible:ring-primary/40 appearance-none"
+ className="mt-2 h-11 w-full min-w-0 rounded-control bg-surface px-4 py-2 text-base text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft appearance-none"
  >
  <option value="">Seleccionar clienta</option>
  {clients.map((client) => (
@@ -423,7 +423,7 @@ function MealPlanUploadForm({
  rows={4}
  maxLength={2000}
  disabled={isPending}
- className="mt-2 min-h-28 w-full resize-none rounded-control bg-black/5 px-4 py-3 text-sm leading-6 text-foreground shadow-none transition-all outline-none placeholder:text-muted-foreground hover:bg-black/10 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white/5 dark:hover:bg-white/10 dark:focus-visible:ring-primary/40"
+ className="mt-2 min-h-28 w-full resize-none rounded-control bg-surface px-4 py-3 text-sm leading-6 text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:ring-primary/40 dark:focus:bg-primary-soft"
  />
  <FieldError
  id="meal-plan-description-error"
@@ -577,7 +577,7 @@ function DocumentEditForm({
  rows={4}
  maxLength={2000}
  defaultValue={document.description ?? ""}
- className="mt-2 w-full resize-none rounded-[20px] border-input bg-surface/90 px-4 py-3 text-sm leading-6 text-foreground outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+ className="mt-2 w-full resize-none rounded-[20px] border-input bg-surface px-4 py-3 text-sm leading-6 text-foreground outline-none ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft"
  />
  <FieldError id="document-edit-description-error" message={fieldErrors.description} />
  </div>

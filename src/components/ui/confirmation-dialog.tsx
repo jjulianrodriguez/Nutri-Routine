@@ -60,7 +60,7 @@ export function ConfirmationDialog({
  <AlertDialogPrimitive.Portal>
  <AlertDialogPrimitive.Overlay
  className={cn(
- "fixed inset-0 z-[140] bg-charcoal/55",
+            "fixed inset-0 z-[140] bg-foreground/55",
  "data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
  "data-[state=open]:animate-in data-[state=open]:fade-in-0",
  )}

@@ -32,7 +32,7 @@ type LoginFormProps = {
 };
 
 const inputClasses =
- "mt-2 h-[3.25rem] rounded-control bg-surface px-4 text-foreground shadow-none placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-focus-ring/20";
+ "mt-2 h-[3.25rem] rounded-control bg-surface px-4 text-foreground placeholder:text-muted-foreground/70 ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft outline-none";
 
 export function LoginForm({ initialError }: LoginFormProps) {
  const router = useRouter();
@@ -144,7 +144,7 @@ export function LoginForm({ initialError }: LoginFormProps) {
  <button
  type="submit"
  disabled={isSubmitting}
- className="flex w-full items-center justify-center gap-2 rounded-control bg-primary py-4 text-sm font-extrabold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+ className="primary-action-button flex w-full items-center justify-center gap-2 rounded-control bg-primary py-4 text-sm font-extrabold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
  >
  {isSubmitting ? (
  <>

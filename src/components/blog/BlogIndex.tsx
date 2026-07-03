@@ -62,7 +62,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
  className={[
  "min-h-11 shrink-0 rounded-full px-4 py-2 text-sm font-black transition-[background-color,border-color,color,box-shadow] duration-300",
  isActive
- ? "border-[var(--blog-night)]/10 bg-[var(--blog-night)] text-[var(--blog-paper)] shadow-[0_18px_46px_-34px_rgb(var(--raspberry-rgb)_/_0.4)]"
+ ? "border-[var(--blog-night)]/10 bg-[var(--blog-night)] text-[var(--blog-paper)]"
  : "border-[var(--blog-night)]/10 bg-[var(--blog-paper)] text-[var(--blog-muted)] hover:border-[var(--blog-clay)]/30 hover:text-[var(--blog-night)]",
  ].join(" ")}
  >

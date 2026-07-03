@@ -140,7 +140,7 @@ function SelectRow({
  <select
  value={value}
  onChange={(event) => onChange(event.target.value)}
- className="h-11 min-w-40 cursor-pointer rounded-control bg-black/5 px-4 text-sm font-bold text-foreground outline-none transition-colors hover:bg-black/10 focus-visible:ring-2 focus-visible:ring-primary/30 dark:bg-white/5 dark:hover:bg-white/10"
+ className="h-11 min-w-40 cursor-pointer rounded-control bg-surface px-4 text-sm font-bold text-foreground outline-none transition-colors ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft"
  >
  {options.map((option) => (
  <option key={option.value} value={option.value}>

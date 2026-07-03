@@ -34,7 +34,7 @@ export function BlogContentRenderer({
  "[&_.blog-color-accent]:text-[var(--blog-clay)] [&_.blog-color-charcoal]:text-[var(--blog-night)] [&_.blog-color-teal]:text-[var(--blog-forest)] [&_.blog-color-warm]:text-[var(--blog-muted)]",
  "[&_.blog-highlight]:rounded-[8px] [&_.blog-highlight]:bg-[var(--blog-rose)] [&_.blog-highlight]:px-1.5 [&_.blog-highlight]:py-0.5",
  "[&_.blog-text-large]:text-xl [&_.blog-text-large]:leading-9 [&_.blog-text-small]:text-sm [&_.blog-text-small]:leading-6",
- "[&_blockquote]:my-8 [&_blockquote]:rounded-[1.4rem] [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--blog-forest)] [&_blockquote]:bg-[var(--blog-paper)] [&_blockquote]:px-5 [&_blockquote]:py-5 [&_blockquote]:font-black [&_blockquote]:text-[var(--blog-night)] [&_blockquote]:shadow-[0_22px_70px_-56px_rgb(var(--raspberry-rgb)_/_0.2)]",
+ "[&_blockquote]:my-8 [&_blockquote]:rounded-[1.4rem] [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--blog-forest)] [&_blockquote]:bg-[var(--blog-sage)] [&_blockquote]:px-5 [&_blockquote]:py-5 [&_blockquote]:font-black [&_blockquote]:text-[var(--blog-night)]",
  "[&_em]:text-[var(--blog-night)] [&_h1]:leading-[1.02] [&_h1]:text-[var(--blog-night)]",
  "[&_h2]:leading-[1.08] [&_h2]:text-[var(--blog-night)] [&_h3]:leading-tight [&_h3]:text-[var(--blog-night)]",
  "[&_h1]:[font-family:var(--font-landing-display)] [&_h1]:font-medium [&_h2]:[font-family:var(--font-landing-display)] [&_h2]:font-medium [&_h3]:[font-family:var(--font-landing-display)] [&_h3]:font-medium",

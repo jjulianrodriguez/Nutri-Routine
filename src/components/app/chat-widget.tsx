@@ -27,6 +27,7 @@ import { DropdownMenu } from "radix-ui";
 import { RelationshipBadge } from "@/components/app/relationship-badges";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
  deleteChatMessageAction,
  getChatBootstrapAction,
@@ -145,10 +146,34 @@ function ChatStatus({
 
 function ChatLoadingState() {
  return (
- <div className="space-y-3 px-4 py-4">
- <div className="h-14 animate-pulse rounded-[18px] bg-surface-secondary" />
- <div className="h-14 animate-pulse rounded-[18px] bg-surface-secondary" />
- <div className="h-14 animate-pulse rounded-[18px] bg-surface-secondary" />
+ <div className="space-y-3 px-4 py-4" aria-busy="true">
+ <div className="rounded-card bg-background p-3">
+ <div className="flex items-center gap-3">
+ <Skeleton className="size-11 rounded-full" />
+ <div className="min-w-0 flex-1">
+ <Skeleton className="h-4 w-36" />
+ <Skeleton className="mt-2 h-3 w-44" />
+ </div>
+ </div>
+ </div>
+ <div className="rounded-card bg-background p-3">
+ <div className="flex items-center gap-3">
+ <Skeleton className="size-11 rounded-full" />
+ <div className="min-w-0 flex-1">
+ <Skeleton className="h-4 w-44" />
+ <Skeleton className="mt-2 h-3 w-32" />
+ </div>
+ </div>
+ </div>
+ <div className="rounded-card bg-background p-3">
+ <div className="flex items-center gap-3">
+ <Skeleton className="size-11 rounded-full" />
+ <div className="min-w-0 flex-1">
+ <Skeleton className="h-4 w-32" />
+ <Skeleton className="mt-2 h-3 w-40" />
+ </div>
+ </div>
+ </div>
  </div>
  );
 }
@@ -195,7 +220,7 @@ function ChatTargetButton({
  type="button"
  onClick={() => onSelect(target)}
  className={cn(
- "group relative flex w-full min-w-0 items-center gap-3.5 overflow-hidden rounded-[20px] p-3 text-left transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 border",
+ "group relative flex w-full min-w-0 items-center gap-3.5 overflow-hidden rounded-[20px] p-3 text-left transition-[background-color,border-color,box-shadow,color,transform] duration-300 ease-out focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 border",
  isSelected 
  ? "bg-primary/5 border-primary/15 shadow-sm" 
  : "bg-background border-transparent shadow-[0_2px_8px_rgb(0,0,0,0.04)] hover:border-primary/10 hover:bg-surface hover:shadow-md"
@@ -203,13 +228,13 @@ function ChatTargetButton({
  >
  <div 
  className={cn(
- "absolute bottom-3 left-0 top-3 w-1 rounded-r-full transition-all duration-300 ease-out",
+ "absolute bottom-3 left-0 top-3 w-1 rounded-r-full transition-[background-color,border-color,box-shadow,color,transform] duration-300 ease-out",
  isSelected ? "bg-primary" : "bg-transparent"
  )}
  />
 
  <div className={cn(
- "grid size-12 shrink-0 place-items-center rounded-full font-extrabold text-[15px] tracking-wide transition-all duration-300",
+ "grid size-12 shrink-0 place-items-center rounded-full font-extrabold text-[15px] tracking-wide transition-[background-color,border-color,box-shadow,color,transform] duration-300",
  isSelected 
  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
  : "bg-background text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md group-hover:shadow-primary/20"
@@ -221,7 +246,7 @@ function ChatTargetButton({
  <div className="flex items-center justify-between gap-2">
  <span className={cn(
  "truncate font-extrabold tracking-tight transition-colors duration-300",
- isSelected ? "text-primary" : "text-charcoal group-hover:text-primary/90",
+ isSelected ? "text-primary" : "text-foreground group-hover:text-primary/90",
  "text-[15px]"
  )}>
  {target.title}
@@ -257,10 +282,10 @@ function ChatTargetButton({
  : isDeleted
  ? "font-semibold italic text-muted/60"
  : isSelected
- ? "font-bold text-charcoal/80"
+ ? "font-bold text-foreground/80"
  : target.unreadCount > 0 
- ? "font-extrabold text-charcoal"
- : "font-semibold text-warm-brown"
+ ? "font-extrabold text-foreground"
+ : "font-semibold text-muted-foreground"
  )}>
  {hasNoMessages 
  ? "Iniciar conversación"
@@ -268,7 +293,7 @@ function ChatTargetButton({
  </span>
  
  {target.unreadCount > 0 ? (
- <span className="grid min-w-[1.25rem] shrink-0 place-items-center rounded-full bg-accent px-1 py-0.5 text-[0.6rem] font-extrabold leading-none text-charcoal shadow-sm">
+ <span className="grid min-w-[1.25rem] shrink-0 place-items-center rounded-full bg-secondary px-1 py-0.5 text-[0.6rem] font-extrabold leading-none text-foreground shadow-sm">
  {target.unreadCount > 99 ? "99+" : target.unreadCount}
  </span>
  ) : null}
@@ -294,7 +319,7 @@ function MessageActionsMenu({
  type="button"
  aria-label="Acciones del mensaje"
  disabled={disabled}
- className="mt-1 grid size-8 shrink-0 place-items-center rounded-full border-primary/15 bg-surface/82 text-warm-brown transition hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:cursor-not-allowed disabled:opacity-50"
+ className="mt-1 grid size-8 shrink-0 place-items-center rounded-full border-primary/15 bg-surface/82 text-muted-foreground transition hover:bg-primary-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:cursor-not-allowed disabled:opacity-50"
  >
  <MoreHorizontal className="size-4" aria-hidden="true" />
  </button>
@@ -311,7 +336,7 @@ function MessageActionsMenu({
  <DropdownMenu.Item
  disabled={disabled}
  onSelect={onEdit}
- className="flex min-h-10 cursor-default select-none items-center gap-3 rounded-[12px] px-3 py-2 text-sm font-bold text-charcoal outline-none transition-colors focus:bg-primary-soft focus:text-charcoal data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+ className="flex min-h-10 cursor-default select-none items-center gap-3 rounded-[12px] px-3 py-2 text-sm font-bold text-foreground outline-none transition-colors focus:bg-primary-soft focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
  >
  <Pencil className="size-4" aria-hidden="true" />
  <span>Editar mensaje</span>
@@ -408,7 +433,7 @@ function ChatMessages({
  "min-w-[7.5rem] max-w-[82%] rounded-[18px] px-3.5 py-2 transition",
  message.isOwn
  ? "border-primary/20 bg-primary text-primary-foreground"
- : " bg-background text-charcoal",
+ : " bg-background text-foreground",
  message.isDeleted && "opacity-75",
  editingMessageId === message.id && "ring-3 ring-primary/25",
  pendingMessageId === message.id && "opacity-60",
@@ -789,7 +814,7 @@ export function ChatWidget() {
  <>
  <button
  type="button"
- className="fixed bottom-20 right-5 z-30 grid size-11 place-items-center rounded-full bg-surface/82 text-warm-brown backdrop-blur-lg transition-[background-color,color,box-shadow,transform] hover:bg-primary hover:text-charcoal hover:shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+ className="fixed bottom-20 right-5 z-30 grid size-11 place-items-center rounded-full bg-surface/82 text-muted-foreground backdrop-blur-lg transition-[background-color,color,box-shadow,transform] hover:bg-primary hover:text-primary-foreground hover:shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
  onClick={togglePanel}
  aria-expanded={open}
  aria-label={open ? "Cerrar chat" : "Abrir chat"}
@@ -800,7 +825,7 @@ export function ChatWidget() {
  <MessageCircle className="size-4" aria-hidden="true" />
  )}
  {totalUnread > 0 ? (
- <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full border-2 border-surface bg-accent px-1.5 py-0.5 text-[0.65rem] font-extrabold leading-none text-charcoal">
+ <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full border-2 border-surface bg-secondary px-1.5 py-0.5 text-[0.65rem] font-extrabold leading-none text-foreground">
  {totalUnread > 99 ? "99+" : totalUnread}
  </span>
  ) : null}
@@ -822,18 +847,18 @@ export function ChatWidget() {
  <button
  type="button"
  onClick={resetToSelector}
- className="grid size-9 shrink-0 place-items-center rounded-full bg-background text-warm-brown hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+ className="grid size-9 shrink-0 place-items-center rounded-full bg-background text-muted-foreground hover:bg-primary-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
  aria-label="Volver a conversaciones"
  >
  <ArrowLeft className="size-4" aria-hidden="true" />
  </button>
  ) : (
- <span className="grid size-9 shrink-0 place-items-center rounded-full border-primary/20 bg-primary-soft text-warm-brown">
+ <span className="grid size-9 shrink-0 place-items-center rounded-full border-primary/20 bg-primary-soft text-muted-foreground">
  <MessageCircle className="size-4" aria-hidden="true" />
  </span>
  )}
  <div className="min-w-0 flex-1">
- <h2 className="truncate text-sm font-extrabold text-charcoal">
+ <h2 className="truncate text-sm font-extrabold text-foreground">
  {title}
  </h2>
  <p className="mt-0.5 truncate text-xs font-bold text-muted">
@@ -848,7 +873,7 @@ export function ChatWidget() {
  <button
  type="button"
  onClick={() => setOpen(false)}
- className="grid size-9 shrink-0 place-items-center rounded-full bg-background text-warm-brown hover:bg-primary-soft hover:text-charcoal focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+ className="grid size-9 shrink-0 place-items-center rounded-full bg-background text-muted-foreground hover:bg-primary-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
  aria-label="Cerrar chat"
  >
  <X className="size-4" aria-hidden="true" />
@@ -920,13 +945,13 @@ export function ChatWidget() {
  className="shrink-0 space-y-2 border-t bg-surface/72 p-3"
  >
  {editingMessage ? (
- <div className="flex items-center justify-between gap-3 rounded-[16px] border-primary/20 bg-primary-soft/65 px-3 py-2 text-xs font-bold text-warm-brown">
+ <div className="flex items-center justify-between gap-3 rounded-[16px] border-primary/20 bg-primary-soft/65 px-3 py-2 text-xs font-bold text-muted-foreground">
  <span>Editando mensaje</span>
  <button
  type="button"
  onClick={cancelEditingMessage}
  disabled={isComposerPending}
- className="rounded-full px-2 py-1 text-charcoal transition hover:bg-surface/80 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:cursor-not-allowed disabled:opacity-50"
+ className="rounded-full px-2 py-1 text-foreground transition hover:bg-surface/80 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:cursor-not-allowed disabled:opacity-50"
  >
  Cancelar
  </button>
@@ -947,7 +972,7 @@ export function ChatWidget() {
  placeholder={
  conversation ? "Escribe un mensaje..." : "Selecciona un chat"
  }
- className="max-h-28 min-h-11 flex-1 rounded-[18px] border-input bg-surface/90 px-3.5 py-2.5 text-sm font-semibold leading-6 text-charcoal outline-none placeholder:text-muted focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-55"
+ className="max-h-28 min-h-11 flex-1 rounded-[18px] border-input bg-surface px-3.5 py-2.5 text-sm font-semibold leading-6 text-foreground outline-none placeholder:text-muted ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-55"
  />
  <Button
  type="submit"

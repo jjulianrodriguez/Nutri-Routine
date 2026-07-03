@@ -470,13 +470,13 @@ function PlantLeaf({
  <path
  d="M0 0C-44-29-88-26-122 8C-92 53-34 55 0 0Z"
  fill={leaf.fill}
- stroke="rgb(var(--bone-rgb) / 0.72)"
+ stroke="rgb(var(--surface-rgb) / 0.72)"
  strokeWidth="2"
  />
  <path
  d="M-9 1C-42 4-78 15-111 34"
  fill="none"
- stroke="rgb(var(--spring-sky-rgb) / 0.38)"
+ stroke="rgb(var(--secondary-rgb) / 0.38)"
  strokeLinecap="round"
  strokeWidth="2"
  />
@@ -667,7 +667,7 @@ function HeroDumbbellSvg({ reduceMotion }: { reduceMotion: boolean }) {
  />
  <path
  d="M146 82H274"
- stroke="rgb(var(--bone-rgb) / 0.28)"
+ stroke="rgb(var(--surface-rgb) / 0.28)"
  strokeLinecap="round"
  strokeWidth="4"
  />
@@ -712,7 +712,7 @@ function HeroDumbbellSvg({ reduceMotion }: { reduceMotion: boolean }) {
  <path
  d="M48 63C58 54 71 51 85 54M287 48C300 40 317 40 328 49"
  fill="none"
- stroke="rgb(var(--bone-rgb) / 0.55)"
+ stroke="rgb(var(--surface-rgb) / 0.55)"
  strokeLinecap="round"
  strokeWidth="5"
  />
@@ -1212,7 +1212,7 @@ function TrustSection() {
  </h2>
  </Reveal>
  <Reveal delay={0.08}>
- <p className="max-w-2xl text-lg leading-8 text-[rgb(var(--bone-rgb)_/_0.74)]">
+ <p className="max-w-2xl text-lg leading-8 text-[rgb(var(--surface-rgb)_/_0.74)]">
  La experiencia pública explica lo esencial antes de pedir datos:
  modalidad, privacidad, acceso con código y una ruta de
  acompañamiento profesional.
@@ -1231,7 +1231,7 @@ function TrustSection() {
  <Icon className="size-5" strokeWidth={1.8} />
  </span>
  <h3 className="mt-8 text-2xl font-black">{item.title}</h3>
- <p className="mt-3 text-sm font-bold leading-6 text-[rgb(var(--bone-rgb)_/_0.68)]">
+ <p className="mt-3 text-sm font-bold leading-6 text-[rgb(var(--surface-rgb)_/_0.68)]">
  {item.copy}
  </p>
  </article>
@@ -1250,7 +1250,7 @@ function TrustSection() {
  <h3 className="mt-4 text-lg font-black leading-7">
  {item.question}
  </h3>
- <p className="mt-3 text-sm font-bold leading-6 text-[rgb(var(--bone-rgb)_/_0.68)]">
+ <p className="mt-3 text-sm font-bold leading-6 text-[rgb(var(--surface-rgb)_/_0.68)]">
  {item.answer}
  </p>
  </article>
@@ -1443,7 +1443,7 @@ function ClosingCta() {
  repeat: Infinity,
  ease: "easeInOut",
  }}
- className="absolute bottom-0 right-3 w-[72%] rounded-[2rem] border-[rgb(var(--bone-rgb)_/_0.7)] bg-[var(--ln-night)] p-6 text-[var(--ln-paper)] shadow-[0_34px_90px_-58px_rgb(var(--raspberry-rgb)_/_0.42)]"
+ className="absolute bottom-0 right-3 w-[72%] rounded-[2rem] border-[rgb(var(--surface-rgb)_/_0.7)] bg-[var(--ln-night)] p-6 text-[var(--ln-paper)] shadow-[0_34px_90px_-58px_rgb(var(--raspberry-rgb)_/_0.42)]"
  >
  <p className="text-[0.66rem] font-black uppercase tracking-[0.2em] text-[var(--ln-peach)]">
  confianza
