@@ -1,68 +1,230 @@
 import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import { Loader2 } from "lucide-react"
+import Link from "next/link"
 import { Slot } from "radix-ui"
 
-import { cn } from "@/lib/utils"
+import {
+ composeClasses,
+ defineVariants,
+ type VariantPropsOf,
+} from "@/components/ui/composition"
+import {
+ primitiveLayoutClasses,
+ primitiveMotionClasses,
+ primitiveStateClasses,
+} from "@/components/ui/shared-classes"
 
-const buttonVariants = cva(
- "group/button inline-flex shrink-0 items-center justify-center rounded-control border-transparent bg-clip-padding text-sm font-bold whitespace-nowrap transition-[background-color,border-color,box-shadow,color,opacity,transform] outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/25 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/35 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+const buttonVariants = defineVariants(
+ composeClasses(
+  "group/button border-transparent bg-clip-padding text-sm font-bold outline-none select-none",
+  primitiveLayoutClasses.control,
+  primitiveLayoutClasses.iconChild,
+  primitiveMotionClasses.standard,
+  primitiveStateClasses.focusRing,
+  "focus-visible:border-focus-ring active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-disabled data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-disabled data-[loading=true]:cursor-wait aria-invalid:border-status-danger aria-invalid:ring-3 aria-invalid:ring-status-danger/20 dark:aria-invalid:border-status-danger/50 dark:aria-invalid:ring-status-danger/35",
+ ),
  {
- variants: {
- variant: {
- default:
- "border-primary/30 bg-primary !text-white hover:border-primary/30 hover:bg-primary",
- outline:
- "border border-input bg-surface text-foreground shadow-none hover:border-secondary/35 hover:bg-surface-hover hover:text-foreground aria-expanded:border-secondary/35 aria-expanded:bg-surface-hover dark:border-input dark:bg-surface dark:hover:bg-surface-hover",
- secondary:
- "border-secondary/15 bg-secondary-soft text-secondary-hover shadow-none hover:border-secondary/35 hover:bg-secondary-soft hover:text-secondary-hover aria-expanded:border-secondary/35 aria-expanded:bg-secondary-soft",
- ghost:
- "text-muted hover:bg-surface-hover hover:text-foreground aria-expanded:bg-surface-hover aria-expanded:text-foreground dark:hover:bg-surface-hover",
- destructive:
- "border-danger/20 bg-destructive/10 text-destructive shadow-none hover:bg-destructive/16 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/18 dark:hover:bg-destructive/25 dark:focus-visible:ring-destructive/35",
- link: "rounded-sm text-primary underline-offset-4 hover:text-primary-hover hover:underline",
+  variants: {
+   variant: {
+    default:
+     "border-action-primary/30 bg-action-primary !text-action-primary-text hover:border-action-primary/30 hover:bg-action-primary",
+    outline:
+     "border border-border-default bg-surface-default text-text-primary shadow-none hover:border-action-secondary/35 hover:bg-surface-interactive hover:text-text-primary aria-expanded:border-action-secondary/35 aria-expanded:bg-surface-interactive dark:border-border-default dark:bg-surface-default dark:hover:bg-surface-interactive",
+    secondary:
+     "border-action-secondary/15 bg-action-secondary-soft text-action-secondary-hover shadow-none hover:border-action-secondary/35 hover:bg-action-secondary-soft hover:text-action-secondary-hover aria-expanded:border-action-secondary/35 aria-expanded:bg-action-secondary-soft",
+    ghost:
+     "text-text-muted hover:bg-surface-interactive hover:text-text-primary aria-expanded:bg-surface-interactive aria-expanded:text-text-primary dark:hover:bg-surface-interactive",
+    destructive:
+     "border-status-danger/20 bg-status-danger-surface text-status-danger-text shadow-none hover:bg-status-danger-surface focus-visible:border-status-danger/40 focus-visible:ring-status-danger/20 dark:focus-visible:ring-status-danger/35",
+    link: "rounded-sm text-action-primary underline-offset-4 hover:text-action-primary-hover hover:underline",
+   },
+   size: {
+    default:
+     "h-ds-10 gap-inline-sm px-ds-4 has-data-[icon=inline-end]:pr-ds-3 has-data-[icon=inline-start]:pl-ds-3",
+    xs: "h-ds-7 gap-inline-xs rounded-[min(var(--ds-radius-md),10px)] px-ds-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-ds-1-5 has-data-[icon=inline-start]:pl-ds-1-5 [&_svg:not([class*='size-'])]:size-icon-xs",
+    sm: "h-[calc(var(--ds-space-8)+var(--ds-space-1))] gap-inline-xs rounded-[min(var(--ds-radius-md),12px)] px-ds-3 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-ds-2 has-data-[icon=inline-start]:pl-ds-2 [&_svg:not([class*='size-'])]:size-icon-sm",
+    lg: "h-ds-12 gap-inline-md px-ds-5 has-data-[icon=inline-end]:pr-ds-4 has-data-[icon=inline-start]:pl-ds-4",
+    icon: "size-ds-10",
+    "icon-xs":
+     "size-ds-7 rounded-[min(var(--ds-radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-icon-xs",
+    "icon-sm":
+     "size-[calc(var(--ds-space-8)+var(--ds-space-1))] rounded-[min(var(--ds-radius-md),12px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-icon-sm",
+    "icon-lg": "size-ds-12 [&_svg:not([class*='size-'])]:size-icon-lg",
+   },
+  },
+  defaultVariants: {
+   variant: "default",
+   size: "default",
+  },
  },
- size: {
- default:
- "h-10 gap-2 px-4 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
- xs: "h-7 gap-1.5 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
- sm: "h-9 gap-1.5 rounded-[min(var(--radius-md),12px)] px-3 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3.5",
- lg: "h-12 gap-2.5 px-5 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
- icon: "size-10",
- "icon-xs":
- "size-7 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
- "icon-sm":
- "size-9 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
- "icon-lg": "size-12",
- },
- },
- defaultVariants: {
- variant: "default",
- size: "default",
- },
- }
 )
+
+type ButtonProps = React.ComponentProps<"button"> &
+ VariantPropsOf<typeof buttonVariants> & {
+  asChild?: boolean
+  loading?: boolean
+  loadingLabel?: React.ReactNode
+ }
 
 function Button({
  className,
  variant = "default",
  size = "default",
  asChild = false,
+ loading = false,
+ loadingLabel,
+ disabled,
+ children,
+ "aria-busy": ariaBusy,
+ "aria-disabled": ariaDisabled,
  ...props
-}: React.ComponentProps<"button"> &
- VariantProps<typeof buttonVariants> & {
- asChild?: boolean
- }) {
+}: ButtonProps) {
  const Comp = asChild ? Slot.Root : "button"
+ const isDisabled = disabled || loading
+ const buttonContent = (
+  <>
+   {loading ? (
+    <Loader2
+     data-slot="button-loading-icon"
+     className="size-icon-md animate-spin"
+     aria-hidden="true"
+    />
+   ) : null}
+   {loading && loadingLabel ? loadingLabel : children}
+  </>
+ )
 
  return (
- <Comp
- data-slot="button"
- data-variant={variant}
- data-size={size}
- className={cn(buttonVariants({ variant, size, className }))}
- {...props}
- />
+  <Comp
+   data-slot="button"
+   data-variant={variant}
+   data-size={size}
+   data-disabled={isDisabled ? "true" : undefined}
+   data-loading={loading ? "true" : undefined}
+   aria-busy={loading ? true : ariaBusy}
+   aria-disabled={asChild && isDisabled ? true : ariaDisabled}
+   className={composeClasses(buttonVariants({ variant, size, className }))}
+   {...(!asChild ? { disabled: isDisabled } : {})}
+   {...props}
+  >
+   {asChild ? children : buttonContent}
+  </Comp>
  )
 }
 
-export { Button, buttonVariants }
+type IconButtonProps = Omit<ButtonProps, "children" | "size"> & {
+ children: React.ReactNode
+ label: string
+ size?: "icon" | "icon-xs" | "icon-sm" | "icon-lg"
+}
+
+function IconButton({
+ children,
+ className,
+ label,
+ size = "icon",
+ title,
+ ...props
+}: IconButtonProps) {
+ return (
+  <Button
+   aria-label={label}
+   data-action="icon"
+   size={size}
+   title={title ?? label}
+   className={composeClasses("min-h-touch-target min-w-touch-target", className)}
+   {...props}
+  >
+   {children}
+  </Button>
+ )
+}
+
+type LinkButtonProps = Omit<ButtonProps, "asChild" | "type"> & {
+ external?: boolean
+ href: React.ComponentProps<typeof Link>["href"] | string
+ prefetch?: React.ComponentProps<typeof Link>["prefetch"]
+ replace?: React.ComponentProps<typeof Link>["replace"]
+ scroll?: React.ComponentProps<typeof Link>["scroll"]
+ target?: React.HTMLAttributeAnchorTarget
+ rel?: string
+}
+
+function LinkButton({
+ children,
+ external = false,
+ href,
+ prefetch,
+ rel,
+ replace,
+ scroll,
+ target,
+ ...props
+}: LinkButtonProps) {
+ return (
+  <Button asChild {...props}>
+   {external ? (
+    <a
+     href={String(href)}
+     target={target ?? "_blank"}
+     rel={rel ?? "noopener noreferrer"}
+    >
+     {children}
+    </a>
+   ) : (
+    <Link
+     href={href as React.ComponentProps<typeof Link>["href"]}
+     prefetch={prefetch}
+     replace={replace}
+     scroll={scroll}
+     target={target}
+     rel={rel}
+    >
+     {children}
+    </Link>
+   )}
+  </Button>
+ )
+}
+
+type ActionButtonProps = Omit<ButtonProps, "children"> & {
+ children: React.ReactNode
+ icon?: React.ReactNode
+ iconPosition?: "end" | "start"
+}
+
+function ActionButton({
+ children,
+ icon,
+ iconPosition = "end",
+ loading = false,
+ ...props
+}: ActionButtonProps) {
+ return (
+  <Button loading={loading} {...props}>
+   {!loading && icon && iconPosition === "start" ? (
+    <span data-icon="inline-start" aria-hidden="true">
+     {icon}
+    </span>
+   ) : null}
+   {children}
+   {!loading && icon && iconPosition === "end" ? (
+    <span data-icon="inline-end" aria-hidden="true">
+     {icon}
+    </span>
+   ) : null}
+  </Button>
+ )
+}
+
+export {
+ ActionButton,
+ Button,
+ IconButton,
+ LinkButton,
+ buttonVariants,
+ type ActionButtonProps,
+ type ButtonProps,
+ type IconButtonProps,
+ type LinkButtonProps,
+}

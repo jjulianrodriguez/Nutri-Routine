@@ -193,6 +193,176 @@
   --font-landing-display: var(--font-display);
   --font-landing-sans: var(--font-geist);
 
+  /* Design System semantic tokens, phase 1: additive aliases only. */
+  --ds-space-0: 0;
+  --ds-space-0-5: 0.125rem;
+  --ds-space-1: 0.25rem;
+  --ds-space-1-5: 0.375rem;
+  --ds-space-2: 0.5rem;
+  --ds-space-2-5: 0.625rem;
+  --ds-space-3: 0.75rem;
+  --ds-space-3-5: 0.875rem;
+  --ds-space-4: 1rem;
+  --ds-space-5: 1.25rem;
+  --ds-space-6: 1.5rem;
+  --ds-space-7: 1.75rem;
+  --ds-space-8: 2rem;
+  --ds-space-10: 2.5rem;
+  --ds-space-12: 3rem;
+  --ds-space-14: 3.5rem;
+  --ds-space-16: 4rem;
+  --ds-space-20: 5rem;
+  --ds-space-page-x: var(--ds-space-5);
+  --ds-space-page-y: var(--ds-space-6);
+  --ds-space-section: var(--ds-space-10);
+  --ds-space-stack-xs: var(--ds-space-2);
+  --ds-space-stack-sm: var(--ds-space-3);
+  --ds-space-stack-md: var(--ds-space-4);
+  --ds-space-stack-lg: var(--ds-space-6);
+  --ds-space-stack-xl: var(--ds-space-8);
+  --ds-space-inline-xs: var(--ds-space-1-5);
+  --ds-space-inline-sm: var(--ds-space-2);
+  --ds-space-inline-md: var(--ds-space-3);
+  --ds-space-inline-lg: var(--ds-space-4);
+
+  --ds-radius-none: 0;
+  --ds-radius-xs: var(--radius-xs);
+  --ds-radius-sm: var(--radius-sm);
+  --ds-radius-md: var(--radius-md);
+  --ds-radius-lg: var(--radius-lg);
+  --ds-radius-xl: var(--radius-xl);
+  --ds-radius-card: var(--radius-card);
+  --ds-radius-control: var(--radius-control);
+  --ds-radius-panel: var(--radius-lg);
+  --ds-radius-pill: 999px;
+  --ds-radius-full: 9999px;
+
+  --ds-color-bg-canvas: var(--background);
+  --ds-color-bg-surface: var(--surface);
+  --ds-color-bg-surface-muted: var(--surface-muted);
+  --ds-color-bg-surface-elevated: var(--surface-elevated);
+  --ds-color-bg-surface-hover: var(--surface-hover);
+  --ds-color-bg-inverse: var(--foreground);
+  --ds-color-text-primary: var(--text-primary);
+  --ds-color-text-secondary: var(--text-secondary);
+  --ds-color-text-muted: var(--text-muted);
+  --ds-color-text-subtle: var(--text-subtle);
+  --ds-color-text-inverse: var(--background);
+  --ds-color-border-default: var(--border);
+  --ds-color-border-subtle: var(--border-subtle);
+  --ds-color-border-strong: var(--text-secondary);
+  --ds-color-action-primary: var(--primary);
+  --ds-color-action-primary-hover: var(--primary-hover);
+  --ds-color-action-primary-soft: var(--primary-soft);
+  --ds-color-action-primary-text: var(--primary-foreground);
+  --ds-color-action-secondary: var(--secondary);
+  --ds-color-action-secondary-hover: var(--secondary-hover);
+  --ds-color-action-secondary-soft: var(--secondary-soft);
+  --ds-color-action-secondary-text: var(--secondary-foreground);
+  --ds-color-status-danger: var(--danger);
+  --ds-color-status-danger-surface: var(--danger-soft);
+  --ds-color-status-danger-text: var(--danger);
+  --ds-color-status-success: var(--success);
+  --ds-color-status-success-surface: var(--success-soft);
+  --ds-color-status-success-text: var(--success);
+  --ds-color-status-warning: var(--warning);
+  --ds-color-status-warning-surface: var(--warning-soft);
+  --ds-color-status-warning-text: var(--warning);
+  --ds-color-status-notice: var(--notice);
+  --ds-color-status-notice-surface: var(--notice-soft);
+  --ds-color-status-notice-text: var(--notice);
+
+  --ds-elevation-0: none;
+  --ds-elevation-1: var(--shadow-soft);
+  --ds-elevation-2: var(--shadow-card);
+  --ds-elevation-3: var(--shadow-pop);
+  --ds-elevation-4: var(--shadow-premium);
+  --ds-shadow-focus: var(--shadow-focus);
+  --ds-shadow-glow: var(--shadow-glow);
+  --ds-shadow-minimal: var(--shadow-minimal);
+
+  --ds-type-display-font: var(--font-family-heading);
+  --ds-type-heading-font: var(--font-family-heading);
+  --ds-type-body-font: var(--font-family-sans);
+  --ds-type-label-font: var(--font-family-sans);
+  --ds-type-display-size: 3rem;
+  --ds-type-display-line-height: 1;
+  --ds-type-display-weight: 760;
+  --ds-type-display-tracking: 0;
+  --ds-type-heading-size: 1.875rem;
+  --ds-type-heading-line-height: 1.16;
+  --ds-type-heading-weight: 720;
+  --ds-type-heading-tracking: 0;
+  --ds-type-title-size: 1.25rem;
+  --ds-type-title-line-height: 1.28;
+  --ds-type-title-weight: 700;
+  --ds-type-title-tracking: 0;
+  --ds-type-body-size: 1rem;
+  --ds-type-body-line-height: 1.58;
+  --ds-type-body-weight: 400;
+  --ds-type-body-tracking: 0;
+  --ds-type-body-sm-size: 0.875rem;
+  --ds-type-body-sm-line-height: 1.5;
+  --ds-type-label-size: 0.875rem;
+  --ds-type-label-line-height: 1.25;
+  --ds-type-label-weight: 700;
+  --ds-type-label-tracking: 0;
+  --ds-type-caption-size: 0.75rem;
+  --ds-type-caption-line-height: 1.35;
+  --ds-type-caption-weight: 700;
+  --ds-type-caption-tracking: 0;
+
+  --ds-icon-xs: 0.75rem;
+  --ds-icon-sm: 0.875rem;
+  --ds-icon-md: 1rem;
+  --ds-icon-lg: 1.25rem;
+  --ds-icon-xl: 1.5rem;
+  --ds-icon-2xl: 2rem;
+  --ds-size-touch-target: 2.75rem;
+
+  --ds-motion-duration-instant: 0ms;
+  --ds-motion-duration-fast: var(--duration-fast);
+  --ds-motion-duration-base: var(--duration-base);
+  --ds-motion-duration-slow: 300ms;
+  --ds-motion-duration-slower: 420ms;
+  --ds-motion-ease-standard: var(--ease-premium);
+  --ds-motion-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ds-motion-ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+  --ds-motion-enter-y: 8px;
+  --ds-motion-enter-scale: 0.98;
+  --ds-motion-press-y: 1px;
+
+  --ds-z-base: 0;
+  --ds-z-raised: 10;
+  --ds-z-sticky: 30;
+  --ds-z-navigation: 40;
+  --ds-z-overlay: 50;
+  --ds-z-popover: 120;
+  --ds-z-dialog: 150;
+  --ds-z-toast: 170;
+  --ds-z-skip-link: 180;
+
+  --ds-focus-ring-color: var(--focus-ring);
+  --ds-focus-ring-rgb: var(--focus-ring-rgb);
+  --ds-focus-ring-width: 2px;
+  --ds-focus-ring-offset: 3px;
+  --ds-focus-ring-opacity: 0.62;
+  --ds-focus-ring-shadow: var(--shadow-focus);
+
+  --ds-overlay-scrim: rgb(var(--foreground-rgb) / 0.55);
+  --ds-overlay-scrim-soft: rgb(var(--foreground-rgb) / 0.28);
+  --ds-overlay-surface: var(--surface-elevated);
+  --ds-overlay-backdrop-blur: 16px;
+
+  --ds-opacity-hidden: 0;
+  --ds-opacity-muted: 0.62;
+  --ds-opacity-subtle: 0.72;
+  --ds-opacity-disabled: 0.5;
+  --ds-opacity-visible: 1;
+  --ds-disabled-opacity: var(--ds-opacity-disabled);
+  --ds-disabled-cursor: not-allowed;
+  --ds-disabled-pointer-events: none;
+
   --sidebar: #171216;
   --sidebar-foreground: #eee7ea;
   --sidebar-primary: var(--primary);
@@ -295,6 +465,10 @@
   --shadow-minimal: 0 12px 36px -12px rgb(0 0 0 / 0.5),
     0 4px 12px -4px rgb(0 0 0 / 0.3);
 
+  --ds-overlay-scrim: rgb(0 0 0 / 0.68);
+  --ds-overlay-scrim-soft: rgb(0 0 0 / 0.42);
+  --ds-focus-ring-opacity: 0.68;
+
 }
 
 @theme inline {
@@ -349,6 +523,40 @@
   --color-highlight-soft: var(--highlight-soft);
   --color-highlight-foreground: var(--highlight-foreground);
 
+  --color-canvas: var(--ds-color-bg-canvas);
+  --color-surface-default: var(--ds-color-bg-surface);
+  --color-surface-subtle: var(--ds-color-bg-surface-muted);
+  --color-surface-raised: var(--ds-color-bg-surface-elevated);
+  --color-surface-interactive: var(--ds-color-bg-surface-hover);
+  --color-surface-inverse: var(--ds-color-bg-inverse);
+  --color-text-secondary: var(--ds-color-text-secondary);
+  --color-text-muted: var(--ds-color-text-muted);
+  --color-text-inverse: var(--ds-color-text-inverse);
+  --color-border-default: var(--ds-color-border-default);
+  --color-border-strong: var(--ds-color-border-strong);
+  --color-action-primary: var(--ds-color-action-primary);
+  --color-action-primary-hover: var(--ds-color-action-primary-hover);
+  --color-action-primary-soft: var(--ds-color-action-primary-soft);
+  --color-action-primary-text: var(--ds-color-action-primary-text);
+  --color-action-secondary: var(--ds-color-action-secondary);
+  --color-action-secondary-hover: var(--ds-color-action-secondary-hover);
+  --color-action-secondary-soft: var(--ds-color-action-secondary-soft);
+  --color-action-secondary-text: var(--ds-color-action-secondary-text);
+  --color-status-danger: var(--ds-color-status-danger);
+  --color-status-danger-surface: var(--ds-color-status-danger-surface);
+  --color-status-danger-text: var(--ds-color-status-danger-text);
+  --color-status-success: var(--ds-color-status-success);
+  --color-status-success-surface: var(--ds-color-status-success-surface);
+  --color-status-success-text: var(--ds-color-status-success-text);
+  --color-status-warning: var(--ds-color-status-warning);
+  --color-status-warning-surface: var(--ds-color-status-warning-surface);
+  --color-status-warning-text: var(--ds-color-status-warning-text);
+  --color-status-notice: var(--ds-color-status-notice);
+  --color-status-notice-surface: var(--ds-color-status-notice-surface);
+  --color-status-notice-text: var(--ds-color-status-notice-text);
+  --color-focus-ring: var(--ds-focus-ring-color);
+  --color-overlay-scrim: var(--ds-overlay-scrim);
+
   --color-neutral-white: var(--surface);
   --color-neutral-50: var(--background);
   --color-neutral-100: var(--surface-muted);
@@ -376,7 +584,41 @@
 
   --font-sans: var(--font-family-sans);
   --font-heading: var(--font-family-heading);
+  --font-body: var(--ds-type-body-font);
+  --font-label: var(--ds-type-label-font);
   --font-serif: var(--font-family-serif);
+  --text-display: var(--ds-type-display-size);
+  --text-display--line-height: var(--ds-type-display-line-height);
+  --text-display--font-weight: var(--ds-type-display-weight);
+  --text-display--letter-spacing: var(--ds-type-display-tracking);
+  --text-heading: var(--ds-type-heading-size);
+  --text-heading--line-height: var(--ds-type-heading-line-height);
+  --text-heading--font-weight: var(--ds-type-heading-weight);
+  --text-heading--letter-spacing: var(--ds-type-heading-tracking);
+  --text-title: var(--ds-type-title-size);
+  --text-title--line-height: var(--ds-type-title-line-height);
+  --text-title--font-weight: var(--ds-type-title-weight);
+  --text-title--letter-spacing: var(--ds-type-title-tracking);
+  --text-body: var(--ds-type-body-size);
+  --text-body--line-height: var(--ds-type-body-line-height);
+  --text-body--font-weight: var(--ds-type-body-weight);
+  --text-body--letter-spacing: var(--ds-type-body-tracking);
+  --text-body-sm: var(--ds-type-body-sm-size);
+  --text-body-sm--line-height: var(--ds-type-body-sm-line-height);
+  --text-label: var(--ds-type-label-size);
+  --text-label--line-height: var(--ds-type-label-line-height);
+  --text-label--font-weight: var(--ds-type-label-weight);
+  --text-label--letter-spacing: var(--ds-type-label-tracking);
+  --text-caption: var(--ds-type-caption-size);
+  --text-caption--line-height: var(--ds-type-caption-line-height);
+  --text-caption--font-weight: var(--ds-type-caption-weight);
+  --text-caption--letter-spacing: var(--ds-type-caption-tracking);
+  --font-weight-display: var(--ds-type-display-weight);
+  --font-weight-heading: var(--ds-type-heading-weight);
+  --font-weight-title: var(--ds-type-title-weight);
+  --font-weight-label: var(--ds-type-label-weight);
+  --font-weight-caption: var(--ds-type-caption-weight);
+  --radius-none: 0;
   --radius-xs: 6px;
   --radius-sm: 8px;
   --radius-md: 10px;
@@ -384,6 +626,8 @@
   --radius-xl: 14px;
   --radius-card: 10px;
   --radius-control: 12px;
+  --radius-panel: var(--ds-radius-panel);
+  --radius-pill: var(--ds-radius-pill);
   --shadow-soft: 0 1px 2px rgb(var(--foreground-rgb) / 0.035),
     0 10px 24px -20px rgb(var(--foreground-rgb) / 0.18);
   --shadow-card: 0 1px 2px rgb(var(--foreground-rgb) / 0.035),
@@ -393,13 +637,70 @@
     0 1px 0 rgb(255 255 255 / 0.75) inset;
   --shadow-premium: 0 18px 54px -34px rgb(var(--foreground-rgb) / 0.28),
     0 2px 6px rgb(var(--foreground-rgb) / 0.04);
+  --shadow-elevation-0: var(--ds-elevation-0);
+  --shadow-elevation-1: var(--ds-elevation-1);
+  --shadow-elevation-2: var(--ds-elevation-2);
+  --shadow-elevation-3: var(--ds-elevation-3);
+  --shadow-elevation-4: var(--ds-elevation-4);
+  --shadow-focus-ring: var(--ds-shadow-focus);
   --shadow-glow: 0 14px 32px -24px rgb(var(--primary-rgb) / 0.42);
   --shadow-primary-action: none;
   --shadow-primary-action-hover: none;
   --shadow-primary-action-active: none;
   --shadow-minimal: 0 12px 36px -12px rgb(var(--foreground-rgb) / 0.07),
     0 4px 12px -4px rgb(var(--foreground-rgb) / 0.03);
+  --spacing-ds-0: var(--ds-space-0);
+  --spacing-ds-0-5: var(--ds-space-0-5);
+  --spacing-ds-1: var(--ds-space-1);
+  --spacing-ds-1-5: var(--ds-space-1-5);
+  --spacing-ds-2: var(--ds-space-2);
+  --spacing-ds-2-5: var(--ds-space-2-5);
+  --spacing-ds-3: var(--ds-space-3);
+  --spacing-ds-3-5: var(--ds-space-3-5);
+  --spacing-ds-4: var(--ds-space-4);
+  --spacing-ds-5: var(--ds-space-5);
+  --spacing-ds-6: var(--ds-space-6);
+  --spacing-ds-7: var(--ds-space-7);
+  --spacing-ds-8: var(--ds-space-8);
+  --spacing-ds-10: var(--ds-space-10);
+  --spacing-ds-12: var(--ds-space-12);
+  --spacing-ds-14: var(--ds-space-14);
+  --spacing-ds-16: var(--ds-space-16);
+  --spacing-ds-20: var(--ds-space-20);
+  --spacing-page-x: var(--ds-space-page-x);
+  --spacing-page-y: var(--ds-space-page-y);
+  --spacing-section: var(--ds-space-section);
+  --spacing-stack-xs: var(--ds-space-stack-xs);
+  --spacing-stack-sm: var(--ds-space-stack-sm);
+  --spacing-stack-md: var(--ds-space-stack-md);
+  --spacing-stack-lg: var(--ds-space-stack-lg);
+  --spacing-stack-xl: var(--ds-space-stack-xl);
+  --spacing-inline-xs: var(--ds-space-inline-xs);
+  --spacing-inline-sm: var(--ds-space-inline-sm);
+  --spacing-inline-md: var(--ds-space-inline-md);
+  --spacing-inline-lg: var(--ds-space-inline-lg);
+  --spacing-icon-xs: var(--ds-icon-xs);
+  --spacing-icon-sm: var(--ds-icon-sm);
+  --spacing-icon-md: var(--ds-icon-md);
+  --spacing-icon-lg: var(--ds-icon-lg);
+  --spacing-icon-xl: var(--ds-icon-xl);
+  --spacing-icon-2xl: var(--ds-icon-2xl);
+  --spacing-touch-target: var(--ds-size-touch-target);
+  --transition-duration-instant: var(--ds-motion-duration-instant);
+  --transition-duration-fast: var(--ds-motion-duration-fast);
+  --transition-duration-base: var(--ds-motion-duration-base);
+  --transition-duration-slow: var(--ds-motion-duration-slow);
+  --transition-duration-slower: var(--ds-motion-duration-slower);
   --ease-premium: cubic-bezier(0.2, 0.72, 0.22, 1);
+  --ease-standard: var(--ds-motion-ease-standard);
+  --ease-enter: var(--ds-motion-ease-enter);
+  --ease-exit: var(--ds-motion-ease-exit);
+  --opacity-hidden: var(--ds-opacity-hidden);
+  --opacity-muted: var(--ds-opacity-muted);
+  --opacity-subtle: var(--ds-opacity-subtle);
+  --opacity-disabled: var(--ds-opacity-disabled);
+  --opacity-visible: var(--ds-opacity-visible);
+  --blur-overlay: var(--ds-overlay-backdrop-blur);
 }
 
 *,

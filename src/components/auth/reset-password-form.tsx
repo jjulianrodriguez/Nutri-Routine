@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { ActionButton } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { createClient } from "@/lib/supabase/client";
@@ -134,23 +134,15 @@ export function ResetPasswordForm() {
  </Alert>
  ) : null}
 
- <Button
+ <ActionButton
  type="submit"
- disabled={isSubmitting}
+ loading={isSubmitting}
+ loadingLabel="Guardando..."
+ icon={<ArrowRight className="size-4" />}
  className="h-[3.25rem] w-full rounded-control bg-primary text-sm font-extrabold text-primary-foreground hover:bg-primary-hover"
  >
- {isSubmitting ? (
- <>
- <Loader2 className="size-4 animate-spin" />
- Guardando...
- </>
- ) : (
- <>
  Guardar nueva contraseña
- <ArrowRight className="size-4" />
- </>
- )}
- </Button>
+ </ActionButton>
 
  <p className="pt-2 text-center text-sm text-muted-foreground">
  ¿El enlace expiró?{" "}

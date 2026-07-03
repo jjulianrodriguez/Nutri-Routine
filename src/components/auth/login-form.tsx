@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ActionButton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -141,23 +142,15 @@ export function LoginForm({ initialError }: LoginFormProps) {
  </Alert>
  ) : null}
 
- <button
+ <ActionButton
  type="submit"
- disabled={isSubmitting}
- className="primary-action-button flex w-full items-center justify-center gap-2 rounded-control bg-primary py-4 text-sm font-extrabold text-primary-foreground transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+ loading={isSubmitting}
+ loadingLabel="Entrando..."
+ icon={<ArrowRight className="size-4" />}
+ className="h-[3.25rem] w-full rounded-control bg-primary text-sm font-extrabold text-primary-foreground hover:bg-primary-hover"
  >
- {isSubmitting ? (
- <>
- <Loader2 className="size-4 animate-spin" />
- Entrando...
- </>
- ) : (
- <>
  Iniciar sesión
- <ArrowRight className="size-4" />
- </>
- )}
- </button>
+ </ActionButton>
 
  <div className="pt-2 text-center text-sm">
  <p className="text-muted-foreground">

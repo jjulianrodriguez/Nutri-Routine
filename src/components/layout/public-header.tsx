@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 import { HomeMark } from "@/components/layout/home-mark";
+import { LinkButton } from "@/components/ui/button";
 
 export function PublicHeader() {
  return (
@@ -36,16 +37,15 @@ export function PublicHeader() {
  </Link>
  </nav>
 
- <a
+ <LinkButton
  href="https://wa.me/50688332426"
- target="_blank"
- rel="noopener noreferrer"
- className="primary-action-button inline-flex items-center justify-center gap-2 rounded-control bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground transition-[background-color,box-shadow] duration-200 hover:bg-primary-hover sm:px-5"
+ external
+ className="px-4 py-2.5 sm:px-5"
  >
  <span className="hidden sm:inline">Agendar consulta</span>
  <span className="sm:hidden">Agendar</span>
  <ArrowUpRight className="size-4" />
- </a>
+ </LinkButton>
  </div>
  </header>
  );

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Fragment } from "react";
 import { DropdownMenu } from "radix-ui";
 
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type CardActionItem = {
@@ -36,16 +36,14 @@ export function CardActionsMenu({ items, label }: CardActionsMenuProps) {
  return (
  <DropdownMenu.Root modal={false}>
  <DropdownMenu.Trigger asChild>
- <Button
+ <IconButton
  type="button"
- size="icon"
  variant="outline"
- aria-label={`Acciones de ${label}`}
- title={`Acciones de ${label}`}
+ label={`Acciones de ${label}`}
  className="shrink-0"
  >
  <MoreHorizontal className="size-5" aria-hidden="true" />
- </Button>
+ </IconButton>
  </DropdownMenu.Trigger>
 
  <DropdownMenu.Portal>

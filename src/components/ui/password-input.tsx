@@ -3,6 +3,7 @@
 import { Eye, EyeOff } from "lucide-react";
 import * as React from "react";
 
+import { IconButton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -34,13 +35,14 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
  disabled={disabled}
  {...props}
  />
- <button
+ <IconButton
  type="button"
- aria-label={toggleLabel}
+ label={toggleLabel}
  aria-pressed={isVisible}
  aria-controls={props.id}
  disabled={disabled}
- className="absolute right-1 top-1/2 flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/35 disabled:pointer-events-none disabled:opacity-50"
+ variant="ghost"
+ className="absolute right-1 top-1/2 size-11 -translate-y-1/2 rounded-full text-muted hover:bg-foreground/5 hover:text-foreground focus-visible:ring-ring/35"
  onClick={() => setIsVisible((current) => !current)}
  >
  {isVisible ? (
@@ -48,7 +50,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
  ) : (
  <Eye className="size-5" aria-hidden="true" />
  )}
- </button>
+ </IconButton>
  </div>
  );
  },

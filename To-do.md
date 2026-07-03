@@ -2,9 +2,7 @@
 
 
 
-- En la parte de medidas en progreso, se debe de mostrar aunque tenga una sola configurada.
 
-- El boton de ... en mensajes no funciona
 
 
 

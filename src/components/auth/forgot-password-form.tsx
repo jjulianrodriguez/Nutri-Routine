@@ -1,14 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2, Mail } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { ActionButton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { requestPasswordRecovery } from "@/lib/actions/auth";
@@ -108,23 +108,15 @@ export function ForgotPasswordForm() {
  </Alert>
  ) : null}
 
- <Button
+ <ActionButton
  type="submit"
- disabled={isSubmitting}
+ loading={isSubmitting}
+ loadingLabel="Enviando..."
+ icon={<Mail className="size-4" />}
  className="h-[3.25rem] w-full rounded-control bg-primary text-sm font-extrabold text-primary-foreground hover:bg-primary-hover"
  >
- {isSubmitting ? (
- <>
- <Loader2 className="size-4 animate-spin" />
- Enviando...
- </>
- ) : (
- <>
  Enviar enlace seguro
- <Mail className="size-4" />
- </>
- )}
- </Button>
+ </ActionButton>
 
  <div className="pt-2 text-center text-sm">
  <Link
