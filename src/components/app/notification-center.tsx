@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 
 import { EmptyState } from "@/components/app/AppScreen";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { Button } from "@/components/ui/button";
 import {
  markAllNotificationsRead,
@@ -634,37 +635,19 @@ export function NotificationCenter({
  ) : null}
  </div>
 
- <div
- className="flex gap-2 overflow-x-auto rounded-[20px] bg-background/50 p-2"
- aria-label="Filtros de notificaciones"
- role="tablist"
- >
- {tabs.map((tab) => (
- <button
- key={tab.id}
- type="button"
- role="tab"
- aria-selected={activeFilter === tab.id}
- className={cn(
- "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-control px-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
- activeFilter === tab.id
- ? "bg-primary text-primary-foreground "
- : "text-muted hover:bg-surface hover:text-foreground",
- )}
- onClick={() => setActiveFilter(tab.id)}
- >
- <span>{tab.label}</span>
- <span
- className={cn(
- "rounded-full px-2 py-0.5 text-xs",
- activeFilter === tab.id ? "bg-surface/70" : "bg-surface",
- )}
- >
- {tab.count}
- </span>
- </button>
- ))}
- </div>
+ <SectionTabs
+ activeId={activeFilter}
+ ariaLabel="Filtros de notificaciones"
+ className="flex-nowrap overflow-x-auto rounded-[20px] bg-background/50 p-2"
+ interaction="tabs"
+ items={tabs.map((tab) => ({
+ count: tab.count,
+ id: tab.id,
+ label: tab.label,
+ onClick: () => setActiveFilter(tab.id),
+ }))}
+ size="sm"
+ />
 
  {feedback ? (
  <p

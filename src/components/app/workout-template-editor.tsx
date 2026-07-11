@@ -23,8 +23,11 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { Input } from "@/components/ui/input";
+import { FieldError } from "@/components/ui/form-field";
+import { Input, NumberInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useProgressiveResults } from "@/hooks/use-progressive-results";
 import { saveWorkoutTemplate } from "@/lib/actions/workout-templates";
 import {
@@ -36,10 +39,6 @@ import { cn } from "@/lib/utils";
 import type { RoutineListItem } from "@/types/routine";
 import type { WorkoutTemplateDetail } from "@/types/workout-template";
 
-const selectClasses =
-  "mt-2 h-11 w-full min-w-0 rounded-control bg-surface px-4 py-2 text-base text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft appearance-none";
-const textareaClasses =
-  "mt-2 min-h-28 w-full resize-none rounded-control bg-surface px-4 py-3 text-sm leading-6 text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 dark:ring-primary/40 dark:focus:bg-primary-soft";
 const formSectionClasses =
  "rounded-[22px] bg-background p-4 sm:p-5";
 const legendClasses = "px-1 text-sm font-extrabold text-foreground";
@@ -82,14 +81,6 @@ function getDefaultValues(
  isActive: true,
  name: "",
  };
-}
-
-function FieldError({ message }: { message?: string }) {
- return message ? (
- <p className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- ) : null;
 }
 
 export function WorkoutTemplateEditor({
@@ -321,14 +312,13 @@ export function WorkoutTemplateEditor({
  >
  Días del ciclo
  </Label>
- <Input
+ <NumberInput
  id="template-cycle-days"
- type="number"
  min="1"
  max="31"
  inputMode="numeric"
  className="mt-2"
- aria-invalid={Boolean(errors.cycleDays)}
+ invalid={Boolean(errors.cycleDays)}
  {...register("cycleDays")}
  />
  <FieldError message={errors.cycleDays?.message} />
@@ -344,10 +334,10 @@ export function WorkoutTemplateEditor({
  >
  Descripción
  </Label>
- <textarea
+ <Textarea
  id="template-description"
  rows={4}
- className={textareaClasses}
+ className="mt-2"
  placeholder="Objetivo general o indicaciones del ciclo."
  aria-invalid={Boolean(errors.description)}
  {...register("description")}
@@ -502,9 +492,8 @@ export function WorkoutTemplateEditor({
  >
  Día específico
  </Label>
- <select
+ <Select
  id={`template-day-${day.dayNumber}-weekday`}
- className={selectClasses}
  aria-invalid={Boolean(
  errors.days?.[day.dayNumber - 1]?.weekday,
  )}
@@ -520,7 +509,7 @@ export function WorkoutTemplateEditor({
  {option.label}
  </option>
  ))}
- </select>
+ </Select>
  <FieldError
  message={
  errors.days?.[day.dayNumber - 1]?.weekday?.message

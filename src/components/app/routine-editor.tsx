@@ -25,8 +25,11 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { Input } from "@/components/ui/input";
+import { FieldError } from "@/components/ui/form-field";
+import { Input, NumberInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useProgressiveResults } from "@/hooks/use-progressive-results";
 import { saveRoutine } from "@/lib/actions/routines";
 import {
@@ -70,10 +73,6 @@ const routineTargetAudienceOptions = [
  "Otro",
 ] as const;
 
-const selectClasses =
-  "mt-2 h-11 w-full min-w-0 rounded-control bg-surface px-4 py-2 text-base text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft appearance-none";
-const textareaClasses =
-  "mt-2 min-h-28 w-full resize-none rounded-control bg-surface px-4 py-3 text-sm leading-6 text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 dark:ring-primary/40 dark:focus:bg-primary-soft";
 const formSectionClasses =
  "rounded-[22px] bg-background p-4 sm:p-5";
 const legendClasses = "px-1 text-sm font-extrabold text-foreground";
@@ -183,18 +182,6 @@ function getExerciseSetupState(
  isConfigured: missing.length === 0,
  missing,
  };
-}
-
-function FieldError({ message }: { message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
 }
 
 function RoutineBuilderStat({
@@ -417,9 +404,8 @@ export function RoutineEditor({
  >
  Categoría
  </Label>
- <select
+ <Select
  id="routine-category"
- className={selectClasses}
  aria-invalid={Boolean(errors.category)}
  {...register("category")}
  >
@@ -439,7 +425,7 @@ export function RoutineEditor({
  : ""}
  </option>
  ))}
- </select>
+ </Select>
  <FieldError message={errors.category?.message} />
  </div>
 
@@ -450,9 +436,8 @@ export function RoutineEditor({
  >
  Dificultad
  </Label>
- <select
+ <Select
  id="routine-difficulty"
- className={selectClasses}
  {...register("difficulty")}
  >
  {Object.entries(difficultyLabels).map(([value, label]) => (
@@ -460,7 +445,7 @@ export function RoutineEditor({
  {label}
  </option>
  ))}
- </select>
+ </Select>
  </div>
 
  <div>
@@ -470,9 +455,8 @@ export function RoutineEditor({
  >
  Publico objetivo
  </Label>
- <select
+ <Select
  id="routine-audience"
- className={selectClasses}
  aria-invalid={Boolean(errors.targetAudience)}
  {...register("targetAudience")}
  >
@@ -492,7 +476,7 @@ export function RoutineEditor({
  : ""}
  </option>
  ))}
- </select>
+ </Select>
  <FieldError message={errors.targetAudience?.message} />
  </div>
  </div>
@@ -522,10 +506,10 @@ export function RoutineEditor({
  >
  Descripción
  </Label>
- <textarea
+ <Textarea
  id="routine-description"
  rows={4}
- className={textareaClasses}
+ className="mt-2"
  placeholder="Objetivo, recomendaciones y contexto del entrenamiento."
  aria-invalid={Boolean(errors.description)}
  {...register("description")}
@@ -807,23 +791,21 @@ export function RoutineEditor({
  Descanso
  </Label>
  <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] gap-2">
- <Input
+ <NumberInput
  id={`routine-rest-value-${index}`}
- type="number"
  min="0"
  inputMode="numeric"
  className=""
  placeholder="Cantidad"
  {...register(`exercises.${index}.restValue`)}
  />
- <select
+ <Select
  aria-label={`Unidad de descanso para ${field.name}`}
- className={selectClasses}
  {...register(`exercises.${index}.restUnit`)}
  >
  <option value="seconds">Segundos</option>
  <option value="minutes">Minutos</option>
- </select>
+ </Select>
  </div>
  <p className="mt-2 text-xs text-muted">
  Se guarda internamente en segundos.
@@ -841,10 +823,10 @@ export function RoutineEditor({
  >
  Notas especificas
  </Label>
- <textarea
+ <Textarea
  id={`routine-notes-${index}`}
  rows={2}
- className={textareaClasses}
+ className="mt-2"
  placeholder="Opcional"
  {...register(`exercises.${index}.notes`)}
  />

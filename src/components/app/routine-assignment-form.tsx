@@ -22,7 +22,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { Input } from "@/components/ui/input";
+import { Input, NumberInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useProgressiveResults } from "@/hooks/use-progressive-results";
 import { assignWorkoutTemplateToClient } from "@/lib/actions/workout-templates";
@@ -36,8 +36,6 @@ import type {
 } from "@/types/routine";
 import type { AssignableWorkoutTemplate } from "@/types/workout-template";
 
-const inputClasses =
-  "mt-2 rounded-control bg-surface px-4 text-foreground ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft outline-none";
 const assignmentSectionClasses =
  "rounded-[24px] bg-surface p-5 ";
 
@@ -381,14 +379,13 @@ export function WorkoutTemplateAssignmentForm({
  Duracion
  </Label>
  <div className="relative">
- <Input
+ <NumberInput
  id="assignment-duration"
- type="number"
  min="1"
  max="104"
  inputMode="numeric"
- className={`${inputClasses} pr-20`}
- aria-invalid={Boolean(errors.durationWeeks)}
+ className="mt-2 pr-20"
+ invalid={Boolean(errors.durationWeeks)}
  {...register("durationWeeks")}
  />
  <span className="pointer-events-none absolute right-4 top-1/2 translate-y-0.5 text-xs font-bold text-muted">
@@ -412,8 +409,8 @@ export function WorkoutTemplateAssignmentForm({
  <Input
  id="assignment-start-date"
  type="date"
- className={inputClasses}
- aria-invalid={Boolean(errors.startDate)}
+ className="mt-2"
+ invalid={Boolean(errors.startDate)}
  {...register("startDate")}
  />
  {errors.startDate ? (

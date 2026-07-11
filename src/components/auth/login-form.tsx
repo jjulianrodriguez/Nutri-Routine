@@ -8,32 +8,16 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ActionButton } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormAlert, FormField } from "@/components/ui/form-field";
+import { EmailInput } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { loginProfessional } from "@/lib/actions/auth";
 import { loginSchema, type LoginValues } from "@/lib/validations/auth";
 
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
-}
-
 type LoginFormProps = {
  initialError?: string;
 };
-
-const inputClasses =
- "mt-2 h-[3.25rem] rounded-control bg-surface px-4 text-foreground placeholder:text-muted-foreground/70 ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft outline-none";
 
 export function LoginForm({ initialError }: LoginFormProps) {
  const router = useRouter();
@@ -85,41 +69,37 @@ export function LoginForm({ initialError }: LoginFormProps) {
 
  return (
  <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
- <div>
- <Label htmlFor="email" className="text-sm font-bold text-foreground">
- Email
- </Label>
- <Input
+ <FormField
+ controlId="email"
+ error={errors.email?.message}
+ errorId="login-email-error"
+ label="Email"
+ labelClassName="text-sm font-bold"
+ >
+ <EmailInput
  id="email"
- type="email"
  autoComplete="email"
- aria-describedby={errors.email ? "login-email-error" : undefined}
- aria-invalid={Boolean(errors.email)}
- className={inputClasses}
+ size="lg"
+ className="placeholder:text-muted-foreground/70"
  placeholder="tu@email.com"
  {...register("email")}
  />
- <FieldError id="login-email-error" message={errors.email?.message} />
- </div>
+ </FormField>
 
- <div>
- <Label htmlFor="password" className="text-sm font-bold text-foreground">
- Contraseña
- </Label>
+ <FormField
+ controlId="password"
+ error={errors.password?.message}
+ errorId="login-password-error"
+ label="Contraseña"
+ labelClassName="text-sm font-bold"
+ >
  <PasswordInput
  id="password"
  autoComplete="current-password"
- aria-describedby={
- errors.password ? "login-password-error" : undefined
- }
- aria-invalid={Boolean(errors.password)}
- className={inputClasses}
+ size="lg"
+ className="placeholder:text-muted-foreground/70"
  placeholder="Tu contraseña"
  {...register("password")}
- />
- <FieldError
- id="login-password-error"
- message={errors.password?.message}
  />
  <div className="mt-3 flex justify-end">
  <Link
@@ -129,18 +109,9 @@ export function LoginForm({ initialError }: LoginFormProps) {
  ¿Olvidaste tu contraseña?
  </Link>
  </div>
- </div>
+ </FormField>
 
- {serverMessage || errors.root?.message ? (
- <Alert
- variant="destructive"
- className="rounded-[1.1rem] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage || errors.root?.message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage || errors.root?.message} />
 
  <ActionButton
  type="submit"

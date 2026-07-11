@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 
 import { AppHeader, AppScreen } from "@/components/app/AppScreen";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { WorkoutTemplateEditor } from "@/components/app/workout-template-editor";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getRoutineManagementOverview } from "@/lib/routines/data";
@@ -38,7 +41,11 @@ export default async function NewWorkoutTemplatePage({
  title="Crear plantilla de entrenamiento"
  description="Define los días del ciclo y asigna un entrenamiento diario a cada uno."
  />
- <TrainingSectionNav active="templates" />
+ <SectionTabs
+ activeId="templates"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
  <WorkoutTemplateEditor
  defaultRoutineId={defaultRoutineId}
  routines={overview.routines}

@@ -16,7 +16,10 @@ import {
 } from "@/components/app/AppScreen";
 import { WorkoutTemplateAssignmentForm } from "@/components/app/routine-assignment-form";
 import { RoutineUnassignButton } from "@/components/app/routine-unassign-button";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import {
  getAssignedRelationBadge,
  RelationshipBadge,
@@ -123,7 +126,11 @@ export default async function RoutineAssignmentsPage({
  description="Asigna ciclos de entrenamiento completos a tus clientes y administra su vigencia desde un único lugar."
  />
 
- <TrainingSectionNav active="assignments" />
+ <SectionTabs
+ activeId="assignments"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
 
  {warning ? (
  <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">

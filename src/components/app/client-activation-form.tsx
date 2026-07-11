@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import {
  getAssignedRelationBadge,
  RelationshipBadge,
@@ -36,9 +36,6 @@ type ProfessionalPlanAction = {
  enable: boolean;
  service: "nutrition" | "training";
 };
-
-const selectClasses =
-  "mt-2 h-11 w-full min-w-0 appearance-none rounded-control bg-surface px-4 py-2 text-base text-foreground outline-none ring-2 ring-primary/30 transition-[background-color,box-shadow,color] placeholder:text-muted-foreground focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:bg-danger/10 aria-invalid:ring-danger/40 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft";
 
 function getServiceType(
  nutritionEnabled: boolean,
@@ -532,16 +529,10 @@ export function ClientActivationForm({
  {nutritionEnabled || trainingEnabled ? (
  <div className="grid gap-4 lg:grid-cols-2">
  {nutritionEnabled ? (
- <div>
- <Label
- htmlFor={`nutritionist-${client.id}`}
- className="font-extrabold text-foreground"
- >
- Nutricionista
- </Label>
- <select
+ <Select
  id={`nutritionist-${client.id}`}
- className={selectClasses}
+ label="Nutricionista"
+ labelClassName="font-extrabold"
  disabled={!canManageNutrition}
  value={assignedNutritionistId}
  onChange={(event) =>
@@ -554,21 +545,14 @@ export function ClientActivationForm({
  {professional.email ? ` - ${professional.email}` : ""}
  </option>
  ))}
- </select>
- </div>
+ </Select>
  ) : null}
 
  {trainingEnabled ? (
- <div>
- <Label
- htmlFor={`trainer-${client.id}`}
- className="font-extrabold text-foreground"
- >
- Entrenadora
- </Label>
- <select
+ <Select
  id={`trainer-${client.id}`}
- className={selectClasses}
+ label="Entrenadora"
+ labelClassName="font-extrabold"
  disabled={!canManageTraining}
  value={assignedTrainerId}
  onChange={(event) => setAssignedTrainerId(event.target.value)}
@@ -579,8 +563,7 @@ export function ClientActivationForm({
  {professional.email ? ` - ${professional.email}` : ""}
  </option>
  ))}
- </select>
- </div>
+ </Select>
  ) : null}
  </div>
  ) : (

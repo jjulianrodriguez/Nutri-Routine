@@ -7,18 +7,16 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { FieldError, FormAlert } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { updateOwnProfessionalProfile } from "@/lib/actions/professional-profile";
 import {
  professionalProfileSchema,
  type ProfessionalProfileValues,
 } from "@/lib/validations/professional-profile";
-
-const textareaClasses =
-  "mt-2 min-h-28 w-full resize-none rounded-control bg-surface px-4 py-3 text-sm leading-6 text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 dark:ring-primary/40 dark:focus:bg-primary-soft";
 
 const focusAreaOptions = [
  { label: "Perdida de grasa", value: "fat_loss" },
@@ -28,18 +26,6 @@ const focusAreaOptions = [
  { label: "Rendimiento", value: "performance" },
  { label: "Otras", value: "other" },
 ] as const;
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
-}
 
 export function ProfessionalProfileForm({
  initialValues,
@@ -154,12 +140,12 @@ export function ProfessionalProfileForm({
  <Label htmlFor="professionalBio" className="font-extrabold text-foreground">
  Biografia corta
  </Label>
- <textarea
+ <Textarea
  id="professionalBio"
  rows={4}
  maxLength={800}
  placeholder="Presentacion breve para clientes asignados."
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={errors.bio ? "professional-bio-error" : undefined}
  aria-invalid={Boolean(errors.bio)}
  {...register("bio")}
@@ -186,12 +172,12 @@ export function ProfessionalProfileForm({
  >
  Experiencia
  </Label>
- <textarea
+ <Textarea
  id="professionalExperience"
  rows={5}
  maxLength={4000}
  placeholder="Trayectoria, tipos de clientes o enfoque de trabajo."
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={
  errors.experience ? "professional-experience-error" : undefined
  }
@@ -211,12 +197,12 @@ export function ProfessionalProfileForm({
  >
  Certificaciones
  </Label>
- <textarea
+ <Textarea
  id="professionalCertifications"
  rows={5}
  maxLength={4000}
  placeholder="Certificaciones, estudios o formacion relevante."
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={
  errors.certifications
  ? "professional-certifications-error"
@@ -328,12 +314,12 @@ export function ProfessionalProfileForm({
  >
  Horarios de atencion
  </Label>
- <textarea
+ <Textarea
  id="availabilitySchedule"
  rows={4}
  maxLength={4000}
  placeholder="Bloques horarios, modalidad o reglas de agenda."
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={
  errors.availabilitySchedule
  ? "availability-schedule-error"
@@ -349,27 +335,9 @@ export function ProfessionalProfileForm({
  </div>
  </section>
 
- {serverMessage || errors.root?.message ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage || errors.root?.message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage || errors.root?.message} />
 
- {successMessage ? (
- <Alert
- className="rounded-[18px] border-success/20 bg-success/5 px-4 py-3"
- role="status"
- >
- <AlertDescription className="font-semibold text-success">
- {successMessage}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert tone="success" message={successMessage} />
 
  <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[24px] bg-surface/90 p-4 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
  <div className="flex items-start gap-3 text-sm leading-6">

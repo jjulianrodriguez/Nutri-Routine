@@ -10,7 +10,10 @@ import {
  StatTile,
 } from "@/components/app/AppScreen";
 import { RoutineCardActions } from "@/components/app/routine-card-actions";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { WorkoutSummaryCard } from "@/components/app/workout-summary-card";
 import { Button } from "@/components/ui/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
@@ -41,7 +44,11 @@ export default async function RoutinesPage() {
  description="Crea sesiones de un día usando exclusivamente los ejercicios disponibles en la biblioteca."
  />
 
- <TrainingSectionNav active="routines" />
+ <SectionTabs
+ activeId="routines"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
 
  <div className="flex justify-end">
  <Button asChild size="lg">

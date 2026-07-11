@@ -25,6 +25,7 @@ import {
  RelationshipBadge,
  getPlanBadgeLabel,
 } from "@/components/app/relationship-badges";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { Button } from "@/components/ui/button";
 import { getPersonalDetails } from "@/lib/account/personal-details";
 import { getOwnProfessionalProfile } from "@/lib/account/professional-profile";
@@ -63,32 +64,6 @@ function formatDateTime(value: string | null, timeFormat: TimeFormatPreference) 
  }
 
  return formatAppDateTime(value, timeFormat);
-}
-
-function SectionNav({
- items,
-}: {
- items: Array<{
- href: string;
- label: string;
- }>;
-}) {
- return (
- <nav
- aria-label="Subsecciones de perfil"
- className="flex gap-2 overflow-x-auto backdrop-blur-lg"
- >
- {items.map((item) => (
- <Link
- key={item.href}
- href={item.href}
- className="shrink-0 rounded-[16px] px-3 py-2 text-sm font-extrabold text-muted-foreground transition-colors hover:bg-primary-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
- >
- {item.label}
- </Link>
- ))}
- </nav>
- );
 }
 
 function InfoCard({
@@ -139,13 +114,16 @@ async function ClientProfile({
 
  return (
  <>
- <SectionNav
+ <SectionTabs
+ ariaLabel="Subsecciones de perfil"
+ className="flex-nowrap overflow-x-auto backdrop-blur-lg"
  items={[
- { href: "#informacion-personal", label: "Informacion personal" },
- { href: "#datos-salud", label: "Datos fisicos y salud" },
- { href: "#profesionales", label: "Profesionales asignados" },
- { href: "#resumen-plan", label: "Resumen del plan" },
+ { href: "#informacion-personal", id: "personal", label: "Informacion personal" },
+ { href: "#datos-salud", id: "health", label: "Datos fisicos y salud" },
+ { href: "#profesionales", id: "professionals", label: "Profesionales asignados" },
+ { href: "#resumen-plan", id: "plan", label: "Resumen del plan" },
  ]}
+ size="sm"
  />
 
  <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -326,13 +304,16 @@ async function ProfessionalProfile({
 
  return (
  <>
- <SectionNav
+ <SectionTabs
+ ariaLabel="Subsecciones de perfil"
+ className="flex-nowrap overflow-x-auto backdrop-blur-lg"
  items={[
- { href: "#informacion-profesional", label: "Informacion profesional" },
- { href: "#experiencia", label: "Experiencia" },
- { href: "#disponibilidad", label: "Disponibilidad" },
- { href: "#resumen-profesional", label: "Resumen profesional" },
+ { href: "#informacion-profesional", id: "professional", label: "Informacion profesional" },
+ { href: "#experiencia", id: "experience", label: "Experiencia" },
+ { href: "#disponibilidad", id: "availability", label: "Disponibilidad" },
+ { href: "#resumen-profesional", id: "summary", label: "Resumen profesional" },
  ]}
+ size="sm"
  />
 
  <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">

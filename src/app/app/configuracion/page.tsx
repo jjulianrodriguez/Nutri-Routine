@@ -13,36 +13,11 @@ import { AppHeader, AppPanel, AppScreen } from "@/components/app/AppScreen";
 import { LogoutButton } from "@/components/app/logout-button";
 import { PasswordChangeForm } from "@/components/app/password-change-form";
 import { RelationshipBadge } from "@/components/app/relationship-badges";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { UserSettingsForm } from "@/components/app/user-settings-form";
 import { Button } from "@/components/ui/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getUserSettings } from "@/lib/user-settings/data";
-
-function SectionNav({
- items,
-}: {
- items: Array<{
- href: string;
- label: string;
- }>;
-}) {
- return (
- <nav
- aria-label="Subsecciones de configuracion"
- className="flex gap-2 overflow-x-auto backdrop-blur-lg"
- >
- {items.map((item) => (
- <Link
- key={item.href}
- href={item.href}
- className="shrink-0 rounded-[16px] px-3 py-2 text-sm font-extrabold text-muted-foreground transition-colors hover:bg-primary-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
- >
- {item.label}
- </Link>
- ))}
- </nav>
- );
-}
 
 function SettingRow({
  children,
@@ -87,15 +62,18 @@ export default async function SettingsPage() {
  description="Ajustes tecnicos de la app: acceso, seguridad, apariencia, notificaciones, privacidad y preferencias."
  />
 
- <SectionNav
+ <SectionTabs
+ ariaLabel="Subsecciones de configuracion"
+ className="flex-nowrap overflow-x-auto backdrop-blur-lg"
  items={[
- { href: "#cuenta", label: "Cuenta" },
- { href: "#apariencia", label: "Apariencia" },
- { href: "#privacidad", label: "Privacidad" },
- { href: "#notificaciones", label: "Notificaciones" },
- { href: "#seguridad", label: "Seguridad" },
- { href: "#preferencias", label: "Preferencias" },
+ { href: "#cuenta", id: "account", label: "Cuenta" },
+ { href: "#apariencia", id: "appearance", label: "Apariencia" },
+ { href: "#privacidad", id: "privacy", label: "Privacidad" },
+ { href: "#notificaciones", id: "notifications", label: "Notificaciones" },
+ { href: "#seguridad", id: "security", label: "Seguridad" },
+ { href: "#preferencias", id: "preferences", label: "Preferencias" },
  ]}
+ size="sm"
  />
 
  <div className="grid items-start gap-6 xl:grid-cols-2">

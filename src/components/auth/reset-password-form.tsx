@@ -8,30 +8,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ActionButton } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { FormAlert, FormField } from "@/components/ui/form-field";
 import { PasswordInput } from "@/components/ui/password-input";
 import { createClient } from "@/lib/supabase/client";
 import {
  resetPasswordSchema,
  type ResetPasswordValues,
 } from "@/lib/validations/auth";
-
-const inputClasses =
- "mt-2 h-[3.25rem] rounded-control bg-surface px-4 text-foreground placeholder:text-muted-foreground/70 ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft outline-none";
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
-}
 
 export function ResetPasswordForm() {
  const router = useRouter();
@@ -75,64 +59,42 @@ export function ResetPasswordForm() {
 
  return (
  <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
- <div>
- <Label htmlFor="password" className="text-sm font-bold text-foreground">
- Nueva contraseña
- </Label>
+<FormField
+ controlId="password"
+ error={errors.password?.message}
+ errorId="reset-password-error"
+ label="Nueva contraseña"
+ labelClassName="text-sm font-bold"
+ >
  <PasswordInput
  id="password"
  autoComplete="new-password"
- aria-describedby={
- errors.password ? "reset-password-error" : undefined
- }
- aria-invalid={Boolean(errors.password)}
- className={inputClasses}
+ size="lg"
+ className="placeholder:text-muted-foreground/70"
  placeholder="Mínimo 8 caracteres"
  {...register("password")}
  />
- <FieldError
- id="reset-password-error"
- message={errors.password?.message}
- />
- </div>
+ </FormField>
 
- <div>
- <Label
- htmlFor="confirmPassword"
- className="text-sm font-bold text-foreground"
+<FormField
+ controlId="confirmPassword"
+ error={errors.confirmPassword?.message}
+ errorId="reset-confirm-password-error"
+ label="Confirmar contraseña"
+ labelClassName="text-sm font-bold"
  >
- Confirmar contraseña
- </Label>
  <PasswordInput
  id="confirmPassword"
  visibilityLabel="confirmación de contraseña"
  autoComplete="new-password"
- aria-describedby={
- errors.confirmPassword
- ? "reset-confirm-password-error"
- : undefined
- }
- aria-invalid={Boolean(errors.confirmPassword)}
- className={inputClasses}
+ size="lg"
+ className="placeholder:text-muted-foreground/70"
  placeholder="Repite tu contraseña"
  {...register("confirmPassword")}
  />
- <FieldError
- id="reset-confirm-password-error"
- message={errors.confirmPassword?.message}
- />
- </div>
+ </FormField>
 
- {serverMessage || errors.root?.message ? (
- <Alert
- variant="destructive"
- className="rounded-[1.1rem] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage || errors.root?.message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage || errors.root?.message} />
 
  <ActionButton
  type="submit"

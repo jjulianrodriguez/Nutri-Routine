@@ -7,8 +7,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { FieldError, FormAlert } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { changePassword } from "@/lib/actions/account";
@@ -16,21 +16,6 @@ import {
  changePasswordSchema,
  type ChangePasswordValues,
 } from "@/lib/validations/account";
-
-const inputClasses =
-  "mt-2 h-12 rounded-control bg-surface px-4 text-foreground placeholder:text-muted ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft";
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
-}
 
 export function PasswordChangeForm() {
  const router = useRouter();
@@ -92,14 +77,14 @@ export function PasswordChangeForm() {
  id="currentPassword"
  visibilityLabel="contraseña actual"
  autoComplete="current-password"
- className={inputClasses}
+ className="mt-2 h-12 placeholder:text-muted"
  placeholder="Tu contraseña actual"
  aria-describedby={
  errors.currentPassword
  ? "current-password-error"
  : "current-password-help"
  }
- aria-invalid={Boolean(errors.currentPassword)}
+ invalid={Boolean(errors.currentPassword)}
  {...register("currentPassword")}
  />
  <p id="current-password-help" className="mt-2 text-xs text-muted">
@@ -119,12 +104,12 @@ export function PasswordChangeForm() {
  id="newPassword"
  visibilityLabel="nueva contraseña"
  autoComplete="new-password"
- className={inputClasses}
+ className="mt-2 h-12 placeholder:text-muted"
  placeholder="Minimo 8 caracteres"
  aria-describedby={
  errors.newPassword ? "new-password-error" : "new-password-help"
  }
- aria-invalid={Boolean(errors.newPassword)}
+ invalid={Boolean(errors.newPassword)}
  {...register("newPassword")}
  />
  <p id="new-password-help" className="mt-2 text-xs text-muted">
@@ -147,14 +132,14 @@ export function PasswordChangeForm() {
  id="confirmNewPassword"
  visibilityLabel="confirmación de nueva contraseña"
  autoComplete="new-password"
- className={inputClasses}
+ className="mt-2 h-12 placeholder:text-muted"
  placeholder="Repite la nueva contraseña"
  aria-describedby={
  errors.confirmNewPassword
  ? "confirm-new-password-error"
  : undefined
  }
- aria-invalid={Boolean(errors.confirmNewPassword)}
+ invalid={Boolean(errors.confirmNewPassword)}
  {...register("confirmNewPassword")}
  />
  <FieldError
@@ -163,27 +148,9 @@ export function PasswordChangeForm() {
  />
  </div>
 
- {serverMessage || errors.root?.message ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage || errors.root?.message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage || errors.root?.message} />
 
- {successMessage ? (
- <Alert
- className="rounded-[18px] border-success/20 bg-success/5 px-4 py-3"
- role="status"
- >
- <AlertDescription className="font-semibold text-success">
- {successMessage}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert tone="success" message={successMessage} />
 
  <Button
  type="submit"

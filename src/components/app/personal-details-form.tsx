@@ -14,11 +14,13 @@ import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { Input } from "@/components/ui/input";
+import { FieldError, FormAlert } from "@/components/ui/form-field";
+import { Input, NumberInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import {
  deletePersonalDetails,
  updatePersonalDetails,
@@ -27,11 +29,6 @@ import {
  personalDetailsSchema,
  type PersonalDetailsValues,
 } from "@/lib/validations/personal-details";
-
-const selectClasses =
-  "mt-2 h-11 w-full min-w-0 rounded-control bg-surface px-4 py-2 text-base text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft appearance-none";
-const textareaClasses =
-  "mt-2 min-h-28 w-full resize-none rounded-control bg-surface px-4 py-3 text-sm leading-6 text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 dark:ring-primary/40 dark:focus:bg-primary-soft";
 
 const emptyValues: PersonalDetailsValues = {
  allergies: "",
@@ -49,18 +46,6 @@ const emptyValues: PersonalDetailsValues = {
  professionalNotes: "",
  weightKg: "",
 };
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
-}
 
 export function PersonalDetailsForm({
  hasSavedDetails,
@@ -248,17 +233,12 @@ export function PersonalDetailsForm({
  />
  </div>
 
- <div>
- <Label
- htmlFor="personalGender"
- className="font-extrabold text-foreground"
- >
- Genero
- </Label>
- <select
+ <Select
  id="personalGender"
- className={`${selectClasses} font-semibold`}
- aria-invalid={Boolean(errors.gender)}
+ label="Genero"
+ labelClassName="font-extrabold"
+ className="font-semibold"
+ error={errors.gender?.message}
  {...register("gender")}
  >
  <option value="">Sin especificar</option>
@@ -267,12 +247,7 @@ export function PersonalDetailsForm({
  <option value="non_binary">No binario</option>
  <option value="prefer_not_to_say">Prefiero no decir</option>
  <option value="self_described">Otro / Autodescripción</option>
- </select>
- <FieldError
- id="personal-gender-error"
- message={errors.gender?.message}
- />
- </div>
+ </Select>
 
  {selectedGender === "self_described" ? (
  <div>
@@ -311,9 +286,8 @@ export function PersonalDetailsForm({
  Peso
  </Label>
  <div className="relative">
- <Input
+ <NumberInput
  id="personalWeight"
- type="number"
  inputMode="decimal"
  min="0.01"
  max="1000"
@@ -323,7 +297,7 @@ export function PersonalDetailsForm({
  aria-describedby={
  errors.weightKg ? "personal-weight-error" : undefined
  }
- aria-invalid={Boolean(errors.weightKg)}
+ invalid={Boolean(errors.weightKg)}
  {...register("weightKg")}
  />
  <span className="pointer-events-none absolute right-4 top-1/2 translate-y-0.5 text-xs font-bold text-muted">
@@ -344,9 +318,8 @@ export function PersonalDetailsForm({
  Altura
  </Label>
  <div className="relative">
- <Input
+ <NumberInput
  id="personalHeight"
- type="number"
  inputMode="decimal"
  min="0.01"
  max="300"
@@ -356,7 +329,7 @@ export function PersonalDetailsForm({
  aria-describedby={
  errors.heightCm ? "personal-height-error" : undefined
  }
- aria-invalid={Boolean(errors.heightCm)}
+ invalid={Boolean(errors.heightCm)}
  {...register("heightCm")}
  />
  <span className="pointer-events-none absolute right-4 top-1/2 translate-y-0.5 text-xs font-bold text-muted">
@@ -377,9 +350,8 @@ export function PersonalDetailsForm({
  Porcentaje de grasa
  </Label>
  <div className="relative">
- <Input
+ <NumberInput
  id="personalBodyFat"
- type="number"
  inputMode="decimal"
  min="0.01"
  max="100"
@@ -389,7 +361,7 @@ export function PersonalDetailsForm({
  aria-describedby={
  errors.bodyFatPercentage ? "personal-body-fat-error" : undefined
  }
- aria-invalid={Boolean(errors.bodyFatPercentage)}
+ invalid={Boolean(errors.bodyFatPercentage)}
  {...register("bodyFatPercentage")}
  />
  <span className="pointer-events-none absolute right-4 top-1/2 translate-y-0.5 text-xs font-bold text-muted">
@@ -410,12 +382,12 @@ export function PersonalDetailsForm({
  >
  Medidas fisicas por zonas
  </Label>
- <textarea
+ <Textarea
  id="personalBodyMeasurements"
  rows={4}
  maxLength={4000}
  placeholder="Ejemplo: cintura, cadera, pecho, brazo, pierna u otras zonas relevantes"
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={
  errors.bodyMeasurements
  ? "personal-body-measurements-error"
@@ -443,12 +415,12 @@ export function PersonalDetailsForm({
  >
  Enfermedades o condiciones medicas
  </Label>
- <textarea
+ <Textarea
  id="personalMedicalConditions"
  rows={5}
  maxLength={4000}
  placeholder="Información que deseas conservar en tu perfil"
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={
  errors.medicalConditions
  ? "personal-medical-conditions-error"
@@ -475,12 +447,12 @@ export function PersonalDetailsForm({
  <Label htmlFor="personalInjuries" className="font-extrabold text-foreground">
  Lesiones
  </Label>
- <textarea
+ <Textarea
  id="personalInjuries"
  rows={4}
  maxLength={4000}
  placeholder="Lesiones actuales o historial relevante"
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={errors.injuries ? "personal-injuries-error" : undefined}
  aria-invalid={Boolean(errors.injuries)}
  {...register("injuries")}
@@ -495,12 +467,12 @@ export function PersonalDetailsForm({
  <Label htmlFor="personalAllergies" className="font-extrabold text-foreground">
  Alergias
  </Label>
- <textarea
+ <Textarea
  id="personalAllergies"
  rows={4}
  maxLength={4000}
  placeholder="Alergias alimentarias, medicamentos u otras"
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={errors.allergies ? "personal-allergies-error" : undefined}
  aria-invalid={Boolean(errors.allergies)}
  {...register("allergies")}
@@ -518,12 +490,12 @@ export function PersonalDetailsForm({
  >
  Medicamentos importantes
  </Label>
- <textarea
+ <Textarea
  id="personalImportantMedications"
  rows={4}
  maxLength={4000}
  placeholder="Medicamentos o suplementos relevantes para tu seguimiento"
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={
  errors.importantMedications
  ? "personal-important-medications-error"
@@ -545,12 +517,12 @@ export function PersonalDetailsForm({
  >
  Restricciones alimentarias
  </Label>
- <textarea
+ <Textarea
  id="personalDietaryRestrictions"
  rows={4}
  maxLength={4000}
  placeholder="Preferencias, restricciones o alimentos a evitar"
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={
  errors.dietaryRestrictions
  ? "personal-dietary-restrictions-error"
@@ -573,12 +545,12 @@ export function PersonalDetailsForm({
  >
  Notas importantes para el profesional
  </Label>
- <textarea
+ <Textarea
  id="personalProfessionalNotes"
  rows={4}
  maxLength={4000}
  placeholder="Informacion que tu profesional asignado debe considerar"
- className={textareaClasses}
+ className="mt-2"
  aria-describedby={
  errors.professionalNotes
  ? "personal-professional-notes-error"
@@ -600,27 +572,9 @@ export function PersonalDetailsForm({
  />
  </div>
 
- {serverMessage || errors.root?.message ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage || errors.root?.message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage || errors.root?.message} />
 
- {successMessage ? (
- <Alert
- className="rounded-[18px] border-success/20 bg-success/5 px-4 py-3"
- role="status"
- >
- <AlertDescription className="font-semibold text-success">
- {successMessage}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert tone="success" message={successMessage} />
 
  <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[24px] bg-surface/90 p-4 backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
  <div className="flex items-start gap-3 text-sm leading-6">

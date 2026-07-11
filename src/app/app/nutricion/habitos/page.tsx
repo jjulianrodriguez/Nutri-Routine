@@ -1,6 +1,9 @@
 import { AppHeader, AppScreen } from "@/components/app/AppScreen";
 import { HabitTracker } from "@/components/app/habit-tracker";
-import { NutritionSectionNav } from "@/components/app/nutrition-section-nav";
+import {
+ nutritionSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getNutritionHabitTrackerData } from "@/lib/habits/data";
 
@@ -31,7 +34,13 @@ export default async function NutritionHabitosPage({
  }
  />
 
- <NutritionSectionNav active="habits" canManage={access.canManageNutrition} />
+ <SectionTabs
+ activeId="habits"
+ ariaLabel="Secciones de nutricion"
+ items={nutritionSectionTabs.filter(
+ (item) => !item.adminOnly || access.canManageNutrition,
+ )}
+ />
 
  <HabitTracker
  data={habitData}

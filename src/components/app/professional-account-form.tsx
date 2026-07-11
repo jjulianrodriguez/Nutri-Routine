@@ -7,11 +7,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { FieldError, FormAlert } from "@/components/ui/form-field";
+import { EmailInput, Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
+import { Select } from "@/components/ui/select";
 import { createProfessionalAccount } from "@/lib/actions/professional-accounts";
 import {
  createProfessionalAccountSchema,
@@ -32,21 +33,6 @@ const specialtyOptions = [
  value: "both",
  },
 ] as const;
-
-const selectClasses =
-  "mt-2 h-11 w-full min-w-0 appearance-none rounded-control bg-surface px-4 py-2 text-base text-foreground outline-none ring-2 ring-primary/30 transition-[background-color,box-shadow,color] placeholder:text-muted-foreground focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:bg-danger/10 aria-invalid:ring-danger/40 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft";
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
-}
 
 export function ProfessionalAccountForm() {
  const router = useRouter();
@@ -129,16 +115,15 @@ export function ProfessionalAccountForm() {
  <Label htmlFor="email" className="font-extrabold text-foreground">
  Email
  </Label>
- <Input
+ <EmailInput
  id="email"
- type="email"
  autoComplete="email"
  className="mt-2"
  placeholder="profesional@email.com"
  aria-describedby={
  errors.email ? "professional-email-error" : undefined
  }
- aria-invalid={Boolean(errors.email)}
+ invalid={Boolean(errors.email)}
  {...register("email")}
  />
  <FieldError
@@ -203,17 +188,11 @@ export function ProfessionalAccountForm() {
  </div>
 
  <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
- <div>
- <Label htmlFor="specialty" className="font-extrabold text-foreground">
- Tipo de profesional
- </Label>
- <select
+ <Select
  id="specialty"
- className={selectClasses}
- aria-describedby={
- errors.specialty ? "professional-specialty-error" : undefined
- }
- aria-invalid={Boolean(errors.specialty)}
+ label="Tipo de profesional"
+ labelClassName="font-extrabold"
+ error={errors.specialty?.message}
  {...register("specialty")}
  >
  {specialtyOptions.map((option) => (
@@ -221,12 +200,7 @@ export function ProfessionalAccountForm() {
  {option.label}
  </option>
  ))}
- </select>
- <FieldError
- id="professional-specialty-error"
- message={errors.specialty?.message}
- />
- </div>
+ </Select>
 
  <div className="rounded-[20px] border-primary/25 bg-primary-soft p-4">
  <Label
@@ -256,27 +230,9 @@ export function ProfessionalAccountForm() {
  </div>
  </div>
 
- {serverMessage || errors.root?.message ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage || errors.root?.message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage || errors.root?.message} />
 
- {successMessage ? (
- <Alert
- className="rounded-[18px] border-success/20 bg-success/5 px-4 py-3"
- role="status"
- >
- <AlertDescription className="font-semibold text-success">
- {successMessage}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert tone="success" message={successMessage} />
 
  <Button
  type="submit"

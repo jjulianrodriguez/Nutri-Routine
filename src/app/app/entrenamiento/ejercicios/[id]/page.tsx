@@ -15,7 +15,10 @@ import {
  AppPanel,
  AppScreen,
 } from "@/components/app/AppScreen";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { Button } from "@/components/ui/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getExerciseDetail } from "@/lib/exercises/data";
@@ -66,7 +69,11 @@ export default async function ExerciseDetailPage({
  description="Información completa del ejercicio y sus indicaciones."
  />
  {access.canManageTraining ? (
- <TrainingSectionNav active="exercises" />
+ <SectionTabs
+ activeId="exercises"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
  ) : null}
 
  <div className="flex flex-wrap justify-between gap-3">

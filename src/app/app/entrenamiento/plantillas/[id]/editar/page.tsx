@@ -1,7 +1,10 @@
 import { notFound, redirect } from "next/navigation";
 
 import { AppHeader, AppScreen } from "@/components/app/AppScreen";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { WorkoutTemplateEditor } from "@/components/app/workout-template-editor";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
@@ -37,7 +40,11 @@ export default async function EditWorkoutTemplatePage({
  title={template.name}
  description="Actualiza la duración del ciclo y el entrenamiento asignado a cada día."
  />
- <TrainingSectionNav active="templates" />
+ <SectionTabs
+ activeId="templates"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
  {warning ? (
  <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">
  <AlertDescription className="font-semibold text-muted-foreground">

@@ -7,9 +7,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { FieldError, FormAlert } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateBasicAccount } from "@/lib/actions/account";
@@ -22,18 +22,6 @@ type BasicAccountFormProps = {
  email: string;
  fullName: string;
 };
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
-}
 
 export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
  const router = useRouter();
@@ -126,27 +114,9 @@ export function BasicAccountForm({ email, fullName }: BasicAccountFormProps) {
  </p>
  </div>
 
- {serverMessage || errors.root?.message ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage || errors.root?.message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage || errors.root?.message} />
 
- {successMessage ? (
- <Alert
- className="rounded-[18px] border-success/20 bg-success/5 px-4 py-3"
- role="status"
- >
- <AlertDescription className="font-semibold text-success">
- {successMessage}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert tone="success" message={successMessage} />
 
  <div className="flex flex-col gap-3 rounded-[20px] bg-surface/82 p-4 sm:flex-row sm:items-center sm:justify-between">
  <div className="flex items-start gap-3 text-sm leading-6">

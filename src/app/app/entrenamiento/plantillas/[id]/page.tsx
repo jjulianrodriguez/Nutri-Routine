@@ -3,7 +3,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { AppHeader, AppPanel, AppScreen } from "@/components/app/AppScreen";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { TemplateOverview } from "@/components/app/workout-template-overview";
 import { WorkoutTemplateActions } from "@/components/app/workout-template-actions";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -44,7 +47,11 @@ export default async function WorkoutTemplateDetailPage({
  title="Plantilla de entrenamiento"
  description="Revisa el resumen del ciclo y el entrenamiento asignado a cada día."
  />
- <TrainingSectionNav active="templates" />
+ <SectionTabs
+ activeId="templates"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
 
  {warning ? (
  <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">

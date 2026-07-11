@@ -6,7 +6,6 @@ import {
  Dumbbell,
  Layers3,
  Loader2,
- Search,
  X,
 } from "lucide-react";
 import Link from "next/link";
@@ -18,8 +17,8 @@ import {
  RelationshipBadge,
 } from "@/components/app/relationship-badges";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SearchField } from "@/components/ui/search-field";
 import { cn } from "@/lib/utils";
 import type { ExerciseOption } from "@/types/exercise";
 import type {
@@ -86,21 +85,14 @@ export function AssignmentEntitySelector({
  {resultCount !== totalCount ? ` (${totalCount} disponibles)` : ""}
  </p>
 
- <div className="relative mt-3">
- <Search
- className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted"
- aria-hidden="true"
- />
- <Input
+ <SearchField
  id={id}
- type="search"
  value={query}
- onChange={(event) => onQueryChange(event.target.value)}
- className="pl-11"
+ onValueChange={onQueryChange}
+ containerClassName="mt-3"
  placeholder={searchPlaceholder}
  autoComplete="off"
  />
- </div>
 
  {error ? (
  <p className="mt-2 text-sm font-semibold text-danger" role="alert">

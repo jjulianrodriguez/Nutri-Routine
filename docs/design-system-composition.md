@@ -15,6 +15,9 @@ This document describes the shared composition layer for phase 2 primitives. It 
 - `src/components/ui/shared-classes.ts`
   - Defines token-based shared class groups for motion, focus, disabled, invalid, selected, loading, surfaces, tones, layout, touch targets, and icon sizes.
   - Uses the phase 1 `--ds-*` Tailwind aliases instead of hardcoded visual values.
+- `src/components/ui/boolean-control.ts`
+  - Defines the shared checkbox, radio, and switch recipes.
+  - Centralizes boolean-control sizes, selected, focus, disabled, invalid, and motion classes.
 
 ## Compatibility
 
@@ -35,6 +38,6 @@ New low-level primitives should start from these contracts:
 4. Reuse official vocabulary from `contracts.ts` before adding a new variant, size, tone, or state.
 5. Apply shared state classes from `shared-classes.ts` for focus, disabled, invalid, loading, selected, motion, icon sizing, and touch targets.
 6. Use `getPrimitiveStateAttributes` when a primitive owns state semantics and needs matching `aria-*` and `data-*` attributes.
+7. For checkbox, radio, and switch primitives, reuse the boolean-control recipes instead of defining local track, thumb, indicator, focus, disabled, or invalid classes.
 
 This keeps phase 2 primitives consistent while preserving the existing UI until each primitive is intentionally migrated.
-

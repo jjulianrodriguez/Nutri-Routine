@@ -17,7 +17,10 @@ import {
 } from "@/components/app/AppScreen";
 import { DeleteRoutineButton } from "@/components/app/delete-routine-button";
 import { GroupedRoutineExercises } from "@/components/app/grouped-routine-exercises";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { WorkoutExerciseCard } from "@/components/app/workout-exercise-card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -68,7 +71,11 @@ export default async function RoutineDetailPage({
  title={routine.name}
  description={routine.description}
  />
- <TrainingSectionNav active="routines" />
+ <SectionTabs
+ activeId="routines"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
 
  {inactiveExerciseCount > 0 ? (
  <Alert className="rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-foreground">

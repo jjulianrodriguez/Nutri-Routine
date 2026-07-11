@@ -18,11 +18,13 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { CardActionsMenu } from "@/components/app/card-actions-menu";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { FieldError, FormAlert } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import {
  activateNutritionDocument,
  createNutritionDocumentSignedUrl,
@@ -68,18 +70,6 @@ function formatFileSize(bytes: number) {
  }
 
  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-}
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
 }
 
 function PdfOpenButton({
@@ -370,23 +360,19 @@ function MealPlanUploadForm({
  return (
  <form className="space-y-4" onSubmit={onSubmit} noValidate>
  {clients.length === 0 ? (
- <Alert className="rounded-[18px] border-primary/25 bg-primary-soft">
- <AlertDescription className="font-semibold text-foreground">
+ <FormAlert tone="notice">
  No tienes clientas de nutrición asignadas para subir planes de alimentación.
- </AlertDescription>
- </Alert>
+ </FormAlert>
  ) : null}
 
- <div>
- <Label htmlFor="meal-plan-client" className="font-extrabold text-foreground">
- Clienta
- </Label>
- <select
+ <Select
  id="meal-plan-client"
  name="clientId"
+ label="Clienta"
+ labelClassName="font-extrabold"
+ error={fieldErrors.clientId}
  required
  disabled={isPending}
- className="mt-2 h-11 w-full min-w-0 rounded-control bg-surface px-4 py-2 text-base text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft appearance-none"
  >
  <option value="">Seleccionar clienta</option>
  {clients.map((client) => (
@@ -394,9 +380,7 @@ function MealPlanUploadForm({
  {client.name}
  </option>
  ))}
- </select>
- <FieldError id="meal-plan-client-error" message={fieldErrors.clientId} />
- </div>
+ </Select>
 
  <div>
  <Label htmlFor="meal-plan-title" className="font-extrabold text-foreground">
@@ -417,13 +401,13 @@ function MealPlanUploadForm({
  <Label htmlFor="meal-plan-description" className="font-extrabold text-foreground">
  Descripción opcional
  </Label>
- <textarea
+ <Textarea
  id="meal-plan-description"
  name="description"
  rows={4}
  maxLength={2000}
  disabled={isPending}
- className="mt-2 min-h-28 w-full resize-none rounded-control bg-surface px-4 py-3 text-sm leading-6 text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:ring-primary/40 dark:focus:bg-primary-soft"
+ className="mt-2"
  />
  <FieldError
  id="meal-plan-description-error"
@@ -450,16 +434,7 @@ function MealPlanUploadForm({
  <FieldError id="meal-plan-file-error" message={fieldErrors.file} />
  </div>
 
- {message ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={message} />
 
  <Button
  type="submit"
@@ -571,13 +546,13 @@ function DocumentEditForm({
  <Label htmlFor="document-edit-description" className="font-extrabold text-foreground">
  Descripción opcional
  </Label>
- <textarea
+ <Textarea
  id="document-edit-description"
  name="description"
  rows={4}
  maxLength={2000}
  defaultValue={document.description ?? ""}
- className="mt-2 w-full resize-none rounded-[20px] border-input bg-surface px-4 py-3 text-sm leading-6 text-foreground outline-none ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft"
+ className="mt-2 min-h-0 rounded-[20px] border-input"
  />
  <FieldError id="document-edit-description-error" message={fieldErrors.description} />
  </div>
@@ -596,16 +571,7 @@ function DocumentEditForm({
  <FieldError id="document-edit-file-error" message={fieldErrors.file} />
  </div>
 
- {message ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={message} />
 
  <Button type="submit" size="lg" disabled={isPending}>
  {isPending ? (

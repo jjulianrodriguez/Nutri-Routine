@@ -2,7 +2,10 @@ import { notFound, redirect } from "next/navigation";
 
 import { AppHeader, AppScreen } from "@/components/app/AppScreen";
 import { RoutineEditor } from "@/components/app/routine-editor";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
  getRoutineDetail,
@@ -37,7 +40,11 @@ export default async function EditRoutinePage({
  title={routine.name}
  description="Actualiza la información general, cambia el orden o ajusta la configuración de cada ejercicio."
  />
- <TrainingSectionNav active="routines" />
+ <SectionTabs
+ activeId="routines"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
  <RoutineEditor exerciseOptions={catalog} routine={routine} />
  </AppScreen>
  );

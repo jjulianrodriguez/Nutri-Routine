@@ -15,7 +15,10 @@ import {
  EmptyState,
  StatTile,
 } from "@/components/app/AppScreen";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { WorkoutTemplateActions } from "@/components/app/workout-template-actions";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -60,7 +63,11 @@ export default async function WorkoutTemplatesPage() {
  description="Organiza entrenamientos diarios dentro de ciclos semanales o personalizados."
  />
 
- <TrainingSectionNav active="templates" />
+ <SectionTabs
+ activeId="templates"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
 
  {warning ? (
  <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">

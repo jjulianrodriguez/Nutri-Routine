@@ -9,7 +9,10 @@ import {
  StatTile,
 } from "@/components/app/AppScreen";
 import { NutritionDocumentManager } from "@/components/app/nutrition-document-manager";
-import { NutritionSectionNav } from "@/components/app/nutrition-section-nav";
+import {
+ nutritionSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { Button } from "@/components/ui/button";
 import { getDashboardData } from "@/lib/app/dashboard-data";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
@@ -145,7 +148,13 @@ export default async function NutritionPage() {
  }
  />
 
- <NutritionSectionNav active="plan" canManage={access.canManageNutrition} />
+ <SectionTabs
+ activeId="plan"
+ ariaLabel="Secciones de nutricion"
+ items={nutritionSectionTabs.filter(
+ (item) => !item.adminOnly || access.canManageNutrition,
+ )}
+ />
 
  {access.isClient ? null : (
  <section className="grid items-start gap-4 sm:grid-cols-2">

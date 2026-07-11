@@ -8,28 +8,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ActionButton } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { FieldError, FormAlert } from "@/components/ui/form-field";
+import { EmailInput, Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { registerProfessional } from "@/lib/actions/auth";
 import { registerSchema, type RegisterValues } from "@/lib/validations/auth";
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
-}
-
-const inputClasses =
- "mt-2 h-[3.25rem] rounded-control bg-surface px-4 text-foreground placeholder:text-muted-foreground/70 ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft outline-none";
 
 export function RegisterForm() {
  const router = useRouter();
@@ -97,8 +82,9 @@ export function RegisterForm() {
  aria-describedby={
  errors.fullName ? "register-full-name-error" : undefined
  }
- aria-invalid={Boolean(errors.fullName)}
- className={inputClasses}
+ invalid={Boolean(errors.fullName)}
+ size="lg"
+ className="mt-2 placeholder:text-muted-foreground/70"
  placeholder="Tu nombre completo"
  {...register("fullName")}
  />
@@ -112,13 +98,13 @@ export function RegisterForm() {
  <Label htmlFor="email" className="text-sm font-bold text-foreground">
  Email
  </Label>
- <Input
+ <EmailInput
  id="email"
- type="email"
  autoComplete="email"
  aria-describedby={errors.email ? "register-email-error" : undefined}
- aria-invalid={Boolean(errors.email)}
- className={inputClasses}
+ invalid={Boolean(errors.email)}
+ size="lg"
+ className="mt-2 placeholder:text-muted-foreground/70"
  placeholder="tu@email.com"
  {...register("email")}
  />
@@ -138,8 +124,9 @@ export function RegisterForm() {
  ? "register-access-code-error register-access-code-help"
  : "register-access-code-help"
  }
- aria-invalid={Boolean(errors.accessCode)}
- className={inputClasses}
+ invalid={Boolean(errors.accessCode)}
+ size="lg"
+ className="mt-2 placeholder:text-muted-foreground/70"
  placeholder="Código privado entregado por tu profesional"
  {...register("accessCode")}
  />
@@ -165,8 +152,9 @@ export function RegisterForm() {
  aria-describedby={
  errors.password ? "register-password-error" : undefined
  }
- aria-invalid={Boolean(errors.password)}
- className={inputClasses}
+ invalid={Boolean(errors.password)}
+ size="lg"
+ className="mt-2 placeholder:text-muted-foreground/70"
  placeholder="Mínimo 8 caracteres"
  {...register("password")}
  />
@@ -192,8 +180,9 @@ export function RegisterForm() {
  ? "register-confirm-password-error"
  : undefined
  }
- aria-invalid={Boolean(errors.confirmPassword)}
- className={inputClasses}
+ invalid={Boolean(errors.confirmPassword)}
+ size="lg"
+ className="mt-2 placeholder:text-muted-foreground/70"
  placeholder="Repetí tu contraseña"
  {...register("confirmPassword")}
  />
@@ -203,27 +192,13 @@ export function RegisterForm() {
  />
  </div>
 
- {serverMessage || errors.root?.message ? (
- <Alert
- variant="destructive"
- className="rounded-[1.1rem] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage || errors.root?.message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage || errors.root?.message} />
 
- {successMessage ? (
- <Alert
- className="rounded-[1.1rem] border-success/20 bg-success/5 px-4 py-3"
- role="status"
- >
- <AlertDescription className="font-semibold text-success">
- {successMessage} Cuando confirmes tu email, podés iniciar sesión.
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert tone="success">
+ {successMessage
+ ? `${successMessage} Cuando confirmes tu email, podés iniciar sesión.`
+ : null}
+ </FormAlert>
 
  <ActionButton
  type="submit"

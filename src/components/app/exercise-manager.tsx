@@ -26,8 +26,12 @@ import { CardActionsMenu } from "@/components/app/card-actions-menu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { FieldError } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { SearchField } from "@/components/ui/search-field";
+import { Textarea } from "@/components/ui/textarea";
 import {
  deleteExercise,
  saveExercise,
@@ -57,10 +61,6 @@ const difficultyLabels = {
  intermediate: "Intermedio",
 } as const;
 
-const selectClasses =
-  "mt-2 h-11 w-full min-w-0 rounded-control bg-surface px-4 py-2 text-base text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft appearance-none";
-const textareaClasses =
-  "mt-2 min-h-28 w-full resize-none rounded-control bg-surface px-4 py-3 text-sm leading-6 text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 dark:ring-primary/40 dark:focus:bg-primary-soft";
 const formSectionClasses =
  "rounded-[22px] bg-background p-4 sm:p-5";
 const legendClasses = "px-1 text-sm font-extrabold text-foreground";
@@ -108,18 +108,6 @@ function formatDate(value: string) {
  month: "short",
  year: "numeric",
  }).format(new Date(value));
-}
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
 }
 
 function getDraftFilters(filters: ExerciseListFilters): ExerciseFilterDraft {
@@ -504,10 +492,10 @@ export function ExerciseManager({
  >
  Descripción e instrucciones
  </Label>
- <textarea
+ <Textarea
  id="exercise-description"
  rows={5}
- className={textareaClasses}
+ className="mt-2"
  placeholder="Explica la tecnica, postura y puntos de control."
  aria-invalid={Boolean(errors.description)}
  aria-describedby={
@@ -528,16 +516,10 @@ export function ExerciseManager({
  <legend className={legendClasses}>Clasificación</legend>
 
  <div className="grid gap-5 sm:grid-cols-2">
- <div>
- <Label
- htmlFor="exercise-difficulty"
- className="font-extrabold text-foreground"
- >
- Dificultad
- </Label>
- <select
+ <Select
  id="exercise-difficulty"
- className={selectClasses}
+ label="Dificultad"
+ labelClassName="font-extrabold"
  {...register("difficulty")}
  >
  {Object.entries(difficultyLabels).map(([value, label]) => (
@@ -545,25 +527,13 @@ export function ExerciseManager({
  {label}
  </option>
  ))}
- </select>
- </div>
+ </Select>
 
- <div>
- <Label
- htmlFor="exercise-muscle-group"
- className="font-extrabold text-foreground"
- >
- Grupo muscular
- </Label>
- <select
+ <Select
  id="exercise-muscle-group"
- className={selectClasses}
- aria-invalid={Boolean(errors.muscleGroup)}
- aria-describedby={
- errors.muscleGroup
- ? "exercise-muscle-group-error"
- : undefined
- }
+ label="Grupo muscular"
+ labelClassName="font-extrabold"
+ error={errors.muscleGroup?.message}
  {...register("muscleGroup")}
  >
  <option value="" disabled>
@@ -582,12 +552,7 @@ export function ExerciseManager({
  : ""}
  </option>
  ))}
- </select>
- <FieldError
- id="exercise-muscle-group-error"
- message={errors.muscleGroup?.message}
- />
- </div>
+ </Select>
 
  <div>
  <Label
@@ -596,9 +561,8 @@ export function ExerciseManager({
  >
  Categoría
  </Label>
- <select
+ <Select
  id="exercise-category"
- className={selectClasses}
  aria-invalid={Boolean(errors.category)}
  aria-describedby={
  errors.category ? "exercise-category-error" : undefined
@@ -621,7 +585,7 @@ export function ExerciseManager({
  : ""}
  </option>
  ))}
- </select>
+ </Select>
  <FieldError
  id="exercise-category-error"
  message={errors.category?.message}
@@ -635,9 +599,8 @@ export function ExerciseManager({
  >
  Tipo
  </Label>
- <select
+ <Select
  id="exercise-type"
- className={selectClasses}
  aria-invalid={Boolean(errors.exerciseType)}
  aria-describedby={
  errors.exerciseType ? "exercise-type-error" : undefined
@@ -660,7 +623,7 @@ export function ExerciseManager({
  : ""}
  </option>
  ))}
- </select>
+ </Select>
  <FieldError
  id="exercise-type-error"
  message={errors.exerciseType?.message}
@@ -790,22 +753,12 @@ export function ExerciseManager({
  className="mt-5 rounded-[22px] border-foreground/10 bg-background p-4"
  onSubmit={applyLibraryFilters}
  >
- <div className="relative">
- <Search
- className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted"
- aria-hidden="true"
- />
- <Input
- type="search"
+ <SearchField
  value={draftFilters.query}
- onChange={(event) =>
- updateDraftFilter("query", event.target.value)
- }
- className="pl-10"
+ onValueChange={(value) => updateDraftFilter("query", value)}
  placeholder="Buscar por nombre, grupo, categoría o tipo"
  aria-label="Buscar ejercicios"
  />
- </div>
 
  <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
  <div>
@@ -815,13 +768,12 @@ export function ExerciseManager({
  >
  Grupo muscular
  </Label>
- <select
+ <Select
  id="exercise-filter-muscle"
  value={draftFilters.muscleGroup}
  onChange={(event) =>
  updateDraftFilter("muscleGroup", event.target.value)
  }
- className={selectClasses}
  >
  <option value="all">Todos</option>
  {filterOptions.muscleGroups.map((option) => (
@@ -829,7 +781,7 @@ export function ExerciseManager({
  {option}
  </option>
  ))}
- </select>
+ </Select>
  </div>
 
  <div>
@@ -839,13 +791,12 @@ export function ExerciseManager({
  >
  Dificultad
  </Label>
- <select
+ <Select
  id="exercise-filter-difficulty"
  value={draftFilters.difficulty}
  onChange={(event) =>
  updateDraftFilter("difficulty", event.target.value)
  }
- className={selectClasses}
  >
  <option value="all">Todas</option>
  {Object.entries(difficultyLabels).map(([value, label]) => (
@@ -853,7 +804,7 @@ export function ExerciseManager({
  {label}
  </option>
  ))}
- </select>
+ </Select>
  </div>
 
  <div>
@@ -863,20 +814,19 @@ export function ExerciseManager({
  >
  Estado
  </Label>
- <select
+ <Select
  id="exercise-filter-status"
  value={draftFilters.status}
  onChange={(event) =>
  updateDraftFilter("status", event.target.value)
  }
- className={selectClasses}
  >
  {Object.entries(statusFilterLabels).map(([value, label]) => (
  <option key={value} value={value}>
  {label}
  </option>
  ))}
- </select>
+ </Select>
  </div>
 
  <div>
@@ -886,13 +836,12 @@ export function ExerciseManager({
  >
  Categoría
  </Label>
- <select
+ <Select
  id="exercise-filter-category"
  value={draftFilters.category}
  onChange={(event) =>
  updateDraftFilter("category", event.target.value)
  }
- className={selectClasses}
  >
  <option value="all">Todas</option>
  {filterOptions.categories.map((option) => (
@@ -900,7 +849,7 @@ export function ExerciseManager({
  {option}
  </option>
  ))}
- </select>
+ </Select>
  </div>
 
  <div>
@@ -910,13 +859,12 @@ export function ExerciseManager({
  >
  Tipo
  </Label>
- <select
+ <Select
  id="exercise-filter-type"
  value={draftFilters.exerciseType}
  onChange={(event) =>
  updateDraftFilter("exerciseType", event.target.value)
  }
- className={selectClasses}
  >
  <option value="all">Todos</option>
  {filterOptions.exerciseTypes.map((option) => (
@@ -924,7 +872,7 @@ export function ExerciseManager({
  {option}
  </option>
  ))}
- </select>
+ </Select>
  </div>
  </div>
 

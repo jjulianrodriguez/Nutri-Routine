@@ -7,7 +7,10 @@ import {
  EmptyState,
 } from "@/components/app/AppScreen";
 import { RoutineEditor } from "@/components/app/routine-editor";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { Button } from "@/components/ui/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { listExerciseOptions } from "@/lib/routines/data";
@@ -31,7 +34,11 @@ export default async function NewRoutinePage() {
  title="Crear entrenamiento"
  description="Selecciona ejercicios de la biblioteca y configura su orden, series, repeticiones, descanso y notas."
  />
- <TrainingSectionNav active="routines" />
+ <SectionTabs
+ activeId="routines"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
  {catalog.length > 0 ? (
  <RoutineEditor exerciseOptions={catalog} />
  ) : (

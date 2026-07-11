@@ -4,7 +4,10 @@ import { UserRound } from "lucide-react";
 import { AppHeader, AppScreen } from "@/components/app/AppScreen";
 import { HabitTracker } from "@/components/app/habit-tracker";
 import { NutritionClientSelector } from "@/components/app/nutrition-client-selector";
-import { NutritionSectionNav } from "@/components/app/nutrition-section-nav";
+import {
+ nutritionSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getNutritionHabitTrackerData } from "@/lib/habits/data";
 
@@ -36,7 +39,13 @@ export default async function NutritionAsignacionesPage({
  description="Define hábitos por clienta con vigencia, días aplicables e impacto claro."
  />
 
- <NutritionSectionNav active="assignments" canManage={access.canManageNutrition} />
+ <SectionTabs
+ activeId="assignments"
+ ariaLabel="Secciones de nutricion"
+ items={nutritionSectionTabs.filter(
+ (item) => !item.adminOnly || access.canManageNutrition,
+ )}
+ />
 
  {habitData.clients.length > 0 && (
  <section className="flex flex-col gap-3 rounded-[22px] bg-surface p-4 sm:flex-row sm:items-center sm:justify-between">

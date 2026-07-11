@@ -24,9 +24,10 @@ import {
 } from "@/components/app/user-preference-applier";
 import { useTheme } from "@/components/theme/theme-provider";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { updateUserSettings } from "@/lib/actions/user-settings";
 import type { UserSettingsValues } from "@/lib/user-settings/types";
-import { cn } from "@/lib/utils";
 
 type UserSettingsFormProps = {
  initialValues: UserSettingsValues;
@@ -100,24 +101,13 @@ function SwitchRow({
  icon={icon}
  label={label}
  action={
- <button
- type="button"
- role="switch"
- aria-checked={checked}
+ <Switch
+ aria-label={label}
+ checked={checked}
  disabled={disabled}
- onClick={() => onChange(!checked)}
- className={cn(
- "relative h-8 w-14 rounded-full bg-surface-secondary p-1 transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:cursor-not-allowed disabled:opacity-55",
- checked && "border-primary/40 bg-primary",
- )}
- >
- <span
- className={cn(
- "block size-6 rounded-full bg-surface transition-transform",
- checked && "translate-x-6",
- )}
+ onCheckedChange={onChange}
+ size="lg"
  />
- </button>
  }
  />
  );
@@ -137,17 +127,18 @@ function SelectRow({
  icon={icon}
  label={label}
  action={
- <select
+ <Select
+ aria-label={label}
  value={value}
  onChange={(event) => onChange(event.target.value)}
- className="h-11 min-w-40 cursor-pointer rounded-control bg-surface px-4 text-sm font-bold text-foreground outline-none transition-colors ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft"
+ className="min-w-40 cursor-pointer"
  >
  {options.map((option) => (
  <option key={option.value} value={option.value}>
  {option.label}
  </option>
  ))}
- </select>
+ </Select>
  }
  />
  );

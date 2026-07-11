@@ -16,11 +16,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { AppPanel } from "@/components/app/AppScreen";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { FieldError, FormAlert } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import {
  deleteProfessionalAccount,
  setProfessionalActive,
@@ -38,20 +40,6 @@ const specialtyOptions = [
  { label: "Entrenamiento", value: "training" },
  { label: "Ambas áreas", value: "both" },
 ] as const;
-
-const selectClasses =
-  "mt-2 h-11 w-full min-w-0 rounded-control bg-surface px-4 py-2 text-base text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 md:text-sm dark:ring-primary/40 dark:focus:bg-primary-soft appearance-none";
-
-const textareaClasses =
-  "mt-2 min-h-28 w-full resize-none rounded-control bg-surface px-4 py-3 text-sm leading-6 text-foreground transition-[background-color,border-color,box-shadow,color,transform] outline-none placeholder:text-muted-foreground ring-2 ring-primary/30 focus:bg-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-danger/40 aria-invalid:bg-danger/10 dark:ring-primary/40 dark:focus:bg-primary-soft";
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- return message ? (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- ) : null;
-}
 
 export function ProfessionalAccountManager({
  professional,
@@ -170,15 +158,11 @@ export function ProfessionalAccountManager({
  </div>
  </div>
 
- <div>
- <Label htmlFor="professional-specialty">Especialidad</Label>
- <select
+ <Select
  id="professional-specialty"
- className={selectClasses}
- aria-describedby={
- errors.specialty ? "professional-specialty-error" : undefined
- }
- aria-invalid={Boolean(errors.specialty)}
+ label="Especialidad"
+ error={errors.specialty?.message}
+ helper="No se puede retirar un area mientras tenga clientes asignados en ese servicio."
  {...register("specialty")}
  >
  {specialtyOptions.map((option) => (
@@ -186,23 +170,14 @@ export function ProfessionalAccountManager({
  {option.label}
  </option>
  ))}
- </select>
- <FieldError
- id="professional-specialty-error"
- message={errors.specialty?.message}
- />
- <p className="mt-2 text-sm leading-6 text-muted">
- No se puede retirar un área mientras tenga clientes asignados en
- ese servicio.
- </p>
- </div>
+ </Select>
 
  <div>
  <Label htmlFor="professional-bio">Descripción interna</Label>
- <textarea
+ <Textarea
  id="professional-bio"
  rows={5}
- className={textareaClasses}
+ className="mt-2"
  placeholder="Notas o descripción profesional opcional"
  aria-describedby={
  errors.bio ? "professional-bio-error" : undefined
@@ -216,16 +191,7 @@ export function ProfessionalAccountManager({
  />
  </div>
 
- {serverMessage ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage} />
 
  <Button type="submit" size="lg" disabled={isSubmitting}>
  {isSubmitting ? (

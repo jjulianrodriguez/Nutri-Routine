@@ -18,7 +18,10 @@ import {
 } from "@/components/app/AppScreen";
 import { ClientTodayTraining } from "@/components/app/client-today-training";
 import { AssignedProfessionalCards } from "@/components/app/relationship-badges";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
  getClientTrainingOverview,
@@ -418,7 +421,11 @@ export default async function TrainingPage() {
  description="Crea ejercicios, combínalos en entrenamientos diarios y organiza esos entrenamientos dentro de plantillas."
  />
 
- <TrainingSectionNav active="overview" />
+ <SectionTabs
+ activeId="overview"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
 
  <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
  <StatTile

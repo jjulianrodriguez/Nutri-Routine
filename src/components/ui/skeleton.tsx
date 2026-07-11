@@ -1,13 +1,68 @@
+import type * as React from "react";
+
+import {
+ composeClasses,
+ defineVariants,
+ type VariantPropsOf,
+} from "@/components/ui/composition";
 import { cn } from "@/lib/utils";
+
+const skeletonBlockVariants = defineVariants("bg-muted-surface", {
+ variants: {
+  animated: {
+   false: "",
+   true: "animate-pulse",
+  },
+  shape: {
+   avatar: "rounded-full",
+   block: "rounded-card",
+   control: "rounded-control",
+   media: "rounded-card",
+   text: "rounded-pill",
+  },
+ },
+ defaultVariants: {
+  animated: true,
+  shape: "control",
+ },
+});
+
+type SkeletonBlockProps = React.HTMLAttributes<HTMLDivElement> &
+ VariantPropsOf<typeof skeletonBlockVariants> & {
+  decorative?: boolean;
+ };
+
+function SkeletonBlock({
+ animated = true,
+ className,
+ decorative = true,
+ shape = "control",
+ "aria-hidden": ariaHidden,
+ ...props
+}: SkeletonBlockProps) {
+ return (
+ <div
+ data-slot="skeleton-block"
+ data-shape={shape}
+ aria-hidden={decorative ? true : ariaHidden}
+ className={composeClasses(
+ skeletonBlockVariants({ animated, shape }),
+ className,
+ )}
+ {...props}
+ />
+ );
+}
 
 function Skeleton({
  className,
  ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
  return (
- <div
- aria-hidden="true"
- className={cn("animate-pulse rounded-control bg-muted-surface", className)}
+ <SkeletonBlock
+ shape="control"
+ animated
+ className={className}
  {...props}
  />
  );
@@ -241,6 +296,98 @@ function CardGridSkeleton({
  );
 }
 
+function ListSkeleton({
+ action = false,
+ avatar = false,
+ className,
+ rows = 3,
+}: {
+ action?: boolean;
+ avatar?: boolean;
+ className?: string;
+ rows?: number;
+}) {
+ return (
+ <div
+ data-slot="list-skeleton"
+ className={cn("space-y-3", className)}
+ aria-busy="true"
+ >
+ {Array.from({ length: rows }).map((_, index) => (
+ <ListRowSkeleton
+ key={index}
+ action={action}
+ avatar={avatar}
+ />
+ ))}
+ </div>
+ );
+}
+
+function CardSkeleton({
+ action = false,
+ avatar = false,
+ className,
+ media = false,
+}: {
+ action?: boolean;
+ avatar?: boolean;
+ className?: string;
+ media?: boolean;
+}) {
+ return (
+ <article
+ data-slot="card-skeleton"
+ className={cn("h-fit self-start rounded-card bg-background p-4", className)}
+ aria-busy="true"
+ >
+ {media ? <SkeletonBlock shape="media" className="mb-4 aspect-video w-full" /> : null}
+ <div className="flex items-start gap-3">
+ {avatar ? <SkeletonBlock shape="avatar" className="size-11 shrink-0" /> : null}
+ <div className="min-w-0 flex-1">
+ <SkeletonBlock shape="text" className="h-5 w-40 max-w-full" />
+ <SkeletonBlock shape="text" className="mt-2 h-3.5 w-full max-w-sm" />
+ </div>
+ {action ? <SkeletonBlock className="h-9 w-24 shrink-0" /> : null}
+ </div>
+ <div className="mt-4 flex flex-wrap gap-2">
+ <SkeletonBlock shape="text" className="h-6 w-24" />
+ <SkeletonBlock shape="text" className="h-6 w-28" />
+ </div>
+ </article>
+ );
+}
+
+function GridSkeleton({
+ cards = 4,
+ className,
+ columns = "responsive",
+ ...props
+}: {
+ cards?: number;
+ className?: string;
+ columns?: "responsive" | "two" | "three" | "four";
+} & Omit<React.ComponentPropsWithoutRef<typeof CardSkeleton>, "className">) {
+ return (
+ <div
+ data-slot="grid-skeleton"
+ className={cn(
+ "grid items-start gap-4",
+ columns === "responsive" && "sm:grid-cols-2 xl:grid-cols-4",
+ columns === "two" && "md:grid-cols-2",
+ columns === "three" && "md:grid-cols-2 xl:grid-cols-3",
+ columns === "four" && "sm:grid-cols-2 xl:grid-cols-4",
+ className,
+ )}
+ aria-busy="true"
+ >
+ {Array.from({ length: cards }).map((_, index) => (
+ <CardSkeleton key={index} {...props} />
+ ))}
+ </div>
+ );
+}
+
 function FormSkeleton({
  fields = 4,
  textarea = false,
@@ -267,17 +414,59 @@ function FormSkeleton({
  );
 }
 
+function PageSkeleton({
+ className,
+ navItems = 0,
+ sections = 2,
+ stats = 0,
+}: {
+ className?: string;
+ navItems?: number;
+ sections?: number;
+ stats?: number;
+}) {
+ return (
+ <div
+ data-slot="page-skeleton"
+ className={cn("space-y-6", className)}
+ aria-busy="true"
+ >
+ <PageHeaderSkeleton />
+ {navItems > 0 ? <SectionNavSkeleton count={navItems} /> : null}
+ {stats > 0 ? (
+ <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
+ {Array.from({ length: stats }).map((_, index) => (
+ <StatTileSkeleton key={index} />
+ ))}
+ </section>
+ ) : null}
+ <div className="grid items-start gap-6 xl:grid-cols-2">
+ {Array.from({ length: sections }).map((_, index) => (
+ <AppPanelSkeleton key={index} items={index === 0 ? 2 : 3} />
+ ))}
+ </div>
+ </div>
+ );
+}
+
 export {
  AppPanelSkeleton,
  ButtonRowSkeleton,
  CardGridSkeleton,
+ CardSkeleton,
  FormSkeleton,
+ GridSkeleton,
  ListRowSkeleton,
+ ListSkeleton,
  PageHeaderSkeleton,
+ PageSkeleton,
  PanelHeaderSkeleton,
  SearchFilterSkeleton,
  SectionNavSkeleton,
  Skeleton,
+ SkeletonBlock,
  SkeletonTextStack,
  StatTileSkeleton,
+ skeletonBlockVariants,
+ type SkeletonBlockProps,
 };

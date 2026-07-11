@@ -1,1000 +1,3 @@
-Antes de comenzar:
-
-Lee AGENTS.md, las skills relevantes y el contrato técnico.
-
-Objetivo
-========
-
-Construir el sistema oficial de Inputs del proyecto.
-
-No debe existir más de una implementación oficial de Input.
-
-Consolida toda la infraestructura para:
-
-- Input
-- PasswordInput
-- NumberInput
-- EmailInput
-- SearchInput base (la lógica avanzada vendrá después)
-
-Todos deben compartir:
-
-- tokens
-- tamaños
-- estados
-- disabled
-- focus
-- invalid
-- readonly
-- loading cuando aplique
-
-Busca por toda la aplicación:
-
-- inputs nativos
-- clases repetidas
-- inputClasses
-- implementaciones locales
-- inputs de auth
-- inputs de app
-
-Migra únicamente los casos compatibles.
-
-No cambies comportamiento.
-
-No implementes todavía FormField.
-
-No implementes todavía SearchField completo.
-
-Al finalizar:
-
-- verifica que no existan inputs duplicados
-- resume los archivos migrados
-- documenta excepciones
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Antes de comenzar:
-
-Lee AGENTS.md y toda la documentación creada en fases anteriores.
-
-Objetivo
-========
-
-Crear el componente oficial Select del Design System.
-
-Actualmente existen múltiples selects con clases locales.
-
-Todo debe converger hacia un único componente reutilizable.
-
-Debe soportar:
-
-- label
-- placeholder
-- disabled
-- invalid
-- helper
-- error
-- tamaños
-- variantes
-- icono
-- keyboard navigation
-- accesibilidad
-
-Busca todas las implementaciones de:
-
-<select>
-
-y todas las constantes tipo:
-
-selectClasses
-
-Migra únicamente los casos compatibles.
-
-No cambies comportamiento.
-
-No cambies lógica de negocio.
-
-No cambies formularios complejos todavía.
-
-Al finalizar:
-
-- resume todos los selects migrados
-- documenta los casos especiales
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Antes de comenzar:
-
-Lee AGENTS.md, las skills y el contrato técnico.
-
-Objetivo
-========
-
-Construir el componente oficial Textarea.
-
-Actualmente existen múltiples textareas con clases locales.
-
-Todo debe reutilizar una única primitive.
-
-Debe soportar:
-
-- resize
-- autoResize cuando aplique
-- helper
-- error
-- disabled
-- readonly
-- tamaños
-- variantes
-
-Busca:
-
-<textarea>
-
-y
-
-textareaClasses
-
-Migra únicamente los casos compatibles.
-
-No cambies comportamiento.
-
-No implementes todavía FormField.
-
-Al finalizar:
-
-- verifica consistencia
-- resume la migración
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Antes de comenzar:
-
-Lee AGENTS.md y toda la documentación previa.
-
-Objetivo
-========
-
-Crear el sistema oficial para controles booleanos.
-
-Debe existir una infraestructura común para:
-
-- Checkbox
-- Radio
-- Switch
-
-Todos deben compartir:
-
-- estados
-- tamaños
-- tokens
-- focus
-- disabled
-- invalid
-- accesibilidad
-
-Busca implementaciones repetidas.
-
-Migra únicamente las compatibles.
-
-No modifiques lógica de negocio.
-
-No cambies formularios complejos.
-
-Al finalizar:
-
-- resume los componentes creados
-- documenta casos pendientes
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Antes de comenzar:
-
-Lee AGENTS.md, las skills y el contrato técnico.
-
-Objetivo
-========
-
-Construir toda la infraestructura oficial de formularios.
-
-A partir de esta fase NO deberían existir implementaciones locales de:
-
-FieldError
-
-FieldHint
-
-FieldLabel
-
-RequiredIndicator
-
-FormAlert
-
-FieldGroup
-
-Debe existir una arquitectura clara basada en:
-
-FormField
-
-que componga:
-
-- Label
-- Control
-- Error
-- Hint
-- RequiredIndicator
-
-Busca por toda la aplicación:
-
-- FieldError locales
-- mensajes de error repetidos
-- labels duplicadas
-- helpers duplicados
-
-Migra únicamente los casos compatibles.
-
-No cambies validaciones.
-
-No cambies server actions.
-
-No cambies lógica RHF.
-
-No cambies comportamiento.
-
-Al finalizar:
-
-- resume todas las implementaciones eliminadas
-- documenta los formularios pendientes
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Antes de comenzar:
-
-Lee AGENTS.md y las fases anteriores.
-
-Objetivo
-========
-
-Crear el componente oficial SearchField.
-
-No debe ser solamente un Input con placeholder.
-
-Debe servir como infraestructura para todos los buscadores del sistema.
-
-Debe soportar:
-
-- icono
-- clear button
-- loading
-- debounce opcional
-- disabled
-- tamaños
-- variantes
-- accesibilidad
-
-Busca buscadores repetidos en:
-
-- clientes
-- recursos
-- ejercicios
-- entrenamiento
-- nutrición
-- progreso
-- cualquier otro módulo
-
-Migra únicamente los casos seguros.
-
-No cambies la lógica de búsqueda.
-
-No cambies filtros.
-
-No cambies URLs.
-
-Solo unifica la infraestructura visual y de composición.
-
-Al finalizar:
-
-- resume todos los buscadores migrados
-- documenta excepciones
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Objetivo:
-
-Separar oficialmente IconButton de Button.
-
-Actualmente existen muchos botones icon-only implementados manualmente.
-
-Crear un componente reutilizable.
-
-Debe soportar:
-
-- tooltip opcional
-- loading
-- destructive
-- ghost
-- outline
-- tamaños
-
-No migrar todavía.
-
-Entrega:
-
-- API
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Objetivo:
-
-Auditar que las nuevas primitives creadas durante la Fase 3 sean compatibles con toda la aplicación.
-
-No modificar nada.
-
-Revisar:
-
-- Button
-- Input
-- PasswordInput
-- SearchInput
-- Select
-- Textarea
-- Checkbox
-- Switch
-- IconButton
-
-Detectar:
-
-- posibles regresiones
-- componentes incompatibles
-- imports futuros
-- casos especiales
-
-Generar un reporte indicando:
-
-- qué módulos podrán migrarse directamente
-- cuáles necesitarán adaptadores
-- cuáles deberán esperar fases posteriores
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Objetivo
-
-Migrar todos los formularios pequeños y medianos para utilizar exclusivamente el nuevo sistema de formularios del Design System.
-
-Objetivos específicos
-
-- Reemplazar todos los FieldError locales.
-- Eliminar todas las implementaciones locales de:
-  - selectClasses
-  - textareaClasses
-  - inputClasses
-- Sustituirlos por:
-  - FormField
-  - FieldLabel
-  - FieldHint
-  - FieldError
-  - FormAlert
-  - Input
-  - Select
-  - Textarea
-  - SearchField
-- Mantener exactamente el mismo comportamiento funcional.
-- No modificar server actions.
-- No modificar validaciones.
-- No modificar lógica RHF.
-- No cambiar nombres de props públicas.
-
-Prioridad
-
-Migrar primero:
-
-- Perfil
-- Configuración
-- Cuenta
-- Login
-- Registro
-- Recuperación
-
-Luego:
-
-- Ejercicios
-- Rutinas
-- Plantillas
-- Nutrición
-- Recursos
-
-No tocar todavía:
-
-- ResourceManager
-- CalendarManager
-- BlogRichTextEditor
-
-Al finalizar
-
-Entregar un reporte indicando:
-
-- formularios migrados
-- formularios pendientes
-- FieldError eliminados
-- clases locales eliminadas
-- comportamiento preservado
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Objetivo
-
-Eliminar todas las implementaciones locales de navegación secundaria.
-
-Migrar completamente al nuevo componente SectionTabs.
-
-Debe reemplazar:
-
-- TrainingSectionNav
-- NutritionSectionNav
-- navegación de Perfil
-- navegación de Configuración
-- tabs de Progreso
-- tabs de Notificaciones
-- cualquier navegación horizontal equivalente
-
-Restricciones
-
-- No cambiar rutas.
-- No cambiar comportamiento.
-- No cambiar permisos.
-- Solo cambiar infraestructura visual.
-
-Eliminar componentes duplicados cuando ya no sean utilizados.
-
-Entregar un reporte indicando:
-
-- componentes eliminados
-- componentes migrados
-- imports simplificados
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Objetivo
-
-Migrar toda la aplicación para utilizar únicamente los nuevos componentes oficiales de estados.
-
-Debe reemplazar:
-
-- EmptyState locales
-- ErrorState locales
-- LoadingState locales
-- Skeletons personalizados
-
-Utilizar exclusivamente:
-
-- EmptyState
-- ErrorState
-- StateBlock
-- SkeletonBlock
-- LoadingState
-
-No modificar:
-
-- lógica
-- fetch
-- server actions
-
-Solo presentación.
-
-Entregar un resumen de:
-
-- estados eliminados
-- estados unificados
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Objetivo
-
-Refactorizar ResourceManager.
-
-Actualmente concentra demasiadas responsabilidades.
-
-Debe dividirse sin modificar comportamiento.
-
-Crear la siguiente arquitectura:
-
-resources/
-
-- ResourceManager
-- ResourceList
-- ResourceCard
-- ResourceFilters
-- ResourceUploadForm
-- ExternalResourceForm
-- FolderManager
-- FolderCard
-- ResourcePreview
-- hooks/
-    useResourceFilters
-    useResourceMutations
-    useFolderOperations
-
-Restricciones
-
-- No cambiar UI.
-- No cambiar rutas.
-- No cambiar comportamiento.
-- No introducir regresiones.
-
-Objetivo final
-
-Ningún archivo debe superar aproximadamente 500 líneas salvo justificación técnica.
-
-Entregar:
-
-- árbol nuevo
-- archivos creados
-- responsabilidades de cada uno
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Objetivo
-
-Dividir CalendarManager.
-
-Separar completamente:
-
-- CalendarGrid
-- EventFormDialog
-- UpcomingEventList
-- CalendarFilters
-- CalendarToolbar
-- EventCard
-- hooks
-
-No modificar:
-
-- comportamiento
-- lógica
-- permisos
-- UX
-
-Mantener exactamente el mismo resultado visual.
-
-Reducir el archivo principal al mínimo.
-
-Entregar reporte.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Objetivo
-
-Dividir completamente BlogRichTextEditor.
-
-Crear componentes independientes para:
-
-- EditorToolbar
-- FloatingToolbar
-- LinkPopover
-- ImagePopover
-- ColorPicker
-- MediaMenu
-- EditorCanvas
-- PreviewPanel
-
-Extraer además hooks:
-
-- useFloatingToolbar
-- useSelectionState
-- useEditorCommands
-
-No modificar experiencia de usuario.
-
-No cambiar funcionalidades.
-
-Mantener compatibilidad total.
-
-Entregar árbol nuevo.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Objetivo
-
-Separar ProgressDashboard.
-
-Crear:
-
-- ProgressTabs
-- ProgressMetricGrid
-- ProgressCharts
-- ProgressClientSelector
-- ProgressSummary
-- ProgressEmptyState
-- hooks
-
-Reducir el componente principal únicamente a composición.
-
-No modificar comportamiento.
-
-Entregar resumen.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Objetivo
-
-Separar HabitTracker.
-
-Actualmente mezcla:
-
-- biblioteca
-- asignaciones
-- tracking
-- formularios
-- tablas
-
-Crear componentes independientes.
-
-Extraer hooks.
-
-Mantener API pública.
-
-No modificar UX.
-
-Entregar árbol final.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Objetivo
 
@@ -1247,4 +250,258 @@ Entregar un documento con:
 - valoración del Design System (0–10)
 - valoración de mantenibilidad (0–10)
 - valoración de escalabilidad (0–10)
-- recomendación final sobre si el proyecto está listo para una versión 1.0.
+- recomendación final sobre si el proyecto está listo para una versión 1.0.}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Antes de comenzar:
+
+Lee AGENTS.md, todas las skills relevantes y toda la documentación generada durante el refactor.
+
+Lee también el contrato técnico y el roadmap de refactorización.
+
+NO modifiques ningún archivo.
+
+NO escribas código.
+
+NO ejecutes scripts de corrección.
+
+Esta es una auditoría exclusivamente de verificación.
+
+Objetivo
+
+Verificar que cada fase del roadmap de refactorización realmente se haya ejecutado como fue solicitada.
+
+No evaluar si la arquitectura "podría ser mejor".
+
+No proponer nuevos refactors.
+
+No inventar mejoras.
+
+El objetivo es comprobar si el trabajo solicitado en cada prompt fue realmente realizado.
+
+Debes comparar el estado actual del proyecto contra los objetivos definidos para cada fase.
+
+Qué debes verificar
+Fase 3 — Primitives del Design System
+
+Verificar que realmente existan y funcionen:
+
+Button
+IconButton
+LinkButton (si estaba planificado)
+Input
+PasswordInput
+NumberInput
+EmailInput
+SearchInput base
+Select
+Textarea
+Checkbox
+Radio
+Switch
+
+Comprobar además que:
+
+usan la misma infraestructura
+usan los mismos tokens
+comparten tamaños
+comparten variantes
+comparten estados
+comparten accesibilidad
+
+Verificar que las implementaciones locales realmente hayan sido migradas cuando el prompt así lo pedía.
+
+Fase 4 — Sistema de Formularios
+
+Verificar que exista realmente:
+
+FormField
+FieldLabel
+FieldError
+FieldHint
+RequiredIndicator
+FormAlert
+FieldGroup
+
+Comprobar que:
+
+los FieldError locales hayan desaparecido
+las clases locales de inputs hayan sido eliminadas
+los formularios migrados realmente utilicen la infraestructura nueva
+Fase 5 — Migración de Formularios
+
+Verificar que los formularios pequeños y medianos realmente hayan sido migrados.
+
+Especialmente revisar:
+
+Perfil
+Configuración
+Cuenta
+Login
+Registro
+Recuperación
+Ejercicios
+Rutinas
+Plantillas
+Nutrición
+Recursos
+
+Confirmar que:
+
+no quedó infraestructura antigua
+no aparecieron duplicaciones nuevas
+no se modificó el comportamiento funcional
+Fase 6 — Navegación Secundaria
+
+Verificar que SectionTabs realmente reemplazó:
+
+TrainingSectionNav
+NutritionSectionNav
+navegación de Perfil
+navegación de Configuración
+tabs de Progreso
+tabs de Notificaciones
+equivalentes
+
+Comprobar que los componentes antiguos fueron eliminados cuando correspondía.
+
+Fase 7 — Estados Compartidos
+
+Verificar que realmente exista un sistema oficial para:
+
+EmptyState
+ErrorState
+LoadingState
+SkeletonBlock
+StateBlock
+
+Comprobar que los estados locales hayan sido reemplazados donde el roadmap lo indicaba.
+
+Fase 8 — Managers Grandes
+
+Verificar individualmente:
+
+ResourceManager
+CalendarManager
+BlogRichTextEditor
+ProgressDashboard
+HabitTracker
+
+Comprobar que:
+
+fueron divididos
+las responsabilidades fueron separadas
+los hooks fueron extraídos
+el archivo principal quedó reducido
+no cambió el comportamiento
+Fase 9 — Organización
+
+Verificar que:
+
+la estructura final de carpetas coincida con la arquitectura aprobada
+los imports hayan sido actualizados
+no existan duplicados producto de la reorganización
+los componentes estén ubicados en el dominio correcto
+Fase 10 — Limpieza
+
+Verificar que realmente se eliminaron:
+
+componentes muertos
+helpers muertos
+hooks muertos
+imports muertos
+variantes antiguas
+constantes sin uso
+
+Confirmar que no se eliminaron elementos todavía utilizados.
+
+Qué NO debes hacer
+
+No propongas nuevas mejoras.
+
+No rediseñes la arquitectura.
+
+No sugieras nuevos componentes.
+
+No critiques decisiones del roadmap.
+
+No propongas nuevas fases.
+
+No generes código.
+
+No modifiques archivos.
+
+Esta auditoría es únicamente para verificar el cumplimiento del trabajo solicitado.
+
+Entrega
+
+Genera un informe organizado por fases.
+
+Para cada fase incluye:
+
+Estado
+✅ Completamente cumplida
+⚠️ Parcialmente cumplida
+❌ No cumplida
+Evidencia
+
+Lista los componentes, archivos o cambios que demuestran el cumplimiento (o incumplimiento).
+
+Desviaciones
+
+Describe exactamente qué objetivos del prompt original no se cumplieron.
+
+No menciones mejoras futuras; solo diferencias respecto al contrato.
+
+Riesgo
+
+Clasifica el impacto de las desviaciones:
+
+Bajo
+Medio
+Alto
+Crítico
+Resumen Final
+
+Incluye una tabla como esta:
+
+Fase	Estado	Cumplimiento
+Fase 3	✅	100%
+Fase 4	⚠️	85%
+Fase 5	✅	100%
+...	...	...
+
+Después indica:
+
+Porcentaje total de cumplimiento del roadmap.
+Fases que requieren retrabajo.
+Componentes que quedaron pendientes respecto al plan original.
+Confirmación de si el proyecto cumple o no con el roadmap acordado.
+
+Importante: evalúa únicamente el cumplimiento de los prompts originales. No penalices decisiones de diseño distintas si cumplen el objetivo solicitado. No conviertas esta auditoría en una nueva revisión arquitectónica.

@@ -2,7 +2,10 @@ import { redirect } from "next/navigation";
 
 import { AppHeader, AppScreen } from "@/components/app/AppScreen";
 import { ExerciseManager } from "@/components/app/exercise-manager";
-import { TrainingSectionNav } from "@/components/app/training-section-nav";
+import {
+ trainingSectionTabs,
+} from "@/components/app/section-tab-presets";
+import { SectionTabs } from "@/components/app/section-tabs";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
  getExerciseFilterOptions,
@@ -84,7 +87,11 @@ export default async function ExercisesPage({
  title="Ejercicios"
  description="Crea y mantiene la biblioteca que se utiliza despues para construir entrenamientos."
  />
- <TrainingSectionNav active="exercises" />
+ <SectionTabs
+ activeId="exercises"
+ ariaLabel="Secciones de entrenamiento"
+ items={trainingSectionTabs}
+ />
  <ExerciseManager
  exercises={exerciseResult.items}
  filterOptions={filterOptions}

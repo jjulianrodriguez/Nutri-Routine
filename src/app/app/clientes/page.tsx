@@ -5,7 +5,6 @@ import {
  CircleOff,
  Dumbbell,
  Leaf,
- Search,
  SlidersHorizontal,
 } from "lucide-react";
 import Link from "next/link";
@@ -26,8 +25,9 @@ import {
 } from "@/components/app/AppScreen";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SearchField } from "@/components/ui/search-field";
+import { Select } from "@/components/ui/select";
 import {
  listClientActivationData,
  type ClientAccountListItem,
@@ -68,9 +68,6 @@ type SelectOption = {
 type ProfessionalOption = SelectOption & {
  count: number;
 };
-
-const selectClasses =
- "mt-2 h-11 w-full rounded-control bg-surface px-3 text-sm font-semibold text-foreground outline-none transition focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20";
 
 function normalizeSearch(value?: string) {
  return value?.trim().slice(0, 80) ?? "";
@@ -426,26 +423,14 @@ function SelectField({
  options: SelectOption[];
 }) {
  return (
- <div>
- <Label
- htmlFor={id}
- className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted"
- >
- {label}
- </Label>
- <select
+ <Select
  id={id}
  name={name}
  defaultValue={defaultValue}
- className={selectClasses}
- >
- {options.map((option) => (
- <option key={option.value} value={option.value}>
- {option.label}
- </option>
- ))}
- </select>
- </div>
+ label={label}
+ labelClassName="text-xs uppercase tracking-[0.14em] text-muted"
+ options={options}
+ />
  );
 }
 
@@ -617,20 +602,15 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
  >
  Buscar clientes
  </Label>
- <div className="relative mt-2">
- <Search
- className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
- aria-hidden="true"
- />
- <Input
+ <SearchField
  id="client-search"
  name="q"
- type="search"
  defaultValue={query}
  placeholder="Nombre, correo o ID visible"
- className="h-12 rounded-control pl-10 font-semibold"
+ className="font-semibold"
+ controlClassName="mt-2"
+ size="lg"
  />
- </div>
  </div>
 
  <details

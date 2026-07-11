@@ -26,6 +26,7 @@ import { BlogRichTextEditor } from "@/components/app/blog-rich-text-editor";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { FieldError } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -66,18 +67,6 @@ function formatDate(value: string) {
  dateStyle: "medium",
  timeStyle: "short",
  }).format(new Date(value));
-}
-
-function FieldError({ id, message }: { id: string; message?: string }) {
- if (!message) {
- return null;
- }
-
- return (
- <p id={id} className="mt-2 text-sm font-semibold text-danger" role="alert">
- {message}
- </p>
- );
 }
 
 function SaveStatusBadge({ status }: { status: SaveStatus }) {
