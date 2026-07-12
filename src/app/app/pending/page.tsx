@@ -1,7 +1,7 @@
 import { Clock, ShieldCheck, UserRound } from "lucide-react";
 
-import { BasicAccountForm } from "@/components/app/basic-account-form";
-import { AppHeader, AppPanel, AppScreen } from "@/components/app/AppScreen";
+import { BasicAccountForm } from "@/components/app/domains/profile/basic-account-form";
+import { AppHeader, AppPanel, AppScreen } from "@/components/app/layouts/AppScreen";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 
 export default async function PendingAccountPage() {

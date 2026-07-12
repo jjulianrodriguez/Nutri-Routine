@@ -11,20 +11,20 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
  StatTile,
-} from "@/components/app/AppScreen";
-import { WorkoutTemplateAssignmentForm } from "@/components/app/routine-assignment-form";
-import { RoutineUnassignButton } from "@/components/app/routine-unassign-button";
+} from "@/components/app/layouts/AppScreen";
+import { EmptyState } from "@/components/ui/feedback/state-block";
+import { WorkoutTemplateAssignmentForm } from "@/components/app/domains/training/routine-assignment-form";
+import { RoutineUnassignButton } from "@/components/app/domains/training/routine-unassign-button";
 import {
  trainingSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
 import {
  getAssignedRelationBadge,
  RelationshipBadge,
-} from "@/components/app/relationship-badges";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+} from "@/components/app/shared/relationship-badges";
+import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
  listAssignableTrainingClients,

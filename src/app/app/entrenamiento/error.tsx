@@ -1,7 +1,7 @@
 "use client";
 
-import { AppScreen } from "@/components/app/AppScreen";
-import { RecoveryState } from "@/components/errors/recovery-state";
+import { AppScreen } from "@/components/app/layouts/AppScreen";
+import { RecoveryState } from "@/components/ui/feedback/recovery-state";
 
 type TrainingErrorProps = {
  error: Error & { digest?: string };

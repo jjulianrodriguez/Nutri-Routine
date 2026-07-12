@@ -6,16 +6,16 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
  StatTile,
-} from "@/components/app/AppScreen";
-import { RoutineCardActions } from "@/components/app/routine-card-actions";
+} from "@/components/app/layouts/AppScreen";
+import { EmptyState } from "@/components/ui/feedback/state-block";
+import { RoutineCardActions } from "@/components/app/domains/training/routine-card-actions";
 import {
  trainingSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
-import { WorkoutSummaryCard } from "@/components/app/workout-summary-card";
-import { Button } from "@/components/ui/button";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
+import { WorkoutSummaryCard } from "@/components/app/domains/training/workout-summary-card";
+import { Button } from "@/components/ui/actions/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getRoutineManagementOverview } from "@/lib/routines/data";
 

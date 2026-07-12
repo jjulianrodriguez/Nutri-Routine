@@ -5,15 +5,15 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
  StatTile,
-} from "@/components/app/AppScreen";
-import { NutritionDocumentManager } from "@/components/app/nutrition-document-manager";
+} from "@/components/app/layouts/AppScreen";
+import { EmptyState } from "@/components/ui/feedback/state-block";
+import { NutritionDocumentManager } from "@/components/app/domains/nutrition/nutrition-document-manager";
 import {
  nutritionSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
-import { Button } from "@/components/ui/button";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
+import { Button } from "@/components/ui/actions/button";
 import { getDashboardData } from "@/lib/app/dashboard-data";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getNutritionHabitTrackerData } from "@/lib/habits/data";

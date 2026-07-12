@@ -1,9 +1,9 @@
-import { AppHeader, AppScreen } from "@/components/app/AppScreen";
-import { HabitTracker } from "@/components/app/habit-tracker";
+import { AppHeader, AppScreen } from "@/components/app/layouts/AppScreen";
+import { HabitTracker } from "@/components/app/domains/nutrition/habit-tracker";
 import {
  nutritionSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getNutritionHabitTrackerData } from "@/lib/habits/data";
 

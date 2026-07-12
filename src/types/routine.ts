@@ -2,7 +2,7 @@ import type {
  ExerciseDifficulty,
  ExerciseOption,
 } from "@/types/exercise";
-import type { WorkoutTemplateSnapshot } from "@/types/workout-template";
+import type { WorkoutTemplateSnapshot } from "@/types/workout-template-snapshot";
 
 export type RoutineDifficulty = ExerciseDifficulty;
 

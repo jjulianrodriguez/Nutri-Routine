@@ -13,15 +13,15 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
  StatTile,
-} from "@/components/app/AppScreen";
-import { ClientTodayTraining } from "@/components/app/client-today-training";
-import { AssignedProfessionalCards } from "@/components/app/relationship-badges";
+} from "@/components/app/layouts/AppScreen";
+import { EmptyState } from "@/components/ui/feedback/state-block";
+import { ClientTodayTraining } from "@/components/app/domains/training/client-today-training";
+import { AssignedProfessionalCards } from "@/components/app/shared/relationship-badges";
 import {
  trainingSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
  getClientTrainingOverview,

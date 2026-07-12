@@ -14,14 +14,14 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
  StatTile,
-} from "@/components/app/AppScreen";
+} from "@/components/app/layouts/AppScreen";
+import { EmptyState } from "@/components/ui/feedback/state-block";
 import {
  AssignedProfessionalCards,
  RelationshipBadge,
-} from "@/components/app/relationship-badges";
-import { FadeIn } from "@/components/motion/fade-in";
+} from "@/components/app/shared/relationship-badges";
+import { FadeIn } from "@/components/ui/utilities/fade-in";
 import type { CurrentUserAccess } from "@/lib/auth/access-rules";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {

@@ -12,16 +12,16 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
  StatTile,
-} from "@/components/app/AppScreen";
+} from "@/components/app/layouts/AppScreen";
+import { EmptyState } from "@/components/ui/feedback/state-block";
 import {
  trainingSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
-import { WorkoutTemplateActions } from "@/components/app/workout-template-actions";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
+import { WorkoutTemplateActions } from "@/components/app/domains/training/workout-template-actions";
+import { Button } from "@/components/ui/actions/button";
+import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { listWorkoutTemplatesWithMeta } from "@/lib/workout-templates/data";
 

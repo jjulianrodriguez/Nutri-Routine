@@ -32,9 +32,9 @@ import {
 import Link from "next/link";
 import { useRef, type PointerEvent, type ReactNode } from "react";
 
-import { Footer } from "@/components/Footer";
-import { Navbar } from "@/components/Navbar";
-import { SmoothScroll } from "@/components/SmoothScroll";
+import { Footer } from "@/components/app/marketing/Footer";
+import { Navbar } from "@/components/app/marketing/Navbar";
+import { SmoothScroll } from "@/components/app/marketing/SmoothScroll";
 
 const whatsappHref = "https://wa.me/50688332426";
 const motionEase = [0.18, 0.82, 0.22, 1] as const;

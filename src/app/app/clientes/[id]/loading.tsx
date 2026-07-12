@@ -1,11 +1,11 @@
-import { RouteLoadingFrame } from "@/components/app/route-loading-frame";
+import { RouteLoadingFrame } from "@/components/app/layouts/route-loading-frame";
 import {
  AppPanelSkeleton,
  ButtonRowSkeleton,
  FormSkeleton,
  ListRowSkeleton,
  Skeleton,
-} from "@/components/ui/skeleton";
+} from "@/components/ui/feedback/skeleton";
 
 export default function ClientProfileLoading() {
  return (

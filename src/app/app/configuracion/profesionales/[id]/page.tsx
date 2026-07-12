@@ -2,9 +2,9 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { AppHeader, AppScreen } from "@/components/app/AppScreen";
-import { ProfessionalAccountManager } from "@/components/app/professional-account-manager";
-import { Button } from "@/components/ui/button";
+import { AppHeader, AppScreen } from "@/components/app/layouts/AppScreen";
+import { ProfessionalAccountManager } from "@/components/app/domains/settings/professional-account-manager";
+import { Button } from "@/components/ui/actions/button";
 import { getProfessionalAccount } from "@/lib/actions/professional-accounts";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 

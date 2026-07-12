@@ -114,7 +114,8 @@ These were intentionally left in place because they are domain-specific, public-
 
 ## Current IconButton Separation
 
-- `src/components/ui/button-core.tsx` owns `Button`, `buttonVariants`, `ActionButton`, and `LinkButton`.
-- `src/components/ui/icon-button.tsx` owns `IconButton` and composes `Button`.
-- `src/components/ui/button.tsx` remains a compatibility export surface so existing imports keep working.
+- `src/components/ui/actions/button-core.tsx` owns `Button`, `buttonVariants`, `ActionButton`, and `LinkButton`.
+- `src/components/ui/actions/icon-button.tsx` owns `IconButton` and composes `Button`.
+- `src/components/ui/actions/button.tsx` exports the action family for current folder-based imports.
+- `src/components/ui/button.tsx`, `src/components/ui/button-core.tsx`, and `src/components/ui/icon-button.tsx` remain compatibility export surfaces so existing imports keep working.
 - No app, auth, blog, manager, route, database, auth, or permission behavior was migrated in this separation.

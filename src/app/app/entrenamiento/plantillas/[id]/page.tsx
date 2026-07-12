@@ -2,15 +2,15 @@ import { ArrowLeft, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { AppHeader, AppPanel, AppScreen } from "@/components/app/AppScreen";
+import { AppHeader, AppPanel, AppScreen } from "@/components/app/layouts/AppScreen";
 import {
  trainingSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
-import { TemplateOverview } from "@/components/app/workout-template-overview";
-import { WorkoutTemplateActions } from "@/components/app/workout-template-actions";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
+import { TemplateOverview } from "@/components/app/domains/training/workout-template-overview";
+import { WorkoutTemplateActions } from "@/components/app/domains/training/workout-template-actions";
+import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
+import { Button } from "@/components/ui/actions/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getWorkoutTemplateDetailWithMeta } from "@/lib/workout-templates/data";
 

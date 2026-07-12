@@ -9,13 +9,13 @@ import {
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { AppHeader, AppPanel, AppScreen } from "@/components/app/AppScreen";
-import { LogoutButton } from "@/components/app/logout-button";
-import { PasswordChangeForm } from "@/components/app/password-change-form";
-import { RelationshipBadge } from "@/components/app/relationship-badges";
-import { SectionTabs } from "@/components/app/section-tabs";
-import { UserSettingsForm } from "@/components/app/user-settings-form";
-import { Button } from "@/components/ui/button";
+import { AppHeader, AppPanel, AppScreen } from "@/components/app/layouts/AppScreen";
+import { LogoutButton } from "@/components/app/shared/logout-button";
+import { PasswordChangeForm } from "@/components/app/domains/settings/password-change-form";
+import { RelationshipBadge } from "@/components/app/shared/relationship-badges";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
+import { UserSettingsForm } from "@/components/app/domains/settings/user-settings-form";
+import { Button } from "@/components/ui/actions/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getUserSettings } from "@/lib/user-settings/data";
 

@@ -20,7 +20,9 @@ This document defines the official boolean control system for checkbox, radio, a
 ## Shared Infrastructure
 
 - `src/components/ui/boolean-control.ts`
-  - Centralizes visual recipes for checkbox, radio, switch, and switch thumb.
+  - Public compatibility export for the folder-based boolean-control implementation.
+- `src/components/ui/forms/boolean-control.ts`
+  - Centralizes visual recipes for checkbox, radio, switch, switch thumb, and indicators.
   - Uses the existing `defineVariants`, `composeClasses`, `primitiveMotionClasses`, and `primitiveStateClasses` helpers.
   - Uses design-system tokens through Tailwind aliases such as `bg-surface-default`, `border-border-default`, `bg-action-primary`, `ring-focus-ring`, `opacity-disabled`, and `duration-base`.
   - Provides `getBooleanControlStateAttributes` so disabled and invalid state attributes stay consistent.
@@ -54,6 +56,7 @@ Accessibility expectations:
 - `src/components/app/user-settings-form.tsx`
   - Replaced the local `SwitchRow` track/thumb implementation with the official `Switch`.
   - Preserved the existing settings state updates and disabled behavior.
+- `Checkbox`, `RadioGroup`, and `RadioGroupItem` are now implemented under `src/components/ui/forms/` and re-exported from `src/components/ui/checkbox.tsx` and `src/components/ui/radio-group.tsx`.
 
 ## Pending Compatible Candidates
 

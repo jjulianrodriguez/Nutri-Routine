@@ -1,6 +1,6 @@
 "use client";
 
-import { RecoveryState } from "@/components/errors/recovery-state";
+import { RecoveryState } from "@/components/ui/feedback/recovery-state";
 
 type BlogErrorProps = {
  error: Error & { digest?: string };

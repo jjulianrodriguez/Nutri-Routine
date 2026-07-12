@@ -1,11 +1,11 @@
 import { notFound, redirect } from "next/navigation";
 
-import { AppHeader, AppScreen } from "@/components/app/AppScreen";
-import { RoutineEditor } from "@/components/app/routine-editor";
+import { AppHeader, AppScreen } from "@/components/app/layouts/AppScreen";
+import { RoutineEditor } from "@/components/app/domains/training/routine-editor";
 import {
  trainingSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
  getRoutineDetail,

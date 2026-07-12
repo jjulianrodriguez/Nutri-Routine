@@ -1,5 +1,5 @@
-import { AuthCard } from "@/components/auth/auth-card";
-import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { AuthCard } from "@/components/app/auth/auth-card";
+import { ResetPasswordForm } from "@/components/app/auth/reset-password-form";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

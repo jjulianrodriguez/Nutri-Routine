@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import { BlogFooter } from "@/components/blog/BlogFooter";
-import { BlogNavbar } from "@/components/blog/BlogNavbar";
+import { BlogFooter } from "@/components/app/domains/blog/BlogFooter";
+import { BlogNavbar } from "@/components/app/domains/blog/BlogNavbar";
 
 export const metadata: Metadata = {
  title: "Blog · Nutrición Con Enfoque",

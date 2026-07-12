@@ -14,12 +14,12 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
-} from "@/components/app/AppScreen";
+} from "@/components/app/layouts/AppScreen";
 import {
  trainingSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
-import { Button } from "@/components/ui/button";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
+import { Button } from "@/components/ui/actions/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getExerciseDetail } from "@/lib/exercises/data";
 import { getExternalResourcePresentation } from "@/lib/exercises/multimedia";

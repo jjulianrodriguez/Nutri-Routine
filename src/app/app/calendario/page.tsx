@@ -1,9 +1,9 @@
-import { CalendarManager } from "@/components/app/calendar-manager";
+import { CalendarManager } from "@/components/app/domains/calendar/calendar-manager";
 import {
  AppHeader,
  AppScreen,
  StatTile,
-} from "@/components/app/AppScreen";
+} from "@/components/app/layouts/AppScreen";
 import { getCalendarPageData } from "@/lib/calendar/data";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 

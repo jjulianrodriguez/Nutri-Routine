@@ -4,14 +4,16 @@ This document records the official SearchField primitive phase.
 
 ## Official Primitive
 
-- `src/components/ui/search-field.tsx`
+- `src/components/ui/forms/search-field.tsx`
   - Exports `SearchField`, `searchFieldInputVariants`, and `SearchFieldProps`.
   - Owns search-specific composition: leading icon, clear action, loading indicator, disabled/read-only/invalid states, sizes, variants, labels, helper text, errors, and accessible descriptions.
   - Supports controlled and initial uncontrolled values while keeping native `type="search"` form participation.
   - Supports optional `debounceMs` through `onValueChange`; native `onChange` remains immediate for compatibility.
-- `src/components/ui/input.tsx`
-  - Keeps `SearchInput` as a typed input compatibility primitive.
+- `src/components/ui/forms/input.tsx`
+  - Keeps `SearchInput` as a typed input compatibility primitive built from `Input`.
   - Re-exports `SearchField` from the official file so older import paths do not create a second implementation.
+- `src/components/ui/search-field.tsx` and `src/components/ui/input.tsx`
+  - Public compatibility exports for the same implementation files above.
 
 ## Supported API
 
@@ -51,7 +53,8 @@ database table, policy, or validation schema was changed in this phase.
 
 ## Exceptions
 
-- `src/components/ui/input.tsx`: `SearchInput` remains for compatibility, but app modules should prefer `SearchField` for search UI composition.
+- `SearchField` is the official public API for composed search UI.
+- `SearchInput` remains official only as a typed `Input` compatibility primitive for simple native search inputs. It does not own a second search-field implementation or a separate style recipe.
 - `src/app/app/calendario/loading.tsx`, `src/app/app/clientes/loading.tsx`, `src/app/app/recursos/loading.tsx`, and `src/app/app/progreso/loading.tsx`: `SearchFilterSkeleton` usage is a loading placeholder, not an interactive search field.
 - Nutrition and progress modules currently expose selectors and tab/filter URL state, but no safe repeated free-text search field was found to migrate in this phase.
 - Complex filter selects in `exercise-manager`, `resource-manager`, and client listing were intentionally left unchanged because the task only covered search-field infrastructure.

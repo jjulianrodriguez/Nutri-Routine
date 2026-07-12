@@ -1,4 +1,4 @@
-import { BlogIndex } from "@/components/blog/BlogIndex";
+import { BlogIndex } from "@/components/app/domains/blog/BlogIndex";
 import { getPublishedBlogPosts } from "@/lib/blog/posts";
 
 export const dynamic = "force-dynamic";

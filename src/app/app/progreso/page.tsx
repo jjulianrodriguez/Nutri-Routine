@@ -1,5 +1,5 @@
-import { AppHeader, AppScreen } from "@/components/app/AppScreen";
-import { ProgressDashboard } from "@/components/app/progress-dashboard";
+import { AppHeader, AppScreen } from "@/components/app/layouts/AppScreen";
+import { ProgressDashboard } from "@/components/app/domains/progress/progress-dashboard";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import {
  getProgressPageData,

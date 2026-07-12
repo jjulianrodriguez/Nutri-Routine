@@ -1,4 +1,4 @@
-import { RouteLoadingFrame } from "@/components/app/route-loading-frame";
+import { RouteLoadingFrame } from "@/components/app/layouts/route-loading-frame";
 import {
  AppPanelSkeleton,
  ListRowSkeleton,
@@ -6,7 +6,7 @@ import {
  SectionNavSkeleton,
  Skeleton,
  StatTileSkeleton,
-} from "@/components/ui/skeleton";
+} from "@/components/ui/feedback/skeleton";
 
 export default function NutritionLoading() {
  return (

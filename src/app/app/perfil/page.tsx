@@ -13,20 +13,20 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
  StatTile,
-} from "@/components/app/AppScreen";
-import { BasicAccountForm } from "@/components/app/basic-account-form";
-import { ClientAvatar } from "@/components/app/client-avatar";
-import { PersonalDetailsForm } from "@/components/app/personal-details-form";
-import { ProfessionalProfileForm } from "@/components/app/professional-profile-form";
+} from "@/components/app/layouts/AppScreen";
+import { EmptyState } from "@/components/ui/feedback/state-block";
+import { BasicAccountForm } from "@/components/app/domains/profile/basic-account-form";
+import { ClientAvatar } from "@/components/app/domains/clients/client-avatar";
+import { PersonalDetailsForm } from "@/components/app/domains/profile/personal-details-form";
+import { ProfessionalProfileForm } from "@/components/app/domains/profile/professional-profile-form";
 import {
  AssignedProfessionalCards,
  RelationshipBadge,
  getPlanBadgeLabel,
-} from "@/components/app/relationship-badges";
-import { SectionTabs } from "@/components/app/section-tabs";
-import { Button } from "@/components/ui/button";
+} from "@/components/app/shared/relationship-badges";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
+import { Button } from "@/components/ui/actions/button";
 import { getPersonalDetails } from "@/lib/account/personal-details";
 import { getOwnProfessionalProfile } from "@/lib/account/professional-profile";
 import {

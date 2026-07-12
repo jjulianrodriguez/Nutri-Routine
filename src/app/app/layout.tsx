@@ -1,5 +1,5 @@
-import { Sidebar } from "@/components/app/Sidebar";
-import { UserPreferenceApplier } from "@/components/app/user-preference-applier";
+import { Sidebar } from "@/components/app/layouts/Sidebar";
+import { UserPreferenceApplier } from "@/components/app/shared/user-preference-applier";
 import { requireCurrentUserAccess } from "@/lib/auth/current-user-access";
 import { getUnreadNotificationCount } from "@/lib/notifications/data";
 import { getUserSettings } from "@/lib/user-settings/data";

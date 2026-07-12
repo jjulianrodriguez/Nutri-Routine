@@ -4,14 +4,14 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
-} from "@/components/app/AppScreen";
-import { RoutineEditor } from "@/components/app/routine-editor";
+} from "@/components/app/layouts/AppScreen";
+import { EmptyState } from "@/components/ui/feedback/state-block";
+import { RoutineEditor } from "@/components/app/domains/training/routine-editor";
 import {
  trainingSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
-import { Button } from "@/components/ui/button";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
+import { Button } from "@/components/ui/actions/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { listExerciseOptions } from "@/lib/routines/data";
 import Link from "next/link";

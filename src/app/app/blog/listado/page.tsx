@@ -1,9 +1,9 @@
 import { BookOpenText, Eye, EyeOff, PenLine, Pin } from "lucide-react";
 import Link from "next/link";
 
-import { AppHeader, AppScreen, StatTile } from "@/components/app/AppScreen";
-import { BlogManager } from "@/components/app/blog-manager";
-import { Button } from "@/components/ui/button";
+import { AppHeader, AppScreen, StatTile } from "@/components/app/layouts/AppScreen";
+import { BlogManager } from "@/components/app/domains/blog/blog-manager";
+import { Button } from "@/components/ui/actions/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getAdminBlogPosts } from "@/lib/blog/admin-posts";
 

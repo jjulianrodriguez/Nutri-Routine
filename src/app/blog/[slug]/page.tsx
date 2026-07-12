@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { BlogContentRenderer } from "@/components/blog/BlogContentRenderer";
+import { BlogContentRenderer } from "@/components/app/domains/blog/BlogContentRenderer";
 import { getPostBySlug } from "@/lib/blog/posts";
 
 type BlogPostPageProps = {

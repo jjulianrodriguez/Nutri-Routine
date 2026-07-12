@@ -1,5 +1,5 @@
-import { AuthCard } from "@/components/auth/auth-card";
-import { LoginForm } from "@/components/auth/login-form";
+import { AuthCard } from "@/components/app/auth/auth-card";
+import { LoginForm } from "@/components/app/auth/login-form";
 import { getCurrentUser } from "@/lib/auth/session";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";

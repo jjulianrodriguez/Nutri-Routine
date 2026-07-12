@@ -13,10 +13,10 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
-} from "@/components/app/AppScreen";
-import { WorkoutTemplateSnapshotView } from "@/components/app/workout-template-snapshot-view";
-import { Button } from "@/components/ui/button";
+} from "@/components/app/layouts/AppScreen";
+import { EmptyState } from "@/components/ui/feedback/state-block";
+import { WorkoutTemplateSnapshotView } from "@/components/app/domains/training/workout-template-snapshot-view";
+import { Button } from "@/components/ui/actions/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getRoutineAssignmentDetail } from "@/lib/routines/data";
 import type {

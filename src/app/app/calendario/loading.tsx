@@ -1,11 +1,11 @@
-import { RouteLoadingFrame } from "@/components/app/route-loading-frame";
+import { RouteLoadingFrame } from "@/components/app/layouts/route-loading-frame";
 import {
  AppPanelSkeleton,
  PageHeaderSkeleton,
  SearchFilterSkeleton,
  Skeleton,
  StatTileSkeleton,
-} from "@/components/ui/skeleton";
+} from "@/components/ui/feedback/skeleton";
 
 function MonthGridSkeleton() {
  return (

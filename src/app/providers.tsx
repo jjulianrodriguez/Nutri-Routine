@@ -7,8 +7,8 @@ import {
 } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
-import { ThemeProvider } from "@/components/theme/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/app/shared/theme-provider";
+import { Toaster } from "@/components/ui/feedback/sonner";
 
 function makeQueryClient() {
  return new QueryClient({

@@ -1,9 +1,9 @@
 import { Eye, LibraryBig } from "lucide-react";
 import Link from "next/link";
 
-import { AppHeader, AppScreen } from "@/components/app/AppScreen";
-import { BlogManager } from "@/components/app/blog-manager";
-import { Button } from "@/components/ui/button";
+import { AppHeader, AppScreen } from "@/components/app/layouts/AppScreen";
+import { BlogManager } from "@/components/app/domains/blog/blog-manager";
+import { Button } from "@/components/ui/actions/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 
 export const dynamic = "force-dynamic";

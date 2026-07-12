@@ -9,25 +9,25 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { ClientAvatar } from "@/components/app/client-avatar";
-import { ClientCardActions } from "@/components/app/client-card-actions";
+import { ClientAvatar } from "@/components/app/domains/clients/client-avatar";
+import { ClientCardActions } from "@/components/app/domains/clients/client-card-actions";
 import {
  getAssignedRelationBadge,
  RelationshipBadge,
  type RelationshipBadgeTone,
-} from "@/components/app/relationship-badges";
+} from "@/components/app/shared/relationship-badges";
 import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
  StatTile,
-} from "@/components/app/AppScreen";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { SearchField } from "@/components/ui/search-field";
-import { Select } from "@/components/ui/select";
+} from "@/components/app/layouts/AppScreen";
+import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
+import { EmptyState } from "@/components/ui/feedback/state-block";
+import { Button } from "@/components/ui/actions/button";
+import { Label } from "@/components/ui/forms/label";
+import { SearchField } from "@/components/ui/forms/search-field";
+import { Select } from "@/components/ui/forms/select";
 import {
  listClientActivationData,
  type ClientAccountListItem,

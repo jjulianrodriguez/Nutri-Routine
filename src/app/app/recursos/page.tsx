@@ -2,11 +2,11 @@ import {
  AppHeader,
  AppScreen,
  StatTile,
-} from "@/components/app/AppScreen";
+} from "@/components/app/layouts/AppScreen";
 import Link from "next/link";
 
-import { ResourceManager } from "@/components/app/resource-manager";
-import { Button } from "@/components/ui/button";
+import { ResourceManager } from "@/components/app/domains/resources/resource-manager";
+import { Button } from "@/components/ui/actions/button";
 import { getManageableResourceAreas } from "@/lib/auth/access-rules";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getVisibleResourceLibrary } from "@/lib/resources/data";

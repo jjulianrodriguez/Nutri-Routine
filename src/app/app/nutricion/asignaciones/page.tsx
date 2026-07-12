@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation";
 import { UserRound } from "lucide-react";
 
-import { AppHeader, AppScreen } from "@/components/app/AppScreen";
-import { HabitTracker } from "@/components/app/habit-tracker";
-import { NutritionClientSelector } from "@/components/app/nutrition-client-selector";
+import { AppHeader, AppScreen } from "@/components/app/layouts/AppScreen";
+import { HabitTracker } from "@/components/app/domains/nutrition/habit-tracker";
+import { NutritionClientSelector } from "@/components/app/domains/nutrition/nutrition-client-selector";
 import {
  nutritionSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getNutritionHabitTrackerData } from "@/lib/habits/data";
 

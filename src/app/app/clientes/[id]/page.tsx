@@ -18,21 +18,21 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { ClientActivationForm } from "@/components/app/client-activation-form";
-import { ClientAvatar } from "@/components/app/client-avatar";
-import { HabitTracker } from "@/components/app/habit-tracker";
+import { ClientActivationForm } from "@/components/app/domains/clients/client-activation-form";
+import { ClientAvatar } from "@/components/app/domains/clients/client-avatar";
+import { HabitTracker } from "@/components/app/domains/nutrition/habit-tracker";
 import {
  AppPanel,
  AppScreen,
- EmptyState,
-} from "@/components/app/AppScreen";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+} from "@/components/app/layouts/AppScreen";
+import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
+import { EmptyState } from "@/components/ui/feedback/state-block";
+import { Button } from "@/components/ui/actions/button";
 import {
  getAssignedRelationBadge,
  getPlanBadgeLabel,
  RelationshipBadge,
-} from "@/components/app/relationship-badges";
+} from "@/components/app/shared/relationship-badges";
 import { listClientActivationData } from "@/lib/actions/client-activation";
 import { requireCurrentUserAccess } from "@/lib/auth/current-user-access";
 import {

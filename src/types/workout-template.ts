@@ -1,9 +1,11 @@
 import type {
  RoutineDetail,
- RoutineExerciseDetail,
- RoutineListItem,
 } from "@/types/routine";
 import type { WorkoutWeekday } from "@/lib/workout-templates/weekdays";
+export type {
+ WorkoutSnapshotRoutine,
+ WorkoutTemplateSnapshot,
+} from "@/types/workout-template-snapshot";
 
 export type WorkoutTemplateCompleteness = {
  assignedDayCount: number;
@@ -50,29 +52,3 @@ export type AssignableWorkoutTemplate = Pick<
  | "name"
 >;
 
-export type WorkoutSnapshotRoutine = Pick<
- RoutineListItem,
- | "category"
- | "description"
- | "difficulty"
- | "id"
- | "name"
- | "targetAudience"
-> & {
- exercises: RoutineExerciseDetail[];
-};
-
-export type WorkoutTemplateSnapshot = {
- days: {
- dayNumber: number;
- routine: WorkoutSnapshotRoutine;
- weekday: WorkoutWeekday | null;
- }[];
- template: {
- cycleDays: number;
- description: string | null;
- id: string;
- name: string;
- };
- version: number;
-};

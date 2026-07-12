@@ -1,110 +1,84 @@
 import type * as React from "react"
 
-export const primitiveVariants = [
- "default",
- "secondary",
- "outline",
- "ghost",
- "destructive",
- "link",
-] as const
+type PrimitiveVariant =
+ | "default"
+ | "destructive"
+ | "ghost"
+ | "link"
+ | "outline"
+ | "secondary"
 
-export const primitiveSizes = [
- "xs",
- "sm",
- "default",
- "lg",
- "icon",
- "icon-xs",
- "icon-sm",
- "icon-lg",
-] as const
+type PrimitiveSize =
+ | "default"
+ | "icon"
+ | "icon-lg"
+ | "icon-sm"
+ | "icon-xs"
+ | "lg"
+ | "sm"
+ | "xs"
 
-export const primitiveTones = [
- "default",
- "muted",
- "primary",
- "secondary",
- "success",
- "warning",
- "danger",
- "notice",
-] as const
+type PrimitiveTone =
+ | "danger"
+ | "default"
+ | "notice"
+ | "success"
+ | "warning"
 
-export const primitiveStates = [
- "idle",
- "hover",
- "focus",
- "active",
- "disabled",
- "loading",
- "invalid",
- "selected",
- "expanded",
-] as const
-
-export type PrimitiveVariant = (typeof primitiveVariants)[number]
-export type PrimitiveSize = (typeof primitiveSizes)[number]
-export type PrimitiveTone = (typeof primitiveTones)[number]
-export type PrimitiveState = (typeof primitiveStates)[number]
-
-export type ClassNameProp = {
- className?: string
+type PrimitiveDataAttributes = {
+ "data-disabled"?: boolean | "true"
+ "data-invalid"?: boolean | "true"
+ "data-loading"?: boolean | "true"
+ "data-selected"?: boolean | "true"
 }
 
-export type AsChildProp = {
- asChild?: boolean
-}
-
-export type PrimitiveStateProps = {
+type PrimitiveStateProps = {
  disabled?: boolean
  invalid?: boolean
  loading?: boolean
  selected?: boolean
- expanded?: boolean
 }
 
-export type PrimitiveComponentProps<
- TElement extends React.ElementType,
- TOwnProps extends object = object,
-> = TOwnProps &
- Omit<React.ComponentPropsWithoutRef<TElement>, keyof TOwnProps>
-
-export type PrimitiveDataAttributes = {
- "data-slot"?: string
- "data-variant"?: string
- "data-size"?: string
- "data-tone"?: string
- "data-state"?: string
+type AsChildProp = {
+ asChild?: boolean
 }
 
-export function getPrimitiveStateAttributes({
+type ClassNameProp = {
+ className?: string
+}
+
+type PrimitiveComponentProps<TElement extends React.ElementType> =
+ React.ComponentPropsWithoutRef<TElement> & ClassNameProp
+
+function getPrimitiveStateAttributes({
  disabled,
- expanded,
  invalid,
  loading,
  selected,
-}: PrimitiveStateProps): {
+}: PrimitiveStateProps): PrimitiveDataAttributes & {
  "aria-busy"?: true
  "aria-disabled"?: true
- "aria-expanded"?: boolean
  "aria-invalid"?: true
- "aria-selected"?: true
- "data-disabled"?: true
- "data-invalid"?: true
- "data-loading"?: true
- "data-selected"?: true
 } {
  return {
   "aria-busy": loading || undefined,
   "aria-disabled": disabled || undefined,
-  "aria-expanded": expanded,
   "aria-invalid": invalid || undefined,
-  "aria-selected": selected || undefined,
-  "data-disabled": disabled || undefined,
-  "data-invalid": invalid || undefined,
-  "data-loading": loading || undefined,
-  "data-selected": selected || undefined,
+  "data-disabled": disabled ? "true" : undefined,
+  "data-invalid": invalid ? "true" : undefined,
+  "data-loading": loading ? "true" : undefined,
+  "data-selected": selected ? "true" : undefined,
  }
 }
 
+export {
+ getPrimitiveStateAttributes,
+ type AsChildProp,
+ type ClassNameProp,
+ type PrimitiveComponentProps,
+ type PrimitiveDataAttributes,
+ type PrimitiveSize,
+ type PrimitiveStateProps,
+ type PrimitiveTone,
+ type PrimitiveVariant,
+}

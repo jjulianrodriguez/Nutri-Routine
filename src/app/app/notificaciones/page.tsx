@@ -3,8 +3,8 @@ import {
  AppPanel,
  AppScreen,
  StatTile,
-} from "@/components/app/AppScreen";
-import { NotificationCenter } from "@/components/app/notification-center";
+} from "@/components/app/layouts/AppScreen";
+import { NotificationCenter } from "@/components/app/domains/messaging/notification-center";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getNotifications } from "@/lib/notifications/data";
 

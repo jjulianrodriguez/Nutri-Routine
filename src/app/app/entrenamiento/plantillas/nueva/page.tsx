@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 
-import { AppHeader, AppScreen } from "@/components/app/AppScreen";
+import { AppHeader, AppScreen } from "@/components/app/layouts/AppScreen";
 import {
  trainingSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
-import { WorkoutTemplateEditor } from "@/components/app/workout-template-editor";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
+import { WorkoutTemplateEditor } from "@/components/app/domains/training/workout-template-editor";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getRoutineManagementOverview } from "@/lib/routines/data";
 

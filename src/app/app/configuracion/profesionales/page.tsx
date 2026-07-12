@@ -11,11 +11,11 @@ import {
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { AppHeader, AppPanel, AppScreen } from "@/components/app/AppScreen";
-import { ProfessionalAccountForm } from "@/components/app/professional-account-form";
-import { FadeIn } from "@/components/motion/fade-in";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { AppHeader, AppPanel, AppScreen } from "@/components/app/layouts/AppScreen";
+import { ProfessionalAccountForm } from "@/components/app/domains/settings/professional-account-form";
+import { FadeIn } from "@/components/ui/utilities/fade-in";
+import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
+import { Button } from "@/components/ui/actions/button";
 import { listProfessionalAccounts } from "@/lib/actions/professional-accounts";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import type { ProfessionalSpecialty } from "@/lib/validations/professional-accounts";

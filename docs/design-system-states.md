@@ -1,14 +1,18 @@
 # Design System States
 
-This document records the official state primitive phase. The phase is additive only: no app module, route, fetch path, server action, layout, database table, policy, or existing local state implementation was migrated or removed.
+This document records the official state primitive phase. The current phase publishes the official state components and migrates only compatible UI composition. No route fetch path, server action, database table, policy, permission rule, or business logic was changed.
 
 ## File Tree Created Or Updated
 
+- `src/components/ui/feedback/state-block.tsx`
+  - Official state composition primitive and semantic wrappers.
 - `src/components/ui/state-block.tsx`
-  - New official state composition primitive and semantic wrappers.
-- `src/components/ui/skeleton.tsx`
+  - Compatibility re-export for the official state primitives.
+- `src/components/ui/feedback/skeleton.tsx`
   - Existing skeleton compatibility exports preserved.
-  - Added `SkeletonBlock`, `ListSkeleton`, `CardSkeleton`, `GridSkeleton`, and `PageSkeleton`.
+  - Publishes `SkeletonBlock`, `ListSkeleton`, `CardSkeleton`, `GridSkeleton`, and `PageSkeleton`.
+- `src/components/ui/skeleton.tsx`
+  - Compatibility re-export for the official skeleton primitives.
 - `docs/design-system-states.md`
   - This phase contract and API reference.
 
@@ -57,7 +61,7 @@ Supported variants:
 - `no-permission`
 - `offline`
 
-It defaults to `variant="empty"` and generic title copy. Callers should pass domain-specific `title`, `description`, and `actions` when the empty state explains a real workflow.
+It defaults to `variant="empty"`. Children-only calls render a compact compatible block; callers should pass domain-specific `title`, `description`, and `actions` when the empty state explains a real workflow.
 
 ### `ErrorState`
 
@@ -152,10 +156,18 @@ Existing compatibility skeletons remain exported:
 - `Skeleton` reuses `SkeletonBlock`.
 - `ListSkeleton`, `GridSkeleton`, and `PageSkeleton` reuse existing skeleton building blocks where compatible.
 
+## Compatible Migrations Completed
+
+- Removed the local `EmptyState` export from `AppScreen`; compatible consumers now import the official `EmptyState`.
+- Removed `ProgressEmptyState`; progress empty states now use `EmptyState`.
+- Removed the local progress `BlockError`; compatible progress alerts now use compact `ErrorState`.
+- Removed `TrainingLoadingState`; training `loading.tsx` files now compose official skeleton primitives directly.
+- Removed `ChatLoadingState`; the chat loading surface now composes `SkeletonBlock` directly.
+
 ## Design Decisions
 
 - The new primitives live in `src/components/ui` because they are low-level Design System infrastructure with no domain knowledge.
-- Local app states were intentionally not migrated in this phase to avoid behavior changes and broad review risk.
+- Only compatible local app states were migrated in this phase to avoid behavior changes and broad review risk.
 - State variants are semantic, not visual. Callers choose `no-permission` or `offline` instead of a color name.
 - Actions are slots instead of boolean props so callers can compose links, buttons, or recovery blocks without the primitive knowing routing or mutations.
 - Skeleton dimensions stay explicit through `className` to keep layout ownership near the consuming layout.

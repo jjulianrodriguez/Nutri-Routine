@@ -13,17 +13,17 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- EmptyState,
-} from "@/components/app/AppScreen";
-import { DeleteRoutineButton } from "@/components/app/delete-routine-button";
-import { GroupedRoutineExercises } from "@/components/app/grouped-routine-exercises";
+} from "@/components/app/layouts/AppScreen";
+import { EmptyState } from "@/components/ui/feedback/state-block";
+import { DeleteRoutineButton } from "@/components/app/domains/training/delete-routine-button";
+import { GroupedRoutineExercises } from "@/components/app/domains/training/grouped-routine-exercises";
 import {
  trainingSectionTabs,
-} from "@/components/app/section-tab-presets";
-import { SectionTabs } from "@/components/app/section-tabs";
-import { WorkoutExerciseCard } from "@/components/app/workout-exercise-card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+} from "@/components/app/shared/section-tab-presets";
+import { SectionTabs } from "@/components/app/shared/section-tabs";
+import { WorkoutExerciseCard } from "@/components/app/domains/training/workout-exercise-card";
+import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
+import { Button } from "@/components/ui/actions/button";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getRoutineDetail } from "@/lib/routines/data";
 import type { RoutineDifficulty } from "@/types/routine";
