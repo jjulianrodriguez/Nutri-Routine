@@ -5,19 +5,18 @@ import {
 } from "@/components/app/layouts/AppScreen";
 import Link from "next/link";
 
-import { ResourceManager } from "@/components/app/domains/resources/resource-manager";
+import {
+ ResourceManager,
+ type ResourceContentFilter,
+ type ResourceFilter,
+ type ResourceStatusFilter,
+} from "@/components/app/domains/resources";
 import { Button } from "@/components/ui/actions/button";
 import { getManageableResourceAreas } from "@/lib/auth/access-rules";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
 import { getVisibleResourceLibrary } from "@/lib/resources/data";
-import type { Enums } from "@/types/database";
 
 export const dynamic = "force-dynamic";
-
-type ResourceArea = Enums<"service_area">;
-type ResourceFilter = ResourceArea | "all";
-type ResourceContentFilter = "all" | "folders" | "links" | "pdf";
-type ResourceStatusFilter = "active" | "all" | "inactive";
 
 function normalizeFilter(value?: string): ResourceFilter {
  if (

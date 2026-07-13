@@ -83,7 +83,7 @@ export function Footer() {
  href={whatsappHref}
  target="_blank"
  rel="noopener noreferrer"
- className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ln-clay)] px-5 py-2.5 text-sm font-black text-[var(--ln-paper)] shadow-[0_20px_58px_-36px_rgb(var(--raspberry-rgb)_/_0.34)]"
+ className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ln-clay)] px-5 py-2.5 text-sm font-black !text-[var(--ln-paper)] shadow-[0_20px_58px_-36px_rgb(var(--raspberry-rgb)_/_0.34)]"
  >
  <MessageCircle className="size-4" />
  WhatsApp

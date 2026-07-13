@@ -1,6 +1,7 @@
 import { UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/actions/button";
+import { Input } from "@/components/ui/forms/input";
 import { Select } from "@/components/ui/forms/select";
 import type { ProgressClientOption } from "@/lib/progress/data";
 
@@ -19,7 +20,7 @@ export function ProgressClientSelector({
  action="/app/progreso"
  className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end"
  >
- <input name="tab" type="hidden" value="resumen" />
+ <Input name="tab" type="hidden" value="resumen" />
  <Select
  label="Selecciona un cliente para ver su progreso"
  labelClassName="text-sm font-bold"

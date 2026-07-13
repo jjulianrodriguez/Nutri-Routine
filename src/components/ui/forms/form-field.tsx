@@ -40,6 +40,7 @@ const formFieldVariants = defineVariants("grid gap-2", {
 
 type FormFieldProps = Omit<React.ComponentPropsWithoutRef<"div">, "children"> &
  VariantPropsOf<typeof formFieldVariants> & {
+  autoControl?: boolean
   children?: React.ReactNode
   controlId?: string
   error?: React.ReactNode
@@ -55,6 +56,7 @@ type FormFieldProps = Omit<React.ComponentPropsWithoutRef<"div">, "children"> &
  }
 
 function FormField({
+ autoControl = true,
  children,
  className,
  controlId,
@@ -97,7 +99,9 @@ function FormField({
       {label}
      </FieldLabel>
     ) : null}
-    {React.isValidElement<ControlChildProps>(children) ? (
+    {autoControl &&
+    React.isValidElement<ControlChildProps>(children) &&
+    children.type !== FormControl ? (
      <FormControl>{children}</FormControl>
     ) : (
      children
@@ -404,4 +408,12 @@ export {
  FormControl,
  FormField,
  RequiredIndicator,
+ type FieldErrorProps,
+ type FieldGroupProps,
+ type FieldHintProps,
+ type FieldLabelProps,
+ type FormAlertProps,
+ type FormControlProps,
+ type FormFieldProps,
+ type RequiredIndicatorProps,
 }

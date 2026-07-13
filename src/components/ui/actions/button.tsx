@@ -3,6 +3,7 @@ export {
  Button,
  LinkButton,
  buttonVariants,
+ type ActionButtonProps,
  type ButtonProps,
  type LinkButtonProps,
 } from "@/components/ui/actions/button-core"

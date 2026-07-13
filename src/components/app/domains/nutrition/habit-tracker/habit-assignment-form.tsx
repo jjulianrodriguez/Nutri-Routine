@@ -3,8 +3,8 @@
 import { Check, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/actions/button";
+import { FieldGroup, FormField } from "@/components/ui/forms/form-field";
 import { Input } from "@/components/ui/forms/input";
-import { Label } from "@/components/ui/forms/label";
 import { Select } from "@/components/ui/forms/select";
 import type {
  HabitClientOption,
@@ -54,10 +54,9 @@ export function HabitAssignmentForm({
  La clienta verá este hábito solo durante la vigencia y en los días que selecciones.
  </p>
  <div className="mt-4 space-y-4">
- <div>
- <Label htmlFor="habit-client">Clienta</Label>
  <Select
  id="habit-client"
+ label="Clienta"
  value={clientId}
  onChange={(event) => onClientChange(event.target.value)}
  >
@@ -67,12 +66,10 @@ export function HabitAssignmentForm({
  </option>
  ))}
  </Select>
- </div>
 
- <div>
- <Label htmlFor="habit-select">Hábito</Label>
  <Select
  id="habit-select"
+ label="Hábito"
  value={habitId}
  onChange={(event) => onHabitChange(event.target.value)}
  >
@@ -85,16 +82,16 @@ export function HabitAssignmentForm({
  </option>
  ))}
  </Select>
- </div>
 
- <div>
- <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
- <p className="text-sm font-bold text-foreground">Días aplicables</p>
- </div>
+ <FieldGroup
+ description="Estos son los días en que la clienta podrá marcar el hábito."
+ descriptionClassName="text-xs font-semibold leading-5"
+ legend="Días aplicables"
+ >
  <div
  role="group"
  aria-label="Días aplicables del hábito"
- className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5 lg:grid-cols-4 2xl:grid-cols-7"
+ className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5 lg:grid-cols-4 2xl:grid-cols-7"
  >
  {weekdayOptions.map((day) => {
  const selected = daysOfWeek.includes(day.value);
@@ -126,32 +123,23 @@ export function HabitAssignmentForm({
  );
  })}
  </div>
- <p className="mt-2 text-xs font-semibold leading-5 text-muted">
- Estos son los días en que la clienta podrá marcar el hábito.
- </p>
- </div>
+ </FieldGroup>
 
  <div className="grid items-start gap-3 sm:grid-cols-2">
- <div>
- <Label htmlFor="habit-start">Inicio</Label>
+ <FormField controlId="habit-start" label="Inicio">
  <Input
- id="habit-start"
  type="date"
  value={startDate}
  onChange={(event) => onStartDateChange(event.target.value)}
- className="mt-2"
  />
- </div>
- <div>
- <Label htmlFor="habit-end">Fin opcional</Label>
+ </FormField>
+ <FormField controlId="habit-end" label="Fin opcional">
  <Input
- id="habit-end"
  type="date"
  value={endDate}
  onChange={(event) => onEndDateChange(event.target.value)}
- className="mt-2"
  />
- </div>
+ </FormField>
  </div>
 
  <Button

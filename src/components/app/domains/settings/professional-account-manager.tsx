@@ -125,7 +125,7 @@ export function ProfessionalAccountManager({
  description="El email se conserva como dato de acceso y no se modifica desde esta pantalla."
  >
  <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
- <input type="hidden" {...register("professionalId")} />
+ <Input type="hidden" {...register("professionalId")} />
 
  <div className="grid gap-5 sm:grid-cols-2">
  <FormField

@@ -12,7 +12,6 @@ export type AppRouteKind =
  | "clients"
  | "nutrition"
  | "notifications"
- | "pending"
  | "professionalAccounts"
  | "training"
  | "resources"
@@ -30,7 +29,6 @@ export type AppNavIcon =
  | "training"
  | "resources"
  | "calendar"
- | "pending"
  | "settings";
 
 export type AppNavigationItem = {
@@ -94,7 +92,6 @@ const ROUTE_PATHS: Record<AppRouteKind, string> = {
  dashboard: "/app/dashboard",
  nutrition: "/app/nutricion",
  notifications: "/app/notificaciones",
- pending: "/app/pending",
  profile: "/app/perfil",
  professionalAccounts: "/app/configuracion/profesionales",
  progress: "/app/progreso",
@@ -107,7 +104,6 @@ const ROUTE_ALIASES: Partial<Record<AppRouteKind, string[]>> = {
  calendar: ["/app/calendar"],
  clients: ["/app/clients"],
  nutrition: ["/app/nutrition", "/app/dietas"],
- pending: ["/app/account-pending"],
  profile: ["/app/profile"],
  progress: ["/app/progress"],
  resources: ["/app/resources"],
@@ -333,8 +329,6 @@ export function canAccessRoute(
  return true;
  case "blog":
  return access.canManageBlogPosts;
- case "pending":
- return access.canAccessOnlyBasicSettings;
  case "profile":
  return access.isClient || access.isProfessional || access.isAdmin;
  case "progress":

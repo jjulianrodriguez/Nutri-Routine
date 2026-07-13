@@ -912,42 +912,6 @@ html[data-reduced-motion="true"] *::after {
   }
 }
 
-@layer utilities {
-  .nce-glass {
-    border: 1px solid var(--border-soft);
-    background-color: var(--surface-glass);
-    box-shadow: var(--shadow-card);
-  }
-
-  .nce-raise {
-    box-shadow: var(--shadow-soft);
-    transform: translateZ(0);
-  }
-
-  .nce-grain {
-    position: relative;
-  }
-
-  .nce-grain::before {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    content: "";
-    opacity: 0;
-  }
-
-  .nce-text-outline {
-    color: transparent;
-    -webkit-text-stroke: 1px rgb(var(--foreground-rgb) / 0.28);
-    text-stroke: 1px rgb(var(--foreground-rgb) / 0.28);
-  }
-
-  .nce-vertical {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-  }
-}
-
 :where([data-slot="card"], .cn-toast) {
   background-color: var(--surface);
   color: var(--foreground);
@@ -1329,17 +1293,6 @@ textarea:not([data-no-form-style]):is(:focus, :focus-visible, :focus-within) {
     transform var(--duration-fast) var(--ease-premium);
 }
 
-.primary-action-button {
-  background-color: var(--primary);
-  color: #ffffff;
-  transition:
-    background-color var(--duration-base) var(--ease-premium),
-    border-color var(--duration-base) var(--ease-premium),
-    box-shadow var(--duration-base) var(--ease-premium),
-    color var(--duration-base) var(--ease-premium),
-    transform var(--duration-fast) var(--ease-premium);
-}
-
 [data-slot="button"][data-variant="default"] {
   border-radius: var(--radius-control);
   background-color: var(--primary);
@@ -1348,8 +1301,7 @@ textarea:not([data-no-form-style]):is(:focus, :focus-visible, :focus-within) {
 
 [data-slot="button"][data-variant="default"]:not([data-size^="icon"]):not(
     :disabled
-  ):not([aria-disabled="true"]),
-.primary-action-button:not(:disabled):not([aria-disabled="true"]) {
+  ):not([aria-disabled="true"]) {
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-primary-action);
   transform: none;
@@ -1363,8 +1315,7 @@ textarea:not([data-no-form-style]):is(:focus, :focus-visible, :focus-within) {
 
 [data-slot="button"][data-variant="default"]:not([data-size^="icon"]):not(
     :disabled
-  ):not([aria-disabled="true"]):hover,
-.primary-action-button:not(:disabled):not([aria-disabled="true"]):hover {
+  ):not([aria-disabled="true"]):hover {
   background-color: var(--primary);
   box-shadow: var(--shadow-primary-action-hover);
   color: #ffffff;
@@ -1373,8 +1324,7 @@ textarea:not([data-no-form-style]):is(:focus, :focus-visible, :focus-within) {
 
 [data-slot="button"][data-variant="default"]:not([data-size^="icon"]):not(
     :disabled
-  ):not([aria-disabled="true"]):active,
-.primary-action-button:not(:disabled):not([aria-disabled="true"]):active {
+  ):not([aria-disabled="true"]):active {
   box-shadow: var(--shadow-primary-action-active);
   transform: none;
 }
@@ -1467,14 +1417,6 @@ tbody th {
     background-color: var(--primary);
     content: "";
     animation: nce-fade-in-up 180ms var(--ease-premium) forwards;
-  }
-
-  .nce-fade-in-up {
-    animation: nce-fade-in-up 260ms var(--ease-premium) forwards;
-  }
-
-  .nce-scale-in {
-    animation: nce-scale-in 220ms var(--ease-premium) forwards;
   }
 
   [role="dialog"][data-state="open"],

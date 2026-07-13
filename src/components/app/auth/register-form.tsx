@@ -110,10 +110,10 @@ export function RegisterForm() {
  controlId="accessCode"
  error={errors.accessCode?.message}
  errorId="register-access-code-error"
- hint="CÃ³digo privado entregado por tu profesional."
+ hint="Código privado entregado por tu profesional."
  hintClassName="font-semibold text-muted-foreground"
  hintId="register-access-code-help"
- label="CÃ³digo de acceso"
+ label="Código de acceso"
  labelClassName="text-sm font-bold"
  >
  <Input

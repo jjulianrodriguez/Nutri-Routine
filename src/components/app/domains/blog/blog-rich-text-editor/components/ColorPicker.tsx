@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Highlighter, Palette, X } from "lucide-react";
 
+import { Input } from "@/components/ui/forms/input";
 import { cn } from "@/lib/utils";
 
 import { ToolbarPopover } from "./ToolbarPopover";
@@ -129,7 +130,7 @@ export function ColorPicker({
  </p>
  <div className="flex items-center gap-2">
  <label className="relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[8px] bg-background transition-colors hover:bg-surface-hover">
- <input
+ <Input
  type="color"
  value={
  value && value !== "default" && value.startsWith("#")
@@ -149,7 +150,7 @@ export function ColorPicker({
  }}
  />
  </label>
- <input
+ <Input
  type="text"
  placeholder="#HEX"
  defaultValue={hexInputValue}
@@ -163,7 +164,8 @@ export function ColorPicker({
  onChange(nextValue);
  }
  }}
- className="h-8 w-full rounded-[8px] bg-background px-2 text-xs font-bold uppercase text-foreground outline-none focus:border-primary/40 focus:ring-1 focus:ring-ring"
+ className="h-8 w-full rounded-[8px] bg-background px-2 text-xs font-bold uppercase"
+ size="sm"
  />
  </div>
  </div>

@@ -103,7 +103,6 @@ function nullableNumber(value: string) {
 }
 
 function revalidateAccountPaths() {
- revalidatePath("/app/pending");
  revalidatePath("/app/configuracion");
  revalidatePath("/app/perfil");
  revalidatePath("/app", "layout");

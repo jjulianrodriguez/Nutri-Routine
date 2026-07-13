@@ -121,7 +121,7 @@ export function Navbar() {
  rel="noopener noreferrer"
  whileHover={reduceMotion ? undefined : { y: -1 }}
  whileTap={reduceMotion ? undefined : { scale: 0.99 }}
- className="hidden min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ln-clay)] px-5 py-2.5 text-xs font-black uppercase tracking-[0.13em] text-[var(--ln-paper)] shadow-[0_14px_36px_-30px_rgb(var(--raspberry-rgb)_/_0.34)] transition-colors duration-200 hover:bg-[var(--ln-clay-hover)] lg:inline-flex"
+ className="hidden min-h-11 items-center justify-center gap-2 rounded-full bg-[var(--ln-clay)] px-5 py-2.5 text-xs font-black uppercase tracking-[0.13em] !text-[var(--ln-paper)] shadow-[0_14px_36px_-30px_rgb(var(--raspberry-rgb)_/_0.34)] transition-colors duration-200 hover:bg-[var(--ln-clay-hover)] lg:inline-flex"
  >
  <MessageCircle className="size-4" />
  Agendar
@@ -130,7 +130,7 @@ export function Navbar() {
  <button
  type="button"
  onClick={() => setMenuOpen((value) => !value)}
- className="inline-flex size-12 items-center justify-center rounded-[1.2rem] bg-[var(--ln-clay)] text-[var(--ln-paper)] shadow-[0_14px_36px_-30px_rgb(var(--raspberry-rgb)_/_0.34)] transition-colors duration-200 hover:bg-[var(--ln-clay-hover)] lg:hidden"
+ className="inline-flex size-12 items-center justify-center rounded-[1.2rem] bg-[var(--ln-clay)] !text-[var(--ln-paper)] shadow-[0_14px_36px_-30px_rgb(var(--raspberry-rgb)_/_0.34)] transition-colors duration-200 hover:bg-[var(--ln-clay-hover)] lg:hidden"
  aria-expanded={menuOpen}
  aria-controls="landing-mobile-menu"
  aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
@@ -182,7 +182,7 @@ export function Navbar() {
  target="_blank"
  rel="noopener noreferrer"
  onClick={() => setMenuOpen(false)}
- className="mt-4 flex min-h-12 items-center justify-center gap-2 rounded-full bg-[var(--ln-clay)] px-5 py-3.5 text-sm font-black text-[var(--ln-paper)] shadow-[0_14px_36px_-30px_rgb(var(--raspberry-rgb)_/_0.34)] transition-colors duration-200 hover:bg-[var(--ln-clay-hover)]"
+ className="mt-4 flex min-h-12 items-center justify-center gap-2 rounded-full bg-[var(--ln-clay)] px-5 py-3.5 text-sm font-black !text-[var(--ln-paper)] shadow-[0_14px_36px_-30px_rgb(var(--raspberry-rgb)_/_0.34)] transition-colors duration-200 hover:bg-[var(--ln-clay-hover)]"
  >
  Agendar consulta
  <ArrowUpRight className="size-4" />

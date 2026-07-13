@@ -4,9 +4,16 @@ import type { LucideIcon } from "lucide-react";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";
-import { DropdownMenu } from "radix-ui";
 
 import { IconButton } from "@/components/ui/actions/button";
+import {
+ AppDropdownMenu,
+ AppDropdownMenuContent,
+ AppDropdownMenuItem,
+ AppDropdownMenuPortal,
+ AppDropdownMenuSeparator,
+ AppDropdownMenuTrigger,
+} from "@/components/ui/overlays/app-dropdown-menu";
 import { cn } from "@/lib/utils";
 
 type CardActionItem = {
@@ -34,8 +41,8 @@ export function CardActionsMenu({ items, label }: CardActionsMenuProps) {
  }
 
  return (
- <DropdownMenu.Root modal={false}>
- <DropdownMenu.Trigger asChild>
+ <AppDropdownMenu modal={false}>
+ <AppDropdownMenuTrigger asChild>
  <IconButton
  type="button"
  variant="outline"
@@ -44,10 +51,10 @@ export function CardActionsMenu({ items, label }: CardActionsMenuProps) {
  >
  <MoreHorizontal className="size-5" aria-hidden="true" />
  </IconButton>
- </DropdownMenu.Trigger>
+ </AppDropdownMenuTrigger>
 
- <DropdownMenu.Portal>
- <DropdownMenu.Content
+ <AppDropdownMenuPortal>
+ <AppDropdownMenuContent
  data-slot="card-actions-menu"
  align="end"
  sideOffset={8}
@@ -66,11 +73,11 @@ export function CardActionsMenu({ items, label }: CardActionsMenuProps) {
  return (
  <Fragment key={item.label}>
  {item.separatorBefore ? (
- <DropdownMenu.Separator className="my-1 h-px bg-border" />
+ <AppDropdownMenuSeparator className="my-1 h-px bg-border" />
  ) : null}
 
  {item.href ? (
- <DropdownMenu.Item
+ <AppDropdownMenuItem
  asChild
  disabled={item.disabled}
  className={cn(
@@ -90,9 +97,9 @@ export function CardActionsMenu({ items, label }: CardActionsMenuProps) {
  ) : (
  <Link href={item.href}>{content}</Link>
  )}
- </DropdownMenu.Item>
+ </AppDropdownMenuItem>
  ) : (
- <DropdownMenu.Item
+ <AppDropdownMenuItem
  disabled={item.disabled}
  onSelect={item.onSelect}
  className={cn(
@@ -102,13 +109,13 @@ export function CardActionsMenu({ items, label }: CardActionsMenuProps) {
  )}
  >
  {content}
- </DropdownMenu.Item>
+ </AppDropdownMenuItem>
  )}
  </Fragment>
  );
  })}
- </DropdownMenu.Content>
- </DropdownMenu.Portal>
- </DropdownMenu.Root>
+ </AppDropdownMenuContent>
+ </AppDropdownMenuPortal>
+ </AppDropdownMenu>
  );
 }

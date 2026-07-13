@@ -262,6 +262,7 @@ export {
  Button,
  LinkButton,
  buttonVariants,
+ type ActionButtonProps,
  type ButtonProps,
  type LinkButtonProps,
 }

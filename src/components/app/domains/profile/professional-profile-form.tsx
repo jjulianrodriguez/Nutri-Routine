@@ -4,10 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, CheckCircle2, Loader2, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/actions/button";
+import { Checkbox } from "@/components/ui/forms/checkbox";
 import { FieldGroup, FormAlert, FormField } from "@/components/ui/forms/form-field";
 import { Input } from "@/components/ui/forms/input";
 import { Textarea } from "@/components/ui/forms/textarea";
@@ -36,6 +37,7 @@ export function ProfessionalProfileForm({
  const [successMessage, setSuccessMessage] = useState("");
  const {
  clearErrors,
+ control,
  formState: { errors, isDirty, isSubmitting },
  handleSubmit,
  register,
@@ -184,22 +186,36 @@ export function ProfessionalProfileForm({
  errorId="professional-focus-areas-error"
  legend="Areas de enfoque"
  >
+ <Controller
+ control={control}
+ name="focusAreas"
+ render={({ field }) => (
  <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
- {focusAreaOptions.map((option) => (
+ {focusAreaOptions.map((option) => {
+ const checked = field.value.includes(option.value);
+
+ return (
  <label
  key={option.value}
- className="flex min-h-11 items-center gap-3 rounded-[16px] bg-background px-3 py-2 text-sm font-bold text-muted-foreground "
+ className="flex min-h-11 cursor-pointer items-center gap-3 rounded-[16px] bg-background px-3 py-2 text-sm font-bold text-muted-foreground"
  >
- <input
- type="checkbox"
- value={option.value}
- className="size-4 accent-[rgb(var(--primary-rgb))]"
- {...register("focusAreas")}
+ <Checkbox
+ checked={checked}
+ onCheckedChange={(nextChecked) => {
+ field.onChange(
+ nextChecked === true
+ ? [...field.value, option.value]
+ : field.value.filter((value) => value !== option.value),
+ );
+ }}
  />
  <span>{option.label}</span>
  </label>
- ))}
+ );
+ })}
  </div>
+ )}
+ />
  </FieldGroup>
  </section>
 

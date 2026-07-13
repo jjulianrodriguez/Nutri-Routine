@@ -17,7 +17,7 @@ import {
  RelationshipBadge,
 } from "@/components/app/shared/relationship-badges";
 import { Button } from "@/components/ui/actions/button";
-import { Label } from "@/components/ui/forms/label";
+import { FormField } from "@/components/ui/forms/form-field";
 import { SearchField } from "@/components/ui/forms/search-field";
 import { cn } from "@/lib/utils";
 import type { ExerciseOption } from "@/types/exercise";
@@ -74,31 +74,26 @@ export function AssignmentEntitySelector({
  error ? "border-danger/35" : "border-foreground/10",
  )}
  >
- <Label htmlFor={id} className="font-extrabold text-foreground">
- {label}
- </Label>
- <p
- className="mt-1 text-xs font-semibold text-muted"
- aria-live="polite"
- >
+ <FormField
+ controlId={id}
+ error={error}
+ errorId={`${id}-error`}
+ hint={
+ <span aria-live="polite">
  Mostrando {visibleCount} de {resultCount} resultados
  {resultCount !== totalCount ? ` (${totalCount} disponibles)` : ""}
- </p>
-
+ </span>
+ }
+ hintClassName="text-xs font-semibold"
+ label={label}
+ >
  <SearchField
- id={id}
  value={query}
  onValueChange={onQueryChange}
- containerClassName="mt-3"
  placeholder={searchPlaceholder}
  autoComplete="off"
  />
-
- {error ? (
- <p className="mt-2 text-sm font-semibold text-danger" role="alert">
- {error}
- </p>
- ) : null}
+ </FormField>
 
  <div
  className="mt-4 max-h-[32rem] space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain pr-1"

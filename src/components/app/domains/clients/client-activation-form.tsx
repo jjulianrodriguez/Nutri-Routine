@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
 import { Button } from "@/components/ui/actions/button";
 import { ConfirmationDialog } from "@/components/ui/overlays/confirmation-dialog";
+import { FormAlert } from "@/components/ui/forms/form-field";
 import { Select } from "@/components/ui/forms/select";
 import {
  getAssignedRelationBadge,
@@ -454,16 +455,7 @@ export function ClientActivationForm({
  ) : null}
  </div>
 
- {serverMessage ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage} />
 
  <ConfirmationDialog
  open={Boolean(confirmAction)}
@@ -574,16 +566,7 @@ export function ClientActivationForm({
  </Alert>
  )}
 
- {serverMessage ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {serverMessage}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage} />
 
  <Button
  type="button"

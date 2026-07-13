@@ -6,6 +6,8 @@ import { LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/actions/button";
+import { FormField } from "@/components/ui/forms/form-field";
+import { Input } from "@/components/ui/forms/input";
 
 import { normalizeEditorUrl } from "../utils";
 import { ToolbarButton } from "./ToolbarButton";
@@ -63,10 +65,12 @@ export function LinkPopover({
  width={280}
  className="p-3"
  >
- <label className="text-[10px] font-extrabold uppercase tracking-wider text-muted">
- URL del enlace
- </label>
- <input
+ <FormField
+ controlId="editor-link-url"
+ label="URL del enlace"
+ labelClassName="text-[10px] uppercase tracking-wider text-muted"
+ >
+ <Input
  type="url"
  value={hrefValue}
  onChange={(event) => setHrefValue(event.target.value)}
@@ -77,8 +81,10 @@ export function LinkPopover({
  }
  }}
  placeholder="https://..."
- className="mt-2 h-10 w-full rounded-[10px] bg-background px-3 text-sm font-semibold text-foreground outline-none focus:border-primary/40 focus:ring-2 focus:ring-ring/20"
+ className="h-10 rounded-[10px] bg-background px-3 font-semibold"
+ size="sm"
  />
+ </FormField>
  <div className="mt-3 flex items-center justify-end gap-2">
  <Button
  type="button"

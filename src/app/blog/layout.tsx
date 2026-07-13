@@ -5,7 +5,7 @@ import { BlogFooter } from "@/components/app/domains/blog/BlogFooter";
 import { BlogNavbar } from "@/components/app/domains/blog/BlogNavbar";
 
 export const metadata: Metadata = {
- title: "Blog · Nutrición Con Enfoque",
+ title: "Blog",
  description:
  "Artículos sobre nutrición funcional, entrenamiento, salud hormonal y bienestar.",
 };

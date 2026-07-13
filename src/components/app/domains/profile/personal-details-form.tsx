@@ -253,6 +253,7 @@ export function PersonalDetailsForm({
  ) : null}
 
  <FormField
+ autoControl={false}
  controlId="personalWeight"
  error={errors.weightKg?.message}
  errorId="personal-weight-error"
@@ -278,6 +279,7 @@ export function PersonalDetailsForm({
  </FormField>
 
  <FormField
+ autoControl={false}
  controlId="personalHeight"
  error={errors.heightCm?.message}
  errorId="personal-height-error"
@@ -303,6 +305,7 @@ export function PersonalDetailsForm({
  </FormField>
 
  <FormField
+ autoControl={false}
  controlId="personalBodyFat"
  error={errors.bodyFatPercentage?.message}
  errorId="personal-body-fat-error"

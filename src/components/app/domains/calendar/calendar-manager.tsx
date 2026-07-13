@@ -4,14 +4,14 @@ import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
 import { ConfirmationDialog } from "@/components/ui/overlays/confirmation-dialog";
 import type { CalendarPageData } from "@/lib/calendar/types";
 
-import { CalendarFilters } from "./calendar/calendar-filters";
-import { CalendarGrid } from "./calendar/calendar-grid";
-import { CalendarToolbar } from "./calendar/calendar-toolbar";
-import { DayAgenda } from "./calendar/day-agenda";
-import { EventDetailCard } from "./calendar/event-detail-card";
-import { EventFormDialog } from "./calendar/event-form-dialog";
-import { UpcomingEventList } from "./calendar/upcoming-event-list";
-import { useCalendarManager } from "./calendar/hooks/use-calendar-manager";
+import { CalendarFilters } from "./calendar-filters";
+import { CalendarGrid } from "./calendar-grid";
+import { CalendarToolbar } from "./calendar-toolbar";
+import { DayAgenda } from "./day-agenda";
+import { EventDetailCard } from "./event-detail-card";
+import { EventFormDialog } from "./event-form-dialog";
+import { UpcomingEventList } from "./upcoming-event-list";
+import { useCalendarManager } from "./hooks/use-calendar-manager";
 
 export function CalendarManager({ data }: { data: CalendarPageData }) {
  const manager = useCalendarManager(data);

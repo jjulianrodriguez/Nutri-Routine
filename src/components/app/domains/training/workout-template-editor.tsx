@@ -13,19 +13,22 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 import {
  AssignmentEntitySelector,
  RoutineSearchCard,
 } from "@/components/app/domains/clients/assignment-entity-selector";
-import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
 import { Button } from "@/components/ui/actions/button";
 import { ConfirmationDialog } from "@/components/ui/overlays/confirmation-dialog";
-import { FieldError } from "@/components/ui/forms/form-field";
+import { Checkbox } from "@/components/ui/forms/checkbox";
+import {
+ FieldGroup,
+ FormAlert,
+ FormField,
+} from "@/components/ui/forms/form-field";
 import { Input, NumberInput } from "@/components/ui/forms/input";
-import { Label } from "@/components/ui/forms/label";
 import { Select } from "@/components/ui/forms/select";
 import { Textarea } from "@/components/ui/forms/textarea";
 import { useProgressiveResults } from "@/hooks/use-progressive-results";
@@ -38,10 +41,6 @@ import { WORKOUT_WEEKDAYS } from "@/lib/workout-templates/weekdays";
 import { cn } from "@/lib/utils";
 import type { RoutineListItem } from "@/types/routine";
 import type { WorkoutTemplateDetail } from "@/types/workout-template";
-
-const formSectionClasses =
- "rounded-[22px] bg-background p-4 sm:p-5";
-const legendClasses = "px-1 text-sm font-extrabold text-foreground";
 
 function normalizeSearch(value: string) {
  return value
@@ -161,6 +160,10 @@ export function WorkoutTemplateEditor({
  completedDayCount,
  0,
  );
+ const daysError =
+ typeof errors.days?.message === "string"
+ ? errors.days.message
+ : errors.days?.root?.message;
 
  useEffect(() => {
  if (!Number.isInteger(cycleDays) || cycleDays < 1 || cycleDays > 31) {
@@ -265,94 +268,84 @@ export function WorkoutTemplateEditor({
  </Button>
  </div>
 
- <fieldset className={cn(formSectionClasses, "mt-6")}>
- <legend className={legendClasses}>Información general</legend>
-
- <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)_minmax(10rem,0.35fr)]">
- <div>
- <Label
- htmlFor="template-name"
- className="font-extrabold text-foreground"
+ <FieldGroup
+ className="mt-6 rounded-[22px] bg-background p-4 sm:p-5"
+ legend="Información general"
+ legendClassName="px-1"
  >
- Nombre
- </Label>
+ <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)_minmax(10rem,0.35fr)]">
+ <FormField
+ controlId="template-name"
+ label="Nombre"
+ error={errors.name?.message}
+ >
  <Input
- id="template-name"
- className="mt-2"
  placeholder="Ej. Semana de fuerza inicial"
- aria-invalid={Boolean(errors.name)}
  {...register("name")}
  />
- <FieldError message={errors.name?.message} />
- </div>
+ </FormField>
 
- <div>
- <Label
- htmlFor="template-identifier"
- className="font-extrabold text-foreground"
+ <FormField
+ controlId="template-identifier"
+ label="Identificador interno"
+ hint="Opcional, único y visible solo para profesionales."
+ hintClassName="text-xs leading-5"
+ error={errors.identifier?.message}
  >
- Identificador interno
- </Label>
  <Input
- id="template-identifier"
- className="mt-2"
- aria-invalid={Boolean(errors.identifier)}
  {...register("identifier")}
  />
- <p className="mt-2 text-xs leading-5 text-muted">
- Opcional, único y visible solo para profesionales.
- </p>
- <FieldError message={errors.identifier?.message} />
- </div>
+ </FormField>
 
- <div>
- <Label
- htmlFor="template-cycle-days"
- className="font-extrabold text-foreground"
+ <FormField
+ controlId="template-cycle-days"
+ label="Días del ciclo"
+ error={errors.cycleDays?.message}
  >
- Días del ciclo
- </Label>
  <NumberInput
- id="template-cycle-days"
  min="1"
  max="31"
  inputMode="numeric"
- className="mt-2"
- invalid={Boolean(errors.cycleDays)}
  {...register("cycleDays")}
  />
- <FieldError message={errors.cycleDays?.message} />
+ </FormField>
  </div>
- </div>
- </fieldset>
+ </FieldGroup>
 
- <fieldset className={cn(formSectionClasses, "mt-5")}>
- <legend className={legendClasses}>Notas de la plantilla</legend>
- <Label
- htmlFor="template-description"
- className="font-extrabold text-foreground"
+ <FieldGroup
+ className="mt-5 rounded-[22px] bg-background p-4 sm:p-5"
+ legend="Notas de la plantilla"
+ legendClassName="px-1"
  >
- Descripción
- </Label>
+ <FormField
+ controlId="template-description"
+ label="Descripción"
+ error={errors.description?.message}
+ >
  <Textarea
- id="template-description"
  rows={4}
- className="mt-2"
  placeholder="Objetivo general o indicaciones del ciclo."
- aria-invalid={Boolean(errors.description)}
  {...register("description")}
  />
- <FieldError message={errors.description?.message} />
- </fieldset>
+ </FormField>
+ </FieldGroup>
 
- <label className="mt-5 flex min-h-11 w-fit items-center gap-3 rounded-control bg-background px-4 text-sm font-extrabold text-foreground">
- <input
- type="checkbox"
- className="size-4 accent-[var(--primary)]"
- {...register("isActive")}
+ <Controller
+ control={control}
+ name="isActive"
+ render={({ field }) => (
+ <label className="mt-5 flex min-h-11 w-fit cursor-pointer items-center gap-3 rounded-control bg-background px-4 text-sm font-extrabold text-foreground">
+ <Checkbox
+ ref={field.ref}
+ name={field.name}
+ checked={field.value}
+ onBlur={field.onBlur}
+ onCheckedChange={(checked) => field.onChange(checked === true)}
  />
  Plantilla activa
  </label>
+ )}
+ />
  </section>
 
  <section className="rounded-[28px] bg-surface p-5 sm:p-6">
@@ -391,17 +384,17 @@ export function WorkoutTemplateEditor({
  />
  </div>
 
- {pendingDayCount > 0 ? (
- <Alert className="mt-4 rounded-[18px] border-danger/25 bg-danger/5 px-4 py-3">
- <TriangleAlert className="size-5 text-danger" aria-hidden="true" />
- <AlertDescription className="font-semibold leading-6 text-danger">
+ <FormAlert className="mt-4" message={pendingDayCount > 0 ? (
+ <span className="flex items-start gap-3">
+ <TriangleAlert className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+ <span className="leading-6">
  Completa {pendingDayCount}{" "}
  {pendingDayCount === 1 ? "día pendiente" : "días pendientes"}{" "}
  antes de guardar. Cada día del ciclo necesita un entrenamiento
  asignado.
- </AlertDescription>
- </Alert>
- ) : null}
+ </span>
+ </span>
+ ) : null} />
 
  <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
  {watchedDays.map((day) => {
@@ -426,13 +419,13 @@ export function WorkoutTemplateEditor({
  : " bg-background",
  )}
  >
- <input
+ <Input
  type="hidden"
  {...register(`days.${day.dayNumber - 1}.dayNumber`, {
  valueAsNumber: true,
  })}
  />
- <input
+ <Input
  type="hidden"
  {...register(`days.${day.dayNumber - 1}.routineId`)}
  />
@@ -485,18 +478,14 @@ export function WorkoutTemplateEditor({
  </Button>
  ) : null}
  </div>
- <div className="mt-4">
- <Label
- htmlFor={`template-day-${day.dayNumber}-weekday`}
- className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted"
+ <FormField
+ controlId={`template-day-${day.dayNumber}-weekday`}
+ className="mt-4"
+ label="Día específico"
+ labelClassName="text-xs font-extrabold uppercase tracking-[0.12em] text-muted"
+ error={errors.days?.[day.dayNumber - 1]?.weekday?.message}
  >
- Día específico
- </Label>
  <Select
- id={`template-day-${day.dayNumber}-weekday`}
- aria-invalid={Boolean(
- errors.days?.[day.dayNumber - 1]?.weekday,
- )}
  {...register(`days.${day.dayNumber - 1}.weekday`)}
  >
  <option value="">Sin día específico</option>
@@ -510,12 +499,7 @@ export function WorkoutTemplateEditor({
  </option>
  ))}
  </Select>
- <FieldError
- message={
- errors.days?.[day.dayNumber - 1]?.weekday?.message
- }
- />
- </div>
+ </FormField>
  <Button
  type="button"
  variant={isSelected ? "default" : "outline"}
@@ -529,13 +513,7 @@ export function WorkoutTemplateEditor({
  })}
  </div>
 
- <FieldError
- message={
- typeof errors.days?.message === "string"
- ? errors.days.message
- : errors.days?.root?.message
- }
- />
+ <FormAlert className="mt-4" message={daysError} />
 
  <div className="mt-6">
  <AssignmentEntitySelector
@@ -565,11 +543,7 @@ export function WorkoutTemplateEditor({
  </div>
  </section>
 
- {serverMessage ? (
- <Alert variant="destructive">
- <AlertDescription>{serverMessage}</AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={serverMessage} />
 
  <div className="flex flex-wrap justify-end gap-3">
  <Button asChild type="button" variant="outline" size="lg">

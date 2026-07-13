@@ -1,4 +1,4 @@
-import { CalendarManager } from "@/components/app/domains/calendar/calendar-manager";
+import { CalendarManager } from "@/components/app/domains/calendar";
 import {
  AppHeader,
  AppScreen,

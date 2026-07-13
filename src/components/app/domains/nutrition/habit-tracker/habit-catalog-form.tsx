@@ -3,8 +3,9 @@
 import { Loader2, Plus, Save, X } from "lucide-react";
 
 import { Button } from "@/components/ui/actions/button";
+import { Checkbox } from "@/components/ui/forms/checkbox";
+import { FormField } from "@/components/ui/forms/form-field";
 import { Input } from "@/components/ui/forms/input";
-import { Label } from "@/components/ui/forms/label";
 import { Textarea } from "@/components/ui/forms/textarea";
 import type { HabitSummary } from "@/lib/habits/utils";
 
@@ -37,32 +38,24 @@ export function HabitCatalogForm({
  {editing ? "Editar hábito" : "Crear hábito"}
  </h3>
  <div className="mt-4 space-y-4">
- <div>
- <Label htmlFor="habit-title">Nombre</Label>
+ <FormField controlId="habit-title" label="Nombre">
  <Input
- id="habit-title"
  value={title}
  onChange={(event) => onTitleChange(event.target.value)}
  placeholder="Tomar 2L de agua"
- className="mt-2"
  />
- </div>
- <div>
- <Label htmlFor="habit-description">Descripción opcional</Label>
+ </FormField>
+ <FormField controlId="habit-description" label="Descripción opcional">
  <Textarea
- id="habit-description"
  value={description}
  onChange={(event) => onDescriptionChange(event.target.value)}
- className="mt-2"
  placeholder="Indicaciones breves para la clienta"
  />
- </div>
- <label className="flex min-h-11 items-center gap-3 rounded-[16px] bg-surface px-3 py-2 text-sm font-bold text-muted-foreground">
- <input
- type="checkbox"
+ </FormField>
+ <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-[16px] bg-surface px-3 py-2 text-sm font-bold text-muted-foreground">
+ <Checkbox
  checked={active}
- onChange={(event) => onActiveChange(event.target.checked)}
- className="size-4 accent-primary"
+ onCheckedChange={(checked) => onActiveChange(checked === true)}
  />
  Hábito activo
  </label>

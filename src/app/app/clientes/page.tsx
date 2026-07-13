@@ -25,7 +25,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
 import { EmptyState } from "@/components/ui/feedback/state-block";
 import { Button } from "@/components/ui/actions/button";
-import { Label } from "@/components/ui/forms/label";
+import { FormField } from "@/components/ui/forms/form-field";
 import { SearchField } from "@/components/ui/forms/search-field";
 import { Select } from "@/components/ui/forms/select";
 import {
@@ -595,23 +595,19 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
  tone="primary"
  >
  <form action="/app/clientes" className="space-y-4">
- <div>
- <Label
- htmlFor="client-search"
- className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted"
+ <FormField
+ controlId="client-search"
+ label="Buscar clientes"
+ labelClassName="text-xs font-extrabold uppercase tracking-[0.14em] text-muted"
  >
- Buscar clientes
- </Label>
  <SearchField
- id="client-search"
  name="q"
  defaultValue={query}
  placeholder="Nombre, correo o ID visible"
  className="font-semibold"
- controlClassName="mt-2"
  size="lg"
  />
- </div>
+ </FormField>
 
  <details
  open

@@ -40,7 +40,6 @@ const iconMap: Record<AppNavIcon, LucideIcon> = {
  dashboard: Home,
  nutrition: Leaf,
  notifications: Bell,
- pending: Sparkles,
  profile: Sparkles,
  progress: Activity,
  resources: BookOpen,

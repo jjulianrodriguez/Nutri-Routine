@@ -17,7 +17,6 @@ import type { Enums, Tables } from "@/types/database";
 
 const CLIENTS_PATH = "/app/clientes";
 const DASHBOARD_PATH = "/app/dashboard";
-const PENDING_PATH = "/app/pending";
 const PRIVILEGED_ROLES = new Set<ProfileRole>(["admin", "professional"]);
 
 type ProfileRole = Enums<"profile_role">;
@@ -667,7 +666,6 @@ export async function activateClientAccount(
 
  revalidatePath(CLIENTS_PATH);
  revalidatePath(DASHBOARD_PATH);
- revalidatePath(PENDING_PATH);
  revalidatePath("/app", "layout");
 
  return {

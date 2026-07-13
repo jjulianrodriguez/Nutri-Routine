@@ -22,8 +22,12 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/feedback/alert";
 import { Button } from "@/components/ui/actions/button";
 import { ConfirmationDialog } from "@/components/ui/overlays/confirmation-dialog";
+import {
+ FormAlert,
+ FormControl,
+ FormField,
+} from "@/components/ui/forms/form-field";
 import { Input, NumberInput } from "@/components/ui/forms/input";
-import { Label } from "@/components/ui/forms/label";
 import { useProgressiveResults } from "@/hooks/use-progressive-results";
 import { assignWorkoutTemplateToClient } from "@/lib/actions/workout-templates";
 import {
@@ -258,8 +262,8 @@ export function WorkoutTemplateAssignmentForm({
  onSubmit={handleSubmit(onSubmit)}
  noValidate
  >
- <input type="hidden" {...register("clientId")} />
- <input type="hidden" {...register("templateId")} />
+ <Input type="hidden" {...register("clientId")} />
+ <Input type="hidden" {...register("templateId")} />
 
  <div className="grid min-w-0 gap-5 xl:grid-cols-2 xl:items-start">
  <AssignmentEntitySelector
@@ -371,54 +375,42 @@ export function WorkoutTemplateAssignmentForm({
  </div>
 
  <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(8rem,0.55fr)_minmax(10rem,0.65fr)_auto] xl:items-end">
- <div>
- <Label
- htmlFor="assignment-duration"
- className="font-extrabold text-foreground"
+ <FormField
+ autoControl={false}
+ controlId="assignment-duration"
+ error={errors.durationWeeks?.message}
+ errorId="assignment-duration-error"
+ label="Duracion"
  >
- Duracion
- </Label>
  <div className="relative">
+ <FormControl>
  <NumberInput
- id="assignment-duration"
  min="1"
  max="104"
  inputMode="numeric"
- className="mt-2 pr-20"
+ className="pr-20"
  invalid={Boolean(errors.durationWeeks)}
  {...register("durationWeeks")}
  />
+ </FormControl>
  <span className="pointer-events-none absolute right-4 top-1/2 translate-y-0.5 text-xs font-bold text-muted">
  semanas
  </span>
  </div>
- {errors.durationWeeks ? (
- <p className="mt-2 text-sm font-semibold text-danger" role="alert">
- {errors.durationWeeks.message}
- </p>
- ) : null}
- </div>
+ </FormField>
 
- <div>
- <Label
- htmlFor="assignment-start-date"
- className="font-extrabold text-foreground"
+ <FormField
+ controlId="assignment-start-date"
+ error={errors.startDate?.message}
+ errorId="assignment-start-date-error"
+ label="Fecha de inicio"
  >
- Fecha de inicio
- </Label>
  <Input
- id="assignment-start-date"
  type="date"
- className="mt-2"
  invalid={Boolean(errors.startDate)}
  {...register("startDate")}
  />
- {errors.startDate ? (
- <p className="mt-2 text-sm font-semibold text-danger" role="alert">
- {errors.startDate.message}
- </p>
- ) : null}
- </div>
+ </FormField>
 
  <Button
  type="submit"
@@ -436,29 +428,19 @@ export function WorkoutTemplateAssignmentForm({
  </div>
  </section>
 
- {missingAssignmentReasons.length > 0 ? (
- <Alert className="rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3">
- <TriangleAlert
- className="size-5 text-muted-foreground"
- aria-hidden="true"
+ <FormAlert
+ tone="notice"
+ message={missingAssignmentReasons.length > 0 ? (
+ <span className="flex items-start gap-3">
+ <TriangleAlert className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+ <span className="leading-6">
+ Para confirmar la asignación: {missingAssignmentReasons.join(" ")}
+ </span>
+ </span>
+ ) : null}
  />
- <AlertDescription className="font-semibold leading-6 text-foreground">
- Para confirmar la asignación:{" "}
- {missingAssignmentReasons.join(" ")}
- </AlertDescription>
- </Alert>
- ) : null}
 
- {errors.root?.message ? (
- <Alert
- variant="destructive"
- className="rounded-[18px] border-danger/20 bg-danger/5 px-4 py-3"
- >
- <AlertDescription className="font-semibold text-danger">
- {errors.root.message}
- </AlertDescription>
- </Alert>
- ) : null}
+ <FormAlert message={errors.root?.message} />
 
  <ConfirmationDialog
  open={Boolean(pendingReplacement)}

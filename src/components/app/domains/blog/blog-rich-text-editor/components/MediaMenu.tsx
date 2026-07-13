@@ -4,7 +4,6 @@ import type { Editor } from "@tiptap/core";
 import { Unlink } from "lucide-react";
 
 import type { EditorToolbarCommands } from "../types";
-import { ImagePopover } from "./ImagePopover";
 import { LinkPopover } from "./LinkPopover";
 import { ToolbarButton } from "./ToolbarButton";
 import { ToolbarGroup } from "./ToolbarGroup";
@@ -38,7 +37,6 @@ export function MediaMenu({
  label="Quitar enlace"
  onClick={commands.unsetLink}
  />
- <ImagePopover />
  </ToolbarGroup>
  );
 }

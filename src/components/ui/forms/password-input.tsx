@@ -44,7 +44,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
      aria-controls={props.id}
      disabled={disabled || loading}
      variant="ghost"
-     className="absolute right-1 top-1/2 size-11 -translate-y-1/2 rounded-full text-muted hover:bg-foreground/5 hover:text-foreground focus-visible:ring-ring/35"
+     className="absolute right-1 top-1/2 z-[1] size-11 -translate-y-1/2 rounded-full text-muted hover:bg-foreground/5 hover:text-foreground focus-visible:ring-ring/35 active:not-aria-[haspopup]:-translate-y-1/2"
      onClick={() => setIsVisible((current) => !current)}
     >
      {isVisible ? (
