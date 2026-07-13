@@ -82,13 +82,13 @@ export function StatTile({
 }) {
  return (
  <div
- className="h-fit self-start rounded-card bg-surface p-5"
+ className="h-fit self-start rounded-card bg-surface p-4 sm:p-5"
  >
- <p className="text-sm font-bold text-muted">{label}</p>
- <p className="mt-3 font-heading text-4xl font-bold leading-none text-foreground">
+ <p className="text-xs font-bold text-muted sm:text-sm">{label}</p>
+ <p className="mt-3 font-heading text-3xl font-bold leading-none text-foreground sm:text-4xl">
  {value}
  </p>
- <p className="mt-4 text-sm font-bold text-muted">{detail}</p>
+ <p className="mt-4 text-xs font-bold leading-5 text-muted sm:text-sm">{detail}</p>
  </div>
  );
 }

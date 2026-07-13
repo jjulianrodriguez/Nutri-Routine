@@ -50,7 +50,7 @@ export default async function CalendarPage({
  />
 
  <section
- className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4"
+ className="grid grid-cols-2 items-start gap-3 sm:gap-4 xl:grid-cols-4"
  aria-label="Resumen del calendario"
  >
  <StatTile

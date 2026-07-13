@@ -41,7 +41,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
  }
 
  return (
- <article className="relative overflow-hidden px-5 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-16 lg:px-10">
+ <article className="relative overflow-hidden px-4 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-16 lg:px-10">
  <div className="hidden" />
  <div className="relative mx-auto max-w-5xl">
  <Link
@@ -52,8 +52,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
  Todos los artículos
  </Link>
 
- <header className="mt-10 overflow-hidden rounded-[2.4rem] border-[var(--blog-night)]/10 bg-[var(--blog-paper)] p-5 shadow-[0_40px_120px_-86px_rgb(var(--raspberry-rgb)_/_0.28)] sm:mt-14 sm:p-7">
- <div className="relative overflow-hidden rounded-[1.8rem] border-[var(--blog-night)]/8 bg-[var(--blog-sage)] p-6 sm:p-10">
+ <header className="mt-10 overflow-hidden rounded-[2rem] border-[var(--blog-night)]/10 bg-[var(--blog-paper)] p-4 shadow-[0_40px_120px_-86px_rgb(var(--raspberry-rgb)_/_0.28)] sm:mt-14 sm:rounded-[2.4rem] sm:p-7">
+ <div className="relative overflow-hidden rounded-[1.5rem] border-[var(--blog-night)]/8 bg-[var(--blog-sage)] p-5 sm:rounded-[1.8rem] sm:p-10">
  <div className="hidden" />
  <div className="hidden" />
  <div className="relative">
@@ -72,7 +72,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
  fontFamily: "var(--font-landing-display)",
  fontWeight: 500,
  }}
- className="mt-7 max-w-4xl text-[clamp(3.6rem,10vw,7.6rem)] leading-[0.82] tracking-[-0.04em] text-[var(--blog-night)]"
+ className="mt-7 max-w-4xl text-[clamp(2.9rem,15vw,3.6rem)] leading-[0.88] tracking-[-0.04em] text-[var(--blog-night)] sm:text-[clamp(3.6rem,10vw,7.6rem)] sm:leading-[0.82]"
  >
  {post.title}
  </h1>
@@ -94,7 +94,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
  </div>
  </header>
 
- <div className="mx-auto mt-12 max-w-[68ch] rounded-[2rem] border-[var(--blog-night)]/8 bg-[var(--blog-paper)] p-6 shadow-[0_34px_96px_-78px_rgb(var(--raspberry-rgb)_/_0.2)] sm:p-10">
+ <div className="mx-auto mt-12 max-w-[68ch] rounded-[2rem] border-[var(--blog-night)]/8 bg-[var(--blog-paper)] p-5 shadow-[0_34px_96px_-78px_rgb(var(--raspberry-rgb)_/_0.2)] sm:p-10">
  <BlogContentRenderer content={post.content} />
  </div>
  </div>

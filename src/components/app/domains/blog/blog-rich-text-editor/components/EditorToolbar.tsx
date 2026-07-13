@@ -59,7 +59,7 @@ export const EditorToolbar = forwardRef<HTMLDivElement, EditorToolbarProps>(
  <div
  ref={ref}
  className={cn(
- "relative z-30 flex items-center gap-2 overflow-x-auto bg-background/95 p-2 backdrop-blur-md sm:flex-wrap",
+ "relative z-30 flex max-w-full items-center gap-2 overflow-x-auto overscroll-x-contain bg-surface/95 px-3 py-3 backdrop-blur-md sm:flex-wrap sm:px-4",
  error && "border-danger/40",
  className,
  )}

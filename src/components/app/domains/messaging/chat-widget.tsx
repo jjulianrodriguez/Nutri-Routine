@@ -21,10 +21,12 @@ export function ChatWidget() {
 
  return (
   <>
-   <button type="button" className="fixed bottom-20 right-5 z-30 grid size-11 place-items-center rounded-full bg-surface/82 text-muted-foreground backdrop-blur-lg transition-[background-color,color,box-shadow,transform] hover:bg-primary hover:text-primary-foreground hover:shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25" onClick={chat.togglePanel} aria-expanded={chat.open} aria-label={chat.open ? "Cerrar chat" : "Abrir chat"}>
-    {chat.open ? <X className="size-4" aria-hidden="true" /> : <MessageCircle className="size-4" aria-hidden="true" />}
-    {chat.totalUnread > 0 ? <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full border-2 border-surface bg-secondary px-1.5 py-0.5 text-[0.65rem] font-extrabold leading-none text-foreground">{chat.totalUnread > 99 ? "99+" : chat.totalUnread}</span> : null}
-   </button>
+   {!chat.open ? (
+    <button type="button" className="fixed bottom-20 right-5 z-30 grid size-11 place-items-center rounded-full bg-surface/82 text-muted-foreground backdrop-blur-lg transition-[background-color,color,box-shadow,transform] hover:bg-primary hover:text-primary-foreground hover:shadow-soft focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25" onClick={chat.togglePanel} aria-expanded={false} aria-label="Abrir chat">
+     <MessageCircle className="size-4" aria-hidden="true" />
+     {chat.totalUnread > 0 ? <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full border-2 border-surface bg-secondary px-1.5 py-0.5 text-[0.65rem] font-extrabold leading-none text-foreground">{chat.totalUnread > 99 ? "99+" : chat.totalUnread}</span> : null}
+    </button>
+   ) : null}
 
    <AnimatePresence>
     {chat.open ? (

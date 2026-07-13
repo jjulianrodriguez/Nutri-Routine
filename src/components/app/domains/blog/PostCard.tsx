@@ -43,7 +43,7 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[var(--blog-peach)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
  <div className="relative z-0 flex h-full flex-col">
- <div className="flex items-center justify-between gap-4">
+ <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
  <div className="flex flex-wrap items-center gap-2">
  <span className="rounded-full bg-[var(--blog-paper)] px-3 py-1.5 text-xs font-black text-[var(--blog-muted)]">
  {post.category}
@@ -55,7 +55,7 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
  </span>
  ) : null}
  </div>
- <span className="text-xs font-bold text-[var(--blog-muted)]/70">
+ <span className="shrink-0 text-xs font-bold text-[var(--blog-muted)]/70">
  {post.readTime}
  </span>
  </div>
@@ -68,7 +68,7 @@ export function PostCard({ index, post, variant = "default" }: PostCardProps) {
  className={[
  "mt-8 leading-[0.9] tracking-[-0.028em] text-[var(--blog-night)]",
  isFeatured
- ? "text-[clamp(3.4rem,8vw,6.4rem)]"
+ ? "text-[clamp(2.9rem,15vw,3.4rem)] sm:text-[clamp(3.4rem,8vw,6.4rem)]"
  : "text-4xl sm:text-5xl",
  ].join(" ")}
  >

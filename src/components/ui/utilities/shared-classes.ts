@@ -9,6 +9,8 @@ export const primitiveMotionClasses = {
 export const primitiveStateClasses = {
  focusRing:
   "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-ring/25",
+ formFocus:
+  "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-focus-ring/20 focus-visible:shadow-focus-ring aria-invalid:focus-visible:ring-status-danger/25 aria-invalid:focus-visible:shadow-none",
  disabled:
   "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-disabled",
  invalid:

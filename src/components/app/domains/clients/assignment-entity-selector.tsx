@@ -96,7 +96,7 @@ export function AssignmentEntitySelector({
  </FormField>
 
  <div
- className="mt-4 max-h-[32rem] space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain pr-1"
+ className="mt-4 max-h-[min(32rem,70dvh)] space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain pr-1"
  aria-busy={isLoading}
  >
  {resultCount > 0 ? (

@@ -1,6 +1,10 @@
 import "server-only";
 
 import type { CurrentUserAccess } from "@/lib/auth/access-rules";
+import {
+ getNotifications,
+ type AppNotification,
+} from "@/lib/notifications/data";
 import { createClient } from "@/lib/supabase/server";
 import type { Enums, Tables } from "@/types/database";
 
@@ -15,8 +19,12 @@ export type DashboardData = {
  currentDietPlan: AppRecordSummary | null;
  currentWorkoutPlan: AppRecordSummary | null;
  dietPlansCount: number;
+ notifications: AppNotification[];
+ recentProgress: SectionData;
  recentResources: AppRecordSummary[];
  resourcesCount: number;
+ unreadNotificationCount: number;
+ upcomingEvents: SectionData;
  workoutPlansCount: number;
 };
 
@@ -33,9 +41,9 @@ type AppointmentRow = Pick<
  Tables<"appointments">,
  "area" | "id" | "starts_at" | "status" | "title"
 >;
-type DietPlanRow = Pick<
- Tables<"diet_plans">,
- "created_at" | "description" | "end_date" | "id" | "start_date" | "status" | "title"
+type NutritionDocumentRow = Pick<
+ Tables<"nutrition_documents">,
+ "created_at" | "description" | "id" | "status" | "title" | "updated_at"
 >;
 type ProgressEntryRow = Pick<
  Tables<"progress_entries">,
@@ -70,6 +78,14 @@ const PLAN_STATUS_LABELS: Record<Enums<"plan_status">, string> = {
  active: "Activo",
  archived: "Archivado",
  draft: "Borrador",
+};
+
+const NUTRITION_DOCUMENT_STATUS_LABELS: Record<
+ Enums<"nutrition_document_status">,
+ string
+> = {
+ active: "Activo",
+ inactive: "Inactivo",
 };
 
 const AREA_LABELS: Record<Enums<"service_area">, string> = {
@@ -124,7 +140,7 @@ function formatDate(value: string | null) {
  }).format(new Date(value));
 }
 
-function summarizePlan(record: DietPlanRow | WorkoutPlanRow): AppRecordSummary {
+function summarizePlan(record: WorkoutPlanRow): AppRecordSummary {
  const dates = [formatDate(record.start_date), formatDate(record.end_date)]
  .filter(Boolean)
  .join(" - ");
@@ -134,6 +150,32 @@ function summarizePlan(record: DietPlanRow | WorkoutPlanRow): AppRecordSummary {
  PLAN_STATUS_LABELS[record.status],
  dates || null,
  record.description,
+ formatDate(record.created_at),
+ ),
+ id: record.id,
+ title: record.title,
+ };
+}
+
+function formatDateTime(value: string) {
+ return new Intl.DateTimeFormat("es-CR", {
+ day: "numeric",
+ hour: "numeric",
+ minute: "2-digit",
+ month: "short",
+ timeZone: "America/Costa_Rica",
+ weekday: "short",
+ }).format(new Date(value));
+}
+
+function summarizeNutritionDocument(
+ record: NutritionDocumentRow,
+): AppRecordSummary {
+ return {
+ detail: firstText(
+ NUTRITION_DOCUMENT_STATUS_LABELS[record.status],
+ record.description,
+ formatDate(record.updated_at),
  formatDate(record.created_at),
  ),
  id: record.id,
@@ -151,7 +193,7 @@ function summarizeResource(record: ResourceRow): AppRecordSummary {
 
 function summarizeAppointment(record: AppointmentRow): SectionRecord {
  return {
- detail: firstText(formatDate(record.starts_at), AREA_LABELS[record.area]),
+ detail: firstText(formatDateTime(record.starts_at), AREA_LABELS[record.area]),
  id: record.id,
  meta: APPOINTMENT_STATUS_LABELS[record.status],
  title: record.title,
@@ -201,36 +243,39 @@ async function countAssignedClients(access: CurrentUserAccess) {
  return resolveCount(query);
 }
 
-async function getDietPlans(access: CurrentUserAccess, limit?: number) {
+async function getNutritionMealPlans(
+ access: CurrentUserAccess,
+ limit?: number,
+) {
  const supabase = await createClient();
  let query = supabase
- .from("diet_plans")
- .select("id, title, description, status, start_date, end_date, created_at")
- .order("created_at", { ascending: false });
+ .from("nutrition_documents")
+ .select("id, title, description, status, created_at, updated_at")
+ .eq("document_type", "meal_plan")
+ .eq("status", "active")
+ .order("updated_at", { ascending: false });
 
  if (access.isClient) {
  query = query.eq("client_id", access.userId);
- } else if (!isGeneralAdmin(access)) {
- query = query.eq("nutritionist_id", access.userId);
  }
 
  if (limit) {
  query = query.limit(limit);
  }
 
- return resolveRows<DietPlanRow>(query);
+ return resolveRows<NutritionDocumentRow>(query);
 }
 
-async function countDietPlans(access: CurrentUserAccess) {
+async function countNutritionMealPlans(access: CurrentUserAccess) {
  const supabase = await createClient();
  let query = supabase
- .from("diet_plans")
- .select("id", { count: "exact", head: true });
+ .from("nutrition_documents")
+ .select("id", { count: "exact", head: true })
+ .eq("document_type", "meal_plan")
+ .eq("status", "active");
 
  if (access.isClient) {
  query = query.eq("client_id", access.userId);
- } else if (!isGeneralAdmin(access)) {
- query = query.eq("nutritionist_id", access.userId);
  }
 
  return resolveCount(query);
@@ -316,25 +361,42 @@ export async function getDashboardData(
  dietPlanRows,
  workoutPlanRows,
  resourceRows,
+ upcomingEvents,
+ recentProgress,
+ notificationResult,
  ] = await Promise.all([
  countAssignedClients(access),
- shouldReadNutrition ? countDietPlans(access) : Promise.resolve(0),
+ shouldReadNutrition ? countNutritionMealPlans(access) : Promise.resolve(0),
  shouldReadTraining ? countWorkoutPlans(access) : Promise.resolve(0),
  countResources(access),
- shouldReadNutrition ? getDietPlans(access, 1) : Promise.resolve([]),
+ shouldReadNutrition ? getNutritionMealPlans(access, 1) : Promise.resolve([]),
  shouldReadTraining ? getWorkoutPlans(access, 1) : Promise.resolve([]),
  getResources(access, 3),
+ getCalendarData(access),
+ getProgressData(access),
+ getNotifications(access.userId),
  ]);
+
+ const notifications = notificationResult.items.slice(0, 4);
 
  return {
  assignedClientsCount,
- currentDietPlan: dietPlanRows[0] ? summarizePlan(dietPlanRows[0]) : null,
+ currentDietPlan: dietPlanRows[0]
+ ? summarizeNutritionDocument(dietPlanRows[0])
+ : null,
  currentWorkoutPlan: workoutPlanRows[0]
  ? summarizePlan(workoutPlanRows[0])
  : null,
  dietPlansCount,
+ notifications,
+ recentProgress,
  recentResources: resourceRows.map(summarizeResource),
  resourcesCount,
+ unreadNotificationCount: notificationResult.items.reduce(
+ (total, notification) => total + notification.groupUnreadCount,
+ 0,
+ ),
+ upcomingEvents,
  workoutPlansCount,
  };
 }
@@ -343,14 +405,19 @@ export async function getCalendarData(
  access: CurrentUserAccess,
 ): Promise<SectionData> {
  const supabase = await createClient();
+ const now = new Date().toISOString();
  let rowsQuery = supabase
  .from("appointments")
  .select("id, title, area, starts_at, status")
+ .eq("status", "scheduled")
+ .gte("starts_at", now)
  .order("starts_at", { ascending: true })
  .limit(5);
  let countQuery = supabase
  .from("appointments")
- .select("id", { count: "exact", head: true });
+ .select("id", { count: "exact", head: true })
+ .eq("status", "scheduled")
+ .gte("starts_at", now);
 
  if (access.isClient) {
  rowsQuery = rowsQuery.eq("client_id", access.userId);

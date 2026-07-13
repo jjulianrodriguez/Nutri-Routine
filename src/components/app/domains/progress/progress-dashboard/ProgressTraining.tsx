@@ -14,7 +14,7 @@ import type { ClientTrainingOverview } from "@/types/routine";
 
 import { BarHistoryChart } from "./ProgressCharts";
 import { ProgressMetricGrid } from "./ProgressMetricGrid";
-import { ProgressPlanMeta } from "./ProgressShared";
+import { getProgressStatusLabel, ProgressPlanMeta } from "./ProgressShared";
 import { formatDate, getTrainingHistory, getWorkoutStats } from "./utils";
 
 export function ProgressTraining({
@@ -110,7 +110,7 @@ export function ProgressTraining({
  detail: "Estado actual del plan",
  icon: Dumbbell,
  label: "Plan",
- value: current?.state ?? "Sin plan",
+ value: current ? getProgressStatusLabel(current.state) : "Sin plan",
  },
  ]}
  />

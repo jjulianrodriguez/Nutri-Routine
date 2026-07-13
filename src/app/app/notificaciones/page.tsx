@@ -2,7 +2,6 @@ import {
  AppHeader,
  AppPanel,
  AppScreen,
- StatTile,
 } from "@/components/app/layouts/AppScreen";
 import { NotificationCenter } from "@/components/app/domains/messaging/notification-center";
 import { requireRouteAccess } from "@/lib/auth/current-user-access";
@@ -13,14 +12,6 @@ export const dynamic = "force-dynamic";
 export default async function NotificationsPage() {
  const access = await requireRouteAccess("/app/notificaciones");
  const result = await getNotifications(access.userId);
- const totalCount = result.items.reduce(
- (total, notification) => total + notification.groupCount,
- 0,
- );
- const unreadCount = result.items.reduce(
- (total, notification) => total + notification.groupUnreadCount,
- 0,
- );
  const pageDescription = access.isClient
  ? access.canViewTraining && !access.canViewNutrition
  ? "Consulta avisos sobre tu entrenamiento, calendario y recursos."
@@ -44,35 +35,9 @@ export default async function NotificationsPage() {
  tone="accent"
  />
  ) : (
- <>
  <section
- className="grid items-start gap-4 sm:grid-cols-3"
- aria-label="Resumen de notificaciones"
- >
- <StatTile
- label="Total"
- value={String(totalCount)}
- detail="Actividad reciente disponible"
- />
- <StatTile
- label="Sin leer"
- value={String(unreadCount)}
- detail="Eventos que requieren tu atención"
- />
- <StatTile
- label="Leídas"
- value={String(totalCount - unreadCount)}
- detail="Eventos que ya revisaste"
- />
- </section>
-
- <AppPanel
- title="Actividad reciente"
- description={
- access.isClient
- ? "Selecciona una notificación para abrir el detalle relacionado."
- : "Selecciona una notificación para abrir la sección exacta relacionada."
- }
+ className="rounded-[28px] bg-surface p-5 sm:p-6"
+ aria-label="Notificaciones"
  >
  <NotificationCenter
  assignedNutritionistName={access.assignedNutritionistName}
@@ -82,8 +47,7 @@ export default async function NotificationsPage() {
  notifications={result.items}
  viewer={access.isClient ? "client" : "professional"}
  />
- </AppPanel>
- </>
+ </section>
  )}
  </AppScreen>
  );

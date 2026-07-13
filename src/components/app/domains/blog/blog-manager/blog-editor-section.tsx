@@ -24,19 +24,19 @@ export function BlogEditorSection({ manager }: { manager: BlogManagerViewModel }
  } = form;
 
  return (
-  <div ref={formRef} className="scroll-mt-6 rounded-[28px] bg-surface p-5 sm:p-6">
-   <div className="flex flex-wrap items-start justify-between gap-4">
+  <div ref={formRef} className="min-w-0 scroll-mt-6 rounded-[28px] bg-surface p-5 sm:p-6">
+   <div className="flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
     <div>
      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">{editingPost ? "Edición" : "Nuevo contenido"}</p>
      <h2 className="mt-2 text-3xl font-semibold text-foreground">{editingPost ? "Editar blog" : "Crear blog"}</h2>
     </div>
-    <div className="flex flex-wrap items-center justify-end gap-2">
+    <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
      <SaveStatusBadge status={manager.saveStatus} />
      {editingPost ? <Button type="button" variant="ghost" onClick={() => manager.clearForm()}><X className="size-4" aria-hidden="true" />Cancelar</Button> : null}
     </div>
    </div>
 
-   <form className="mt-6 space-y-5" onSubmit={handleSubmit(manager.onSubmit)} noValidate>
+   <form className="mt-6 min-w-0 space-y-5" onSubmit={handleSubmit(manager.onSubmit)} noValidate>
     <FormField controlId="blog-title" error={errors.title?.message} errorId="blog-title-error" label="Titulo">
      <Input aria-invalid={Boolean(errors.title)} maxLength={180} {...register("title")} />
     </FormField>
@@ -44,9 +44,9 @@ export function BlogEditorSection({ manager }: { manager: BlogManagerViewModel }
      <Input list="blog-category-options" aria-invalid={Boolean(errors.category)} maxLength={80} placeholder="Bienestar" {...register("category")} />
     </FormField>
     <datalist id="blog-category-options"><option value="Bienestar" /><option value="Nutrición" /><option value="Entrenamiento" /><option value="Consejos" /></datalist>
-    <FormField controlId="blog-content" error={errors.content?.message} errorId="blog-content-error" hint={<><>Escribe y da formato al contenido sin tocar código ni Markdown.</><br />Usa la vista previa para revisar cómo se verá publicado.</>} hintId="blog-content-help" label="Contenido">
+    <FormField controlId="blog-content" error={errors.content?.message} errorId="blog-content-error" hint="El editor guarda texto con formato; no necesitas usar código ni Markdown." hintId="blog-content-help" label="Contenido">
      <Input type="hidden" {...register("content")} />
-     <div>
+     <div className="min-w-0">
       <BlogRichTextEditor
        id="blog-content"
        describedBy={["blog-content-help", errors.content ? "blog-content-error" : ""].filter(Boolean).join(" ")}
@@ -72,7 +72,7 @@ export function BlogEditorSection({ manager }: { manager: BlogManagerViewModel }
 
     <FormAlert tone="notice" message={manager.isPinned ? "Un blog principal siempre queda visible." : null} />
     <FormAlert message={manager.serverMessage} />
-    <Button type="submit" size="lg" disabled={isSubmitting}>
+    <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={isSubmitting}>
      {isSubmitting ? <><Loader2 className="size-4 animate-spin" aria-hidden="true" />Guardando...</> : editingPost ? <><Save className="size-4" aria-hidden="true" />Guardar cambios</> : <><Plus className="size-4" aria-hidden="true" />Crear blog</>}
     </Button>
    </form>

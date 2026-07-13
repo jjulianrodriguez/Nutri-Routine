@@ -534,7 +534,6 @@ export function ClientActivationForm({
  {nutritionists.map((professional) => (
  <option key={professional.id} value={professional.id}>
  {professional.fullName}
- {professional.email ? ` - ${professional.email}` : ""}
  </option>
  ))}
  </Select>
@@ -552,7 +551,6 @@ export function ClientActivationForm({
  {trainers.map((professional) => (
  <option key={professional.id} value={professional.id}>
  {professional.fullName}
- {professional.email ? ` - ${professional.email}` : ""}
  </option>
  ))}
  </Select>

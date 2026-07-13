@@ -29,14 +29,14 @@ export default async function AdminBlogPage() {
  contenido guardado.
  </p>
  </div>
- <div className="flex flex-wrap gap-2">
- <Button asChild>
+ <div className="grid w-full gap-2 sm:flex sm:w-auto sm:flex-wrap">
+ <Button asChild className="w-full sm:w-auto">
  <Link href="/app/blog/listado">
  <LibraryBig className="size-4" aria-hidden="true" />
  Ver blogs creados
  </Link>
  </Button>
- <Button asChild variant="outline">
+ <Button asChild variant="outline" className="w-full sm:w-auto">
  <Link href="/blog" target="_blank" rel="noreferrer">
  <Eye className="size-4" aria-hidden="true" />
  Ver blog público

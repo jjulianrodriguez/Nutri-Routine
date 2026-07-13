@@ -262,7 +262,7 @@ async function ClientTrainingPage({
  </AppPanel>
  )}
 
- <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
+ <section className="grid grid-cols-2 items-start gap-3 sm:gap-4 xl:grid-cols-3">
  <StatTile
  label="Estado actual"
  value={current ? assignmentStateLabels[current.state] : "Sin plantilla"}
@@ -427,7 +427,7 @@ export default async function TrainingPage() {
  items={trainingSectionTabs}
  />
 
- <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
+ <section className="grid grid-cols-2 items-start gap-3 sm:gap-4 xl:grid-cols-4">
  <StatTile
  label="Ejercicios activos"
  value={String(overview.exerciseCount)}

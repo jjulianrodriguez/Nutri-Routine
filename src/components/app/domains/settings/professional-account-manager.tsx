@@ -8,7 +8,7 @@ import {
  Loader2,
  Save,
  Trash2,
- Utensils,
+ Leaf,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -240,7 +240,7 @@ export function ProfessionalAccountManager({
  >
  <div className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-1">
  <div className="h-fit self-start rounded-[18px] bg-background p-4">
- <Utensils className="size-4 text-muted-foreground" aria-hidden="true" />
+ <Leaf className="size-4 text-muted-foreground" aria-hidden="true" />
  <p className="mt-3 text-2xl font-semibold text-foreground">
  {professional.assignedNutritionClients}
  </p>

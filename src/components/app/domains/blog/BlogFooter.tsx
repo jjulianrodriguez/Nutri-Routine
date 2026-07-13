@@ -22,7 +22,7 @@ export function BlogFooter() {
  fontFamily: "var(--font-landing-display)",
  fontWeight: 500,
  }}
- className="mt-4 max-w-2xl text-[clamp(3rem,7vw,5.8rem)] leading-[0.86] tracking-[-0.035em] text-[var(--blog-night)]"
+ className="mt-4 max-w-2xl text-[clamp(2.5rem,13vw,3rem)] leading-[0.9] tracking-[-0.035em] text-[var(--blog-night)] sm:text-[clamp(3rem,7vw,5.8rem)] sm:leading-[0.86]"
  >
  lecturas para cuidar tu cuerpo con criterio.
  </p>
@@ -33,12 +33,12 @@ export function BlogFooter() {
  </div>
 
  <div className="grid gap-4">
- <div className="flex flex-wrap gap-2">
+ <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
  {footerLinks.map((link) => (
  <Link
  key={link.href}
  href={link.href}
- className="group inline-flex min-h-10 items-center gap-2 rounded-full border-[var(--blog-night)]/10 bg-[var(--blog-paper)] px-4 py-2 text-sm font-black text-[var(--blog-night)] shadow-[0_18px_48px_-40px_rgb(var(--raspberry-rgb)_/_0.2)] transition-colors hover:border-[var(--blog-clay)]/30 hover:bg-[var(--blog-rose)]"
+ className="group inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-[var(--blog-night)]/10 bg-[var(--blog-paper)] px-3 py-2 text-center text-sm font-black text-[var(--blog-night)] shadow-[0_18px_48px_-40px_rgb(var(--raspberry-rgb)_/_0.2)] transition-colors hover:border-[var(--blog-clay)]/30 hover:bg-[var(--blog-rose)] sm:min-h-10 sm:justify-start sm:px-4"
  >
  {link.label}
  <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

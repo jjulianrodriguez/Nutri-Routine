@@ -4,6 +4,10 @@ import { cn } from "@/lib/utils";
 
 import { formatDate } from "./utils";
 
+export function getProgressStatusLabel(status: string) {
+ return status.trim().toLocaleLowerCase("es") === "active" ? "Activo" : status;
+}
+
 export function ProgressStatusPill({
  children,
  tone = "neutral",
@@ -46,7 +50,7 @@ export function ProgressPlanMeta({
  <h3 className="mt-1 text-lg font-black text-foreground">{title}</h3>
  </div>
  <ProgressStatusPill tone={status === "active" ? "good" : "neutral"}>
- {status}
+ {getProgressStatusLabel(status)}
  </ProgressStatusPill>
  </div>
  {description ? (

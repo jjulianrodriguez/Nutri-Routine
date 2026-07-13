@@ -157,7 +157,7 @@ export default async function NutritionPage() {
  />
 
  {access.isClient ? null : (
- <section className="grid items-start gap-4 sm:grid-cols-2">
+ <section className="grid grid-cols-2 items-start gap-3 sm:gap-4">
  <StatTile
  label="Clientas de nutrición"
  value={String(dashboardData?.assignedClientsCount ?? 0)}

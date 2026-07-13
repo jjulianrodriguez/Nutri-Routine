@@ -1,4 +1,4 @@
-import { BarChart3, Dumbbell, Scale, Utensils } from "lucide-react";
+import { BarChart3, Dumbbell, Leaf, Scale } from "lucide-react";
 import type { ElementType } from "react";
 
 import { SectionTabs } from "@/components/app/shared/section-tabs";
@@ -12,7 +12,7 @@ const progressTabs: Array<{
  label: string;
 }> = [
  { id: "resumen", icon: BarChart3, label: "Resumen" },
- { id: "nutricion", icon: Utensils, label: "Nutricion" },
+ { id: "nutricion", icon: Leaf, label: "Nutricion" },
  { id: "entrenamiento", icon: Dumbbell, label: "Entrenamiento" },
  { id: "medidas", icon: Scale, label: "Medidas" },
 ];

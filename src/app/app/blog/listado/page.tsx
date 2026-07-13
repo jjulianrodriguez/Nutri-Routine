@@ -35,14 +35,14 @@ export default async function AdminBlogListPage() {
  para crear uno nuevo.
  </p>
  </div>
- <div className="flex flex-wrap gap-2">
- <Button asChild>
+ <div className="grid w-full gap-2 sm:flex sm:w-auto sm:flex-wrap">
+ <Button asChild className="w-full sm:w-auto">
  <Link href="/app/blog">
  <PenLine className="size-4" aria-hidden="true" />
  Crear blog
  </Link>
  </Button>
- <Button asChild variant="outline">
+ <Button asChild variant="outline" className="w-full sm:w-auto">
  <Link href="/blog" target="_blank" rel="noreferrer">
  <Eye className="size-4" aria-hidden="true" />
  Ver blog público
@@ -52,7 +52,7 @@ export default async function AdminBlogListPage() {
  </section>
 
  <section
- className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4"
+ className="grid grid-cols-2 items-start gap-3 sm:gap-4 xl:grid-cols-4"
  aria-label="Resumen de blogs"
  >
  <StatTile
@@ -70,7 +70,7 @@ export default async function AdminBlogListPage() {
  value={String(hiddenPosts)}
  detail="Fuera del blog público"
  />
- <div className="h-fit self-start rounded-[24px] border-primary/30 bg-primary-soft p-5 ">
+ <div className="h-fit self-start rounded-[24px] border-primary/30 bg-primary-soft p-4 sm:p-5 ">
  <div className="flex items-center gap-2 text-sm font-bold text-muted">
  {pinnedPost ? (
  <Pin className="size-4" aria-hidden="true" />

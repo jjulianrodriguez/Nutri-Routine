@@ -7,6 +7,7 @@ import {
  defineVariants,
  type VariantPropsOf,
 } from "@/components/ui/utilities/composition"
+import { primitiveStateClasses } from "@/components/ui/utilities/shared-classes"
 
 const textareaVariants = defineVariants(
  composeClasses(
@@ -15,6 +16,7 @@ const textareaVariants = defineVariants(
   "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
   "read-only:cursor-default read-only:bg-surface-muted/60",
   "aria-invalid:bg-danger/10 aria-invalid:ring-danger/40",
+  primitiveStateClasses.formFocus,
  ),
  {
   variants: {
@@ -31,11 +33,11 @@ const textareaVariants = defineVariants(
    },
    variant: {
     default:
-     "bg-surface ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft",
+     "bg-surface ring-2 ring-primary/30 focus-visible:bg-surface dark:ring-primary/40",
     ghost:
-     "bg-transparent ring-0 focus:bg-primary-soft/60 dark:focus:bg-primary-soft/70",
+     "bg-transparent ring-0 focus-visible:bg-surface",
     outline:
-     "border-input bg-surface ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft",
+     "border-input bg-surface ring-2 ring-primary/30 focus-visible:bg-surface dark:ring-primary/40",
    },
   },
   defaultVariants: {

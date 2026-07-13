@@ -1,6 +1,6 @@
-# Herramienta privada de planificacion
+# Nutrición Con Enfoque
 
-Base inicial de una aplicacion privada para profesionales que necesitan crear y organizar contenido de entrenamiento y nutricion sin convertir todavia el producto en un SaaS completo.
+Aplicación web privada para gestionar nutrición, entrenamiento y seguimiento profesional. La versión 1.0 incluye autenticación y roles, clientes, planes y documentos de nutrición, hábitos, ejercicios, rutinas, calendario, progreso, recursos, blog, notificaciones y configuración de cuenta.
 
 ## Stack
 
@@ -9,63 +9,63 @@ Base inicial de una aplicacion privada para profesionales que necesitan crear y 
 - Tailwind CSS
 - Supabase con `@supabase/ssr` y `@supabase/supabase-js`
 
-## Configuracion local
+## Requisitos
 
-1. Instala dependencias:
+- Node.js 20.9.0 o superior
+- npm compatible con `package-lock.json` v3
+- Un proyecto de Supabase con las migraciones del directorio `supabase/migrations/` aplicadas
 
-```bash
-npm install
-```
+## Configuración local
 
-2. Crea tu archivo local de entorno:
-
-```bash
-copy .env.example .env.local
-```
-
-3. Completa las variables:
+1. Instala las dependencias bloqueadas:
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+npm ci
 ```
 
-4. Corre el proyecto:
+2. Crea el archivo local de entorno:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+3. Completa las variables necesarias y ejecuta el servidor de desarrollo:
 
 ```bash
 npm run dev
 ```
 
-La app queda disponible en `http://localhost:3000`.
+La aplicación queda disponible en `http://localhost:3000`.
 
-## Estructura inicial
+## Variables de entorno
 
-```txt
-src/
-  app/
-    page.tsx
-    login/
-    register/
-    app/
-      layout.tsx
-      dashboard/
-  components/
-    ui/
-    layout/
-    auth/
-    motion/
-  lib/
-    auth/
-    supabase/
-    actions/
-    validations/
-    utils/
-  types/
-    database.ts
-    routine.ts
-    exercise.ts
+| Variable | Uso |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL pública del proyecto de Supabase. Requerida. |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Clave pública recomendada de Supabase. Puede sustituirse por `NEXT_PUBLIC_SUPABASE_ANON_KEY`. |
+| `SUPABASE_SECRET_KEY` | Clave privada para operaciones administrativas del servidor. Puede sustituirse por `SUPABASE_SERVICE_ROLE_KEY`. |
+| `REGISTER_ACCESS_CODE` | Habilita y protege el registro de cuentas. Sin valor, el registro queda deshabilitado. |
+| `PROFESSIONAL_REGISTER_ACCESS_CODE` | Protege la creación administrativa de cuentas profesionales. |
+| `RESOURCE_PDF_MAX_SIZE_BYTES` | Límite opcional para PDF de recursos; por defecto, 10 MiB. |
+| `NUTRITION_PDF_MAX_SIZE_BYTES` | Límite opcional para PDF de nutrición; por defecto, 10 MiB. |
+
+Las variables privadas nunca deben usar el prefijo `NEXT_PUBLIC_` ni guardarse en el repositorio. `.env.local` está excluido por `.gitignore`; `.env.example` contiene únicamente nombres y valores de ejemplo no sensibles.
+
+## Scripts
+
+| Comando | Propósito |
+| --- | --- |
+| `npm run dev` | Inicia Next.js en modo desarrollo. |
+| `npm run lint` | Ejecuta ESLint sobre el proyecto. |
+| `npm run build` | Genera y valida el build de producción. |
+| `npm run start` | Inicia el servidor sobre un build existente. |
+
+## Verificación para producción
+
+```bash
+npm run lint
+npm run build
+npm run start
 ```
 
-## Siguiente fase
-
-La siguiente fase puede conectar pantallas privadas reales para rutinas, ejercicios, nutricion, comidas y exportacion limpia. Todavia no se agregaron CRUD de contenido, clientes, pagos, chat, seguimiento, calendario ni exportacion final.
+Antes del despliegue, configura las variables de entorno en la plataforma de producción y no copies `.env.local`, `node_modules` ni `.next` desde una máquina de desarrollo.

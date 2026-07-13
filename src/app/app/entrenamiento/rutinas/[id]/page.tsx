@@ -119,26 +119,26 @@ export default async function RoutineDetailPage({
  </div>
  </div>
 
- <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
- <div className="h-fit self-start rounded-[24px] bg-surface p-5 ">
+ <section className="grid grid-cols-2 items-start gap-3 sm:gap-4 xl:grid-cols-4">
+ <div className="h-fit self-start rounded-[24px] bg-surface p-4 sm:p-5 ">
  <p className="text-sm font-bold text-muted">Dificultad</p>
  <p className="mt-3 text-xl font-extrabold text-foreground">
  {difficultyLabels[routine.difficulty]}
  </p>
  </div>
- <div className="h-fit self-start rounded-[24px] bg-surface p-5 ">
+ <div className="h-fit self-start rounded-[24px] bg-surface p-4 sm:p-5 ">
  <p className="text-sm font-bold text-muted">Categoría</p>
  <p className="mt-3 text-xl font-extrabold text-foreground">
  {routine.category}
  </p>
  </div>
- <div className="h-fit self-start rounded-[24px] bg-surface p-5 ">
+ <div className="h-fit self-start rounded-[24px] bg-surface p-4 sm:p-5 ">
  <p className="text-sm font-bold text-muted">Publico objetivo</p>
  <p className="mt-3 text-xl font-extrabold text-foreground">
  {routine.targetAudience}
  </p>
  </div>
- <div className="h-fit self-start rounded-[24px] bg-surface p-5 ">
+ <div className="h-fit self-start rounded-[24px] bg-surface p-4 sm:p-5 ">
  <p className="text-sm font-bold text-muted">Estado</p>
  <p className="mt-3 text-xl font-extrabold text-foreground">
  {routine.isActive ? "Activo" : "Inactivo"}

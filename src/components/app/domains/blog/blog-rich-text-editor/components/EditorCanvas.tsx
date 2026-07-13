@@ -20,8 +20,8 @@ export function EditorCanvas({
  <div className={cn(editorContentClasses, error && "border-danger/40")}>
  <EditorContent editor={editor} />
  {isEmpty ? (
- <span className="pointer-events-none absolute left-4 top-4 text-base leading-7 text-muted sm:left-5">
- Escribe el contenido del blog...
+ <span className="pointer-events-none absolute left-1/2 top-8 w-[calc(100%-3rem)] max-w-3xl -translate-x-1/2 text-base leading-7 text-muted sm:top-10">
+ Empieza a escribir tu publicación…
  </span>
  ) : null}
  </div>

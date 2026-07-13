@@ -41,7 +41,7 @@ import type {
 import type { AssignableWorkoutTemplate } from "@/types/workout-template";
 
 const assignmentSectionClasses =
- "rounded-[24px] bg-surface p-5 ";
+ "rounded-[24px] bg-surface p-4 sm:p-5 ";
 
 function normalizeSearch(value: string) {
  return value
@@ -500,8 +500,8 @@ function SelectedEntity({
  <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
  {label}
  </p>
- <p className="mt-1 truncate font-extrabold text-foreground">{value}</p>
- <p className="mt-1 truncate text-xs font-semibold text-muted">
+ <p className="mt-1 break-words font-extrabold text-foreground">{value}</p>
+ <p className="mt-1 break-words text-xs font-semibold leading-5 text-muted">
  {detail}
  </p>
  </div>

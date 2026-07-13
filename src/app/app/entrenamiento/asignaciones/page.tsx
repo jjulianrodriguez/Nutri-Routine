@@ -140,7 +140,7 @@ export default async function RoutineAssignmentsPage({
  </Alert>
  ) : null}
 
- <section className="grid items-start gap-4 sm:grid-cols-3">
+ <section className="grid grid-cols-2 items-start gap-3 sm:grid-cols-3 sm:gap-4">
  <StatTile
  label="Clientes disponibles"
  value={String(clients.length)}
@@ -211,9 +211,9 @@ export default async function RoutineAssignmentsPage({
  return (
  <article
  key={client.id}
- className="h-fit self-start rounded-[24px] bg-background p-5 "
+ className="h-fit self-start rounded-[24px] bg-background p-4 sm:p-5 "
  >
- <div className="flex items-start justify-between gap-4">
+ <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
  <div className="flex min-w-0 items-center gap-3">
  <div className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-soft text-foreground">
  <UserRound className="size-5" aria-hidden="true" />
@@ -242,7 +242,7 @@ export default async function RoutineAssignmentsPage({
  </div>
  <span
  className={cn(
- "rounded-full px-3 py-1 text-xs font-extrabold",
+ "self-end rounded-full px-3 py-1 text-xs font-extrabold sm:self-auto",
  !assignment && "bg-surface-muted text-foreground",
  assignment?.state === "active" &&
  "bg-primary text-primary-foreground",
@@ -258,7 +258,7 @@ export default async function RoutineAssignmentsPage({
  </span>
  </div>
 
- <div className="mt-4 grid items-start gap-3 border-t pt-4 sm:grid-cols-2">
+ <div className="mt-4 grid grid-cols-2 items-start gap-3 border-t pt-4">
  <div>
  <p className="text-xs font-extrabold uppercase tracking-wide text-muted">
  Plan de entrenamiento
@@ -303,7 +303,7 @@ export default async function RoutineAssignmentsPage({
  />
  </div>
 
- <div className="mt-4 grid items-start gap-3 border-t pt-4 sm:grid-cols-3">
+ <div className="mt-4 grid grid-cols-2 items-start gap-3 border-t pt-4 sm:grid-cols-3">
  <AssignmentMeta
  icon={CalendarDays}
  label="Inicio"

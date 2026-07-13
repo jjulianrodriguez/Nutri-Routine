@@ -49,7 +49,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
 
  return (
  <div className="relative">
- <div className="flex gap-2 overflow-x-auto rounded-full border-[var(--blog-night)]/8 bg-[var(--blog-paper)] p-2 shadow-[0_22px_70px_-56px_rgb(var(--raspberry-rgb)_/_0.2)]">
+ <div className="flex gap-2 overflow-x-auto overscroll-x-contain rounded-full border-[var(--blog-night)]/8 bg-[var(--blog-paper)] p-2 shadow-[0_22px_70px_-56px_rgb(var(--raspberry-rgb)_/_0.2)] scrollbar-none">
  {blogCategories.map((category) => {
  const isActive = category === activeCategory;
 

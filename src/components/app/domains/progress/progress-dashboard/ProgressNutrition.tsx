@@ -21,7 +21,7 @@ import { formatShortDate } from "./utils";
 
 function WeekdayHabitGrid({ nutrition }: { nutrition: NutritionProgressSummary }) {
  return (
- <div className="grid grid-cols-7 gap-2">
+ <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
  {nutrition.habits.weekDays.map((day) => {
  const applicable = nutrition.habits.assignments.filter((assignment) =>
  isAssignmentApplicableOnDate(assignment, day.date),

@@ -5,7 +5,7 @@ import {
  CircleOff,
  Dumbbell,
  ShieldCheck,
- Utensils,
+ Leaf,
  Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -137,7 +137,7 @@ export default async function ProfessionalAccountsPage() {
  </div>
  <div className="flex flex-wrap gap-2 text-xs font-extrabold text-foreground">
  <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-2.5 py-1.5">
- <Utensils className="size-3.5" aria-hidden="true" />
+ <Leaf className="size-3.5" aria-hidden="true" />
  {item.assignedNutritionClients} nutrición
  </span>
  <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-2.5 py-1.5">

@@ -34,6 +34,7 @@ type UserSettingsFormProps = {
 };
 
 type SwitchRowProps = {
+ alignRightOnMobile?: boolean;
  checked: boolean;
  description: string;
  disabled?: boolean;
@@ -56,18 +57,26 @@ type SelectRowProps = {
 
 function SettingsControl({
  action,
+ alignRightOnMobile = false,
  description,
  icon,
  label,
 }: {
  action: ReactNode;
+ alignRightOnMobile?: boolean;
  description: string;
  icon?: ReactNode;
  label: string;
 }) {
  return (
  <div className="rounded-[18px] bg-background p-4">
- <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+ <div
+ className={
+ alignRightOnMobile
+ ? "flex min-w-0 items-center justify-between gap-4"
+ : "flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+ }
+ >
  <div className="flex min-w-0 items-start gap-3">
  {icon ? (
  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-muted-foreground">
@@ -88,6 +97,7 @@ function SettingsControl({
 }
 
 function SwitchRow({
+ alignRightOnMobile = false,
  checked,
  description,
  disabled = false,
@@ -97,6 +107,7 @@ function SwitchRow({
 }: SwitchRowProps) {
  return (
  <SettingsControl
+ alignRightOnMobile={alignRightOnMobile}
  description={description}
  icon={icon}
  label={label}
@@ -249,6 +260,7 @@ export function UserSettingsForm({
  </p>
  </div>
  <SwitchRow
+ alignRightOnMobile
  checked={values.allowAssignedProfessionalsPersonalInfo}
  description="Tu telefono, fecha de nacimiento y datos de contacto utiles para coordinar citas o seguimiento."
  icon={<ShieldCheck className="size-4" aria-hidden="true" />}
@@ -258,6 +270,7 @@ export function UserSettingsForm({
  }
  />
  <SwitchRow
+ alignRightOnMobile
  checked={values.allowAssignedProfessionalsHealthData}
  description="Peso, altura, medidas, condiciones, lesiones, alergias y restricciones que ayudan a adaptar tu plan."
  icon={<Eye className="size-4" aria-hidden="true" />}
@@ -267,6 +280,7 @@ export function UserSettingsForm({
  }
  />
  <SwitchRow
+ alignRightOnMobile
  checked={values.allowAssignedProfessionalsSensitiveNotes}
  description="Notas que vos escribiste para que tu profesional tome en cuenta detalles sensibles de tu atencion."
  icon={<EyeOff className="size-4" aria-hidden="true" />}
@@ -286,6 +300,7 @@ export function UserSettingsForm({
  >
  <div className="space-y-3">
  <SwitchRow
+ alignRightOnMobile
  checked={values.notificationsEnabled}
  description="Activa o pausa todos los avisos de actividad."
  icon={<Bell className="size-4" aria-hidden="true" />}
@@ -293,6 +308,7 @@ export function UserSettingsForm({
  onChange={(checked) => updateValue("notificationsEnabled", checked)}
  />
  <SwitchRow
+ alignRightOnMobile
  checked={values.notificationsEnabled && values.notifyMessages}
  description="Avisos cuando recibis mensajes nuevos."
  disabled={!values.notificationsEnabled}
@@ -300,6 +316,7 @@ export function UserSettingsForm({
  onChange={(checked) => updateValue("notifyMessages", checked)}
  />
  <SwitchRow
+ alignRightOnMobile
  checked={values.notificationsEnabled && values.notifyAppointments}
  description="Avisos sobre citas y recordatorios."
  disabled={!values.notificationsEnabled}
@@ -307,6 +324,7 @@ export function UserSettingsForm({
  onChange={(checked) => updateValue("notifyAppointments", checked)}
  />
  <SwitchRow
+ alignRightOnMobile
  checked={values.notificationsEnabled && values.notifyPlanChanges}
  description="Avisos cuando cambia un plan activo o una plantilla."
  disabled={!values.notificationsEnabled}
@@ -314,6 +332,7 @@ export function UserSettingsForm({
  onChange={(checked) => updateValue("notifyPlanChanges", checked)}
  />
  <SwitchRow
+ alignRightOnMobile
  checked={values.notificationsEnabled && values.notifyAssignments}
  description="Avisos por asignaciones, recursos o cambios importantes."
  disabled={!values.notificationsEnabled}

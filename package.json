@@ -1,7 +1,11 @@
 {
-  "name": "exercises-system",
-  "version": "0.1.0",
+  "name": "nutricion-con-enfoque",
+  "version": "1.0.0",
+  "description": "Aplicación privada de nutrición, entrenamiento y seguimiento profesional.",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

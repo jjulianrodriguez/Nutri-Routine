@@ -59,7 +59,7 @@ export default async function RoutinesPage() {
  </Button>
  </div>
 
- <section className="grid items-start gap-4 sm:grid-cols-3">
+ <section className="grid grid-cols-2 items-start gap-3 sm:grid-cols-3 sm:gap-4">
  <StatTile
  label="Entrenamientos"
  value={String(overview.routines.length)}

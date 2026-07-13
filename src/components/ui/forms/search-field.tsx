@@ -20,7 +20,7 @@ const searchFieldInputVariants = defineVariants(
   "read-only:cursor-default read-only:bg-surface-subtle read-only:text-text-secondary",
   "aria-invalid:bg-status-danger-surface aria-invalid:ring-status-danger/35",
   primitiveMotionClasses.standard,
-  primitiveStateClasses.focusRing,
+  primitiveStateClasses.formFocus,
   primitiveStateClasses.disabled,
   primitiveStateClasses.loading,
  ),
@@ -33,11 +33,11 @@ const searchFieldInputVariants = defineVariants(
    },
    variant: {
     default:
-     "bg-surface ring-2 ring-primary/30 focus:bg-primary-soft dark:ring-primary/40 dark:focus:bg-primary-soft",
+     "bg-surface ring-2 ring-primary/30 focus-visible:bg-surface dark:ring-primary/40",
     outline:
      "border-border-default bg-surface-default ring-0 hover:bg-surface-interactive focus-visible:border-focus-ring",
     secondary:
-     "bg-action-secondary-soft text-action-secondary-hover ring-2 ring-action-secondary/20 focus:bg-action-secondary-soft",
+     "bg-action-secondary-soft text-action-secondary-hover ring-2 ring-action-secondary/20 focus-visible:bg-action-secondary-soft",
     ghost:
      "bg-transparent ring-0 hover:bg-surface-interactive focus-visible:bg-surface-interactive",
    },

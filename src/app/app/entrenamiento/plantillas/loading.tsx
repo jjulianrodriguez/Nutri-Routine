@@ -16,7 +16,7 @@ export default function PlantillasLoading() {
  <div className="flex justify-end">
  <Skeleton className="h-12 w-44" />
  </div>
- <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
+ <section className="grid grid-cols-2 items-start gap-3 sm:gap-4 xl:grid-cols-4">
  <StatTileSkeleton />
  <StatTileSkeleton />
  <StatTileSkeleton />

@@ -14,7 +14,6 @@ import { ClientCardActions } from "@/components/app/domains/clients/client-card-
 import {
  getAssignedRelationBadge,
  RelationshipBadge,
- type RelationshipBadgeTone,
 } from "@/components/app/shared/relationship-badges";
 import {
  AppHeader,
@@ -172,34 +171,6 @@ function formatCreatedAt(value: string) {
  month: "short",
  year: "numeric",
  }).format(new Date(value));
-}
-
-function getClientPlanLabel(client: ClientAccountListItem) {
- if (client.hasNutritionService && client.hasTrainingService) {
- return "Ambos planes";
- }
-
- if (client.hasNutritionService) {
- return "Nutrición";
- }
-
- if (client.hasTrainingService) {
- return "Entrenamiento";
- }
-
- return "Sin plan activo";
-}
-
-function serviceTone(client: ClientAccountListItem): RelationshipBadgeTone {
- if (!client.isClientActivated) {
- return "muted";
- }
-
- if (client.hasNutritionService && client.hasTrainingService) {
- return "accent";
- }
-
- return "neutral";
 }
 
 function getClientSearchText(client: ClientAccountListItem) {
@@ -566,7 +537,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
  </Alert>
  ) : null}
 
- <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
+ <section className="grid grid-cols-2 items-start gap-3 sm:gap-4 xl:grid-cols-4">
  <StatTile
  label="Clientes visibles"
  value={String(data.counts.all)}
@@ -601,6 +572,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
  labelClassName="text-xs font-extrabold uppercase tracking-[0.14em] text-muted"
  >
  <SearchField
+ id="client-search"
  name="q"
  defaultValue={query}
  placeholder="Nombre, correo o ID visible"
@@ -761,6 +733,11 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
  )}
  <RelationshipBadge
  tone={client.isClientActivated ? "success" : "muted"}
+ className={
+ client.isClientActivated
+ ? "border-success/90 bg-success/90 text-white"
+ : undefined
+ }
  >
  {client.isClientActivated ? (
  <CheckCircle2
@@ -794,9 +771,6 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
 
  <div className="min-w-0 space-y-2">
  <div className="flex flex-wrap gap-2">
- <RelationshipBadge tone={serviceTone(client)}>
- {getClientPlanLabel(client)}
- </RelationshipBadge>
  {client.hasNutritionService ? (
  <RelationshipBadge tone="primary">
  <Leaf className="size-3.5" aria-hidden="true" />

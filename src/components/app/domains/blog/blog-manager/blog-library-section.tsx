@@ -11,24 +11,24 @@ import type { BlogManagerViewModel } from "./hooks/use-blog-manager";
 
 export function BlogLibrarySection({ manager }: { manager: BlogManagerViewModel }) {
  return (
-  <section className="rounded-[28px] bg-surface p-5 sm:p-6">
-   <div className="flex flex-wrap items-center justify-between gap-4">
+  <section className="min-w-0 rounded-[28px] bg-surface p-5 sm:p-6">
+   <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
     <div><p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">Biblioteca</p><h2 className="mt-2 text-3xl font-semibold text-foreground">Blogs creados</h2></div>
-    <Button asChild variant="outline"><Link href="/blog" target="_blank" rel="noreferrer"><Eye className="size-4" aria-hidden="true" />Ver blog público</Link></Button>
+    <Button asChild variant="outline" className="w-full sm:w-auto"><Link href="/blog" target="_blank" rel="noreferrer"><Eye className="size-4" aria-hidden="true" />Ver blog público</Link></Button>
    </div>
 
    {manager.initialPosts.length > 0 ? (
     <div className="mt-6 space-y-4">
      {manager.initialPosts.map((post) => (
       <article key={post.id} className="rounded-[22px] bg-background p-4 sm:p-5">
-       <div className="flex items-start justify-between gap-3">
+       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-wrap items-center gap-2">
          <span className={["inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold", post.published ? "bg-success/10 text-success" : "bg-surface-muted text-muted-foreground"].join(" ")}>
           {post.published ? <Eye className="size-3" aria-hidden="true" /> : <EyeOff className="size-3" aria-hidden="true" />}{post.published ? "Publicado" : "Oculto"}
          </span>
          {post.is_pinned ? <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-extrabold text-primary-foreground"><Pin className="size-3" aria-hidden="true" />Anclado</span> : null}
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex w-full shrink-0 items-center justify-end gap-2 sm:w-auto">
          <Button type="button" variant="outline" size="sm" onClick={() => manager.startEditing(post)}><Pencil className="size-3.5" aria-hidden="true" />Editar</Button>
          <CardActionsMenu label={post.title} items={[
           ...(post.published && post.slug ? [{ external: true, href: `/blog/${post.slug}`, icon: Eye, label: "Ver publicado" }] : []),

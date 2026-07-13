@@ -117,10 +117,10 @@ function SectionNavSkeleton({ count = 4 }: { count?: number }) {
 
 function StatTileSkeleton() {
  return (
- <div className="h-fit self-start rounded-card bg-surface p-5" aria-busy="true">
- <Skeleton className="h-3.5 w-32" />
- <Skeleton className="mt-3 h-10 w-20" />
- <Skeleton className="mt-4 h-3.5 w-40" />
+ <div className="h-fit self-start rounded-card bg-surface p-4 sm:p-5" aria-busy="true">
+ <Skeleton className="h-3.5 w-full max-w-32" />
+ <Skeleton className="mt-3 h-9 w-20 sm:h-10" />
+ <Skeleton className="mt-4 h-3.5 w-full max-w-40" />
  </div>
  );
 }
@@ -403,7 +403,7 @@ function PageSkeleton({
  <PageHeaderSkeleton />
  {navItems > 0 ? <SectionNavSkeleton count={navItems} /> : null}
  {stats > 0 ? (
- <section className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
+ <section className="grid grid-cols-2 items-start gap-3 sm:gap-4 xl:grid-cols-4">
  {Array.from({ length: stats }).map((_, index) => (
  <StatTileSkeleton key={index} />
  ))}

@@ -17,17 +17,17 @@ const selectVariants = defineVariants(
   "placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-disabled",
   "aria-invalid:bg-status-danger-surface aria-invalid:ring-status-danger/35 dark:ring-primary/40",
   primitiveMotionClasses.standard,
-  primitiveStateClasses.focusRing,
+  primitiveStateClasses.formFocus,
  ),
  {
   variants: {
    variant: {
     default:
-     "bg-surface focus:bg-primary-soft dark:focus:bg-primary-soft",
+     "bg-surface focus-visible:bg-surface",
     outline:
      "border-border-default bg-surface-default ring-0 hover:bg-surface-interactive focus-visible:border-focus-ring",
     secondary:
-     "bg-action-secondary-soft text-action-secondary-hover ring-action-secondary/20 focus:bg-action-secondary-soft",
+     "bg-action-secondary-soft text-action-secondary-hover ring-action-secondary/20 focus-visible:bg-action-secondary-soft",
     ghost:
      "bg-transparent ring-0 hover:bg-surface-interactive focus-visible:bg-surface-interactive",
    },

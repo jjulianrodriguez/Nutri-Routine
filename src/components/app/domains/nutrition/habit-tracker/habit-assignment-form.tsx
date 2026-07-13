@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Loader2 } from "lucide-react";
+import { CalendarDays, Check, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/actions/button";
 import { FieldGroup, FormField } from "@/components/ui/forms/form-field";
@@ -47,6 +47,11 @@ export function HabitAssignmentForm({
  onToggleDay: (day: number) => void;
  startDate: string;
 }) {
+ const selectedDayLabels = weekdayOptions
+ .filter((day) => daysOfWeek.includes(day.value))
+ .map((day) => day.shortLabel)
+ .join(", ");
+
  return (
  <div className="h-fit self-start rounded-[22px] bg-background p-4">
  <h3 className="font-extrabold text-foreground">Asignar hábito</h3>
@@ -84,14 +89,23 @@ export function HabitAssignmentForm({
  </Select>
 
  <FieldGroup
- description="Estos son los días en que la clienta podrá marcar el hábito."
- descriptionClassName="text-xs font-semibold leading-5"
- legend="Días aplicables"
+ className="rounded-[22px] border border-border/70 bg-surface p-3 sm:p-4"
+ description="Elige cada día en que la clienta podrá marcar este hábito."
+ descriptionClassName="mb-0 text-sm font-semibold leading-5"
+ legend={
+ <span className="flex items-center gap-2">
+ <span className="grid size-9 place-items-center rounded-[12px] bg-primary-soft text-primary-hover">
+ <CalendarDays className="size-4" aria-hidden="true" />
+ </span>
+ <span>Días aplicables</span>
+ </span>
+ }
+ legendClassName="mb-1 text-base"
  >
  <div
  role="group"
  aria-label="Días aplicables del hábito"
- className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5 lg:grid-cols-4 2xl:grid-cols-7"
+ className="grid grid-cols-2 gap-2 sm:grid-cols-4"
  >
  {weekdayOptions.map((day) => {
  const selected = daysOfWeek.includes(day.value);
@@ -104,24 +118,48 @@ export function HabitAssignmentForm({
  aria-label={`${selected ? "Quitar" : "Seleccionar"} ${day.label}`}
  onClick={() => onToggleDay(day.value)}
  className={cn(
- "group flex h-11 items-center justify-between gap-3 rounded-[14px] border px-4 py-2 text-sm font-extrabold transition-[background-color,border-color,box-shadow,color,transform] duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 active:scale-[0.98]",
+ "group relative flex min-h-20 flex-col items-start justify-between gap-3 overflow-hidden rounded-[16px] border p-3 text-left transition-[background-color,border-color,box-shadow,color,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/30 active:scale-[0.98]",
  selected
- ? "border-primary/20 bg-primary/10 text-primary"
- : "border-transparent bg-surface text-muted-foreground hover:bg-surface/80 hover:text-foreground",
+ ? "border-primary/35 bg-primary text-primary-foreground shadow-sm"
+ : "border-border/70 bg-background text-muted-foreground hover:border-primary/30 hover:bg-primary-soft hover:text-foreground",
  )}
  >
- <span className="truncate">{day.label}</span>
  <span
  className={cn(
- "flex size-4 shrink-0 items-center justify-center transition-[background-color,border-color,box-shadow,color,transform] duration-200",
- selected ? "scale-100 opacity-100" : "scale-50 opacity-0",
+ "flex size-6 shrink-0 items-center justify-center rounded-full border transition-[background-color,border-color,box-shadow,color,transform] duration-200",
+ selected
+ ? "border-primary-foreground/30 bg-primary-foreground/15 text-primary-foreground"
+ : "border-border bg-surface text-transparent group-hover:border-primary/30",
  )}
  >
- <Check className="size-4" strokeWidth={2.5} aria-hidden="true" />
+ <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
+ </span>
+ <span>
+ <span className="block text-[0.68rem] font-extrabold uppercase tracking-[0.12em] opacity-75">
+ Día {day.value}
+ </span>
+ <span className="mt-0.5 block text-sm font-extrabold">
+ {day.label}
+ </span>
  </span>
  </button>
  );
  })}
+ </div>
+ <div
+ className="flex flex-col gap-1 rounded-[14px] bg-background px-3 py-2.5 text-xs sm:flex-row sm:items-center sm:justify-between"
+ aria-live="polite"
+ >
+ <span className="font-extrabold text-foreground">
+ {daysOfWeek.length === 0
+ ? "Ningún día seleccionado"
+ : `${daysOfWeek.length} ${daysOfWeek.length === 1 ? "día seleccionado" : "días seleccionados"}`}
+ </span>
+ {selectedDayLabels ? (
+ <span className="font-semibold text-muted">{selectedDayLabels}</span>
+ ) : (
+ <span className="font-semibold text-danger">Selecciona al menos uno</span>
+ )}
  </div>
  </FieldGroup>
 

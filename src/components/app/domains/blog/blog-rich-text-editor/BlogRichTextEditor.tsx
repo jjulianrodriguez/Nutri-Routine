@@ -3,6 +3,7 @@
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { Eye, EyeOff, PenLine } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/actions/button";
@@ -51,8 +52,7 @@ export function BlogRichTextEditor({
  "aria-invalid": error ? "true" : "false",
  "aria-label": "Contenido del blog",
  "aria-multiline": "true",
- class:
- "min-h-[20rem] px-4 py-4 text-base leading-7 text-foreground outline-none sm:px-5",
+ class: "text-base leading-8 text-foreground outline-none",
  id,
  role: "textbox",
  },
@@ -84,7 +84,7 @@ export function BlogRichTextEditor({
  strike: false,
  }),
  Placeholder.configure({
- placeholder: "Escribe el contenido del blog...",
+ placeholder: "Empieza a escribir tu publicación…",
  }),
  ],
  immediatelyRender: false,
@@ -127,12 +127,47 @@ export function BlogRichTextEditor({
  };
 
  return (
- <div ref={containerRef}>
+ <div
+ ref={containerRef}
+ className={cn(
+ "min-w-0 overflow-hidden rounded-[26px] border bg-background shadow-[0_18px_50px_-42px_rgb(var(--foreground-rgb)/0.45)]",
+ error && "border-danger/40",
+ )}
+ >
+ <div className="flex flex-col gap-4 border-b bg-surface-muted/70 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+ <div className="flex min-w-0 items-start gap-3">
+ <span className="grid size-10 shrink-0 place-items-center rounded-[14px] bg-primary-soft text-primary-hover">
+ <PenLine className="size-4" aria-hidden="true" />
+ </span>
+ <div className="min-w-0">
+ <p className="font-extrabold text-foreground">Espacio de escritura</p>
+ <p className="mt-1 text-sm leading-5 text-muted">
+ Da formato al texto y revisa el resultado antes de publicar.
+ </p>
+ </div>
+ </div>
+ <Button
+ type="button"
+ variant={showPreview ? "secondary" : "outline"}
+ size="sm"
+ className="w-full sm:w-auto"
+ onClick={() => setShowPreview((current) => !current)}
+ aria-expanded={showPreview}
+ >
+ {showPreview ? (
+ <EyeOff className="size-4" aria-hidden="true" />
+ ) : (
+ <Eye className="size-4" aria-hidden="true" />
+ )}
+ {showPreview ? "Ocultar vista previa" : "Ver vista previa"}
+ </Button>
+ </div>
+
  <EditorToolbar
  ref={mainToolbarRef}
  {...toolbarProps}
  toolbarId="main"
- className="rounded-t-[22px] border border-input "
+ className="rounded-none border-x-0 border-t-0 border-b border-input"
  />
 
  <FloatingToolbar
@@ -143,31 +178,23 @@ export function BlogRichTextEditor({
 
  <EditorCanvas editor={editor} error={error} isEmpty={isEmpty} />
 
- <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+ <div className="flex flex-col gap-3 border-t bg-surface-muted/45 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
  <div className="text-xs font-semibold leading-5 text-muted">
  <p>
- Formato permitido: titulos, listas, enlaces seguros, citas,
- alineacion, color de paleta y resaltado.
- </p>
- <p
- className={cn(
- "mt-1",
- isNearContentLimit && "font-extrabold text-danger",
- )}
- >
- {selectionState.wordCount} palabras / {selectionState.textLength}{" "}
- caracteres de texto / {contentLength.toLocaleString("es-CR")} de
- 50 000 caracteres guardables.
+ Puedes usar títulos, listas, enlaces, citas, alineación, color y
+ resaltado.
  </p>
  </div>
- <Button
- type="button"
- variant={showPreview ? "secondary" : "outline"}
- size="sm"
- onClick={() => setShowPreview((current) => !current)}
+ <p
+ className={cn(
+ "shrink-0 text-xs font-extrabold tabular-nums text-muted",
+ isNearContentLimit && "text-danger",
+ )}
+ aria-live="polite"
  >
- {showPreview ? "Ocultar vista previa" : "Vista previa"}
- </Button>
+ {selectionState.wordCount} palabras · {selectionState.textLength}{" "}
+ caracteres de texto · {contentLength.toLocaleString("es-CR")} / 50 000
+ </p>
  </div>
 
  {showPreview ? <PreviewPanel content={value} /> : null}

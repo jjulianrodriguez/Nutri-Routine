@@ -12,7 +12,7 @@ export function BlogManager(props: BlogManagerProps) {
  const { confirmation } = manager;
 
  return (
-  <div className={["grid gap-6", manager.showEditor && manager.isManageMode ? "xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] xl:items-start" : ""].filter(Boolean).join(" ")}>
+  <div className={["grid min-w-0 gap-6", manager.showEditor && manager.isManageMode ? "xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] xl:items-start" : ""].filter(Boolean).join(" ")}>
    {manager.showEditor ? <BlogEditorSection manager={manager} /> : null}
    {manager.isManageMode ? <BlogLibrarySection manager={manager} /> : null}
    <ConfirmationDialog

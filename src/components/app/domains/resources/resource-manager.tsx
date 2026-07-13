@@ -214,8 +214,8 @@ export function ResourceManager({
  }
 
  return (
- <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)]">
  <div className="space-y-6">
+ <div className="grid items-start gap-6 xl:grid-cols-2">
  {editingPdfResource ? (
  <div ref={formRef}>
  <ResourcePdfEditForm
@@ -258,6 +258,8 @@ export function ResourceManager({
  manageableAreas={manageableAreas}
  selectedFolder={selectedFolder}
  />
+ </div>
+
  <FolderManager
  editingFolder={editingFolder}
  folders={folders}
@@ -270,7 +272,6 @@ export function ResourceManager({
  setConfirmation({ folder, type: "toggle-folder" })
  }
  />
- </div>
 
  {library}
 

@@ -179,7 +179,7 @@ function ServiceCard({
  return (
  <div
  className={cn(
- "h-fit self-start rounded-[22px] p-5",
+ "h-fit self-start rounded-[22px] p-4 sm:p-5",
  active
  ? "border-primary/35 bg-primary-soft/60"
  : " bg-background",
@@ -401,7 +401,7 @@ export default async function ClientProfilePage({
  </div>
  </section>
 
- <section className="grid items-start gap-4 md:grid-cols-2">
+ <section className="grid grid-cols-2 items-start gap-3 sm:gap-4">
  <ServiceCard
  active={client.hasNutritionService}
  assignedId={client.assignedNutritionistId}

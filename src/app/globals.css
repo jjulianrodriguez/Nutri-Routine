@@ -1213,12 +1213,14 @@ input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type=
 select:not([data-no-form-style]),
 textarea:not([data-no-form-style]) {
   --form-field-bg: #f2f5f7;
-  --form-field-focus-bg: #eef3f6;
+  --form-field-focus-bg: var(--surface-elevated);
+  --form-field-focus-rgb: var(--focus-ring-rgb);
   --form-field-shadow: 0 1px 2px rgb(var(--foreground-rgb) / 0.04),
     0 12px 26px -20px rgb(var(--secondary-rgb) / 0.38),
     0 1px 0 rgb(255 255 255 / 0.82) inset;
-  --form-field-focus-shadow: 0 2px 5px rgb(var(--foreground-rgb) / 0.06),
-    0 18px 38px -24px rgb(var(--secondary-rgb) / 0.48),
+  --form-field-focus-shadow: 0 0 0 1px rgb(var(--form-field-focus-rgb) / 0.92),
+    0 0 0 4px rgb(var(--form-field-focus-rgb) / 0.16),
+    0 14px 30px -22px rgb(var(--form-field-focus-rgb) / 0.62),
     0 1px 0 rgb(255 255 255 / 0.9) inset;
 
   border-color: transparent !important;
@@ -1230,6 +1232,10 @@ textarea:not([data-no-form-style]) {
     background-color var(--duration-base) var(--ease-premium),
     box-shadow var(--duration-base) var(--ease-premium),
     color var(--duration-base) var(--ease-premium);
+}
+
+:is(input, select, textarea)[aria-invalid="true"] {
+  --form-field-focus-rgb: var(--destructive-rgb);
 }
 
 textarea {
@@ -1512,8 +1518,9 @@ tbody th {
   --form-field-shadow: 0 1px 2px rgb(0 0 0 / 0.24),
     0 12px 26px -20px rgb(0 0 0 / 0.8),
     0 1px 0 rgb(255 255 255 / 0.055) inset;
-  --form-field-focus-shadow: 0 2px 5px rgb(0 0 0 / 0.3),
-    0 18px 38px -24px rgb(0 0 0 / 0.88),
+  --form-field-focus-shadow: 0 0 0 1px rgb(var(--form-field-focus-rgb) / 0.94),
+    0 0 0 4px rgb(var(--form-field-focus-rgb) / 0.24),
+    0 16px 34px -22px rgb(0 0 0 / 0.9),
     0 1px 0 rgb(255 255 255 / 0.075) inset;
 
   color: var(--foreground);
