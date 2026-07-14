@@ -41,60 +41,47 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
  }
 
  return (
- <article className="relative overflow-hidden px-4 pb-20 pt-12 sm:px-8 sm:pb-24 sm:pt-16 lg:px-10">
- <div className="hidden" />
- <div className="relative mx-auto max-w-5xl">
+ <article className="bg-[var(--surface-muted)] px-6 py-12 sm:py-16 md:py-20">
+ <div className="mx-auto max-w-5xl">
  <Link
  href="/blog"
- className="inline-flex min-h-11 items-center gap-2 rounded-full border-[var(--blog-night)]/10 bg-[var(--blog-paper)] px-4 py-2.5 text-sm font-black text-[var(--blog-night)] shadow-[0_18px_48px_-38px_rgb(var(--raspberry-rgb)_/_0.2)] transition-colors hover:border-[var(--blog-clay)]/30 hover:bg-[var(--blog-rose)]"
+ className="inline-flex min-h-11 items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--surface)] px-4 py-2.5 text-sm font-semibold text-[var(--muted-foreground)] transition-colors duration-200 hover:border-[var(--brand)] hover:text-[var(--brand)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand)]"
  >
- <ArrowLeft className="size-4" />
+ <ArrowLeft className="size-4" aria-hidden="true" />
  Todos los artículos
  </Link>
 
- <header className="mt-10 overflow-hidden rounded-[2rem] border-[var(--blog-night)]/10 bg-[var(--blog-paper)] p-4 shadow-[0_40px_120px_-86px_rgb(var(--raspberry-rgb)_/_0.28)] sm:mt-14 sm:rounded-[2.4rem] sm:p-7">
- <div className="relative overflow-hidden rounded-[1.5rem] border-[var(--blog-night)]/8 bg-[var(--blog-sage)] p-5 sm:rounded-[1.8rem] sm:p-10">
- <div className="hidden" />
- <div className="hidden" />
- <div className="relative">
+ <header className="mt-8 rounded-2xl border border-[var(--border-soft)] bg-[var(--surface)] px-6 py-10 shadow-sm sm:px-10 sm:py-14">
  <div className="flex flex-wrap items-center gap-3">
- <span className="rounded-full bg-[var(--blog-sage)] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[var(--blog-night)]">
+ <span className="rounded-md bg-[var(--primary-soft)] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--brand)]">
  {post.category}
  </span>
- <span className="inline-flex items-center gap-2 rounded-full border-[var(--blog-night)]/10 bg-[var(--blog-paper)] px-4 py-2 text-xs font-black text-[var(--blog-muted)]">
- <Clock className="size-3.5" />
+ <span className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--surface)] px-4 py-2 text-xs font-semibold text-[var(--muted-foreground)]">
+ <Clock className="size-3.5" aria-hidden="true" />
  {post.readTime} de lectura
  </span>
  </div>
 
- <h1
- style={{
- fontFamily: "var(--font-landing-display)",
- fontWeight: 500,
- }}
- className="mt-7 max-w-4xl text-[clamp(2.9rem,15vw,3.6rem)] leading-[0.88] tracking-[-0.04em] text-[var(--blog-night)] sm:text-[clamp(3.6rem,10vw,7.6rem)] sm:leading-[0.82]"
- >
+ <h1 className="mt-7 max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-[var(--foreground)] sm:text-5xl md:text-6xl">
  {post.title}
  </h1>
 
- <p className="mt-7 max-w-2xl text-lg font-bold leading-8 text-[var(--blog-muted)]">
+ <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--muted-foreground)] md:text-xl">
  {post.excerpt}
  </p>
 
- <div className="mt-9 grid gap-3 border-t border-[var(--blog-night)]/10 pt-6 text-sm font-bold text-[var(--blog-muted)] sm:grid-cols-[1fr_auto] sm:items-center">
+ <div className="mt-9 grid gap-3 border-t border-[var(--border-soft)] pt-6 text-sm font-semibold text-[var(--muted-foreground)] sm:grid-cols-[1fr_auto] sm:items-center">
  <p>
  Por{" "}
- <span className="font-black text-[var(--blog-night)]">
+ <span className="font-bold text-[var(--foreground)]">
  {post.author}
  </span>
  </p>
  <p>{post.date}</p>
  </div>
- </div>
- </div>
  </header>
 
- <div className="mx-auto mt-12 max-w-[68ch] rounded-[2rem] border-[var(--blog-night)]/8 bg-[var(--blog-paper)] p-5 shadow-[0_34px_96px_-78px_rgb(var(--raspberry-rgb)_/_0.2)] sm:p-10">
+ <div className="mx-auto mt-8 max-w-[68ch] rounded-2xl border border-[var(--border-soft)] bg-[var(--surface)] p-6 shadow-sm sm:p-10">
  <BlogContentRenderer content={post.content} />
  </div>
  </div>
