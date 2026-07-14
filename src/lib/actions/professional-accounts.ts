@@ -3,6 +3,7 @@
 import { timingSafeEqual } from "crypto";
 import { revalidatePath } from "next/cache";
 
+import { getAuthenticatedUser } from "@/lib/auth/authenticated-user";
 import { createAdminClient, hasSupabaseAdminConfig } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -136,12 +137,9 @@ function isProfessionalSpecialty(
 
 async function getCurrentUniversalAdminProfile() {
  const supabase = await createClient();
- const {
- data: { user },
- error: userError,
- } = await supabase.auth.getUser();
+ const user = await getAuthenticatedUser(supabase);
 
- if (userError || !user) {
+ if (!user) {
  return {
  error: "Debes iniciar sesión para crear cuentas profesionales.",
  profile: null,

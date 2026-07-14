@@ -27,7 +27,7 @@ const searchFieldInputVariants = defineVariants(
  {
   variants: {
    size: {
-    sm: "h-[calc(var(--ds-space-8)+var(--ds-space-1))] px-ds-3 py-ds-1-5 text-sm",
+    sm: "h-ds-10 px-ds-3 py-ds-1-5 text-sm sm:h-[calc(var(--ds-space-8)+var(--ds-space-1))]",
     default: "h-ds-11 px-ds-4 py-ds-2 text-base md:text-sm",
     lg: "h-ds-12 px-ds-4 py-ds-2 text-base",
    },

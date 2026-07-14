@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
+import { getAuthenticatedUser } from "@/lib/auth/authenticated-user";
 import { hasSupabaseConfig } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 
@@ -10,16 +11,7 @@ export const getCurrentUser = cache(async () => {
  }
 
  const supabase = await createClient();
- const {
- data: { user },
- error,
- } = await supabase.auth.getUser();
-
- if (error) {
- return null;
- }
-
- return user;
+ return getAuthenticatedUser(supabase);
 });
 
 export const getCurrentProfile = cache(async () => {

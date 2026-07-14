@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { getAuthenticatedUser } from "@/lib/auth/authenticated-user";
 import { getRoutineDetail } from "@/lib/routines/data";
 import { parseRoutineSnapshot } from "@/lib/routines/snapshot";
 import { createClient } from "@/lib/supabase/server";
@@ -78,12 +79,9 @@ export async function updateWorkoutDayExerciseProgress(
  }
 
  const supabase = await createClient();
- const {
- data: { user },
- error: userError,
- } = await supabase.auth.getUser();
+ const user = await getAuthenticatedUser(supabase);
 
- if (userError || !user) {
+ if (!user) {
  return {
  message: "Debes iniciar sesión para actualizar tu entrenamiento.",
  status: "error",

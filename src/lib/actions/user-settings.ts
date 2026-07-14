@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { getAuthenticatedUser } from "@/lib/auth/authenticated-user";
 import { createClient } from "@/lib/supabase/server";
 import { userSettingsToRow } from "@/lib/user-settings/types";
 import {
@@ -58,12 +59,9 @@ export async function updateUserSettings(
  }
 
  const supabase = await createClient();
- const {
- data: { user },
- error: userError,
- } = await supabase.auth.getUser();
+ const user = await getAuthenticatedUser(supabase);
 
- if (userError || !user) {
+ if (!user) {
  return {
  message: "Debes iniciar sesion para guardar tu configuracion.",
  status: "error",

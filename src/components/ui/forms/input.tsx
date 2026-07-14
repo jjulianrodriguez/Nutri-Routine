@@ -27,7 +27,7 @@ const inputVariants = defineVariants(
  {
   variants: {
    size: {
-    sm: "h-ds-10",
+    sm: "h-ds-11 sm:h-ds-10",
     default: "h-11",
     lg: "h-[3.25rem]",
    },

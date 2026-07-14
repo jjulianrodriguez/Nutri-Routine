@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { getAuthenticatedUser } from "@/lib/auth/authenticated-user";
 import { createClient } from "@/lib/supabase/server";
 import {
  changePasswordSchema,
@@ -197,12 +198,9 @@ export async function updateBasicAccount(
  }
 
  const supabase = await createClient();
- const {
- data: { user },
- error: userError,
- } = await supabase.auth.getUser();
+ const user = await getAuthenticatedUser(supabase);
 
- if (userError || !user) {
+ if (!user) {
  return {
  message: "Debes iniciar sesión para actualizar tu cuenta.",
  status: "error",
@@ -245,12 +243,9 @@ export async function changePassword(
  }
 
  const supabase = await createClient();
- const {
- data: { user },
- error: userError,
- } = await supabase.auth.getUser();
+ const user = await getAuthenticatedUser(supabase);
 
- if (userError || !user) {
+ if (!user) {
  return {
  message: "Debes iniciar sesión para actualizar tu contraseña.",
  status: "error",
@@ -293,12 +288,9 @@ export async function updatePersonalDetails(
  }
 
  const supabase = await createClient();
- const {
- data: { user },
- error: userError,
- } = await supabase.auth.getUser();
+ const user = await getAuthenticatedUser(supabase);
 
- if (userError || !user) {
+ if (!user) {
  return {
  message: "Debes iniciar sesión para actualizar tu información.",
  status: "error",
@@ -359,12 +351,9 @@ export async function updatePersonalDetails(
 
 export async function deletePersonalDetails(): Promise<PersonalDetailsActionResult> {
  const supabase = await createClient();
- const {
- data: { user },
- error: userError,
- } = await supabase.auth.getUser();
+ const user = await getAuthenticatedUser(supabase);
 
- if (userError || !user) {
+ if (!user) {
  return {
  message: "Debes iniciar sesión para eliminar tu información.",
  status: "error",

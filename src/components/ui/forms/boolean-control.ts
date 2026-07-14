@@ -18,9 +18,9 @@ const switchControlVariants = defineVariants(
  {
   variants: {
    size: {
-    sm: "h-ds-6 w-ds-10",
-    default: "h-ds-7 w-ds-12",
-    lg: "h-ds-8 w-ds-14",
+    sm: "h-[1.625rem] w-[2.625rem] sm:h-ds-6 sm:w-ds-10",
+    default: "h-[1.875rem] w-[3.125rem] sm:h-ds-7 sm:w-ds-12",
+    lg: "h-[2.125rem] w-[3.625rem] sm:h-ds-8 sm:w-ds-14",
    },
   },
   defaultVariants: {
@@ -39,9 +39,9 @@ const checkboxControlVariants = defineVariants(
  {
   variants: {
    size: {
-    sm: "size-ds-4",
-    default: "size-ds-5",
-    lg: "size-ds-6",
+    sm: "size-[1.125rem] sm:size-ds-4",
+    default: "size-[1.375rem] sm:size-ds-5",
+    lg: "size-[1.625rem] sm:size-ds-6",
    },
   },
   defaultVariants: {
@@ -55,9 +55,9 @@ const checkboxIndicatorVariants = defineVariants(
  {
   variants: {
    size: {
-    sm: "size-icon-xs",
-    default: "size-icon-sm",
-    lg: "size-icon-md",
+    sm: "size-icon-sm sm:size-icon-xs",
+    default: "size-icon-md sm:size-icon-sm",
+    lg: "size-[1.125rem] sm:size-icon-md",
    },
   },
   defaultVariants: {
@@ -76,9 +76,9 @@ const radioControlVariants = defineVariants(
  {
   variants: {
    size: {
-    sm: "size-ds-4",
-    default: "size-ds-5",
-    lg: "size-ds-6",
+    sm: "size-[1.125rem] sm:size-ds-4",
+    default: "size-[1.375rem] sm:size-ds-5",
+    lg: "size-[1.625rem] sm:size-ds-6",
    },
   },
   defaultVariants: {
@@ -92,9 +92,9 @@ const radioIndicatorVariants = defineVariants(
  {
   variants: {
    size: {
-    sm: "size-1.5",
-    default: "size-2",
-    lg: "size-2.5",
+    sm: "size-[0.4375rem] sm:size-1.5",
+    default: "size-[0.5625rem] sm:size-2",
+    lg: "size-[0.6875rem] sm:size-2.5",
    },
   },
   defaultVariants: {
@@ -122,9 +122,9 @@ const switchThumbVariants = defineVariants(
  {
   variants: {
    size: {
-    sm: "size-ds-5 data-[state=checked]:translate-x-ds-4",
-    default: "size-ds-6 data-[state=checked]:translate-x-ds-5",
-    lg: "size-ds-7 data-[state=checked]:translate-x-ds-6",
+    sm: "size-[1.375rem] sm:size-ds-5 data-[state=checked]:translate-x-ds-4",
+    default: "size-[1.625rem] sm:size-ds-6 data-[state=checked]:translate-x-ds-5",
+    lg: "size-[1.875rem] sm:size-ds-7 data-[state=checked]:translate-x-ds-6",
    },
   },
   defaultVariants: {

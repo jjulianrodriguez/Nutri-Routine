@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { getAuthenticatedUser } from "@/lib/auth/authenticated-user";
 import { createClient } from "@/lib/supabase/server";
 
 const NOTIFICATIONS_PATH = "/app/notificaciones";
@@ -36,14 +37,11 @@ function getUniqueNotificationIds(notificationIds: string[]) {
 
 async function getAuthenticatedClient() {
  const supabase = await createClient();
- const {
- data: { user },
- error,
- } = await supabase.auth.getUser();
+ const user = await getAuthenticatedUser(supabase);
 
  return {
  supabase,
- user: error ? null : user,
+ user,
  };
 }
 

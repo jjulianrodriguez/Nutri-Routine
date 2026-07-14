@@ -1,6 +1,5 @@
 import "server-only";
 
-import type { User } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
@@ -11,12 +10,13 @@ import {
  type CurrentUserAccess,
  type ProfessionalSpecialty,
 } from "@/lib/auth/access-rules";
+import type { AuthenticatedUser } from "@/lib/auth/authenticated-user";
 import {
  getProfileDirectory,
  getProfileDisplayName,
  type ProfileDirectoryEntry,
 } from "@/lib/auth/profile-directory";
-import { hasSupabaseConfig } from "@/lib/supabase/config";
+import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
 
@@ -73,7 +73,7 @@ function getInitials(name: string, email: string) {
  return parts.map((part) => part[0]?.toUpperCase()).join("");
 }
 
-function getDisplayName(user: User, profile: ProfileRow) {
+function getDisplayName(user: AuthenticatedUser, profile: ProfileRow) {
  const metadata = user.user_metadata ?? {};
 
  return (
@@ -191,17 +191,9 @@ async function getProfessionalProfile(
 }
 
 export const getCurrentUserAccess = cache(async () => {
- if (!hasSupabaseConfig()) {
- return null;
- }
+ const user = await getCurrentUser();
 
- const supabase = await createClient();
- const {
- data: { user },
- error,
- } = await supabase.auth.getUser();
-
- if (error || !user) {
+ if (!user) {
  return null;
  }
 

@@ -39,16 +39,16 @@ const buttonVariants = defineVariants(
     link: "rounded-sm text-action-primary underline-offset-4 hover:text-action-primary-hover hover:underline",
    },
    size: {
-    default:
-     "h-ds-10 gap-inline-sm px-ds-4 has-data-[icon=inline-end]:pr-ds-3 has-data-[icon=inline-start]:pl-ds-3",
-    xs: "h-ds-7 gap-inline-xs rounded-[min(var(--ds-radius-md),10px)] px-ds-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-ds-1-5 has-data-[icon=inline-start]:pl-ds-1-5 [&_svg:not([class*='size-'])]:size-icon-xs",
-    sm: "h-[calc(var(--ds-space-8)+var(--ds-space-1))] gap-inline-xs rounded-[min(var(--ds-radius-md),12px)] px-ds-3 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-ds-2 has-data-[icon=inline-start]:pl-ds-2 [&_svg:not([class*='size-'])]:size-icon-sm",
+   default:
+     "h-ds-11 gap-inline-sm px-ds-4 sm:h-ds-10 has-data-[icon=inline-end]:pr-ds-3 has-data-[icon=inline-start]:pl-ds-3",
+    xs: "h-ds-8 gap-inline-xs rounded-[min(var(--ds-radius-md),10px)] px-ds-2 text-xs sm:h-ds-7 in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-ds-1-5 has-data-[icon=inline-start]:pl-ds-1-5 [&_svg:not([class*='size-'])]:size-icon-xs",
+    sm: "h-ds-10 gap-inline-xs rounded-[min(var(--ds-radius-md),12px)] px-ds-3 text-[0.8rem] sm:h-[calc(var(--ds-space-8)+var(--ds-space-1))] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-ds-2 has-data-[icon=inline-start]:pl-ds-2 [&_svg:not([class*='size-'])]:size-icon-sm",
     lg: "h-ds-12 gap-inline-md px-ds-5 has-data-[icon=inline-end]:pr-ds-4 has-data-[icon=inline-start]:pl-ds-4",
-    icon: "size-ds-10",
+    icon: "size-ds-11 sm:size-ds-10",
     "icon-xs":
-     "size-ds-7 rounded-[min(var(--ds-radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-icon-xs",
+     "size-ds-8 rounded-[min(var(--ds-radius-md),10px)] sm:size-ds-7 in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-icon-xs",
     "icon-sm":
-     "size-[calc(var(--ds-space-8)+var(--ds-space-1))] rounded-[min(var(--ds-radius-md),12px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-icon-sm",
+     "size-ds-10 rounded-[min(var(--ds-radius-md),12px)] sm:size-[calc(var(--ds-space-8)+var(--ds-space-1))] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-icon-sm",
     "icon-lg": "size-ds-12 [&_svg:not([class*='size-'])]:size-icon-lg",
    },
   },

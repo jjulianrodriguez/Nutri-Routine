@@ -1,6 +1,6 @@
 export const editorContentClasses = [
  "relative overflow-hidden bg-surface",
- "[&_.ProseMirror]:mx-auto [&_.ProseMirror]:min-h-[30rem] [&_.ProseMirror]:max-w-3xl [&_.ProseMirror]:px-6 [&_.ProseMirror]:py-8 [&_.ProseMirror]:text-base [&_.ProseMirror]:leading-8 [&_.ProseMirror]:text-foreground [&_.ProseMirror]:outline-none sm:[&_.ProseMirror]:px-10 sm:[&_.ProseMirror]:py-10",
+ "[&_.ProseMirror]:w-full [&_.ProseMirror]:min-w-0 [&_.ProseMirror]:px-6 [&_.ProseMirror]:py-8 [&_.ProseMirror]:text-base [&_.ProseMirror]:leading-8 [&_.ProseMirror]:text-foreground [&_.ProseMirror]:outline-none sm:[&_.ProseMirror]:px-10 sm:[&_.ProseMirror]:py-10",
  "[&_.ProseMirror_a]:font-bold [&_.ProseMirror_a]:text-secondary [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:underline-offset-4",
  "[&_.ProseMirror_.blog-align-center]:text-center [&_.ProseMirror_.blog-align-left]:text-left [&_.ProseMirror_.blog-align-right]:text-right",
  "[&_.ProseMirror_.blog-color-accent]:text-primary [&_.ProseMirror_.blog-color-charcoal]:text-foreground [&_.ProseMirror_.blog-color-teal]:text-secondary [&_.ProseMirror_.blog-color-warm]:text-muted-foreground",

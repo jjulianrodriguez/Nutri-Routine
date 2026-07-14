@@ -32,8 +32,8 @@ const selectVariants = defineVariants(
      "bg-transparent ring-0 hover:bg-surface-interactive focus-visible:bg-surface-interactive",
    },
    size: {
-    xs: "h-ds-8 px-ds-3 py-ds-1 text-xs",
-    sm: "h-[calc(var(--ds-space-8)+var(--ds-space-1))] px-ds-3 py-ds-1-5 text-sm",
+    xs: "h-[calc(var(--ds-space-8)+var(--ds-space-1))] px-ds-3 py-ds-1 text-xs sm:h-ds-8",
+    sm: "h-ds-10 px-ds-3 py-ds-1-5 text-sm sm:h-[calc(var(--ds-space-8)+var(--ds-space-1))]",
     default: "h-ds-11 px-ds-4 py-ds-2 text-base md:text-sm",
     lg: "h-ds-12 px-ds-4 py-ds-2 text-base",
    },

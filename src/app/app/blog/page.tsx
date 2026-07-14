@@ -30,13 +30,13 @@ export default async function AdminBlogPage() {
  </p>
  </div>
  <div className="grid w-full gap-2 sm:flex sm:w-auto sm:flex-wrap">
- <Button asChild className="w-full sm:w-auto">
+ <Button asChild className="w-full max-[649px]:min-h-[46px] max-[649px]:px-[18px] sm:w-auto">
  <Link href="/app/blog/listado">
  <LibraryBig className="size-4" aria-hidden="true" />
  Ver blogs creados
  </Link>
  </Button>
- <Button asChild variant="outline" className="w-full sm:w-auto">
+ <Button asChild variant="outline" className="w-full max-[649px]:min-h-[46px] max-[649px]:px-[18px] sm:w-auto">
  <Link href="/blog" target="_blank" rel="noreferrer">
  <Eye className="size-4" aria-hidden="true" />
  Ver blog público

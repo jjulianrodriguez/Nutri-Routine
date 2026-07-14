@@ -157,7 +157,7 @@ export function Sidebar({
  />
  <button
  type="button"
- className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border-white/12 bg-white/8 text-white/72 shadow-none transition-colors hover:bg-white/14 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30 lg:hidden"
+ className="absolute right-4 top-4 grid size-11 place-items-center rounded-full border-white/12 bg-white/8 text-white/72 shadow-none transition-colors hover:bg-white/14 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30 sm:size-10 lg:hidden"
  onClick={() => setMobileOpen(false)}
  aria-label="Cerrar navegación"
  >
@@ -233,7 +233,7 @@ export function Sidebar({
  <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-white/12 bg-sidebar px-4 text-white lg:hidden">
  <button
  type="button"
- className="grid size-10 place-items-center rounded-full border-white/12 bg-white/8 text-white/72 shadow-none transition-colors hover:bg-white/14 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30"
+ className="grid size-11 place-items-center rounded-full border-white/12 bg-white/8 text-white/72 shadow-none transition-colors hover:bg-white/14 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30 sm:size-10"
  onClick={() => setMobileOpen(true)}
  aria-label="Abrir navegación"
  >

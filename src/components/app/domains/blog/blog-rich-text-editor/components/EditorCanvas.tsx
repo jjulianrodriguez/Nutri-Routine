@@ -17,10 +17,16 @@ export function EditorCanvas({
  isEmpty: boolean;
 }) {
  return (
- <div className={cn(editorContentClasses, error && "border-danger/40")}>
- <EditorContent editor={editor} />
+ <div
+ className={cn(
+ editorContentClasses,
+ "min-h-full !bg-surface !shadow-none [&_.ProseMirror]:min-h-full",
+ error && "border-danger/40",
+ )}
+ >
+ <EditorContent className="!bg-surface !shadow-none" editor={editor} />
  {isEmpty ? (
- <span className="pointer-events-none absolute left-1/2 top-8 w-[calc(100%-3rem)] max-w-3xl -translate-x-1/2 text-base leading-7 text-muted sm:top-10">
+ <span className="pointer-events-none absolute inset-x-6 top-8 text-base leading-7 text-muted sm:inset-x-10 sm:top-10">
  Empieza a escribir tu publicación…
  </span>
  ) : null}

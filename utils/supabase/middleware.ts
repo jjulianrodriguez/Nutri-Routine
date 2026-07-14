@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { getAuthenticatedUser } from "@/lib/auth/authenticated-user";
 import {
   getSupabaseConfig,
   hasSupabaseConfig,
@@ -73,8 +74,8 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const { data, error } = await supabase.auth.getClaims();
-  const isAuthenticated = Boolean(!error && data?.claims?.sub);
+  const user = await getAuthenticatedUser(supabase);
+  const isAuthenticated = Boolean(user);
 
   if (!isAuthenticated && privatePath) {
     return copySessionResponse(

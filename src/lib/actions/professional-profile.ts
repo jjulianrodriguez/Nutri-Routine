@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { getAuthenticatedUser } from "@/lib/auth/authenticated-user";
 import { createClient } from "@/lib/supabase/server";
 import {
  professionalProfileSchema,
@@ -54,12 +55,9 @@ export async function updateOwnProfessionalProfile(
  }
 
  const supabase = await createClient();
- const {
- data: { user },
- error: userError,
- } = await supabase.auth.getUser();
+ const user = await getAuthenticatedUser(supabase);
 
- if (userError || !user) {
+ if (!user) {
  return {
  message: "Debes iniciar sesion para actualizar tu perfil profesional.",
  status: "error",

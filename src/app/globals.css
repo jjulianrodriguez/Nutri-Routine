@@ -1577,3 +1577,110 @@ tbody th {
   color: var(--foreground);
 }
 
+/* Mobile-only refinement of the existing type and interaction scale.
+   The established `sm` boundary restores the original tablet/desktop system. */
+@media (width < 40rem) {
+  :root {
+    --ds-type-body-sm-size: 0.9375rem;
+    --ds-type-caption-size: 0.8125rem;
+    --ds-icon-xs: 0.8125rem;
+    --ds-icon-sm: 0.9375rem;
+    --ds-icon-md: 1.0625rem;
+    --ds-icon-lg: 1.3125rem;
+  }
+
+  .text-xs {
+    font-size: 0.8125rem;
+  }
+
+  .text-sm {
+    font-size: 0.9375rem;
+  }
+
+  .text-lg {
+    font-size: 1.1875rem;
+  }
+
+  .text-xl {
+    font-size: 1.3125rem;
+  }
+
+  .text-2xl {
+    font-size: 1.5625rem;
+  }
+
+  .text-3xl {
+    font-size: 2rem;
+  }
+
+  .text-4xl {
+    font-size: 2.375rem;
+  }
+
+  :where([class*="text-[0.6rem]"], [class*="text-[0.62rem]"]) {
+    font-size: 0.6875rem;
+  }
+
+  :where(
+    [class*="text-[0.64rem]"],
+    [class*="text-[0.65rem]"],
+    [class*="text-[0.66rem]"]
+  ) {
+    font-size: 0.71875rem;
+  }
+
+  :where([class*="text-[0.68rem]"], [class*="text-[0.7rem]"]) {
+    font-size: 0.75rem;
+  }
+
+  :where([class*="text-[0.72rem]"], [class*="text-[0.75rem]"]) {
+    font-size: 0.8125rem;
+  }
+
+  [class*="text-[0.8rem]"] {
+    font-size: 0.875rem;
+  }
+
+  :where(
+    input:not([type="hidden"]):not([data-slot]),
+    select:not([data-slot]),
+    textarea:not([data-slot])
+  ) {
+    font-size: 0.9375rem;
+  }
+
+  :where(input[type="checkbox"], input[type="radio"]) {
+    block-size: 1.125rem;
+    inline-size: 1.125rem;
+  }
+
+  :where([role="dialog"], [role="alertdialog"]) {
+    padding: 1.375rem;
+  }
+
+  :where(
+    [role="menuitem"],
+    [role="menuitemcheckbox"],
+    [role="menuitemradio"]
+  ) {
+    min-height: 2.75rem;
+  }
+
+  :where(
+    [data-slot="button"],
+    [data-sidebar-link],
+    [role="menuitem"],
+    [role="menuitemcheckbox"],
+    [role="menuitemradio"],
+    [role="tab"]
+  )
+    svg[class~="size-4"] {
+    height: 1.0625rem;
+    width: 1.0625rem;
+  }
+
+  thead th {
+    font-size: 0.8125rem;
+  }
+}
+

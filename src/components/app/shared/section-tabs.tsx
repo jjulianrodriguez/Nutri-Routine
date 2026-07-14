@@ -56,7 +56,7 @@ export function SectionTabs<TId extends string = string>({
  );
  const tabClassName = cn(
  "inline-flex shrink-0 items-center justify-center gap-2 rounded-control text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25",
- size === "default" ? "min-h-11 px-4" : "min-h-10 px-3",
+ size === "default" ? "min-h-11 px-4" : "min-h-11 px-3 sm:min-h-10",
  isActive
  ? "bg-primary text-primary-foreground"
  : "text-muted-foreground hover:bg-primary-soft hover:text-foreground",
