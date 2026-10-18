@@ -75,8 +75,8 @@ export function Navbar() {
  progress,
  [0, 0.16],
  [
- "0 18px 58px -48px rgb(26 48 56 / 0.16)",
- "0 22px 64px -50px rgb(26 48 56 / 0.2)",
+ "0 18px 58px -48px rgb(var(--primary-rgb) / 0.16)",
+ "0 22px 64px -50px rgb(var(--primary-rgb) / 0.22)",
  ],
  );
 

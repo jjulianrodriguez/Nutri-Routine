@@ -453,7 +453,7 @@ export default async function TrainingPage() {
  <div className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-4">
  <Link
  href="/app/entrenamiento/ejercicios"
- className="group h-fit self-start rounded-[28px] bg-surface p-6 transition hover:border-primary/40 hover:bg-primary-soft/30"
+ className="group h-fit self-start rounded-[28px] bg-surface p-6 transition hover:border-primary/40 hover:bg-primary-tint/30"
  >
  <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-foreground">
  <Dumbbell className="size-5" aria-hidden="true" />
@@ -473,7 +473,7 @@ export default async function TrainingPage() {
 
  <Link
  href="/app/entrenamiento/rutinas"
- className="group h-fit self-start rounded-[28px] border-foreground/10 bg-secondary-soft p-6 transition hover:border-primary/40 hover:bg-primary-soft/40"
+ className="group h-fit self-start rounded-[28px] border-foreground/10 bg-secondary-tint p-6 transition hover:border-primary/40 hover:bg-primary-tint/40"
  >
  <div className="grid size-12 place-items-center rounded-full bg-surface text-foreground">
  <ListChecks className="size-5" aria-hidden="true" />
@@ -493,7 +493,7 @@ export default async function TrainingPage() {
 
  <Link
  href="/app/entrenamiento/plantillas"
- className="group h-fit self-start rounded-[28px] bg-surface p-6 transition hover:border-primary/40 hover:bg-primary-soft/30"
+ className="group h-fit self-start rounded-[28px] bg-surface p-6 transition hover:border-primary/40 hover:bg-primary-tint/30"
  >
  <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-foreground">
  <Layers3 className="size-5" aria-hidden="true" />
@@ -513,7 +513,7 @@ export default async function TrainingPage() {
 
  <Link
  href="/app/entrenamiento/asignaciones"
- className="group h-fit self-start rounded-[28px] bg-surface p-6 transition hover:border-primary/40 hover:bg-primary-soft/30"
+ className="group h-fit self-start rounded-[28px] bg-surface p-6 transition hover:border-primary/40 hover:bg-primary-tint/30"
  >
  <div className="grid size-12 place-items-center rounded-full bg-primary-soft text-foreground">
  <ClipboardCheck className="size-5" aria-hidden="true" />

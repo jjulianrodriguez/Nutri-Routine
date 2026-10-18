@@ -44,7 +44,7 @@ export function RoutineEditor({ exerciseOptions, routine }: { exerciseOptions: E
      </div>
     </FieldGroup>
 
-    {editor.inactiveSelectedCount > 0 ? <Alert className="mt-5 rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-foreground"><TriangleAlert className="size-5 text-muted-foreground" aria-hidden="true" /><AlertDescription className="font-semibold leading-6 text-foreground">{editor.inactiveSelectedCount === 1 ? "Este entrenamiento contiene 1 ejercicio desactivado." : `Este entrenamiento contiene ${editor.inactiveSelectedCount} ejercicios desactivados.`} Puedes conservarlos o quitarlos. Si los quitas, no podras volver a agregarlos mientras sigan desactivados.</AlertDescription></Alert> : null}
+    {editor.inactiveSelectedCount > 0 ? <Alert className="mt-5 rounded-[18px] border-primary/40 bg-primary-tint/45 px-4 py-3 text-foreground"><TriangleAlert className="size-5 text-muted-foreground" aria-hidden="true" /><AlertDescription className="font-semibold leading-6 text-foreground">{editor.inactiveSelectedCount === 1 ? "Este entrenamiento contiene 1 ejercicio desactivado." : `Este entrenamiento contiene ${editor.inactiveSelectedCount} ejercicios desactivados.`} Puedes conservarlos o quitarlos. Si los quitas, no podras volver a agregarlos mientras sigan desactivados.</AlertDescription></Alert> : null}
 
     <FieldGroup className="mt-5 rounded-[22px] bg-background p-4 sm:p-5" legend="Notas del entrenamiento" legendClassName="px-1">
      <FormField controlId="routine-description" label="Descripción" error={errors.description?.message}><Textarea rows={4} placeholder="Objetivo, recomendaciones y contexto del entrenamiento." {...register("description")} /></FormField>

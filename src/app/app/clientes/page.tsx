@@ -585,7 +585,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
  open
  className="group rounded-[22px] bg-surface/70 "
  >
- <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-extrabold text-foreground outline-none transition hover:bg-primary-soft/50 focus-visible:ring-3 focus-visible:ring-primary/20 [&::-webkit-details-marker]:hidden">
+ <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-extrabold text-foreground outline-none transition hover:bg-primary-tint/50 focus-visible:ring-3 focus-visible:ring-primary/20 [&::-webkit-details-marker]:hidden">
  <span className="inline-flex items-center gap-2">
  <SlidersHorizontal className="size-4" aria-hidden="true" />
  Filtros y orden
@@ -735,7 +735,7 @@ export default async function ClientsPage({ searchParams }: ClientsPageProps) {
  tone={client.isClientActivated ? "success" : "muted"}
  className={
  client.isClientActivated
- ? "border-success/90 bg-success/90 text-white"
+ ? "border-success/90 bg-success/90 text-success-foreground"
  : undefined
  }
  >

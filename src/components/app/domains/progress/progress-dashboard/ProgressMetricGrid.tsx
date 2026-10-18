@@ -24,7 +24,7 @@ export function MetricCard({
  {value}
  </p>
  </div>
- <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary-soft text-secondary sm:size-10">
+ <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary-soft text-text-secondary sm:size-10">
  <Icon className="size-4 sm:size-5" aria-hidden="true" />
  </div>
  </div>

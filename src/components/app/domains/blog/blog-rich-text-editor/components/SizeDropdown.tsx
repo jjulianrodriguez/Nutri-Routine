@@ -82,7 +82,7 @@ export function SizeDropdown({
  className={cn(
  "flex min-h-9 w-full items-center rounded-[10px] px-3 py-1.5 text-xs font-bold transition-colors hover:bg-primary-soft hover:text-foreground",
  value === size.value || (size.value === "16px" && !value)
- ? "bg-primary-soft text-secondary"
+ ? "bg-primary-soft text-text-secondary"
  : "text-muted",
  )}
  >

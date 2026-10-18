@@ -78,7 +78,7 @@ export default async function RoutineDetailPage({
  />
 
  {inactiveExerciseCount > 0 ? (
- <Alert className="rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-foreground">
+ <Alert className="rounded-[18px] border-primary/40 bg-primary-tint/45 px-4 py-3 text-foreground">
  <TriangleAlert
  className="size-5 text-muted-foreground"
  aria-hidden="true"

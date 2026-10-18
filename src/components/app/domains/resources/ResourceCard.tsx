@@ -100,7 +100,7 @@ export function ResourceCard({
  className={cn(
  "rounded-full px-2.5 py-1 text-xs font-extrabold",
  isInactive
- ? "bg-muted/15 text-muted"
+ ? "bg-muted-surface/15 text-muted"
  : "bg-primary-soft text-foreground",
  )}
  >

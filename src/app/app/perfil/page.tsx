@@ -183,7 +183,7 @@ async function ClientProfile({
  title="Datos fisicos y salud"
  description="Informacion privada para tu seguimiento profesional."
  >
- <div className="mb-5 flex items-start gap-3 rounded-[20px] border-primary/25 bg-primary-soft/60 p-4">
+ <div className="mb-5 flex items-start gap-3 rounded-[20px] border-primary/25 bg-primary-tint/60 p-4">
  <LockKeyhole className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
  <div>
  <h3 className="font-extrabold text-foreground">

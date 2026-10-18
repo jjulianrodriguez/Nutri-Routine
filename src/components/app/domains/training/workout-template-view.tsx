@@ -285,7 +285,7 @@ export function WorkoutTemplateView({
  "overflow-hidden rounded-[32px] p-6 sm:p-7",
  statusTone === "warning"
  ? "border-danger/25 bg-danger/5"
- : "border-primary/30 bg-primary-soft/70",
+ : "border-primary/30 bg-primary-tint/70",
  )}
  >
  <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
@@ -412,7 +412,7 @@ export function WorkoutTemplateView({
  }.`}
  </p>
  {progress.completedAt ? (
- <p className="mt-3 rounded-[16px] bg-primary-soft px-4 py-3 text-sm font-extrabold text-foreground">
+ <p className="mt-3 rounded-[16px] bg-primary-tint px-4 py-3 text-sm font-extrabold text-foreground">
  Entrenamiento completado.
  </p>
  ) : null}

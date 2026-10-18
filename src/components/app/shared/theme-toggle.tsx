@@ -34,14 +34,14 @@ export const ThemeToggle = forwardRef<HTMLButtonElement, ThemeToggleProps>(
  title={nextLabel}
  onClick={handleClick}
  className={cn(
- "inline-flex h-11 min-w-0 items-center justify-center gap-3 rounded-control border-white/12 bg-white/8 text-sm font-extrabold text-white/72 shadow-none transition-[background-color,border-color,color,box-shadow,transform]",
- "hover:border-white/24 hover:bg-white/14 hover:text-white focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30 active:translate-y-px",
+ "inline-flex h-11 min-w-0 items-center justify-center gap-3 rounded-control border-[var(--sidebar-border)] bg-[var(--sidebar-accent)] text-sm font-extrabold text-[var(--sidebar-link-muted)] shadow-none transition-[background-color,border-color,color,box-shadow,transform]",
+ "hover:border-[var(--sidebar-border-strong)] hover:bg-[var(--sidebar-accent-hover)] hover:text-[var(--sidebar-foreground)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--sidebar-ring)] active:translate-y-px",
  showLabel ? "px-3" : "size-11 w-11 px-0",
  className,
  )}
  >
  <span
- className="relative grid size-7 shrink-0 place-items-center rounded-full bg-white text-primary"
+ className="relative grid size-7 shrink-0 place-items-center rounded-full bg-white text-[var(--on-white)]"
  aria-hidden="true"
  >
  <Sun

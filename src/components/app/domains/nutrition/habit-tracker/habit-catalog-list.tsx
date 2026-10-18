@@ -32,13 +32,13 @@ export function HabitCatalogList({
  return (
  <div className="space-y-3" aria-busy={isPending}>
  {isPending ? (
- <div className="flex items-center gap-2 rounded-[18px] border-primary/25 bg-primary-soft px-4 py-3 text-sm font-extrabold text-foreground">
+ <div className="flex items-center gap-2 rounded-[18px] border-primary/25 bg-primary-tint px-4 py-3 text-sm font-extrabold text-foreground">
  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
  Guardando cambios del catálogo...
  </div>
  ) : null}
  {habits.length === 0 ? (
- <Alert className="rounded-[22px] border-primary/35 bg-primary-soft/70 p-5">
+ <Alert className="rounded-[22px] border-primary/35 bg-primary-tint/70 p-5">
  <AlertDescription className="flex items-start gap-3 font-semibold text-foreground">
  <span className="grid size-10 shrink-0 place-items-center rounded-[14px] bg-surface text-muted-foreground">
  <Plus className="size-5" aria-hidden="true" />
@@ -73,7 +73,7 @@ export function HabitCatalogList({
  "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold",
  habit.active
  ? "bg-primary-soft text-foreground"
- : "bg-muted/15 text-muted",
+ : "bg-muted-surface/15 text-muted",
  )}
  >
  {habit.active ? (

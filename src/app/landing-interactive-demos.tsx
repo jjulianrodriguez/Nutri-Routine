@@ -257,10 +257,10 @@ function TypedMessage({
 }
 
 const darkDemoControl =
- "transition-[background-color,color,transform,box-shadow] duration-200 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/35 active:scale-[0.96] active:bg-white/[0.14] motion-reduce:transform-none";
+ "transition-[background-color,color,transform,box-shadow] duration-200 hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sidebar-ring)] active:scale-[0.96] active:bg-[var(--sidebar-accent-hover)] motion-reduce:transform-none";
 
 const lightDemoControl =
- "transition-[background-color,border-color,color,transform,box-shadow] duration-200 hover:border-primary hover:bg-primary-soft/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 active:scale-[0.96] active:bg-primary-soft motion-reduce:transform-none";
+ "transition-[background-color,border-color,color,transform,box-shadow] duration-200 hover:border-primary hover:bg-primary-tint/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 active:scale-[0.96] active:bg-primary-soft motion-reduce:transform-none";
 
 const heroDashboardNavItems: Array<{
  active?: boolean;
@@ -306,14 +306,14 @@ export function HeroDashboardPreview() {
  >
  <div className="flex h-full min-w-0 flex-col sm:flex-row">
  <motion.header
- className="flex h-14 shrink-0 items-center justify-between border-b border-white/12 bg-[var(--sidebar)] px-3 text-white sm:hidden"
+ className="flex h-14 shrink-0 items-center justify-between border-b border-[var(--sidebar-border)] bg-[var(--sidebar)] px-3 text-[var(--sidebar-foreground)] sm:hidden"
  variants={demoSidebarVariants}
  >
  <button
  type="button"
  aria-label="Menú del dashboard de demostración"
  className={
- "grid size-8 place-items-center rounded-full border border-white/12 bg-white/8 text-white/72 " +
+ "grid size-8 place-items-center rounded-full border border-[var(--sidebar-border)] bg-[var(--sidebar-accent)] text-[var(--sidebar-link-muted)] " +
  darkDemoControl
  }
  >
@@ -323,11 +323,11 @@ export function HeroDashboardPreview() {
  <p className="text-[0.6rem] font-extrabold leading-none">
  Nutrición Con Enfoque
  </p>
- <p className="mt-1 text-[0.38rem] font-extrabold uppercase tracking-[0.16em] text-white/55">
+ <p className="mt-1 text-[0.38rem] font-extrabold uppercase tracking-[0.16em] text-[var(--sidebar-link-muted-subtle)]">
  Cliente
  </p>
  </div>
- <span className="grid size-8 place-items-center rounded-full bg-white text-[0.5rem] font-extrabold text-[var(--primary)]">
+ <span className="grid size-8 place-items-center rounded-full bg-white text-[0.5rem] font-extrabold text-[var(--on-white)]">
  SV
  </span>
  </motion.header>
@@ -358,7 +358,7 @@ export function HeroDashboardPreview() {
 
  <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden py-4">
  <motion.div className="flex flex-col gap-1" variants={demoGroupVariants}>
- <p className="px-2 text-[0.38rem] font-extrabold uppercase tracking-[0.16em] text-white/40">
+ <p className="px-2 text-[0.38rem] font-extrabold uppercase tracking-[0.16em] text-[var(--sidebar-link-muted-subtle)]">
  Mi bienestar
  </p>
  {heroDashboardNavItems.map(({ active, icon: Icon, label }) => (
@@ -371,7 +371,7 @@ export function HeroDashboardPreview() {
  "relative flex h-7 w-full items-center gap-2 rounded-[10px] px-2 text-left text-[0.5rem] font-semibold",
  darkDemoControl,
  active
- ? "bg-white/[0.07] font-extrabold text-white before:absolute before:-left-3 before:inset-y-1 before:w-0.5 before:rounded-r-full before:bg-white"
+ ? "bg-[var(--sidebar-accent)] font-extrabold text-[var(--sidebar-foreground)] before:absolute before:-left-3 before:inset-y-1 before:w-0.5 before:rounded-r-full before:bg-[var(--sidebar-foreground)]"
  : "text-[var(--sidebar-link-muted)]",
  ].join(" ")}
  >
@@ -389,7 +389,7 @@ export function HeroDashboardPreview() {
  </motion.div>
 
  <motion.div className="flex flex-col gap-1" variants={demoGroupVariants}>
- <p className="px-2 text-[0.38rem] font-extrabold uppercase tracking-[0.16em] text-white/40">
+ <p className="px-2 text-[0.38rem] font-extrabold uppercase tracking-[0.16em] text-[var(--sidebar-link-muted-subtle)]">
  Acompañamiento
  </p>
  {heroDashboardSupportItems.map(({ badge, icon: Icon, label }) => (
@@ -405,7 +405,7 @@ export function HeroDashboardPreview() {
  <Icon className="size-3 shrink-0" aria-hidden="true" />
  <span className="truncate text-[0.5rem] font-semibold">{label}</span>
  {badge ? (
- <span className="ml-auto grid min-w-4 place-items-center rounded-full bg-white px-1 py-0.5 text-[0.38rem] font-extrabold leading-none text-[var(--primary-hover)]">
+ <span className="ml-auto grid min-w-4 place-items-center rounded-full bg-white px-1 py-0.5 text-[0.38rem] font-extrabold leading-none text-[var(--on-white)]">
  <AnimatedCount target={Number(badge)} delay={1.55} duration={0.9} />
  </span>
  ) : null}
@@ -418,11 +418,11 @@ export function HeroDashboardPreview() {
  type="button"
  variants={demoItemVariants}
  className={
- "flex items-center gap-2 border-t border-white/10 pt-3 text-left text-[0.46rem] font-bold text-white/55 " +
+ "flex items-center gap-2 border-t border-[var(--sidebar-border)] pt-3 text-left text-[0.46rem] font-bold text-[var(--sidebar-link-muted-subtle)] " +
  darkDemoControl
  }
  >
- <span className="grid size-6 place-items-center rounded-full bg-white/8">
+ <span className="grid size-6 place-items-center rounded-full bg-[var(--sidebar-accent)]">
  <ChevronLeft className="size-2.5" aria-hidden="true" />
  </span>
  <span className="text-[0.46rem] font-bold">Sidebar abierto</span>
@@ -490,7 +490,7 @@ export function HeroDashboardPreview() {
  lightDemoControl
  }
  >
- <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[var(--secondary-soft)] text-[var(--secondary)] sm:size-7">
+ <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[var(--secondary-soft)] text-[var(--chip-foreground)] sm:size-7">
  <Leaf className="size-3 sm:size-3.5" aria-hidden="true" />
  </span>
  <span className="min-w-0">
@@ -510,7 +510,7 @@ export function HeroDashboardPreview() {
  lightDemoControl
  }
  >
- <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[var(--primary-soft)] text-[var(--primary)] sm:size-7">
+ <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[var(--primary-soft)] text-[var(--chip-primary)] sm:size-7">
  <Dumbbell className="size-3 sm:size-3.5" aria-hidden="true" />
  </span>
  <span className="min-w-0">
@@ -713,8 +713,8 @@ export function CalendarArtwork() {
  "flex min-h-7 flex-col items-center justify-center rounded-[10px] bg-background p-0.5 text-[0.48rem] font-extrabold text-foreground transition-[background-color,box-shadow,transform]",
  outside
  ? "cursor-default opacity-40"
- : "hover:bg-primary-soft/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 active:scale-[0.88] active:bg-primary-soft",
- isAppointment ? "bg-primary-soft/60" : "",
+ : "hover:bg-primary-tint/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 active:scale-[0.88] active:bg-primary-soft",
+ isAppointment ? "bg-primary-tint/60" : "",
  isSelected ? "ring-2 ring-primary/25" : "",
  ].join(" ")}
  >
@@ -739,11 +739,11 @@ export function CalendarArtwork() {
  type="button"
  variants={demoBubbleLeftVariants}
  className={
- "mt-2 flex w-full items-center gap-2 rounded-[18px] border border-transparent bg-primary-soft/70 px-3 py-2 text-left " +
+ "mt-2 flex w-full items-center gap-2 rounded-[18px] border border-transparent bg-primary-tint/70 px-3 py-2 text-left " +
  lightDemoControl
  }
  >
- <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface text-secondary">
+ <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface text-text-secondary">
  <CalendarClock className="size-3.5" aria-hidden="true" />
  </span>
  <span className="min-w-0">
@@ -866,7 +866,7 @@ export function ProgressArtwork() {
  </p>
  </div>
  <motion.span
- className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary-soft text-secondary"
+ className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary-soft text-text-secondary"
  variants={demoMetricVariants}
  >
  <Icon className="size-3.5" aria-hidden="true" />

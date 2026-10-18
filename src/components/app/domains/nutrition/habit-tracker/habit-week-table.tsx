@@ -45,7 +45,7 @@ export function HabitWeekTable({
  key={day.date}
  className={cn(
  "px-3 py-3 text-center text-xs font-extrabold uppercase tracking-[0.12em] relative",
- day.isToday ? "text-foreground bg-primary-soft/30 font-black rounded-t-[14px]" : "text-muted",
+ day.isToday ? "text-foreground bg-primary-tint/30 font-black rounded-t-[14px]" : "text-muted",
  )}
  >
  {day.isToday && (
@@ -78,7 +78,7 @@ export function HabitWeekTable({
  isClient && isHabitDateMarkable(day.date, today, weekStart);
 
  return (
- <td key={day.date} className={cn("px-3 py-4 align-middle", day.isToday && "bg-primary-soft/10")}>
+ <td key={day.date} className={cn("px-3 py-4 align-middle", day.isToday && "bg-primary-tint/10")}>
  <HabitDayToggle
  assignment={assignment}
  canToggle={canToggle}

@@ -415,7 +415,7 @@ export function WorkoutTemplateEditor({
  className={cn(
  "rounded-[20px] p-4 transition",
  isSelected
- ? "border-primary bg-primary-soft/45 "
+ ? "border-primary bg-primary-tint/45 "
  : " bg-background",
  )}
  >
@@ -606,7 +606,7 @@ function TemplateCompletionStat({
  className={cn(
  "rounded-[18px] p-4",
  tone === "neutral" && " bg-background",
- tone === "ready" && "border-primary/40 bg-primary-soft/45",
+ tone === "ready" && "border-primary/40 bg-primary-tint/45",
  tone === "warning" && "border-danger/25 bg-danger/5",
  )}
  >

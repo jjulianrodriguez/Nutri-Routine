@@ -10,21 +10,20 @@ import { ToolbarPopover } from "./ToolbarPopover";
 
 const textPresetColors = [
  { label: "Auto", value: "default", class: "" },
- { label: "Raspberry", value: "#B82D52", class: "bg-[#B82D52]" },
- { label: "Raspberry suave", value: "#F7E4EA", class: "bg-[#F7E4EA]" },
- { label: "Mineral", value: "#2F5F66", class: "bg-[#2F5F66]" },
- { label: "Mineral suave", value: "#E6F0F1", class: "bg-[#E6F0F1]" },
- { label: "Tinta", value: "#171417", class: "bg-[#171417]" },
- { label: "Neutro", value: "#6F6870", class: "bg-[#6F6870]" },
+ { label: "Cereza", value: "#D93A3E", class: "bg-[#D93A3E]" },
+ { label: "Cereza fuerte", value: "#A32629", class: "bg-[#A32629]" },
+ { label: "Tinta", value: "#292929", class: "bg-[#292929]" },
+ { label: "Pizarra", value: "#3A3A3A", class: "bg-[#3A3A3A]" },
+ { label: "Neutro", value: "#5F5F5F", class: "bg-[#5F5F5F]" },
 ];
 
 const highlightPresetColors = [
  { label: "Sin resaltado", value: "default", class: "" },
- { label: "Raspberry", value: "#B82D52", class: "bg-[#B82D52]" },
- { label: "Raspberry suave", value: "#F7E4EA", class: "bg-[#F7E4EA]" },
- { label: "Mineral", value: "#2F5F66", class: "bg-[#2F5F66]" },
- { label: "Mineral suave", value: "#E6F0F1", class: "bg-[#E6F0F1]" },
- { label: "Superficie", value: "#F4F1EF", class: "bg-[#F4F1EF]" },
+ { label: "Cereza", value: "#D93A3E", class: "bg-[#D93A3E]" },
+ { label: "Cereza suave", value: "#F5C9CA", class: "bg-[#F5C9CA]" },
+ { label: "Pizarra", value: "#3A3A3A", class: "bg-[#3A3A3A]" },
+ { label: "Neblina", value: "#D8E1E8", class: "bg-[#D8E1E8]" },
+ { label: "Superficie", value: "#F1F5F7", class: "bg-[#F1F5F7]" },
  { label: "Blanco", value: "#FFFFFF", class: "bg-[#FFFFFF]" },
 ];
 
@@ -48,7 +47,7 @@ export function ColorPicker({
  const isHighlight = kind === "highlight";
  const Icon = isHighlight ? Highlighter : Palette;
  const presetColors = isHighlight ? highlightPresetColors : textPresetColors;
- const fallbackColor = isHighlight ? "#F7E4EA" : "#2F5F66";
+ const fallbackColor = isHighlight ? "#F5C9CA" : "#D93A3E";
  const currentSwatchStyle =
  value && value !== "default" ? { backgroundColor: value } : undefined;
 

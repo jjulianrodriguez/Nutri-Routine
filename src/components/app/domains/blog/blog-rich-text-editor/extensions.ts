@@ -160,16 +160,16 @@ export const BlogTextColorExtension = Mark.create({
  return styleColor;
  }
  if (el.classList.contains("blog-color-teal")) {
- return "#2F5F66";
+ return "#3A3A3A";
  }
  if (el.classList.contains("blog-color-accent")) {
- return "#B82D52";
+ return "#D93A3E";
  }
  if (el.classList.contains("blog-color-charcoal")) {
- return "#171417";
+ return "#292929";
  }
  if (el.classList.contains("blog-color-warm")) {
- return "#6F6870";
+ return "#5F5F5F";
  }
  return null;
  },

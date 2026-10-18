@@ -69,7 +69,7 @@ export function GroupedRoutineExercises({
  {groups.map((group) => (
  <section key={group.label} className={groupClassName}>
  <div className="flex min-w-0 items-center gap-3">
- <p className="max-w-full rounded-full border-primary/25 bg-primary-soft/45 px-3 py-1 text-[0.7rem] font-extrabold uppercase tracking-[0.14em] text-foreground">
+ <p className="max-w-full rounded-full border-primary/25 bg-primary-tint/45 px-3 py-1 text-[0.7rem] font-extrabold uppercase tracking-[0.14em] text-foreground">
  {group.label}
  </p>
  <span className="hidden h-px min-w-8 flex-1 bg-border sm:block" />

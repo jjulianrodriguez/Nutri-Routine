@@ -125,7 +125,7 @@ export default async function HistoricalRoutineDetailPage({
  </Link>
  </Button>
 
- <div className="flex items-start gap-3 rounded-[22px] border-primary/30 bg-primary-soft/55 p-4">
+ <div className="flex items-start gap-3 rounded-[22px] border-primary/30 bg-primary-tint/55 p-4">
  <History
  className="mt-0.5 size-5 shrink-0 text-muted-foreground"
  aria-hidden="true"

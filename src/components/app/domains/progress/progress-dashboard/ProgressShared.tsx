@@ -20,8 +20,8 @@ export function ProgressStatusPill({
  className={cn(
  "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-extrabold",
  tone === "good" && "bg-primary-soft text-foreground",
- tone === "neutral" && "bg-muted/10 text-muted",
- tone === "warn" && "bg-warning-soft text-warning",
+ tone === "neutral" && "bg-muted-surface/10 text-muted",
+ tone === "warn" && "bg-warning-soft text-text-secondary",
  )}
  >
  {children}

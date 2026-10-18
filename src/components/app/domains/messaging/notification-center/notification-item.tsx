@@ -40,7 +40,7 @@ export function NotificationItem({
  const destinationLabel = getDestinationLabel(notification);
 
  return (
-  <article className={cn("flex min-w-0 flex-col gap-3 overflow-hidden rounded-[24px] p-4 transition-colors sm:flex-row sm:items-center", isUnread ? "border-primary/35 bg-primary-soft/65" : " bg-surface")}>
+  <article className={cn("flex min-w-0 flex-col gap-3 overflow-hidden rounded-[24px] p-4 transition-colors sm:flex-row sm:items-center", isUnread ? "border-primary/35 bg-primary-tint/65" : " bg-surface")}>
    <button type="button" className="flex min-w-0 flex-1 items-start gap-4 rounded-control text-left focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25 disabled:cursor-wait" onClick={() => onOpen(notification)} disabled={isPending} aria-label={`${presentation.label}: ${displayMessage}. ${destinationLabel}`}>
     <span className={cn("grid size-11 shrink-0 place-items-center rounded-full ", isUnread ? "border-primary/30 bg-primary text-primary-foreground" : " bg-background text-muted-foreground")}>
      {isProcessing ? <LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> : <Icon className="size-5" aria-hidden="true" />}

@@ -181,7 +181,7 @@ function ServiceCard({
  className={cn(
  "h-fit self-start rounded-[22px] p-4 sm:p-5",
  active
- ? "border-primary/35 bg-primary-soft/60"
+ ? "border-primary/35 bg-primary-tint/60"
  : " bg-background",
  )}
  >

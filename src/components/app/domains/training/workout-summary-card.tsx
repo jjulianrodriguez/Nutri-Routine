@@ -278,7 +278,7 @@ export function WorkoutSummaryCard({
  {onToggle ? (
  <button
  type="button"
- className="flex w-full items-start justify-between gap-4 p-5 text-left outline-none transition hover:bg-primary-soft/35 focus-visible:ring-3 focus-visible:ring-ring/35 sm:p-6"
+ className="flex w-full items-start justify-between gap-4 p-5 text-left outline-none transition hover:bg-primary-tint/35 focus-visible:ring-3 focus-visible:ring-ring/35 sm:p-6"
  aria-expanded={expanded}
  onClick={onToggle}
  >

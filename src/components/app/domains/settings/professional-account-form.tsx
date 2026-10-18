@@ -164,7 +164,7 @@ export function ProfessionalAccountForm() {
  </Select>
 
  <FormField
- className="rounded-[20px] border-primary/25 bg-primary-soft p-4"
+ className="rounded-[20px] border-primary/25 bg-primary-tint p-4"
  controlId="adminAccessCode"
  error={errors.adminAccessCode?.message}
  errorId="professional-admin-code-error"

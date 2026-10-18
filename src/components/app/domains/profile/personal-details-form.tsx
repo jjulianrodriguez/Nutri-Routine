@@ -159,7 +159,7 @@ export function PersonalDetailsForm({
 
  return (
  <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
- <div className="rounded-[20px] border-primary/25 bg-primary-soft/60 p-4">
+ <div className="rounded-[20px] border-primary/25 bg-primary-tint/60 p-4">
  <div className="flex items-start gap-3">
  <LockKeyhole
  className="mt-0.5 size-5 shrink-0 text-muted-foreground"

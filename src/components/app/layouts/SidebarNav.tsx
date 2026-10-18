@@ -98,15 +98,15 @@ function SidebarLink({
  style={isActive ? undefined : inactiveLinkStyle}
  className={cn(
  "relative flex h-11 min-w-0 items-center gap-3 rounded-control px-3 text-sm font-semibold transition-[background-color,color,box-shadow] duration-200 ease-[var(--ease-premium)]",
- "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
+ "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--sidebar-ring)]",
  collapsed && "mx-auto size-11 w-11 justify-center gap-0 px-0",
  !collapsed && hasSubItems && "flex-1",
  isActive
  ? cn(
- "font-extrabold text-white shadow-none before:absolute before:bottom-1 before:top-1 before:w-1 before:rounded-r-full before:bg-white",
+ "font-extrabold text-[var(--sidebar-foreground)] shadow-none before:absolute before:bottom-1 before:top-1 before:w-1 before:rounded-r-full before:bg-[var(--sidebar-accent-foreground)]",
  collapsed ? "before:-left-3" : "before:-left-4",
  )
- : "text-[var(--sidebar-link-muted)] hover:bg-white/[0.055] hover:text-[var(--sidebar-link-muted-hover)]",
+ : "text-[var(--sidebar-link-muted)] hover:bg-[var(--sidebar-accent-foreground)]/[0.055] hover:text-[var(--sidebar-link-muted-hover)]",
  )}
  aria-current={isActive ? "page" : undefined}
  aria-label={collapsed ? label : undefined}
@@ -116,7 +116,7 @@ function SidebarLink({
  {unreadCount > 0 ? (
  <span
  className={cn(
- "ml-auto grid min-w-5 place-items-center rounded-full bg-white px-1.5 py-0.5 text-[0.65rem] font-extrabold leading-none text-primary-hover",
+ "ml-auto grid min-w-5 place-items-center rounded-full bg-[var(--sidebar-accent-foreground)] px-1.5 py-0.5 text-[0.65rem] font-extrabold leading-none text-[var(--sidebar-on-solid)]",
  collapsed &&
  "absolute -right-1 -top-1 ml-0 min-w-4 border-2 border-sidebar px-1",
  )}
@@ -189,7 +189,7 @@ export function SidebarNav({
  {sections.map((section) => (
  <div key={section.label} className="min-w-0 space-y-2">
  {!collapsed ? (
- <p className="px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-white/45">
+ <p className="px-3 text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-[var(--sidebar-link-muted-subtle)]">
  {section.label}
  </p>
  ) : null}
@@ -241,8 +241,8 @@ export function SidebarNav({
  type="button"
  className={cn(
  "grid size-11 shrink-0 place-items-center rounded-control text-[var(--sidebar-link-muted-control)] transition-[background-color,color] duration-200 ease-[var(--ease-premium)]",
- "hover:bg-white/[0.055] hover:text-[var(--sidebar-link-muted-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
- isExpanded && "text-white",
+ "hover:bg-[var(--sidebar-accent-foreground)]/[0.055] hover:text-[var(--sidebar-link-muted-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--sidebar-ring)]",
+ isExpanded && "text-[var(--sidebar-foreground)]",
  )}
  aria-controls={subNavId}
  aria-expanded={isExpanded}
@@ -262,7 +262,7 @@ export function SidebarNav({
  {!collapsed && hasSubItems && isExpanded ? (
  <div
  id={subNavId}
- className="ml-5 mt-1 space-y-1 border-l border-white/16 pl-3"
+ className="ml-5 mt-1 space-y-1 border-l border-[var(--sidebar-border-strong)] pl-3"
  >
  {item.subItems?.map((subItem) => {
  const isSubItemActive = subItem.href === currentHref;
@@ -283,9 +283,9 @@ export function SidebarNav({
  }
  className={cn(
  "block rounded-[12px] px-3 py-1.5 text-xs font-bold text-[var(--sidebar-link-muted-subtle)] transition-[background-color,color] duration-200 ease-[var(--ease-premium)]",
- "hover:bg-white/[0.055] hover:text-[var(--sidebar-link-muted-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/30",
+ "hover:bg-[var(--sidebar-accent-foreground)]/[0.055] hover:text-[var(--sidebar-link-muted-hover)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--sidebar-ring)]",
  isSubItemActive &&
- "font-extrabold text-white",
+ "font-extrabold text-[var(--sidebar-foreground)]",
  !isSubItemActive &&
  isActive &&
  "text-[var(--sidebar-link-muted-nested-active)]",

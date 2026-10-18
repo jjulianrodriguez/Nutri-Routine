@@ -26,8 +26,8 @@ const badgeToneClasses: Record<RelationshipBadgeTone, string> = {
  muted: " bg-background text-muted",
  neutral: "border-secondary-accent bg-secondary-accent-soft text-foreground",
  primary: "border-primary bg-primary text-primary-foreground",
- success: "border-success bg-success text-foreground",
- warning: "border-warning bg-warning text-foreground",
+ success: "border-success bg-success text-success-foreground",
+ warning: "border-warning bg-warning text-warning-foreground",
 };
 
 export function RelationshipBadge({

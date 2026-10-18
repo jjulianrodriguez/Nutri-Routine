@@ -16,7 +16,7 @@ import type { RoutineEditorViewModel } from "./hooks/use-routine-editor";
 
 function RoutineBuilderStat({ detail, label, tone = "neutral", value }: { detail: string; label: string; tone?: "neutral" | "ready" | "warning"; value: string }) {
  return (
-  <div className={cn("rounded-[18px] p-4", tone === "neutral" && " bg-background", tone === "ready" && "border-primary/40 bg-primary-soft/45", tone === "warning" && "border-danger/25 bg-danger/5")}>
+  <div className={cn("rounded-[18px] p-4", tone === "neutral" && " bg-background", tone === "ready" && "border-primary/40 bg-primary-tint/45", tone === "warning" && "border-danger/25 bg-danger/5")}>
    <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted">{label}</p><p className="mt-2 text-3xl font-black text-foreground">{value}</p><p className="mt-1 text-sm font-semibold text-muted-foreground">{detail}</p>
   </div>
  );
@@ -42,7 +42,7 @@ export function RoutineExerciseBuilder({ editor }: { editor: RoutineEditorViewMo
     <RoutineBuilderStat label="Pendientes" value={String(editor.pendingExerciseCount)} detail="Revisa antes de guardar" tone={editor.pendingExerciseCount > 0 ? "warning" : "ready"} />
    </div> : null}
 
-   {editor.pendingExerciseCount > 0 ? <Alert className="mt-4 rounded-[18px] border-primary/40 bg-primary-soft/45 px-4 py-3 text-foreground"><TriangleAlert className="size-5 text-muted-foreground" aria-hidden="true" /><AlertDescription className="font-semibold leading-6 text-foreground">Hay {editor.pendingExerciseCount} {editor.pendingExerciseCount === 1 ? "ejercicio pendiente" : "ejercicios pendientes"} de series, repeticiones o descanso. No pierdes lo avanzado, pero este resumen te ayuda a cerrar la configuración antes de usarlo.</AlertDescription></Alert> : null}
+   {editor.pendingExerciseCount > 0 ? <Alert className="mt-4 rounded-[18px] border-primary/40 bg-primary-tint/45 px-4 py-3 text-foreground"><TriangleAlert className="size-5 text-muted-foreground" aria-hidden="true" /><AlertDescription className="font-semibold leading-6 text-foreground">Hay {editor.pendingExerciseCount} {editor.pendingExerciseCount === 1 ? "ejercicio pendiente" : "ejercicios pendientes"} de series, repeticiones o descanso. No pierdes lo avanzado, pero este resumen te ayuda a cerrar la configuración antes de usarlo.</AlertDescription></Alert> : null}
 
    <div className="mt-5 space-y-4">
     {fields.length > 0 ? fields.map((field, index) => {

@@ -70,7 +70,7 @@ export default async function AdminBlogListPage() {
  value={String(hiddenPosts)}
  detail="Fuera del blog público"
  />
- <div className="h-fit self-start rounded-[24px] border-primary/30 bg-primary-soft p-4 sm:p-5 ">
+ <div className="h-fit self-start rounded-[24px] border-primary/30 bg-primary-tint p-4 sm:p-5 ">
  <div className="flex items-center gap-2 text-sm font-bold text-muted">
  {pinnedPost ? (
  <Pin className="size-4" aria-hidden="true" />

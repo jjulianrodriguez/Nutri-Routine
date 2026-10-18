@@ -20,7 +20,7 @@ export default function ClientesLoading() {
  <StatTileSkeleton />
  </section>
 
- <section className="h-fit self-start rounded-card bg-primary-soft p-5 sm:p-6">
+ <section className="h-fit self-start rounded-card bg-primary-tint p-5 sm:p-6">
  <Skeleton className="h-8 w-52" />
  <Skeleton className="mt-2 h-3.5 w-full max-w-xl" />
  <div className="mt-5">

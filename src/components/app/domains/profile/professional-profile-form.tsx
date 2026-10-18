@@ -75,7 +75,7 @@ export function ProfessionalProfileForm({
 
  return (
  <form className="space-y-7" onSubmit={handleSubmit(onSubmit)} noValidate>
- <div className="rounded-[20px] border-primary/25 bg-primary-soft/60 p-4 text-sm leading-6 text-muted">
+ <div className="rounded-[20px] border-primary/25 bg-primary-tint/60 p-4 text-sm leading-6 text-muted">
  <p className="font-extrabold text-foreground">Visibilidad del perfil</p>
  <p className="mt-1">
  Esta informacion ayuda a tus clientes asignados y al equipo admin a

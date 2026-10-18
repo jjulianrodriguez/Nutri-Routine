@@ -247,7 +247,7 @@ export function UserSettingsForm({
  description="Controla que pueden ver tus profesionales asignados antes de atenderte."
  >
  <div className="space-y-3">
- <div className="rounded-[20px] border-primary/25 bg-primary-soft/60 p-4 text-sm leading-6 text-muted">
+ <div className="rounded-[20px] border-primary/25 bg-primary-tint/60 p-4 text-sm leading-6 text-muted">
  <p className="font-extrabold text-foreground">
  Que significa compartir estos datos
  </p>

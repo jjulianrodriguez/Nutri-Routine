@@ -33,7 +33,7 @@ export function HabitAssignmentManager({
 
  if (clients.length === 0) {
  return (
- <Alert className="rounded-[18px] border-primary/25 bg-primary-soft">
+ <Alert className="rounded-[18px] border-primary/25 bg-primary-tint">
  <AlertDescription className="font-semibold text-foreground">
  No hay clientas de nutrición disponibles para gestionar hábitos.
  Revisa las asignaciones activas antes de crear un seguimiento.

@@ -55,8 +55,8 @@ export function AppPanel({
  className={cn(
  "h-fit self-start rounded-card p-5 sm:p-6",
  tone === "surface" && "bg-surface",
- tone === "accent" && "bg-secondary-soft",
- tone === "primary" && "bg-primary-soft",
+ tone === "accent" && "bg-secondary-tint",
+ tone === "primary" && "bg-primary-tint",
  tone === "warm" && "bg-surface-muted",
  )}
  >

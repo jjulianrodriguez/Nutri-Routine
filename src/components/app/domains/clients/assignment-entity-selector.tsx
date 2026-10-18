@@ -154,7 +154,7 @@ export function ClientSearchCard({
  className={cn(
  "overflow-hidden rounded-[20px] bg-surface transition",
  selected
- ? "border-primary bg-primary-soft/25 shadow-glow"
+ ? "border-primary bg-primary-tint/25 shadow-glow"
  : " hover:border-primary/45 hover:shadow-soft",
  )}
  >
@@ -213,7 +213,9 @@ export function ClientSearchCard({
  className={cn(
  "min-h-11 w-full",
  selected &&
- "border-danger/35 bg-danger/10 text-danger hover:bg-danger/20 hover:text-danger",
+ // /15 instead of /20: in dark mode `--danger` over its own 20% tint only
+ // reached 4.41:1, while /15 keeps it at 4.84:1 and still reads as a hover.
+ "border-danger/35 bg-danger/10 text-danger hover:bg-danger/15 hover:text-danger",
  )}
  onClick={() => onSelect(client.id)}
  aria-pressed={selected}
@@ -242,7 +244,7 @@ export function RoutineSearchCard({
  className={cn(
  "overflow-hidden rounded-[20px] bg-surface transition",
  selected
- ? "border-primary bg-primary-soft/25 shadow-glow"
+ ? "border-primary bg-primary-tint/25 shadow-glow"
  : " hover:border-primary/45 hover:shadow-soft",
  )}
  >
@@ -287,7 +289,9 @@ export function RoutineSearchCard({
  className={cn(
  "min-h-11 w-full",
  selected &&
- "border-danger/35 bg-danger/10 text-danger hover:bg-danger/20 hover:text-danger",
+ // /15 instead of /20: in dark mode `--danger` over its own 20% tint only
+ // reached 4.41:1, while /15 keeps it at 4.84:1 and still reads as a hover.
+ "border-danger/35 bg-danger/10 text-danger hover:bg-danger/15 hover:text-danger",
  )}
  onClick={() => onSelect(routine.id)}
  aria-pressed={selected}
@@ -319,7 +323,7 @@ export function WorkoutTemplateSearchCard({
  className={cn(
  "overflow-hidden rounded-[20px] bg-surface transition",
  selected
- ? "border-primary bg-primary-soft/25 shadow-glow"
+ ? "border-primary bg-primary-tint/25 shadow-glow"
  : " hover:border-primary/45 hover:shadow-soft",
  )}
  >
@@ -368,7 +372,9 @@ export function WorkoutTemplateSearchCard({
  className={cn(
  "min-h-11 w-full",
  selected &&
- "border-danger/35 bg-danger/10 text-danger hover:bg-danger/20 hover:text-danger",
+ // /15 instead of /20: in dark mode `--danger` over its own 20% tint only
+ // reached 4.41:1, while /15 keeps it at 4.84:1 and still reads as a hover.
+ "border-danger/35 bg-danger/10 text-danger hover:bg-danger/15 hover:text-danger",
  )}
  onClick={() => onSelect(template.id)}
  aria-pressed={selected}
@@ -400,7 +406,7 @@ export function ExerciseSearchCard({
  className={cn(
  "min-w-0 overflow-hidden rounded-[20px] bg-surface transition",
  selected
- ? "border-primary bg-primary-soft/25 shadow-glow"
+ ? "border-primary bg-primary-tint/25 shadow-glow"
  : " hover:border-primary/45 hover:shadow-soft",
  !exercise.isActive && "border-danger/25",
  )}
@@ -463,7 +469,9 @@ export function ExerciseSearchCard({
  className={cn(
  "min-h-11 w-full",
  selected &&
- "border-danger/35 bg-danger/10 text-danger hover:bg-danger/20 hover:text-danger",
+ // /15 instead of /20: in dark mode `--danger` over its own 20% tint only
+ // reached 4.41:1, while /15 keeps it at 4.84:1 and still reads as a hover.
+ "border-danger/35 bg-danger/10 text-danger hover:bg-danger/15 hover:text-danger",
  )}
  onClick={() => onSelect(exercise.id)}
  aria-pressed={selected}

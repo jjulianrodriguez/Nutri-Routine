@@ -40,7 +40,7 @@ export function EventDetailCard({
  timeFormat,
 }: EventDetailCardProps) {
  return (
- <section className="rounded-[28px] bg-primary-soft/68 p-5 sm:p-6">
+ <section className="rounded-[28px] bg-primary-tint/68 p-5 sm:p-6">
  <div className="flex items-center gap-3">
  <div className="grid size-11 place-items-center rounded-full bg-surface text-muted-foreground ">
  <CalendarClock className="size-5" aria-hidden="true" />

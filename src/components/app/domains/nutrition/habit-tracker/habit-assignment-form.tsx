@@ -128,7 +128,7 @@ export function HabitAssignmentForm({
  className={cn(
  "flex size-6 shrink-0 items-center justify-center rounded-full border transition-[background-color,border-color,box-shadow,color,transform] duration-200",
  selected
- ? "border-primary-foreground/30 bg-primary-foreground/15 text-primary-foreground"
+ ? "border-primary-foreground/30 bg-primary-foreground/15 text-primary"
  : "border-border bg-surface text-transparent group-hover:border-primary/30",
  )}
  >

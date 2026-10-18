@@ -24,7 +24,7 @@ const AREA_DETAILS: Record<
  },
  nutrition: {
  icon: Leaf,
- tone: "border-accent/40 bg-secondary-soft/70 text-foreground",
+ tone: "border-accent/40 bg-secondary-tint/70 text-foreground",
  },
  training: {
  icon: Dumbbell,

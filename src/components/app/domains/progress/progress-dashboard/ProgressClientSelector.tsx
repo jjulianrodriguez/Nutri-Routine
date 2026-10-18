@@ -44,7 +44,7 @@ export function ProgressClientSelector({
  </Button>
  </form>
  {invalidClientSelection ? (
- <p className="mt-3 text-sm font-semibold text-warning">
+ <p className="mt-3 text-sm font-semibold text-text-secondary">
  Ese cliente no esta disponible para tu cuenta.
  </p>
  ) : null}

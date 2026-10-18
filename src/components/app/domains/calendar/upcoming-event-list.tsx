@@ -44,7 +44,7 @@ export function UpcomingEventList({
  <>
  <button
  type="button"
- className="mt-5 w-full rounded-[22px] border-primary/25 bg-primary-soft/70 p-4 text-left transition hover:border-primary/45 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
+ className="mt-5 w-full rounded-[22px] border-primary/25 bg-primary-tint/70 p-4 text-left transition hover:border-primary/45 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/25"
  onClick={() => onOpen(nextEvent)}
  >
  <span className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] text-muted-foreground">

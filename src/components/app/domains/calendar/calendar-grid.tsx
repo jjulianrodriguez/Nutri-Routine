@@ -81,7 +81,7 @@ export function CalendarGrid({
  "min-h-16 rounded-[16px] bg-background p-1 text-left sm:min-h-28 sm:p-2",
  day.inMonth ? "" : "border-border/60 opacity-55",
  isSelected && "border-primary/60 ring-3 ring-primary/20",
- dayEvents.length > 0 && "bg-primary-soft/32",
+ dayEvents.length > 0 && "bg-primary-tint/32",
  )}
  >
  <button

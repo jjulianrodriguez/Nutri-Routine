@@ -32,7 +32,7 @@ export default function ClientProfileLoading() {
  <AppPanelSkeleton items={1} />
  </section>
 
- <section className="rounded-card bg-primary-soft p-5 sm:p-6">
+ <section className="rounded-card bg-primary-tint p-5 sm:p-6">
  <Skeleton className="h-8 w-48" />
  <Skeleton className="mt-2 h-3.5 w-full max-w-xl" />
  <div className="mt-5">
@@ -58,7 +58,7 @@ export default function ClientProfileLoading() {
  <AppPanelSkeleton items={3} />
  </div>
 
- <section className="rounded-card bg-primary-soft p-5 sm:p-6">
+ <section className="rounded-card bg-primary-tint p-5 sm:p-6">
  <div className="flex flex-wrap items-start justify-between gap-4">
  <div>
  <Skeleton className="h-8 w-56" />

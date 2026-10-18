@@ -133,7 +133,7 @@ export default async function RoutineAssignmentsPage({
  />
 
  {warning ? (
- <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">
+ <Alert className="rounded-[22px] border-primary/30 bg-primary-tint/50 px-5 py-4">
  <AlertDescription className="font-semibold text-muted-foreground">
  {warning}
  </AlertDescription>
@@ -247,7 +247,7 @@ export default async function RoutineAssignmentsPage({
  assignment?.state === "active" &&
  "bg-primary text-primary-foreground",
  assignment?.state === "upcoming" &&
- "bg-secondary-soft text-secondary",
+ "bg-secondary-soft text-text-secondary",
  assignment?.state === "expired" &&
  "bg-danger/10 text-danger",
  )}

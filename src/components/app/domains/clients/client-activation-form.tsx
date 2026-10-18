@@ -100,7 +100,7 @@ function PlanToggle({
  "flex min-h-14 w-full items-center justify-between gap-3 rounded-[18px] px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-55",
  active
  ? "border-primary/40 bg-primary-soft text-foreground"
- : " bg-surface text-muted-foreground hover:border-primary/30 hover:bg-primary-soft/60",
+ : " bg-surface text-muted-foreground hover:border-primary/30 hover:bg-primary-tint/60",
  )}
  >
  <span className="flex items-center gap-3">
@@ -167,8 +167,8 @@ function ProfessionalAreaAction({
  "rounded-[18px] p-4",
  active
  ? assignedToCurrentUser
- ? "border-primary/35 bg-primary-soft/60"
- : "border-secondary/25 bg-secondary-soft/50"
+ ? "border-primary/35 bg-primary-tint/60"
+ : "border-secondary/25 bg-secondary-tint/50"
  : " bg-surface",
  )}
  >
@@ -557,7 +557,7 @@ export function ClientActivationForm({
  ) : null}
  </div>
  ) : (
- <Alert className="rounded-[18px] border-primary/25 bg-primary-soft px-4 py-3">
+ <Alert className="rounded-[18px] border-primary/25 bg-primary-tint px-4 py-3">
  <AlertDescription className="font-semibold text-foreground">
  Sin planes activos, el usuario solo podrá entrar a configuración.
  </AlertDescription>

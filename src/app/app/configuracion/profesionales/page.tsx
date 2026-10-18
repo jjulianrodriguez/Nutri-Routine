@@ -54,7 +54,7 @@ export default async function ProfessionalAccountsPage() {
  </FadeIn>
 
  <FadeIn delay={0.04}>
- <div className="rounded-[22px] border-primary/25 bg-primary-soft p-4">
+ <div className="rounded-[22px] border-primary/25 bg-primary-tint p-4">
  <div className="flex items-center gap-3">
  <div className="grid size-10 place-items-center rounded-full bg-primary text-primary-foreground">
  <ShieldCheck className="size-4" aria-hidden="true" />

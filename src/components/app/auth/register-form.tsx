@@ -106,7 +106,7 @@ export function RegisterForm() {
  </FormField>
 
  <FormField
- className="rounded-card bg-primary-soft/45 p-4"
+ className="rounded-card bg-primary-tint/45 p-4"
  controlId="accessCode"
  error={errors.accessCode?.message}
  errorId="register-access-code-error"

@@ -60,7 +60,7 @@ export function HabitTracker({
  )}
 
  {!isClient && showAssignments && (
- <section className="h-fit self-start rounded-[28px] border-primary/30 bg-primary-soft/70 p-5 backdrop-blur-lg sm:p-6">
+ <section className="h-fit self-start rounded-[28px] border-primary/30 bg-primary-tint/70 p-5 backdrop-blur-lg sm:p-6">
  <h2 className="text-2xl font-bold leading-tight text-foreground">
  Asignaciones
  </h2>

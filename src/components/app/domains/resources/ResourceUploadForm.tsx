@@ -258,7 +258,7 @@ export function ResourcePdfEditForm({
  }
 
  return (
- <section className="rounded-[28px] border-primary/25 bg-primary-soft/65 p-5 sm:p-6">
+ <section className="rounded-[28px] border-primary/25 bg-primary-tint/65 p-5 sm:p-6">
  <div className="flex flex-wrap items-start justify-between gap-3">
  <div>
  <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">

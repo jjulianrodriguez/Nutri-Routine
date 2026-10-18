@@ -54,7 +54,7 @@ export default async function WorkoutTemplateDetailPage({
  />
 
  {warning ? (
- <Alert className="rounded-[22px] border-primary/30 bg-primary-soft/50 px-5 py-4">
+ <Alert className="rounded-[22px] border-primary/30 bg-primary-tint/50 px-5 py-4">
  <AlertDescription className="font-semibold text-muted-foreground">
  {warning}
  </AlertDescription>

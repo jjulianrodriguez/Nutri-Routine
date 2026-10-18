@@ -20,7 +20,7 @@ export function CurrentMealPlanCard({
  professionalName?: string | null;
 }) {
  return (
-  <section className="h-fit self-start rounded-[28px] border-primary/30 bg-primary-soft/70 p-5 sm:p-6">
+  <section className="h-fit self-start rounded-[28px] border-primary/30 bg-primary-tint/70 p-5 sm:p-6">
    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div className="flex min-w-0 items-start gap-3">
      <div className="grid size-11 shrink-0 place-items-center rounded-[16px] bg-surface text-muted-foreground"><FileText className="size-5" aria-hidden="true" /></div>
@@ -80,7 +80,7 @@ export function NutritionDocumentCard({
     {document.clientName ? <div><dt className="text-muted">Clienta asignada</dt><dd className="mt-1 break-words">{document.clientName}</dd></div> : null}
     <div><dt className="text-muted">Subido</dt><dd className="mt-1 tabular-nums">{formatNutritionDocumentDate(document.createdAt)}</dd></div>
     <div><dt className="text-muted">Archivo</dt><dd className="mt-1 break-words">{document.fileName} · {formatNutritionFileSize(document.fileSize)}</dd></div>
-    {canManage ? <div><dt className="text-muted">Estado</dt><dd className="mt-1.5"><span className={cn("rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider", isInactive ? "bg-muted/15 text-muted" : "bg-primary-soft text-foreground")}>{isInactive ? "Inactivo" : "Activo"}</span></dd></div> : null}
+    {canManage ? <div><dt className="text-muted">Estado</dt><dd className="mt-1.5"><span className={cn("rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider", isInactive ? "bg-muted-surface/15 text-muted" : "bg-primary-soft text-foreground")}>{isInactive ? "Inactivo" : "Activo"}</span></dd></div> : null}
    </dl>
    <div className="mt-5"><PdfOpenButton documentId={document.id} /></div>
   </article>

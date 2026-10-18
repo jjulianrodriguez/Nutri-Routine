@@ -59,7 +59,7 @@ export function FolderCard({
  isInactive && "opacity-70",
  )}
  >
- <div className="absolute left-5 top-0 h-3 w-24 -translate-y-px rounded-t-[14px] border-b-0 bg-secondary-soft" />
+ <div className="absolute left-5 top-0 h-3 w-24 -translate-y-px rounded-t-[14px] border-b-0 bg-secondary-tint" />
  <div className="flex items-start justify-between gap-3">
  <div className="min-w-0 flex flex-1 items-start gap-3">
  <div className="grid size-12 shrink-0 place-items-center rounded-[16px] bg-secondary-soft text-muted-foreground">
@@ -79,7 +79,7 @@ export function FolderCard({
  className={cn(
  "rounded-full px-2.5 py-1 text-xs font-extrabold",
  isInactive
- ? "bg-muted/15 text-muted"
+ ? "bg-muted-surface/15 text-muted"
  : "bg-primary-soft text-foreground",
  )}
  >

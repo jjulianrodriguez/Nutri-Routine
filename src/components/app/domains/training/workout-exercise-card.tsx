@@ -62,7 +62,7 @@ export function WorkoutExerciseCard({
  className={cn(
  "rounded-[22px] p-4 transition sm:p-5",
  completed
- ? "bg-primary-soft/40"
+ ? "bg-primary-tint/40"
  : "bg-background",
  )}
  >

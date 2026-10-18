@@ -150,7 +150,7 @@ export function DeltaBadge({
  <span
  className={cn(
  "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold",
- delta <= 0 ? "bg-primary-soft text-foreground" : "bg-warning-soft text-warning",
+ delta <= 0 ? "bg-primary-soft text-foreground" : "bg-warning-soft text-text-secondary",
  )}
  >
  <Icon className="size-3.5" aria-hidden="true" />

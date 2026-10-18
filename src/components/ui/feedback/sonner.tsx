@@ -27,7 +27,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
  ),
  info: <InfoIcon className="size-4 text-primary" aria-hidden="true" />,
  warning: (
- <TriangleAlertIcon className="size-4 text-warning" aria-hidden="true" />
+ <TriangleAlertIcon className="size-4 text-text-secondary" aria-hidden="true" />
  ),
  error: (
  <OctagonXIcon className="size-4 text-danger" aria-hidden="true" />
