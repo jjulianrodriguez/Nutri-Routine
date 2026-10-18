@@ -1,0 +1,11 @@
+allowBuilds:
+  unrs-resolver: true
+
+audit:
+  ignorePrune: true
+  # `braces` (GHSA-vfj7-8cjw-p6xm) is pulled only through the dev-only chain
+  # eslint-config-next > @next/eslint-plugin-next > fast-glob > micromatch > braces.
+  # 3.0.3 is the latest published version and there is no patched release, so the
+  # advisory is tolerated until upstream fast-glob/micromatch removes the dependency.
+  ignore:
+    - GHSA-vfj7-8cjw-p6xm

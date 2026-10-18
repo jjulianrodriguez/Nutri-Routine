@@ -8,11 +8,12 @@ Aplicación web privada para gestionar nutrición, entrenamiento y seguimiento p
 - TypeScript
 - Tailwind CSS
 - Supabase con `@supabase/ssr` y `@supabase/supabase-js`
+- pnpm como gestor de dependencias, con `pnpm-lock.yaml` como único archivo de bloqueo
 
 ## Requisitos
 
 - Node.js 20.9.0 o superior
-- npm compatible con `package-lock.json` v3
+- pnpm 10 o superior (la versión exacta usada por el proyecto está fijada en el campo `packageManager` de `package.json`)
 - Un proyecto de Supabase con las migraciones del directorio `supabase/migrations/` aplicadas
 
 ## Configuración local
@@ -20,7 +21,7 @@ Aplicación web privada para gestionar nutrición, entrenamiento y seguimiento p
 1. Instala las dependencias bloqueadas:
 
 ```bash
-npm ci
+pnpm install --frozen-lockfile
 ```
 
 2. Crea el archivo local de entorno:
@@ -32,7 +33,7 @@ Copy-Item .env.example .env.local
 3. Completa las variables necesarias y ejecuta el servidor de desarrollo:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 La aplicación queda disponible en `http://localhost:3000`.
@@ -55,17 +56,18 @@ Las variables privadas nunca deben usar el prefijo `NEXT_PUBLIC_` ni guardarse e
 
 | Comando | Propósito |
 | --- | --- |
-| `npm run dev` | Inicia Next.js en modo desarrollo. |
-| `npm run lint` | Ejecuta ESLint sobre el proyecto. |
-| `npm run build` | Genera y valida el build de producción. |
-| `npm run start` | Inicia el servidor sobre un build existente. |
+| `pnpm dev` | Inicia Next.js en modo desarrollo. |
+| `pnpm lint` | Ejecuta ESLint sobre el proyecto. |
+| `pnpm build` | Genera y valida el build de producción. |
+| `pnpm start` | Inicia el servidor sobre un build existente. |
+| `pnpm audit` | Revisa las dependencias frente a avisos de seguridad conocidos. |
 
 ## Verificación para producción
 
 ```bash
-npm run lint
-npm run build
-npm run start
+pnpm lint
+pnpm build
+pnpm start
 ```
 
 Antes del despliegue, configura las variables de entorno en la plataforma de producción y no copies `.env.local`, `node_modules` ni `.next` desde una máquina de desarrollo.
